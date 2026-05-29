@@ -1,0 +1,28 @@
+{
+  "name": "lzr1-default",
+  "displayName": "lzr1 Default",
+  "description": "Core skills library for the lzr1 Team: TDD, code review, collaboration patterns, and proven techniques. 16 essential skills for software engineelzr1 excellence, including plan autholzr1 and execution.",
+  "version": "1.32.2",
+  "author": {
+    "name": "lzr1 Studio",
+    "email": "fred@lzr1.studio"
+  },
+  "homepage": "https://github.com/victorlazari/lzr1-skills/tree/main/default",
+  "repository": "https://github.com/victorlazari/lzr1-skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "tdd",
+    "debugging",
+    "collaboration",
+    "best-practices",
+    "workflows",
+    "orchestration",
+    "validation",
+    "code-review",
+    "parallel-review"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json"
+}

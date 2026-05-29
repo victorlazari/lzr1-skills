@@ -1,0 +1,126 @@
+---
+name: lzr1:using-tw-team
+description: |
+  Technical writing specialists for functional and API documentation. Dispatch when
+  you need to create guides, conceptual docs, or API references following established
+  documentation standards.
+---
+
+# Using lzr1 Technical Writing Specialists
+
+## When to use
+- Need to write functional documentation (guides, conceptual docs, tutorials)
+- Need to write API reference documentation
+- Need to review existing documentation quality
+- Writing or updating product documentation
+
+## Skip when
+- Writing code → use dev-team agents
+- Writing plans → use pm-team agents
+- General code review → use `lzr1:codereview` with dev-team reviewer agents
+
+## Related
+**Similar:** lzr1:using-lzr1, lzr1:using-dev-team
+
+The lzr1-tw-team plugin provides specialized agents for technical documentation. Use them via `Task tool with subagent_type:`.
+
+**Remember:** Follow the **ORCHESTRATOR principle** from `lzr1:using-lzr1`. Dispatch agents to handle documentation tasks; don't write complex documentation directly.
+
+## 3 Documentation Specialists
+
+| Agent | Specialization | Use When |
+|-------|---------------|----------|
+| `lzr1:functional-writer` | Conceptual docs, guides, tutorials, best practices, workflows | Writing product guides, tutorials, "how to" content |
+| `lzr1:api-writer` | REST API reference, endpoints, schemas, errors, field descriptions | Documenting API endpoints, request/response examples |
+| `lzr1:docs-reviewer` | Voice/tone, structure, completeness, clarity, accuracy | Reviewing drafts, pre-publication quality check |
+
+---
+
+## Documentation Standards Summary
+
+### Voice and Tone
+- **Assertive, but never arrogant** – Say what needs to be said, clearly
+- **Encouraging and empowelzr1** – Guide users through complexity
+- **Tech-savvy, but human** – Use technical terms when needed, prioritize clarity
+- **Humble and open** – Confident but always learning
+
+### Capitalization
+- **Sentence case** for all headings and titles
+- Only first letter and proper nouns capitalized
+- ✅ "Getting started with the API"
+- ❌ "Getting Started With The API"
+
+### Structure Patterns
+1. Lead with clear definition paragraph
+2. Use bullet points for key characteristics
+3. Separate sections with `---` dividers
+4. Include info boxes and warnings where needed
+5. Link to related API reference
+6. Add code examples for technical topics
+
+---
+
+## Dispatching Specialists
+
+**Parallel dispatch** for comprehensive documentation (single turn, multiple Tasks):
+
+```
+Task #1: functional-writer (write the guide)
+Task #2: api-writer (write API reference)
+(Both run in parallel)
+
+Then:
+Task #3: docs-reviewer (review both)
+```
+
+### ⛔ MUST NOT trickle-dispatch
+
+Tasks #1 and #2 leave in the SAME TURN, before reading either's output. Forbidden: dispatch #1 → read result → dispatch #2. If you find yourself about to dispatch #2 in a turn AFTER #1 has already returned → STOP, report the violation, and re-dispatch both together. Task #3 runs only after both #1 and #2 complete — that sequencing is intentional; the trickle inside the parallel pair is not.
+
+### Parallel dispatch — atomic batch
+
+Emit both Task calls in a SINGLE TURN as one atomic batch. If your runtime exposes a `multi_tool_use.parallel` wrapper, use it. The anti-trickle guard above remains binding.
+
+---
+
+## Available in This Plugin
+
+**Agents:** functional-writer, api-writer, docs-reviewer
+
+**Skills:**
+- using-tw-team: Plugin introduction
+- write-guide: Functional doc patterns
+- write-api: API reference patterns
+- documentation-structure: Hierarchy and organization
+- voice-and-tone: Voice guidelines
+- review-docs: Quality checklist
+- write-api: Also includes detailed field description patterns (merged from api-field-descriptions)
+
+**Commands:**
+- /write-guide: Start functional guide
+- /write-api: Start API documentation
+- /review-docs: Review existing docs
+
+---
+
+## Integration with Other Plugins
+
+| Plugin | Use For |
+|--------|---------|
+| lzr1:using-lzr1 (default) | ORCHESTRATOR principle |
+| lzr1:using-dev-team | Developer agents for technical accuracy |
+| lzr1:using-pm-team | Pre-dev planning before documentation |
+
+---
+
+## ORCHESTRATOR Principle
+
+- **You're the orchestrator** – Dispatch specialists, don't write directly
+- **Let specialists apply standards** – They know voice, tone, structure
+- **Combine with other plugins** – API writers + backend engineers for accuracy
+
+> ✅ "I need documentation for the new feature. Let me dispatch functional-writer."
+>
+> ❌ "I'll manually write all the documentation myself."
+
+---

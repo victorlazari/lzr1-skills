@@ -1,0 +1,29 @@
+{
+  "name": "lzr1-pm-team",
+  "displayName": "lzr1 PM Team",
+  "description": "Pre-dev planning workflows: 5-gate and 10-gate orchestrators for PRD, TRD, API design, data model, and task breakdown. 18 skills + 4 research agents.",
+  "version": "0.29.1",
+  "author": {
+    "name": "lzr1 Studio",
+    "email": "fred@lzr1.studio"
+  },
+  "homepage": "https://github.com/victorlazari/lzr1-skills/tree/main/pm-team",
+  "repository": "https://github.com/victorlazari/lzr1-skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "product",
+    "pre-dev",
+    "planning",
+    "prd",
+    "trd",
+    "api-design",
+    "data-model",
+    "workflow",
+    "feature-planning",
+    "task-breakdown"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json"
+}

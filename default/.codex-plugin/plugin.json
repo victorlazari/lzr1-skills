@@ -1,0 +1,40 @@
+{
+  "name": "lzr1-default",
+  "version": "1.32.2",
+  "description": "Core skills library for the lzr1 Team: TDD, code review, collaboration patterns, and proven techniques. Features parallel code review orchestration with 9 default reviewers plus triggered conditional specialists. 16 essential skills for software engineelzr1 excellence, including plan autholzr1 and execution.",
+  "author": {
+    "name": "lzr1 Studio",
+    "email": "fred@lzr1.studio",
+    "url": "https://github.com/lzr1-studio"
+  },
+  "homepage": "https://github.com/victorlazari/lzr1-skills/tree/main/default",
+  "repository": "https://github.com/victorlazari/lzr1-skills",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "tdd",
+    "debugging",
+    "collaboration",
+    "best-practices",
+    "workflows",
+    "orchestration",
+    "validation",
+    "code-review",
+    "parallel-review"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "interface": {
+    "displayName": "lzr1 Default",
+    "shortDescription": "Core engineelzr1 skills for the lzr1 team: TDD, code review, planning, debugging",
+    "longDescription": "Foundational skills library for lzr1's coding workflow: test-driven development, parallel code review orchestration (9 default reviewers plus triggered conditional specialists), plan autholzr1 and execution, multi-phase codebase exploration, structured commits, and isolated worktree workflows.",
+    "developerName": "lzr1 Studio",
+    "category": "Coding",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Help me plan and implement a feature using TDD.",
+      "Run a code review on the current branch."
+    ],
+    "websiteURL": "https://github.com/victorlazari/lzr1-skills"
+  }
+}
