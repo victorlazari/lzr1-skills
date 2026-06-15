@@ -1,0 +1,58 @@
+# .trivyignore.yaml - Structured Ignore File Template
+# Place this file as .trivyignore.yaml in the root of your repository.
+# Documentation: https://trivy.dev/docs/latest/configuration/filtering/
+#
+# This format provides richer metadata than the plain .trivyignore format,
+# including justification, expiration dates, and path-scoped suppression.
+
+vulnerabilities:
+  # Example: Suppress a CVE with justification and expiration
+  # - id: CVE-2023-12345
+  #   paths:
+  #     - "go.sum"
+  #     - "go.mod"
+  #   reason: "Not exploitable: vulnerable function is not called in our code path"
+  #   expires: 2025-12-31
+
+  # Example: Suppress a vulnerability globally
+  # - id: CVE-2024-67890
+  #   reason: "Mitigated by WAF rules and network segmentation"
+
+  # Example: Suppress GitHub Security Advisory
+  # - id: GHSA-xxxx-yyyy-zzzz
+  #   reason: "False positive: package version is patched via backport"
+
+misconfigurations:
+  # Example: Suppress Dockerfile check for dev images
+  # - id: AVD-DS-0002
+  #   paths:
+  #     - "Dockerfile.dev"
+  #     - "docker/Dockerfile.test"
+  #   reason: "Development-only images, not deployed to production"
+
+  # Example: Suppress Terraform check
+  # - id: AVD-AWS-0107
+  #   paths:
+  #     - "terraform/modules/dev/**"
+  #   reason: "Dev environment does not require encryption at rest"
+
+secrets:
+  # Example: Suppress false positive secret detection
+  # - id: generic-api-key
+  #   paths:
+  #     - "tests/fixtures/**"
+  #     - "docs/examples/**"
+  #   reason: "Test fixtures with dummy/example keys, not real credentials"
+
+  # Example: Suppress private key detection in test certs
+  # - id: private-key
+  #   paths:
+  #     - "tests/certs/**"
+  #   reason: "Self-signed test certificates, not used in production"
+
+licenses:
+  # Example: Suppress license findings
+  # - id: GPL-3.0
+  #   paths:
+  #     - "tools/**"
+  #   reason: "Build-time tool only, not linked into distributed binary"

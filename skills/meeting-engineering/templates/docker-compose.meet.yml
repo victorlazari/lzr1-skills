@@ -1,0 +1,91 @@
+# docker-compose.meet.yml — Template stack for the Google Meet assistant fleet.
+# Run with:  docker compose -f docker-compose.meet.yml --profile meet up -d
+version: "3.9"
+
+services:
+  meet-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.meet
+    profiles: ["meet"]
+    init: true                      # tini as PID 1 (signal forwarding, zombie reaping)
+    entrypoint: ["/app/meet-entrypoint.sh"]
+    command: ["python", "-m", "meet_worker"]
+    shm_size: "2gb"                 # Chromium crashes with default 64MB /dev/shm
+    environment:
+      DISPLAY: ":99"
+      PULSE_SERVER: "unix:/tmp/pulse-socket"
+      MEET_AUTH_STATE: "/app/workspace/config/meet-auth-state.json"
+      MEET_BOT_NAME: "Assistant"
+      MEET_ADMIT_TIMEOUT_S: "300"
+      MEET_DEDUP_TTL: "7200"
+      MEET_SLACK_CHANNEL: "#meeting-bot"
+      # Provider keys
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      # Infra
+      DATABASE_URL: "postgresql://meet:meet@postgres:5432/meet"
+      VALKEY_URL: "redis://valkey:6379/0"
+      AMQP_URL: "amqp://guest:guest@rabbitmq:5672/"
+      AMQP_EXCHANGE: "sindarian.tasks"
+      AMQP_QUEUE: "tasks.meet"
+    volumes:
+      - ./workspace:/app/workspace
+    depends_on:
+      - postgres
+      - valkey
+      - rabbitmq
+    deploy:
+      resources:
+        limits:
+          memory: 3g
+          cpus: "2.0"
+    restart: unless-stopped
+
+  calendar-watcher:
+    build:
+      context: .
+      dockerfile: Dockerfile.meet
+    profiles: ["meet"]
+    init: true
+    command: ["python", "meet_calendar_watcher.py"]
+    environment:
+      MEET_AUTH_STATE: "/app/workspace/config/meet-auth-state.json"
+      MEET_DEDUP_TTL: "7200"
+      DATABASE_URL: "postgresql://meet:meet@postgres:5432/meet"
+      VALKEY_URL: "redis://valkey:6379/0"
+      AMQP_URL: "amqp://guest:guest@rabbitmq:5672/"
+      AMQP_EXCHANGE: "sindarian.tasks"
+    volumes:
+      - ./workspace:/app/workspace
+    depends_on:
+      - rabbitmq
+      - valkey
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    profiles: ["meet"]
+    environment:
+      POSTGRES_USER: meet
+      POSTGRES_PASSWORD: meet
+      POSTGRES_DB: meet
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  valkey:
+    image: valkey/valkey:8
+    profiles: ["meet"]
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    profiles: ["meet"]
+    ports:
+      - "15672:15672"   # management UI
+    restart: unless-stopped
+
+volumes:
+  pgdata:

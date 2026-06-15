@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Landing Page</title>
+    
+    <!-- Preload critical assets -->
+    <!-- <link rel="preload" href="assets/hero-bg.jpg" as="image"> -->
+
+    <!-- Fonts (Example: Inter for clean, modern look) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Reset & Variables */
+        :root {
+            --bg-color: #000000;
+            --text-primary: #f5f5f7;
+            --text-secondary: #86868b;
+            --accent-color: #30d158;
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Fluid Typography */
+            --text-hero: clamp(2.5rem, 5vw + 1rem, 5rem);
+            --text-h2: clamp(2rem, 4vw + 0.5rem, 3.5rem);
+            --text-body: clamp(1rem, 1vw + 0.75rem, 1.25rem);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Utility Classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .text-center { text-align: center; }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff, #86868b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Scrollytelling Track (Example) */
+        .scroll-track {
+            position: relative;
+            width: 100%;
+            height: 300vh; /* Adjust based on sequence length */
+        }
+
+        .sticky-viewport {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .layer {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            will-change: opacity, transform;
+        }
+
+        /* Media Wrappers to prevent CLS */
+        .media-wrapper {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #111;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .media-wrapper img,
+        .media-wrapper video,
+        .media-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            padding: 4rem 0;
+        }
+
+        .bento-card {
+            background: #1d1d1f;
+            border-radius: 24px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Preloader (Optional, requires JS) -->
+    <!-- 
+    <div id="preloader" style="position:fixed; inset:0; background:#000; z-index:9999; display:flex; align-items:center; justify-content:center;">
+        <div style="font-family:monospace; font-size:3rem; color:#fff;"><span id="counter">0</span>%</div>
+    </div>
+    -->
+
+    <!-- Navigation -->
+    <nav style="position: fixed; top: 0; width: 100%; padding: 20px; z-index: 100; backdrop-filter: blur(10px); background: rgba(0,0,0,0.5);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 800; letter-spacing: 2px;">BRAND</div>
+            <a href="#buy" style="background: var(--text-primary); color: var(--bg-color); padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Buy Now</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section style="height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding-top: 60px;">
+        <div class="container">
+            <h1 class="gradient-text" style="font-size: var(--text-hero); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 16px;">The Future is Here.</h1>
+            <p style="font-size: var(--text-body); color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Experience unparalleled performance in a design that redefines what is possible.</p>
+        </div>
+    </section>
+
+    <!-- Scrollytelling Section -->
+    <section class="scroll-track">
+        <div class="sticky-viewport">
+            
+            <!-- Background Image Layer -->
+            <div class="layer" data-fade-in="0" data-fade-out="0.9">
+                <!-- Replace with actual image -->
+                <div style="width: 100%; height: 100%; background: linear-gradient(45deg, #111, #222);"></div>
+            </div>
+
+            <!-- Text Sequence 1 -->
+            <div class="layer" data-fade-in="0.1" data-fade-out="0.4">
+                <h2 style="font-size: var(--text-h2); font-weight: 800;">Precision Engineering</h2>
+            </div>
+
+            <!-- Text Sequence 2 -->
+            <div class="layer" data-fade-in="0.5" data-fade-out="0.8">
+                <h2 style="font-size: var(--text-h2); font-weight: 800; color: var(--accent-color);">Unmatched Speed</h2>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Feature Grid Section -->
+    <section class="container" style="padding: 100px 24px;">
+        <h2 class="text-center" style="font-size: var(--text-h2); margin-bottom: 40px;">Everything you need.</h2>
+        
+        <div class="bento-grid">
+            <div class="bento-card">
+                <h3 style="font-size: 1.5rem;">Battery Life</h3>
+                <p style="color: var(--accent-color); font-size: 3rem; font-weight: 800;">24hrs</p>
+                <p style="color: var(--text-secondary);">All day power.</p>
+            </div>
+            
+            <div class="bento-card">
+                <h3 style="font-size: 1.5rem;">Display</h3>
+                <div class="media-wrapper" style="aspect-ratio: 4/3; margin-top: 16px;">
+                    <!-- Placeholder for image/video -->
+                    <div style="width: 100%; height: 100%; background: #333;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <!-- GSAP Core & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <script>
+        // 1. Initialize Lenis Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smooth: true
+        });
+
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+        gsap.ticker.lagSmoothing(0);
+
+        // 2. Simple Scrollytelling Controller
+        function initScrollytelling() {
+            const tracks = document.querySelectorAll('.scroll-track');
+            
+            window.addEventListener('scroll', () => {
+                const viewH = window.innerHeight;
+                
+                tracks.forEach(track => {
+                    const rect = track.getBoundingClientRect();
+                    const trackH = track.offsetHeight;
+                    
+                    let progress = (-rect.top) / (trackH - viewH);
+                    progress = Math.max(0, Math.min(1, progress));
+
+                    const layers = track.querySelectorAll('[data-fade-in]');
+                    
+                    layers.forEach(layer => {
+                        const start = parseFloat(layer.dataset.fadeIn);
+                        const end = parseFloat(layer.dataset.fadeOut);
+                        const duration = 0.1; // 10% fade duration
+                        
+                        let opacity = 0;
+                        let translateY = 20;
+
+                        if (progress >= start && progress <= end) {
+                            if (progress < start + duration) {
+                                // Fade in
+                                const p = (progress - start) / duration;
+                                opacity = p;
+                                translateY = 20 * (1 - p);
+                            } else if (progress > end - duration) {
+                                // Fade out
+                                const p = (progress - (end - duration)) / duration;
+                                opacity = 1 - p;
+                                translateY = -20 * p;
+                            } else {
+                                // Visible
+                                opacity = 1;
+                                translateY = 0;
+                            }
+                        }
+                        
+                        layer.style.opacity = opacity;
+                        layer.style.transform = `translateY(${translateY}px)`;
+                    });
+                });
+            }, { passive: true });
+        }
+
+        document.addEventListener('DOMContentLoaded', initScrollytelling);
+    </script>
+</body>
+</html>
