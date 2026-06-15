@@ -107,8 +107,8 @@ PATH_OPENCODE="${HOME}/.config/opencode"
 PATH_FACTORY="${HOME}/.factory"
 PATH_CURSOR="${HOME}/.cursor"
 PATH_VSCODE="${HOME}/.vscode"
-PATH_ANTIGRAVITY="${HOME}/.antigravity"
-PATH_AGY="${HOME}/.agy"
+PATH_ANTIGRAVITY="${HOME}/.antigravity-ide"
+PATH_AGY=""  # set in detect_tools based on OS
 
 detect_tools() {
   detect_os
@@ -117,8 +117,10 @@ detect_tools() {
 
   if [ "${OS_TYPE}" = "macos" ]; then
     PATH_CLAUDE_DESKTOP="${HOME}/Library/Application Support/Claude"
+    PATH_AGY="${HOME}/Library/Application Support/Antigravity"
   else
     PATH_CLAUDE_DESKTOP="${HOME}/.config/claude"
+    PATH_AGY="${HOME}/.config/antigravity"
   fi
   [ -d "${PATH_CLAUDE_DESKTOP}" ] && FOUND_CLAUDE_DESKTOP=true
 
@@ -365,7 +367,7 @@ install_vscode() {
 }
 
 install_antigravity() {
-  install_all_skills_to "${PATH_ANTIGRAVITY}/skills" "Antigravity"
+  install_all_skills_to "${PATH_ANTIGRAVITY}/rules" "Antigravity"
 }
 
 install_agy() {
@@ -380,7 +382,7 @@ remove_opencode()       { remove_skills_from "${PATH_OPENCODE}/skills" "OpenCode
 remove_factory()        { remove_skills_from "${PATH_FACTORY}/skills" "Factory"; }
 remove_cursor()         { remove_skills_from "${PATH_CURSOR}/rules" "Cursor"; }
 remove_vscode()         { remove_skills_from "${PATH_VSCODE}/lzr1-skills" "VS Code"; }
-remove_antigravity()    { remove_skills_from "${PATH_ANTIGRAVITY}/skills" "Antigravity"; }
+remove_antigravity()    { remove_skills_from "${PATH_ANTIGRAVITY}/rules" "Antigravity"; }
 remove_agy()            { remove_skills_from "${PATH_AGY}/skills" "Antigravity AGY"; }
 
 # ── State file ────────────────────────────────────────────────────────────────
@@ -453,7 +455,7 @@ EOF
   check_tool_install "Factory"          "${PATH_FACTORY}/skills"
   check_tool_install "Cursor"           "${PATH_CURSOR}/rules"
   check_tool_install "VS Code"          "${PATH_VSCODE}/lzr1-skills"
-  check_tool_install "Antigravity"      "${PATH_ANTIGRAVITY}/skills"
+  check_tool_install "Antigravity"      "${PATH_ANTIGRAVITY}/rules"
   check_tool_install "Antigravity AGY"  "${PATH_AGY}/skills"
   printf "\n"
 }
@@ -552,8 +554,8 @@ print_summary() {
   print_summary_row "Factory"         "${OPT_FACTORY}"        "~/.factory/skills/"
   print_summary_row "Cursor"          "${OPT_CURSOR}"         "~/.cursor/rules/"
   print_summary_row "VS Code"         "${OPT_VSCODE}"         "~/.vscode/lzr1-skills/"
-  print_summary_row "Antigravity"     "${OPT_ANTIGRAVITY}"    "~/.antigravity/skills/"
-  print_summary_row "Antigravity AGY" "${OPT_AGY}"            "~/.agy/skills/"
+  print_summary_row "Antigravity"     "${OPT_ANTIGRAVITY}"    "~/.antigravity-ide/rules/"
+  print_summary_row "Antigravity AGY" "${OPT_AGY}"            "…/Antigravity/skills/"
 
   printf "  %s%s├────────────────────────────────────────────────────┤%s\n" "${DIM}" "${CYAN}" "${RESET}"
   printf "  %s%s│%s  %s%d skills installed%s%s                                  │%s\n" \
