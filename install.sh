@@ -605,7 +605,7 @@ show_menu() {
     "${BOLD}" "${RESET}" "${CYAN}" "${RESET}" "${MAGENTA}" "${RESET}"
 
   local selection=""
-  read -r selection || true
+  read -r selection </dev/tty || true
   selection=$(printf "%s" "${selection}" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
 
   case "${selection}" in
@@ -660,7 +660,7 @@ show_menu() {
     "${RED}" "${RESET}"
 
   local action_input=""
-  read -r action_input || true
+  read -r action_input </dev/tty || true
   action_input=$(printf "%s" "${action_input}" | tr '[:upper:]' '[:lower:]')
 
   case "${action_input}" in
