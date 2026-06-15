@@ -124,13 +124,13 @@ detect_tools() {
   fi
   [ -d "${PATH_CLAUDE_DESKTOP}" ] && FOUND_CLAUDE_DESKTOP=true
 
-  [ -d "${PATH_CODEX}" ]        && FOUND_CODEX=true
-  [ -d "${PATH_OPENCODE}" ]     && FOUND_OPENCODE=true
-  [ -d "${PATH_FACTORY}" ]      && FOUND_FACTORY=true
-  [ -d "${PATH_CURSOR}" ]       && FOUND_CURSOR=true
-  [ -d "${PATH_VSCODE}" ]       && FOUND_VSCODE=true
-  [ -d "${PATH_ANTIGRAVITY}" ]  && FOUND_ANTIGRAVITY=true
-  [ -d "${PATH_AGY}" ]          && FOUND_AGY=true
+  [ -d "${PATH_CODEX}" ]                     && FOUND_CODEX=true
+  [ -d "${PATH_OPENCODE}" ]                  && FOUND_OPENCODE=true
+  [ -d "${PATH_FACTORY}" ]                   && FOUND_FACTORY=true
+  [ -d "${PATH_CURSOR}" ]                    && FOUND_CURSOR=true
+  [ -d "${PATH_VSCODE}" ]                    && FOUND_VSCODE=true
+  [ -d "${PATH_ANTIGRAVITY}" ]               && FOUND_ANTIGRAVITY=true
+  [ -n "${PATH_AGY}" ] && [ -d "${PATH_AGY}" ] && FOUND_AGY=true
 }
 
 # ── Skills source ─────────────────────────────────────────────────────────────
@@ -382,7 +382,9 @@ EOF
 }
 
 install_opencode() {
-  install_all_skills_to "${PATH_OPENCODE}/skills" "OpenCode" true
+  # Clean up any stale files from older installer versions (wrong path)
+  rm -rf "${PATH_OPENCODE}/skills" 2>/dev/null || true
+  install_all_skills_to "${PATH_OPENCODE}/skill" "OpenCode" true
 }
 
 install_factory() {
@@ -402,6 +404,14 @@ install_antigravity() {
 }
 
 install_agy() {
+  # Clean up any stale flat .md files from older installer versions
+  local name
+  while IFS= read -r name; do
+    [ -z "${name}" ] && continue
+    rm -f "${PATH_AGY}/skills/${name}.md" 2>/dev/null || true
+  done <<EOF
+${SKILL_NAMES}
+EOF
   install_all_skills_to "${PATH_AGY}/skills" "Antigravity AGY" true
 }
 
@@ -409,7 +419,7 @@ install_agy() {
 remove_claude_code()    { remove_skills_from "${PATH_CLAUDE_CODE}/skills" "Claude Code" true; }
 remove_claude_desktop() { remove_skills_from "${PATH_CLAUDE_DESKTOP}/skills" "Claude Desktop" true; }
 remove_codex()          { remove_skills_from "${PATH_CODEX}/skills" "Codex" true; }
-remove_opencode()       { remove_skills_from "${PATH_OPENCODE}/skills" "OpenCode" true; }
+remove_opencode()       { remove_skills_from "${PATH_OPENCODE}/skill" "OpenCode" true; }
 remove_factory()        { remove_skills_from "${PATH_FACTORY}/skills" "Factory" true; }
 remove_cursor()         { remove_skills_from "${PATH_CURSOR}/rules" "Cursor"; }
 remove_vscode()         { remove_skills_from "${PATH_VSCODE}/lzr1-skills" "VS Code"; }
@@ -487,7 +497,7 @@ EOF
   check_tool_install "Claude Code"      "${PATH_CLAUDE_CODE}/skills"     true
   check_tool_install "Claude Desktop"   "${PATH_CLAUDE_DESKTOP}/skills"  true
   check_tool_install "Codex"            "${PATH_CODEX}/skills"            true
-  check_tool_install "OpenCode"         "${PATH_OPENCODE}/skills"         true
+  check_tool_install "OpenCode"         "${PATH_OPENCODE}/skill"          true
   check_tool_install "Factory"          "${PATH_FACTORY}/skills"          true
   check_tool_install "Cursor"           "${PATH_CURSOR}/rules"
   check_tool_install "VS Code"          "${PATH_VSCODE}/lzr1-skills"
@@ -586,7 +596,7 @@ print_summary() {
   print_summary_row "Claude Code"     "${OPT_CLAUDE_CODE}"    "~/.claude/skills/"
   print_summary_row "Claude Desktop"  "${OPT_CLAUDE_DESKTOP}" "…/Claude/skills/"
   print_summary_row "Codex"           "${OPT_CODEX}"          "~/.codex/skills/"
-  print_summary_row "OpenCode"        "${OPT_OPENCODE}"        "…/opencode/skills/"
+  print_summary_row "OpenCode"        "${OPT_OPENCODE}"        "…/opencode/skill/"
   print_summary_row "Factory"         "${OPT_FACTORY}"        "~/.factory/skills/"
   print_summary_row "Cursor"          "${OPT_CURSOR}"         "~/.cursor/rules/"
   print_summary_row "VS Code"         "${OPT_VSCODE}"         "~/.vscode/lzr1-skills/"
