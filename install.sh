@@ -108,7 +108,7 @@ PATH_FACTORY="${HOME}/.factory"
 PATH_CURSOR="${HOME}/.cursor"
 PATH_VSCODE="${HOME}/.vscode"
 PATH_ANTIGRAVITY="${HOME}/.antigravity-ide"
-PATH_AGY=""  # set in detect_tools based on OS
+PATH_AGY="${HOME}/.gemini/antigravity-cli"
 
 detect_tools() {
   detect_os
@@ -117,10 +117,8 @@ detect_tools() {
 
   if [ "${OS_TYPE}" = "macos" ]; then
     PATH_CLAUDE_DESKTOP="${HOME}/Library/Application Support/Claude"
-    PATH_AGY="${HOME}/Library/Application Support/Antigravity"
   else
     PATH_CLAUDE_DESKTOP="${HOME}/.config/claude"
-    PATH_AGY="${HOME}/.config/antigravity"
   fi
   [ -d "${PATH_CLAUDE_DESKTOP}" ] && FOUND_CLAUDE_DESKTOP=true
 
@@ -130,7 +128,7 @@ detect_tools() {
   [ -d "${PATH_CURSOR}" ]                    && FOUND_CURSOR=true
   [ -d "${PATH_VSCODE}" ]                    && FOUND_VSCODE=true
   [ -d "${PATH_ANTIGRAVITY}" ]               && FOUND_ANTIGRAVITY=true
-  [ -n "${PATH_AGY}" ] && [ -d "${PATH_AGY}" ] && FOUND_AGY=true
+  [ -d "${PATH_AGY}" ] && FOUND_AGY=true
 }
 
 # ── Skills source ─────────────────────────────────────────────────────────────
@@ -502,7 +500,7 @@ EOF
   check_tool_install "Cursor"           "${PATH_CURSOR}/rules"
   check_tool_install "VS Code"          "${PATH_VSCODE}/lzr1-skills"
   check_tool_install "Antigravity"      "${PATH_ANTIGRAVITY}/rules"
-  check_tool_install "Antigravity AGY"  "${PATH_AGY}/skills"              true
+  check_tool_install "Antigravity AGY"  "${PATH_AGY}/skills"         true
   printf "\n"
 }
 
@@ -601,7 +599,7 @@ print_summary() {
   print_summary_row "Cursor"          "${OPT_CURSOR}"         "~/.cursor/rules/"
   print_summary_row "VS Code"         "${OPT_VSCODE}"         "~/.vscode/lzr1-skills/"
   print_summary_row "Antigravity"     "${OPT_ANTIGRAVITY}"    "~/.antigravity-ide/rules/"
-  print_summary_row "Antigravity AGY" "${OPT_AGY}"            "…/Antigravity/skills/"
+  print_summary_row "Antigravity AGY" "${OPT_AGY}"            "…/antigravity-cli/skills/"
 
   printf "  %s%s├────────────────────────────────────────────────────┤%s\n" "${DIM}" "${CYAN}" "${RESET}"
   printf "  %s%s│%s  %s%d skills installed%s%s                                  │%s\n" \
