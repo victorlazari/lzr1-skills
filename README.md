@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 ## Table of Contents
 
 - [What are Skills?](#what-are-skills)
-- [The Arsenal](#the-arsenal) — 32 skills, organized by domain
+- [The Arsenal](#the-arsenal) — 33 skills, organized by domain
 - [The Armory](#the-armory) — 9 supported tools
 - [Equip Up](#equip-up) — 3 ways to install
 - [Command Reference](#command-reference)
@@ -57,6 +57,7 @@ Each skill in this arsenal is battle-tested and includes:
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
 | `ai-ml-engineering` | ML engineering, MLOps, LLM apps, RAG pipelines, NLP, computer vision, prompt engineering | Building AI systems end-to-end |
+| `masterclaw` | OpenClaw, NemoClaw & Enterprise Prompt Engineering — multi-agent systems, distributed stream-processing, RAG architectures, production ops & incident response | Full-lifecycle expert for the MasterClaw platform |
 | `software-engineering` | Backend, frontend, fullstack, APIs, systems architecture, performance, Go/Rust/and more | Any production code decision |
 | `prompt-master` | Prompt engineering (CoT, ToT, ReAct), RAG pipelines, model-specific tuning for Claude & GPT | Squeezing every token of performance |
 | `meeting-engineering` | Live Google Meet virtual assistants with voice — Playwright, PulseAudio, STT/LLM/TTS, Docker | Building real-time meeting bots |
@@ -130,12 +131,12 @@ The installer detects these tools automatically and installs skills to their con
 | **Claude Code** | `~/.claude/skills/` | ✓ checks `~/.claude/` |
 | **Claude Desktop** | `~/Library/Application Support/Claude/skills/` (macOS)<br>`~/.config/claude/skills/` (Linux) | ✓ |
 | **Codex** | `~/.codex/skills/` | ✓ checks `~/.codex/` |
-| **OpenCode** | `~/.config/opencode/skills/` | ✓ |
+| **OpenCode** | `~/.config/opencode/skill/` | ✓ |
 | **Factory** | `~/.factory/skills/` | ✓ checks `~/.factory/` |
 | **Cursor** | `~/.cursor/rules/` | ✓ checks `~/.cursor/` |
 | **VS Code** | `~/.vscode/lzr1-skills/` | ✓ checks `~/.vscode/` |
-| **Antigravity** | `~/.antigravity/skills/` | ✓ |
-| **Antigravity AGY** | `~/.agy/skills/` | ✓ |
+| **Antigravity** | `~/.antigravity-ide/rules/` | ✓ checks `~/.antigravity-ide/` |
+| **Antigravity AGY** | `~/.gemini/antigravity-cli/skills/` | ✓ checks `~/.gemini/antigravity-cli/` |
 
 ---
 

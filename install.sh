@@ -161,6 +161,7 @@ it-administration
 legal-compliance
 legendary-readme
 marketing
+masterclaw
 meeting-engineering
 one-page
 operations
@@ -571,7 +572,7 @@ any_tool_selected() {
 # ── Summary table ─────────────────────────────────────────────────────────────
 print_summary() {
   local skill_count
-  skill_count=$(printf "%s" "${SKILL_NAMES}" | grep -c . 2>/dev/null || echo "32")
+  skill_count=$(printf "%s" "${SKILL_NAMES}" | grep -c . 2>/dev/null || echo "33")
 
   printf "\n"
   printf "  %s%s┌────────────────────────────────────────────────────┐%s\n" "${DIM}" "${CYAN}" "${RESET}"
