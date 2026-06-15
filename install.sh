@@ -230,16 +230,24 @@ spinner_stop() {
 }
 
 # ── Core install primitive ────────────────────────────────────────────────────
-# install_skill_to_dir <skill_name> <target_dir>
+# install_skill_to_dir <skill_name> <target_dir> [subdir]
+# subdir=true  → target_dir/<name>/SKILL.md  (Codex, Claude Code style)
+# subdir=false → target_dir/<name>.md        (Cursor, flat style)
 install_skill_to_dir() {
   local skill_name="$1"
   local target_dir="$2"
-
-  mkdir -p "${target_dir}"
+  local use_subdir="${3:-false}"
 
   local source
   source="$(get_skill_source "${skill_name}")"
-  local dest="${target_dir}/${skill_name}.md"
+  local dest
+  if [ "${use_subdir}" = true ]; then
+    dest="${target_dir}/${skill_name}/SKILL.md"
+    mkdir -p "${target_dir}/${skill_name}"
+  else
+    dest="${target_dir}/${skill_name}.md"
+    mkdir -p "${target_dir}"
+  fi
 
   if [ "${DRY_RUN}" = true ]; then
     log_dim "[dry-run] would install ${skill_name} → ${dest}"
@@ -272,14 +280,16 @@ install_skill_to_dir() {
     }
   fi
 
-  [ "${VERBOSE}" = true ] && log_dim "  ✓ ${skill_name}.md → ${dest}"
+  [ "${VERBOSE}" = true ] && log_dim "  ✓ ${skill_name} → ${dest}"
   return 0
 }
 
 # Install all skills to a target directory
+# install_all_skills_to <target_dir> <label> [subdir]
 install_all_skills_to() {
   local target_dir="$1"
   local tool_label="$2"
+  local use_subdir="${3:-false}"
   local count=0
   local failed=0
 
@@ -289,7 +299,7 @@ install_all_skills_to() {
   local name
   while IFS= read -r name; do
     [ -z "${name}" ] && continue
-    if install_skill_to_dir "${name}" "${target_dir}" 2>/dev/null; then
+    if install_skill_to_dir "${name}" "${target_dir}" "${use_subdir}" 2>/dev/null; then
       count=$((count + 1))
     else
       failed=$((failed + 1))
@@ -307,9 +317,11 @@ EOF
 }
 
 # Remove all lzr1 skills from a directory
+# remove_skills_from <target_dir> <label> [subdir]
 remove_skills_from() {
   local target_dir="$1"
   local tool_label="$2"
+  local use_subdir="${3:-false}"
   local count=0
 
   if [ ! -d "${target_dir}" ]; then
@@ -320,14 +332,26 @@ remove_skills_from() {
   local name
   while IFS= read -r name; do
     [ -z "${name}" ] && continue
-    local dest="${target_dir}/${name}.md"
-    if [ -f "${dest}" ]; then
-      if [ "${DRY_RUN}" = true ]; then
-        log_dim "[dry-run] would remove ${dest}"
-      else
-        rm -f "${dest}"
+    if [ "${use_subdir}" = true ]; then
+      local dest="${target_dir}/${name}"
+      if [ -d "${dest}" ]; then
+        if [ "${DRY_RUN}" = true ]; then
+          log_dim "[dry-run] would remove ${dest}/"
+        else
+          rm -rf "${dest}"
+        fi
+        count=$((count + 1))
       fi
-      count=$((count + 1))
+    else
+      local dest="${target_dir}/${name}.md"
+      if [ -f "${dest}" ]; then
+        if [ "${DRY_RUN}" = true ]; then
+          log_dim "[dry-run] would remove ${dest}"
+        else
+          rm -f "${dest}"
+        fi
+        count=$((count + 1))
+      fi
     fi
   done <<EOF
 ${SKILL_NAMES}
@@ -338,27 +362,34 @@ EOF
 
 # ── Per-tool installers ───────────────────────────────────────────────────────
 install_claude_code() {
-  install_all_skills_to "${PATH_CLAUDE_CODE}/skills" "Claude Code"
+  install_all_skills_to "${PATH_CLAUDE_CODE}/skills" "Claude Code" true
 }
 
 install_claude_desktop() {
-  install_all_skills_to "${PATH_CLAUDE_DESKTOP}/skills" "Claude Desktop"
+  install_all_skills_to "${PATH_CLAUDE_DESKTOP}/skills" "Claude Desktop" true
 }
 
 install_codex() {
-  install_all_skills_to "${PATH_CODEX}/skills" "Codex"
+  # Clean up any stale flat .md files from older installer versions
+  local name
+  while IFS= read -r name; do
+    [ -z "${name}" ] && continue
+    rm -f "${PATH_CODEX}/skills/${name}.md" 2>/dev/null || true
+  done <<EOF
+${SKILL_NAMES}
+EOF
+  install_all_skills_to "${PATH_CODEX}/skills" "Codex" true
 }
 
 install_opencode() {
-  install_all_skills_to "${PATH_OPENCODE}/skills" "OpenCode"
+  install_all_skills_to "${PATH_OPENCODE}/skills" "OpenCode" true
 }
 
 install_factory() {
-  install_all_skills_to "${PATH_FACTORY}/skills" "Factory"
+  install_all_skills_to "${PATH_FACTORY}/skills" "Factory" true
 }
 
 install_cursor() {
-  # Cursor uses ~/.cursor/rules/ with .md files
   install_all_skills_to "${PATH_CURSOR}/rules" "Cursor"
 }
 
@@ -371,19 +402,19 @@ install_antigravity() {
 }
 
 install_agy() {
-  install_all_skills_to "${PATH_AGY}/skills" "Antigravity AGY"
+  install_all_skills_to "${PATH_AGY}/skills" "Antigravity AGY" true
 }
 
 # ── Per-tool removers ─────────────────────────────────────────────────────────
-remove_claude_code()    { remove_skills_from "${PATH_CLAUDE_CODE}/skills" "Claude Code"; }
-remove_claude_desktop() { remove_skills_from "${PATH_CLAUDE_DESKTOP}/skills" "Claude Desktop"; }
-remove_codex()          { remove_skills_from "${PATH_CODEX}/skills" "Codex"; }
-remove_opencode()       { remove_skills_from "${PATH_OPENCODE}/skills" "OpenCode"; }
-remove_factory()        { remove_skills_from "${PATH_FACTORY}/skills" "Factory"; }
+remove_claude_code()    { remove_skills_from "${PATH_CLAUDE_CODE}/skills" "Claude Code" true; }
+remove_claude_desktop() { remove_skills_from "${PATH_CLAUDE_DESKTOP}/skills" "Claude Desktop" true; }
+remove_codex()          { remove_skills_from "${PATH_CODEX}/skills" "Codex" true; }
+remove_opencode()       { remove_skills_from "${PATH_OPENCODE}/skills" "OpenCode" true; }
+remove_factory()        { remove_skills_from "${PATH_FACTORY}/skills" "Factory" true; }
 remove_cursor()         { remove_skills_from "${PATH_CURSOR}/rules" "Cursor"; }
 remove_vscode()         { remove_skills_from "${PATH_VSCODE}/lzr1-skills" "VS Code"; }
 remove_antigravity()    { remove_skills_from "${PATH_ANTIGRAVITY}/rules" "Antigravity"; }
-remove_agy()            { remove_skills_from "${PATH_AGY}/skills" "Antigravity AGY"; }
+remove_agy()            { remove_skills_from "${PATH_AGY}/skills" "Antigravity AGY" true; }
 
 # ── State file ────────────────────────────────────────────────────────────────
 save_state() {
@@ -422,16 +453,21 @@ doctor() {
   printf "\n%s%s  Doctor Report%s\n\n" "${BOLD}" "${CYAN}" "${RESET}"
 
   local tool_name target_dir installed total
-  # We check each known install dir
+  # check_tool_install <label> <dir> [subdir]
   check_tool_install() {
     tool_name="$1"; target_dir="$2"
+    local chk_subdir="${3:-false}"
     installed=0; total=0
     if [ -d "${target_dir}" ]; then
       local name
       while IFS= read -r name; do
         [ -z "${name}" ] && continue
         total=$((total + 1))
-        [ -f "${target_dir}/${name}.md" ] && installed=$((installed + 1))
+        if [ "${chk_subdir}" = true ]; then
+          [ -f "${target_dir}/${name}/SKILL.md" ] && installed=$((installed + 1))
+        else
+          [ -f "${target_dir}/${name}.md" ] && installed=$((installed + 1))
+        fi
       done <<EOF
 ${SKILL_NAMES}
 EOF
@@ -448,15 +484,15 @@ EOF
     fi
   }
 
-  check_tool_install "Claude Code"      "${PATH_CLAUDE_CODE}/skills"
-  check_tool_install "Claude Desktop"   "${PATH_CLAUDE_DESKTOP}/skills"
-  check_tool_install "Codex"            "${PATH_CODEX}/skills"
-  check_tool_install "OpenCode"         "${PATH_OPENCODE}/skills"
-  check_tool_install "Factory"          "${PATH_FACTORY}/skills"
+  check_tool_install "Claude Code"      "${PATH_CLAUDE_CODE}/skills"     true
+  check_tool_install "Claude Desktop"   "${PATH_CLAUDE_DESKTOP}/skills"  true
+  check_tool_install "Codex"            "${PATH_CODEX}/skills"            true
+  check_tool_install "OpenCode"         "${PATH_OPENCODE}/skills"         true
+  check_tool_install "Factory"          "${PATH_FACTORY}/skills"          true
   check_tool_install "Cursor"           "${PATH_CURSOR}/rules"
   check_tool_install "VS Code"          "${PATH_VSCODE}/lzr1-skills"
   check_tool_install "Antigravity"      "${PATH_ANTIGRAVITY}/rules"
-  check_tool_install "Antigravity AGY"  "${PATH_AGY}/skills"
+  check_tool_install "Antigravity AGY"  "${PATH_AGY}/skills"              true
   printf "\n"
 }
 
