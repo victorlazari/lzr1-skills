@@ -59,3 +59,40 @@ Expert-level finance covering FP&A, accounting, financial modeling, SaaS metrics
 - **Accounting**: See `references/accounting.md` for reporting, compliance, and treasury.
 - **Fundraising**: See `references/fundraising.md` for valuation, investors, and capital.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `accounting`, ... | **Accounting** | Accounting Specialist | `references/accounting.md` |
+| `model`, ... | **Financial Modeling** | Modeling Specialist | `references/financial-modeling.md` |
+| `fundraising`, ... | **Fundraising** | Fundraising Specialist | `references/fundraising.md` |
+| `SaaS`, ... | **SaaS Metrics** | Metrics Specialist | `references/saas-metrics.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 4
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **Financial Consistency Checker** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Ensures SaaS metric definitions are consistent across the financial model. Flags where fundraising narrative assumptions conflict with accounting classifications.

@@ -57,3 +57,39 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - **Time Series Collections:** Optimize by choosing the correct granularity and filtering by `timeField` and `metaField`.
 - **Sharding:** Choose a shard key with high cardinality and even distribution to avoid jumbo chunks.
 - **CLI Tools:** Master `mongosh` for querying and management, `mongodump`/`mongorestore` for backups and point-in-time recovery, and `mongoexport`/`mongoimport` for data integration.
+
+---
+
+## Adversarial Verification Panel
+
+For each significant performance bottleneck produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong performance bottlenecks from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Query Optimizer, Shard Manager, Backup Specialist, Log Analyzer) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: Query Optimizer recommends a compound index on a field while Shard Manager recommends that same field as the shard key, creating conflicting access patterns)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified operations plan so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

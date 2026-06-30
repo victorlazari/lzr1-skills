@@ -59,3 +59,40 @@ Expert-level operations covering business operations, project management, proces
 - **Vendor management**: See `references/vendor-management.md` for procurement and vendors.
 - **Operational excellence**: See `references/operational-excellence.md` for metrics and scaling.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `process`, ... | **Process Optimization** | Process Specialist | `references/process-optimization.md` |
+| `project`, ... | **Project Management** | PM Specialist | `references/project-management.md` |
+| `operational excellence`, ... | **Operational Excellence** | OpEx Specialist | `references/operational-excellence.md` |
+| `vendor`, ... | **Vendor Management** | Vendor Specialist | `references/vendor-management.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 4
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **Operational Conflict Resolver** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Catches where a process optimization creates a vendor contract conflict. Ensures operational KPIs are reflected in vendor SLA requirements.

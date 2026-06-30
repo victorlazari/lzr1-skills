@@ -51,3 +51,39 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - Redis Cluster and Sentinel Architecture: https://redis.io/docs/manual/scaling/
 - Advanced Redis Security Practices: https://redis.io/docs/manual/security/
 - Lua Scripting in Redis: https://redis.io/docs/manual/programmability/eval-intro/
+
+---
+
+## Adversarial Verification Panel
+
+For each significant configuration issue, security vulnerability, or performance bottleneck produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong configuration issues, security vulnerabilities, or performance bottlenecks from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Node Troubleshooter, Policy Validator, Crypto Agent, Tenant Configurator) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: the Crypto Agent recommends enabling full envelope encryption on all keys to harden security, while the Node Troubleshooter recommends disabling per-key encryption to eliminate the CPU overhead causing latency spikes on the same node)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified remediation report so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

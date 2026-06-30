@@ -88,3 +88,41 @@ When executing a code audit, you must generate a structured **Security Audit Rep
 * [3] [OWASP API Security Top 10 2023](https://owasp.org/API-Security/editions/2023/en/0x11-t10/)
 * [4] [Hornetsecurity: Major Security Incidents of 2025 and Lessons Learned](https://www.hornetsecurity.com/en/blog/cybersecurity-incidents/)
 * [5] [Guardz: Top 10 Data Breaches of 2025 and What Caused Them](https://guardz.com/blog/top-recent-data-breaches/)
+
+---
+
+## Parallel Execution Protocol
+
+> **All 5 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **Static Secrets Agent** | Static Secret Scanning | Regex + entropy-based detection of hardcoded API keys, tokens, certificates, and private keys | `references/secrets_patterns.md` |
+| **Data Flow Agent** | Data Flow & Sink Auditing | Trace user inputs from Sources to Sinks — SQLi, XSS, Path Traversal, OS Injection, SSRF | `references/vulnerability_checklists.md` |
+| **Auth Logic Agent** | Logical & Auth Review | Horizontal/vertical privilege enforcement, IDOR/BOLA, state transitions, multi-step workflows | `references/vulnerability_checklists.md` |
+| **PII Logging Agent** | Logging, Exceptions & PII Audit | Log statements for plaintext credential leaks, log injection, raw stack trace exposure | `references/logging_pii_audit.md` |
+| **Supply Chain Agent** | Supply Chain & IaC Security | Lockfiles, dependency confusion, Docker hardening, Terraform and K8s manifests | `references/supply_chain_iac.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 5 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 5
+
+### Synthesis Agent
+
+After all 5 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Cross-reference Phase 2 (data-flow sinks) with Phase 3 (auth gaps) to surface chained attack paths invisible to any single agent. Merge all findings into a unified Vulnerability Table ranked by CVSS score.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.

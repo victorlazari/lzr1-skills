@@ -209,3 +209,41 @@ Ready-to-use starting points:
 - **[Themed Project Template](templates/themed-project-readme.md)** — A fully worked, end-to-end themed README (Guardian Fortress example) showing animated banner, mascot, themed section names, fitting GIFs, and a matching footer all derived from one concept
 - **[Visual Showcase Template](templates/visual-showcase-readme.md)** — Maximum visual impact with GIFs, animated banners, feature cards, stats widgets, and cohesive color design
 - **[Minimal Geek Template](templates/minimal-geek-readme.md)** — Lightweight but still has character and charm
+
+---
+
+## Parallel Execution Protocol
+
+> **All 5 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **Structure Agent** | Codebase Structure Discovery | Directory layout, entry points, module organization, build artifacts | `references/complete-reference.md` |
+| **Stack Detector** | Tech Stack Detection | Languages, frameworks, runtimes, databases, external services from manifests and code | `references/complete-reference.md` |
+| **Docs Auditor** | Existing Documentation Audit | Current README quality, inline comments, API docs, changelog, contributing guide | `references/complete-reference.md` |
+| **Workflow Analyst** | Team Workflow Analysis | CI/CD pipelines, git hooks, scripts, Makefile targets, local dev setup | `references/complete-reference.md` |
+| **Audience Researcher** | Audience & Purpose Research | Who uses this repo, what they need to know first, common onboarding friction | `references/reading-list.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 5 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 5
+
+### Synthesis Agent
+
+After all 5 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Pass the complete discovery bundle to one Writer Agent. The Writer synthesizes all 5 discovery reports into a single cohesive README — no gaps, no contradictions, correct audience framing.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.

@@ -58,3 +58,40 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - [AI/ML Integration](./references/complete-reference.md#aiml-integration)
 - [Data Migration Strategies](./references/complete-reference.md#data-migration-strategies)
 - [Ticket-Supreme CLI Command Reference](./references/complete-reference.md#ticket-supreme-cli-command-reference)
+
+---
+
+## Parallel Execution Protocol
+
+> **All 4 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **Scope Estimator** | Technical Scope & Estimation | Code changes required, complexity, story points, technical debt implications | `references/complete-reference.md` |
+| **Business Value Agent** | Business Value Assessment | User impact, revenue implications, strategic alignment, opportunity cost | `references/complete-reference.md` |
+| **Risk Analyst** | Risk Analysis | Technical risk, regression surface, rollback complexity, security implications | `references/complete-reference.md` |
+| **Dependency Mapper** | Dependency Mapping | Blocked-by and blocking tickets, team dependencies, external API constraints | `references/complete-reference.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 4 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 4
+
+### Synthesis Agent
+
+After all 4 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Produce a sprint-ready ticket with contradictions resolved. Flag where high business value conflicts with high risk (requires explicit stakeholder sign-off). Ensure acceptance criteria cover all dependency edge cases.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.

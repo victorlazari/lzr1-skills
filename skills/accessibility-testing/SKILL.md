@@ -57,3 +57,40 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 -   [WAI-ARIA Authoring Practices Guide (APG)](https://www.w3.org/WAI/ARIA/apg/)
 -   [Playwright Accessibility Testing Documentation](https://playwright.dev/docs/accessibility-testing)
 -   [Axe Core Documentation](https://github.com/dequelabs/axe-core)
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `WCAG`, ... | **WCAG Compliance** | WCAG Auditor | `references/complete-reference.md` |
+| `ARIA`, ... | **ARIA & Semantics** | ARIA Auditor | `references/complete-reference.md` |
+| `keyboard`, ... | **Keyboard Navigation** | Keyboard Auditor | `references/complete-reference.md` |
+| `screen reader`, ... | **Screen Reader Compatibility** | Screen Reader Auditor | `references/complete-reference.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 4
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **A11y Remediation Matrix** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Maps each WCAG failure to its ARIA and keyboard root causes. Produces a prioritized remediation matrix with criterion cross-references so fixes address multiple issues at once.

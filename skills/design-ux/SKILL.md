@@ -63,3 +63,41 @@ Expert-level design covering user experience, interface design, design systems, 
 - **Accessibility**: See `references/accessibility.md` for WCAG, ARIA, and inclusive design.
 - **Interaction design**: See `references/interaction-design.md` for patterns and motion.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `user research`, ... | **UX Research** | UX Research Specialist | `references/ux-research.md` |
+| `interaction`, ... | **Interaction Design** | Interaction Specialist | `references/interaction-design.md` |
+| `visual`, ... | **UI Design** | UI Design Specialist | `references/ui-design.md` |
+| `design system`, ... | **Design Systems** | Design Systems Specialist | `references/design-systems.md` |
+| `accessibility`, ... | **Accessibility** | A11y Specialist | `references/accessibility.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 5
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **Design System Synthesizer** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Ensures accessibility requirements are baked into design system components before handoff, not retrofitted. Maps UX research findings to interaction design decisions.

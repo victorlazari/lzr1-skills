@@ -55,3 +55,39 @@ Expert-level QA covering test strategy, automation, performance testing, API tes
 - **Test automation**: See `references/test-automation.md` for frameworks and CI/CD.
 - **Performance testing**: See `references/performance-testing.md` for load and stress testing.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `test plan`, ... | **Test Strategy** | Strategy Specialist | `references/test-strategy.md` |
+| `automation`, ... | **Test Automation** | Automation Specialist | `references/test-automation.md` |
+| `performance`, ... | **Performance Testing** | Performance Specialist | `references/performance-testing.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 3
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **QA Synthesizer** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Aligns automation coverage with strategy gaps. Ensures performance SLAs are reflected in the test plan. Flags where automation effort would be wasted without a strategy foundation.

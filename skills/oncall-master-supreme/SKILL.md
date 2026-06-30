@@ -59,3 +59,40 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - **ChatOps: Collaboration at Scale** (2016). Paul Hammond.
 - **Service Level Objectives: A Practical Guide** (2020). Cindy Sridharan.
 - **Incident Management at Scale** (2020). Charity Majors et al.
+
+---
+
+## Parallel Execution Protocol
+
+> **All 4 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **Infra Investigator** | Infrastructure Layer | Network, DNS, load balancers, node health, disk I/O, CPU/memory saturation | `references/complete-reference.md` |
+| **App Investigator** | Application Layer | Error rates, latency percentiles, dependency failures, deploy correlation, code regression | `references/complete-reference.md` |
+| **Data Investigator** | Data Layer | Database saturation, replication lag, slow queries, lock contention, connection pool exhaustion | `references/complete-reference.md` |
+| **Runbook Lookup** | Runbook & Historical Correlation | Match error signatures to known incidents, retrieve applicable runbooks, check recent changes | `references/complete-reference.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 4 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 4
+
+### Synthesis Agent
+
+After all 4 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Produce a unified blast radius map. Cross-reference Infra, App, and Data findings to determine whether the infra signal is root cause or a cascade from the app or data layer. Link matched runbooks to the confirmed root cause.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.

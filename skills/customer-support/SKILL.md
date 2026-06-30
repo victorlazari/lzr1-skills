@@ -55,3 +55,39 @@ Expert-level customer support covering support operations, technical support, kn
 - **Technical support**: See `references/technical-support.md` for troubleshooting and escalation.
 - **Knowledge management**: See `references/knowledge-management.md` for documentation and self-service.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `technical support`, ... | **Technical Support** | Tech Support Specialist | `references/technical-support.md` |
+| `support operations`, ... | **Support Operations** | Operations Specialist | `references/support-operations.md` |
+| `knowledge base`, ... | **Knowledge Management** | Knowledge Specialist | `references/knowledge-management.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 3
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **Support Process Synthesizer** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Ensures KB changes are reflected in ticketing workflows and escalation paths. Flags where a support operation change requires a knowledge base update to prevent re-escalation.

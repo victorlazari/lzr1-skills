@@ -66,3 +66,39 @@ For deep-dive technical and design patterns, consult the complementary reference
 *   **Animation & Preloaders**: Refer to [references/animation-library.md](references/animation-library.md) for GSAP implementations, Lenis smooth scroll, and text scrambling.
 *   **Media & Scrollytelling**: Refer to [references/media-handling.md](references/media-handling.md) for video backgrounds, YouTube integration, and fade transitions.
 *   **Responsive & Performance Rules**: Refer to [references/responsive-rules.md](references/responsive-rules.md) for mobile optimization and CLS prevention.
+
+---
+
+## Adversarial Verification Panel
+
+For each significant design and implementation recommendation produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong design and implementation recommendations from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Cinematic Scrollytelling, Advanced Animation & Preloaders, Media & Asset Management) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: the Advanced Animation & Preloaders agent recommends a GSAP pixel dissolve preloader with heavy JS timelines, while the Cinematic Scrollytelling agent recommends `content-visibility: auto` and minimal scripting for maximum scroll performance — these can conflict when both are applied simultaneously)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified packaged `index.html` or `.zip` project so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

@@ -72,3 +72,41 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 -   **Next.js App Router Testing Guide**: For understanding Server/Client components and edge middleware testing.
 -   **OpenTelemetry and Pino**: For integrating observability assertions into E2E test flows.
 -   **Web-Tester-Supreme CLI Reference**: For mastering the extensive command set, flags, and configuration options available in the framework.
+
+---
+
+## Parallel Execution Protocol
+
+> **All 5 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **Functional Agent** | Functional Testing | Business logic correctness, user flows, edge cases, regression against spec | `references/complete-reference.md` |
+| **Visual Agent** | Visual Regression | Layout shifts, rendering differences across browsers/devices, snapshot deltas | `references/complete-reference.md` |
+| **A11y Agent** | Accessibility Audit | WCAG 2.1 AA compliance, ARIA, keyboard nav, screen reader compatibility | `references/complete-reference.md` |
+| **Performance Agent** | Performance Testing | Core Web Vitals, load time, bundle size, memory leaks, render blocking | `references/complete-reference.md` |
+| **Security Agent** | Client-Side Security | XSS, CSRF, CSP headers, sensitive data in localStorage, mixed content | `references/complete-reference.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 5 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 5
+
+### Synthesis Agent
+
+After all 5 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Cross-reference visual regressions with performance findings to surface component-level root causes (e.g., a new animation causing both layout shift and CPU spike). Map security findings to functional test gaps. Produce a prioritized defect matrix.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.

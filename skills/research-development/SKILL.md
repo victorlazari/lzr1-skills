@@ -55,3 +55,39 @@ Expert-level R&D covering innovation strategy, technical research methodology, R
 - **Research methodology**: See `references/research-methodology.md` for technical research.
 - **Technology evaluation**: See `references/technology-evaluation.md` for emerging tech.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `innovation`, `ideation`, `emerging technology`, `technology radar`, `strategic bet`, `R&D roadmap`, `future-proofing`, `disruptive` | **Innovation Strategy** | Innovation Specialist | `references/innovation-strategy.md` |
+| `research methodology`, `experiment design`, `hypothesis`, `qualitative study`, `quantitative analysis`, `user study`, `literature review`, `research protocol` | **Research Methodology** | Methodology Specialist | `references/research-methodology.md` |
+| `technology evaluation`, `build vs buy`, `proof of concept`, `POC`, `vendor selection`, `benchmark`, `evaluation criteria`, `due diligence`, `tech assessment` | **Technology Evaluation** | Tech Eval Specialist | `references/technology-evaluation.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 3
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **R&D Decision Synthesizer** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Ensures the technology evaluation methodology is appropriate for the innovation strategy goals. Flags where evaluation criteria bias toward known solutions when the strategy calls for exploration.

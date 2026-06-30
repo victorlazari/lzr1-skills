@@ -79,3 +79,42 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - **Security Frameworks:** MITRE ATLAS, STRIDE for AI, NIST AI RMF.
 - **Mathematical Foundations:** Linear Algebra, Calculus, Probability, Information Theory.
 - **Advanced Architectures:** Transformers (Self-Attention, Multi-Head Attention), LLMs (GPT, BERT, T5).
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple AI system domains are involved, spawn all relevant specialists simultaneously — do not serialize them.
+>
+> **Single-reference note:** This skill uses one comprehensive reference file (`references/complete-reference.md`). Each specialist receives the full reference but is scoped to a specific config schema and concern domain — they analyze independently without sharing findings during their run.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which AI system domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference (Config/Section Focus) |
+|---|---|---|---|
+| `model`, `Claude`, `GPT`, `Gemini`, `Llama`, `select model`, `fine-tune`, `base model`, `architecture`, `Transformer`, `capability benchmark` | **Model Selection & Architecture** | Model Architect | `references/complete-reference.md` (model-registry.json, architecture sections, fine-tuning strategies) |
+| `safety`, `alignment`, `bias`, `hallucination`, `guardrails`, `red-teaming`, `adversarial`, `jailbreak`, `MITRE ATLAS`, `STRIDE`, `data poisoning` | **AI Safety & Security** | Safety Specialist | `references/complete-reference.md` (security audit sections, MITRE ATLAS, differential privacy, PII sanitization) |
+| `deployment`, `serving`, `inference`, `latency`, `throughput`, `auto-scaling`, `GPU`, `dynamic batching`, `blue-green`, `canary`, `OOM`, `drift` | **Deployment & Inference** | Deployment Specialist | `references/complete-reference.md` (inference-config.toml, deployment strategies, observability.yaml) |
+| `cost`, `tokens`, `pricing`, `budget`, `efficiency`, `quantization`, `pruning`, `distillation`, `mixed precision`, `resource optimization` | **Cost & Resource Optimization** | Cost Optimizer | `references/complete-reference.md` (training-pipeline.yaml, resource optimization, model compression) |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to direct reference consultation (no spawning needed).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + `complete-reference.md` with instruction to focus on its designated config schemas and sections
+- No specialist waits for another — all start at the same time
+- Maximum concurrent domain specialists: 4 (separate from the existing bulk sub-agent cap of 10 for multi-model/multi-deployment operations)
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **AI System Synthesizer** with all outputs that:
+
+1. **Identifies safety-performance contradictions** — e.g., Model Architect recommends a larger model for capability while Cost Optimizer recommends quantization that degrades the safety guardrails the Safety Specialist relies on
+2. **Identifies deployment-architecture mismatches** — e.g., Deployment Specialist's dynamic batching config conflicts with the Model Architect's context window requirements
+3. **Maps cost choices to safety implications** — any model compression or pruning recommendation is cross-checked against the Safety Specialist's adversarial robustness requirements before acceptance
+4. **Sequences dependencies** — ensures model registry updates (Model Architect) precede inference config changes (Deployment Specialist) in the execution plan
+
+> Synthesis focus for this skill: Enforces that no model upgrade, deployment change, or cost optimization is accepted without an explicit sign-off from the Safety Specialist's analysis. Surfaces the full tradeoff triangle — capability vs. safety vs. cost — before any recommendation is finalized.

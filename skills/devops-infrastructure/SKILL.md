@@ -65,3 +65,41 @@ Expert-level DevOps, cloud infrastructure, and platform engineering covering the
 - **Networking**: See `references/networking.md` for network design, load balancing, and security.
 - **Database operations**: See `references/database-operations.md` for DBA tasks, replication, and HA.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Parallel Execution Protocol
+
+> **All 5 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **CI/CD Agent** | CI/CD & Automation | Pipeline configuration, secret management, artifact handling, deployment strategies | `references/cicd-automation.md` |
+| **Cloud Arch Agent** | Cloud Architecture | Resource configuration, IAM policies, cost optimization, resilience patterns | `references/cloud-architecture.md` |
+| **K8s Agent** | Kubernetes | Workload configuration, networking, resource limits, RBAC, cluster health | `references/kubernetes.md` |
+| **Networking Agent** | Networking | DNS, load balancing, ingress, service mesh, firewall rules, latency | `references/networking.md` |
+| **SRE Agent** | SRE & Reliability | SLOs/SLAs, alerting, runbooks, error budgets, incident management | `references/sre-reliability.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 5 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 5
+
+### Synthesis Agent
+
+After all 5 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Build a cross-layer dependency graph: map how a networking misconfiguration cascades into K8s scheduling failures, and how those trigger SRE alerts. Identify single points of failure spanning multiple layers.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.

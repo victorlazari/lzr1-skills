@@ -60,3 +60,39 @@ For detailed technical information, refer to the bundled reference files:
 
 - **[Complete Reference](references/complete-reference.md)**: Exhaustive documentation on Speedtest architecture, CLI commands, configuration schemas, deep-dive network analysis, security audit checklists, and troubleshooting guides.
 - **[Reading List](references/reading-list.md)**: Curated list of 30+ books and 30+ articles (2023-2026) covering network performance, 5G, TCP optimization, and network security.
+
+---
+
+## Adversarial Verification Panel
+
+For each significant network performance diagnostic finding produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong network performance diagnostic findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Network Tester, Security Auditor, Diagnostics Agent, Config Deployer) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: the Security Auditor recommends disabling multi-threaded TCP connections to reduce attack surface while the Network Tester recommends enabling more TCP threads to saturate a high-bandwidth 5G link)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified network performance report so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

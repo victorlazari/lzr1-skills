@@ -55,3 +55,39 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 
 -   `/home/ubuntu/specialist-skills/openclaw/references/complete-reference.md`: The definitive, consolidated guide to OpenClaw architecture, configuration, security, and troubleshooting.
 -   `/home/ubuntu/specialist-skills/openclaw/references/reading-list.md`: A curated list of books and articles relevant to AI agent runtimes, multi-agent orchestration, and production operations.
+
+---
+
+## Adversarial Verification Panel
+
+For each significant operational and security finding produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong operational and security findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Channel Specialist, Extension Auditor, Log Analyzer, Orchestration Checker) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: Channel Specialist recommending aggressive reconnection timeouts while Orchestration Checker recommends conservative timeout thresholds to prevent cross-context message flooding)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified remediation plan so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

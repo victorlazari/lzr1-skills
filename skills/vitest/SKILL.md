@@ -59,3 +59,39 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 
 -   **Complete Reference**: `/home/ubuntu/specialist-skills/vitest/references/complete-reference.md` - An exhaustive guide covering advanced mocking, snapshot testing, configuration schemas, CLI commands, and troubleshooting.
 -   **Reading List**: `/home/ubuntu/specialist-skills/vitest/references/reading-list.md` - A curated list of recent books and articles on Vitest, React testing, and modern JavaScript testing practices.
+
+---
+
+## Adversarial Verification Panel
+
+For each significant test finding (failing tests, coverage gaps, mocking issues) produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong test findings (failing tests, coverage gaps, mocking issues) from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Component Tester, Mocking Specialist, Schema Validator, Diagnostics Agent) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: Component Tester recommends accepting a snapshot update while Diagnostics Agent flags the same snapshot as a symptom of a broken mock)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified test report so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

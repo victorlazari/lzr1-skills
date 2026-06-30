@@ -59,3 +59,40 @@ Expert-level legal and compliance covering corporate law, contracts, IP, data pr
 - **Compliance programs**: See `references/compliance-programs.md` for certifications and audits.
 - **Corporate and IP**: See `references/corporate-ip.md` for governance and intellectual property.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `contract`, ... | **Contract Law** | Contract Specialist | `references/complete-reference.md` |
+| `regulatory`, ... | **Regulatory Compliance** | Regulatory Specialist | `references/complete-reference.md` |
+| `IP`, ... | **Intellectual Property** | IP Specialist | `references/complete-reference.md` |
+| `data privacy`, ... | **Data Privacy** | Privacy Specialist | `references/complete-reference.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 4
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **Legal Risk Synthesizer** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Flags where a data handling practice violates multiple regulatory frameworks simultaneously. Maps IP risks to contract clause gaps.

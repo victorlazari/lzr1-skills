@@ -73,3 +73,42 @@ Expert-level software engineering covering the full stack: backend services, fro
 - **Performance engineering**: See `references/performance-engineering.md` for profiling, optimization, and load testing.
 - **Language guides**: See `references/language-guides.md` for Go, Rust, blockchain, embedded, and game development.
 - **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+
+---
+
+## Multi-Specialist Protocol
+
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+### Domain Detection Table
+
+Scan the task for signals that indicate which domains apply:
+
+| Task Signal (examples) | Domain | Specialist Agent | Reference |
+|---|---|---|---|
+| `backend`, `API`, `service`, `REST`, `gRPC`, `microservice`, `server-side`, `HTTP handler`, `middleware` | **Backend Engineering** | Backend Specialist | `references/backend-engineering.md` |
+| `frontend`, `UI`, `React`, `Next.js`, `Vue`, `Angular`, `CSS`, `browser`, `component`, `client-side`, `SSR` | **Frontend Engineering** | Frontend Specialist | `references/frontend-engineering.md` |
+| `architecture`, `system design`, `distributed`, `scalability`, `trade-off`, `monolith`, `event-driven`, `CQRS`, `saga` | **Systems Architecture** | Architecture Specialist | `references/systems-architecture.md` |
+| `database`, `SQL`, `schema`, `migration`, `query`, `index`, `ORM`, `Postgres`, `MySQL`, `MongoDB`, `normalization` | **Database Engineering** | DB Specialist | `references/database-engineering.md` |
+| `performance`, `profiling`, `latency`, `throughput`, `benchmark`, `bottleneck`, `memory leak`, `cache`, `optimize` | **Performance Engineering** | Performance Specialist | `references/performance-engineering.md` |
+| `Go`, `Rust`, `blockchain`, `smart contract`, `Solidity`, `embedded`, `firmware`, `RTOS`, `game engine`, `ECS` | **Language-Specific Guidance** | Language Specialist | `references/language-guides.md` |
+
+### Spawning Logic
+
+**Single domain detected** → Fall back to original single-reference behavior (no change).
+
+**Multiple domains detected** → Launch all relevant specialists simultaneously:
+- Each specialist receives: **full task context** + its dedicated reference file only
+- No specialist waits for another — all start at the same time
+- Maximum concurrent specialists: 6
+
+### Cross-Domain Synthesizer
+
+After all specialists complete, run one **Stack Synthesizer** with all specialist outputs that:
+
+1. **Identifies contradictions** between specialist recommendations for the same component
+2. **Identifies gaps** — requirements addressed by no specialist
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+
+> Synthesis focus for this skill: Resolves contradictions between domain specialists (e.g., backend recommends Redis caching while DB specialist recommends materialized views). Ensures cross-domain consistency in the final implementation plan.

@@ -58,3 +58,40 @@ This skill includes helper scripts to automate complex workflows:
 4. **For remote repositories**, you can specify branches, tags, or commits:
    `trivy repo --branch main https://github.com/user/repo`
 5. **Full License Scanning**: If deep license analysis is required (scanning source code headers, not just package managers), add the `--license-full` flag. Note this takes significantly longer.
+
+---
+
+## Parallel Execution Protocol
+
+> **All 4 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **Vulnerability Agent** | CVE Scanning | OS packages, language dependencies, and application libraries against NVD/CVE databases | `references/filtering.md` |
+| **Misconfig Agent** | Misconfiguration Scanning | Dockerfile, Kubernetes manifests, Terraform, and cloud config security misconfigurations | `references/compliance-sbom.md` |
+| **Secret Agent** | Secret Detection | Hardcoded credentials, tokens, and private keys embedded in source or container layers | `references/filtering.md` |
+| **License Agent** | License Compliance | SBOM generation, license compatibility analysis, copyleft risk assessment | `references/compliance-sbom.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 4 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 4
+
+### Synthesis Agent
+
+After all 4 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Merge all scan types into a single severity-ranked SBOM. Flag CVEs whose affected packages also have license compliance issues. Map misconfigurations to the CVEs they expose.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.

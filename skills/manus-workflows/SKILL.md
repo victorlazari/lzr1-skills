@@ -60,3 +60,39 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - **Integration Configuration**: `connectors.yaml` manages external service connections and credentials.
 - **Security Configuration**: `rbac-config.yaml` defines roles, permissions, and access control.
 - **CLI Tool**: `manus-workflows` CLI for initializing, running, managing, and monitoring workflows.
+
+---
+
+## Adversarial Verification Panel
+
+For each significant workflow execution issue, integration failure, or performance bottleneck produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong workflow execution issues, integration failures, or performance bottlenecks from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Workflow Auditor, Integration Specialist, Scheduling Expert, Diagnostics Agent) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: the Diagnostics Agent recommends increasing retry attempts to handle transient connector failures, while the Workflow Auditor flags the same retry logic as a cascading failure risk that will amplify load on a degraded downstream service)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified workflow remediation plan so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

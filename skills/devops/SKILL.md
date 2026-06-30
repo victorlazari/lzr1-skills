@@ -55,3 +55,39 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 For detailed technical guidance, refer to the following resources:
 - [Complete Reference](references/complete-reference.md): In-depth guide on AWS, Kubernetes, EKS, Helm, Git, VPC, CI/CD, and configuration schemas.
 - [Reading List](references/reading-list.md): Curated list of recent books and articles on advanced DevOps practices.
+
+---
+
+## Adversarial Verification Panel
+
+For each significant infrastructure and deployment finding produced by the parallel sub-agents:
+
+1. Spawn **3 independent Refuter Agents** per finding, each with:
+   - The finding in full
+   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it
+3. A finding is **discarded** if ≥2 refuters succeed
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+
+> This prevents plausible-but-wrong infrastructure and deployment findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+
+## Cross-System Consistency Validator
+
+After all parallel agents (Deployment Agent, Infrastructure Provisioner, CI/CD Configurator, Security/Compliance Auditor, Cluster Diagnostics Agent) complete, but **before** synthesis:
+
+Run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other
+  *(example: the Security/Compliance Auditor recommends locking down all outbound egress rules in the VPC, while the Cluster Diagnostics Agent recommends opening additional ports to external registries to resolve image pull failures)*
+- Notes where one agent's output is a prerequisite for another agent's recommendation
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+
+## Synthesis Agent (Upgraded)
+
+The synthesis step actively resolves rather than aggregates:
+
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified infrastructure remediation plan so prerequisites appear before the steps that depend on them
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives

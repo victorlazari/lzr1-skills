@@ -61,3 +61,41 @@ When building or debugging a Meet assistant, work through these layers in order:
 | Chromium crashes in container | `shm_size: 2gb`, `--disable-dev-shm-usage`, memory limit ≥3GB. |
 | Latency feels slow | Measure per stage. Usual culprits: silence threshold too high (>800ms), non-streamed LLM/TTS, TTS text normalization enabled, oversized prompt. |
 | Double-joins after restart | Valkey dedup key must use TTL and never be deleted on shutdown. |
+
+---
+
+## Parallel Execution Protocol
+
+> **All 5 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+
+### Agent Roster
+
+| Agent | Dimension | Scope | Reference |
+|---|---|---|---|
+| **Audio/Transport Agent** | Audio & Transport Layer | WebRTC, codec selection, jitter buffers, packet loss, network topology | `references/architecture_and_audio.md` |
+| **Transcript Agent** | Transcript & NLP Pipeline | ASR accuracy, punctuation restoration, speaker diarization, latency | `references/low_latency_pipelines.md` |
+| **Knowledge Agent** | Knowledge Grounding | RAG integration, meeting context injection, entity resolution, factual accuracy | `references/knowledge_grounding.md` |
+| **Orchestration Agent** | Orchestration & Operations | Meeting lifecycle, bot management, scaling, error recovery, session state | `references/orchestration_and_ops.md` |
+| **Playwright Agent** | Playwright Automation | Browser-based meeting join, UI interaction, recording automation, resilience | `references/playwright_automation.md` |
+
+### Spawning Rules
+
+- **Trigger**: Every invocation of this skill — no exceptions
+- **Concurrency**: All 5 agents launch in a single `parallel()` call
+- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
+- **Maximum concurrent agents**: 5
+
+### Synthesis Agent
+
+After all 5 agents report, run one **Synthesis Agent** with all reports that:
+
+1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
+2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
+3. **Prioritizes** the merged set by severity/impact
+4. **Produces** a single unified output document
+
+> Synthesis note for this skill: Map latency contributions across all layers. Identify where a bottleneck in one layer (e.g., slow ASR) creates downstream degradation in another (e.g., knowledge grounding starts late). Produce end-to-end latency breakdown with root cause attribution.
+
+### Quality Gate
+
+A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.
