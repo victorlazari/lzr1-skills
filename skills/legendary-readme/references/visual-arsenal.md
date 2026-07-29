@@ -1,487 +1,284 @@
-# Visual Arsenal: Badges, Banners, ASCII Art, and Diagrams
+# Visual Arsenal
 
-> "A picture is worth a thousand words. A well-placed GIF is worth a thousand stars."
+> "A README with no visuals is a cover letter. A README with the right visuals is a movie trailer."
 
-This reference covers every visual technique available for making your README a visual masterpiece that works on GitHub, GitLab, and other platforms.
+This is the grab-bag toolkit for every README visual that **isn't** deep ASCII/terminal-animation
+technique (that's [Char Art and Animation](char-art-and-animation.md)) and **isn't** deep
+Mermaid/table technique (that's [Tables, Diagrams, and Workflows](tables-diagrams-workflows.md)).
+Use it in **Step 6: Add Visual Firepower** to assemble badges, banners, GIFs, theme-aware images,
+and hidden surprises.
 
----
-
-## Table of Contents
-
-- [Header Banners](#header-banners)
-- [Badges and Shields](#badges-and-shields)
-- [ASCII Art](#ascii-art)
-- [Mermaid.js Diagrams](#mermaidjs-diagrams)
-- [GIFs and Screenshots](#gifs-and-screenshots)
-- [Dark/Light Mode Support](#darklight-mode-support)
-- [Custom HTML Layouts](#custom-html-layouts)
-- [Visual Easter Eggs](#visual-easter-eggs)
+Everything here still obeys the **Visual Budget Rule**: 1 banner + 1 badge row + 2-3 GIFs + 1-2
+diagrams + 1 footer, max. This file gives you the recipes; the budget still applies once you use
+them.
 
 ---
 
-## Header Banners
+## 1. Badges
 
-### Capsule Render (Dynamic SVG — No Hosting Required)
+Badges are the fastest way to communicate project health at a glance. They all come from
+[shields.io](https://shields.io) (or a service that mimics its API), and they all live in one
+row, directly under the title/tagline.
 
-Base URL: `https://capsule-render.vercel.app/api`
+### Static badges
 
-| Parameter | Options | Description |
-| :--- | :--- | :--- |
-| `type` | `waving`, `egg`, `shark`, `slice`, `rect`, `soft`, `rounded`, `cylinder`, `venom`, `transparent` | Banner shape |
-| `color` | `auto`, `gradient`, `timeAuto`, hex code, `0:COLOR1,100:COLOR2` | Color scheme |
-| `height` | Number (px) | Banner height |
-| `text` | URL-encoded string | Display text |
-| `fontSize` | Number | Text size |
-| `fontColor` | Hex code (no #) | Text color |
-| `animation` | `fadeIn`, `scaleIn`, `blink`, `blinking`, `twinkling` | Text animation |
-| `section` | `header`, `footer` | Position |
-| `desc` | URL-encoded string | Subtitle text |
-
-**Popular Combinations:**
+For anything shields.io doesn't auto-detect from a registry — a fixed claim you control by hand.
 
 ```markdown
-<!-- Waving gradient with animation -->
-![Header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=ProjectName&fontSize=50&fontColor=fff&animation=twinkling)
-
-<!-- Minimal transparent with color accent -->
-![Header](https://capsule-render.vercel.app/api?type=transparent&color=auto&height=120&text=ProjectName&fontSize=40&fontAlignY=50)
-
-<!-- Venom style (dramatic) -->
-![Header](https://capsule-render.vercel.app/api?type=venom&color=0:8B5CF6,100:EC4899&height=200&text=ProjectName&fontSize=50&fontColor=fff)
-
-<!-- Footer wave -->
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer)
+![Made with Love](https://img.shields.io/badge/Made%20with-Love-red)
+![Status](https://img.shields.io/badge/status-active-success)
 ```
 
-### Typing Effect (Animated Taglines)
+### Dynamic badges (pull live data)
 
-```markdown
-<p align="center">
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=6366F1&center=true&vCenter=true&random=false&width=600&lines=Build+Legendary+READMEs;Make+Documentation+Fun+Again;Write+Once%2C+Impress+Forever" alt="Typing SVG" />
-  </a>
-</p>
-```
-
-Parameters: `font`, `weight`, `size`, `pause` (ms between lines), `color`, `center`, `vCenter`, `width`, `lines` (separated by `;`).
-
----
-
-## Badges and Shields
-
-### Badge Anatomy
-
-URL pattern: `https://img.shields.io/badge/LABEL-MESSAGE-COLOR?style=STYLE&logo=LOGO&logoColor=LOGOCOLOR`
-
-### Style Options
-
-| Style | Look | Best For |
-| :--- | :--- | :--- |
-| `flat` | Default, clean | General use |
-| `flat-square` | No rounded corners | Modern, minimal |
-| `for-the-badge` | Large, bold | Headers, CTAs |
-| `plastic` | Glossy, 3D | Retro feel |
-| `social` | GitHub-style | Social metrics |
-
-### Essential Badge Categories
-
-**Project Health:**
-```markdown
-![Build](https://img.shields.io/github/actions/workflow/status/user/repo/ci.yml?style=flat-square&label=build)
-![Coverage](https://img.shields.io/codecov/c/github/user/repo?style=flat-square)
-![Version](https://img.shields.io/github/v/release/user/repo?style=flat-square)
-![Downloads](https://img.shields.io/npm/dm/package-name?style=flat-square)
-```
-
-**Tech Stack:**
-```markdown
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
-![Rust](https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![Go](https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white)
-```
-
-**Fun/Personality Badges:**
-```markdown
-![Powered by Coffee](https://img.shields.io/badge/Powered_by-Coffee-brown?style=flat-square&logo=buymeacoffee&logoColor=white)
-![Works on My Machine](https://img.shields.io/badge/Works_on-My_Machine-green?style=flat-square)
-![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square)
-![Made with Love](https://img.shields.io/badge/Made_with-❤️-red?style=flat-square)
-![Mass of Bugs](https://img.shields.io/badge/Bugs-Features-blue?style=flat-square)
-![Sleep Deprived](https://img.shields.io/badge/Built_at-3AM-purple?style=flat-square)
-```
-
-**Social/Community:**
-```markdown
-![Stars](https://img.shields.io/github/stars/user/repo?style=social)
-![Forks](https://img.shields.io/github/forks/user/repo?style=social)
-![Discord](https://img.shields.io/discord/SERVER_ID?style=flat-square&logo=discord&logoColor=white&label=Discord)
-![Twitter Follow](https://img.shields.io/twitter/follow/username?style=social)
-```
-
-### Custom Badge Builder
-
-For any custom badge: `https://img.shields.io/badge/LABEL-MESSAGE-COLOR`
-
-- Replace spaces with `_` or `%20`
-- Replace `-` with `--` (double dash)
-- Colors: named (`green`, `blue`) or hex (`FF6B6B`)
-
----
-
-## ASCII Art
-
-### When to Use ASCII Art
-
-- Terminal-focused projects (CLI tools, shell scripts)
-- Retro/hacker aesthetic (personality level 4-5)
-- Project logos when no image is available
-- Section dividers for dramatic effect
-
-### ASCII Art Generators
-
-Use these tools, then paste the output in a code block:
-
-- **figlet** — Classic block letters: `figlet -f slant "ProjectName"`
-- **toilet** — Colored ASCII: `toilet -f mono12 "ProjectName"`
-- **boxes** — Decorative borders: `echo "text" | boxes -d stone`
-
-### Pre-Made Patterns
-
-**Simple divider:**
-```
-═══════════════════════════════════════════════════════
-```
-
-**Retro computer:**
-```
-┌──────────────────────────────────────────────────┐
-│  ██████╗ ██████╗  ██████╗      ██╗███████╗ ██████╗████████╗│
-│  ██╔══██╗██╔══██╗██╔═══██╗     ██║██╔════╝██╔════╝╚══██╔══╝│
-│  ██████╔╝██████╔╝██║   ██║     ██║█████╗  ██║        ██║   │
-│  ██╔═══╝ ██╔══██╗██║   ██║██   ██║██╔══╝  ██║        ██║   │
-│  ██║     ██║  ██║╚██████╔╝╚█████╔╝███████╗╚██████╗   ██║   │
-│  ╚═╝     ╚═╝  ╚═╝ ╚═════╝  ╚════╝ ╚══════╝ ╚═════╝   ╚═╝   │
-└──────────────────────────────────────────────────┘
-```
-
-**Minimal box:**
-```
-╔═══════════════════════════════╗
-║   ProjectName v2.0            ║
-║   "Making things less broken" ║
-╚═══════════════════════════════╝
-```
-
----
-
-## Mermaid.js Diagrams
-
-GitHub renders Mermaid natively. No images needed. Always prefer Mermaid over static diagrams.
-
-### Flowchart (Decision/Process)
-
-````markdown
-```mermaid
-graph TD
-    A[Start] --> B{Is it working?}
-    B -->|Yes| C[Don't touch it]
-    B -->|No| D{Did you change something?}
-    D -->|Yes| E[Undo it]
-    D -->|No| F[It's DNS]
-    E --> B
-    F --> B
-```
-````
-
-### Sequence Diagram (API Flows)
-
-````markdown
-```mermaid
-sequenceDiagram
-    actor User
-    participant App
-    participant API
-    participant DB
-
-    User->>App: Click "Save"
-    App->>API: POST /data
-    API->>DB: INSERT INTO...
-    DB-->>API: OK (id: 42)
-    API-->>App: 201 Created
-    App-->>User: "Saved! ✓"
-```
-````
-
-### State Diagram (Lifecycle)
-
-````markdown
-```mermaid
-stateDiagram-v2
-    [*] --> Draft
-    Draft --> Review : Submit
-    Review --> Approved : Accept
-    Review --> Draft : Request Changes
-    Approved --> Published : Deploy
-    Published --> Archived : Deprecate
-    Archived --> [*]
-```
-````
-
-### Git Graph (Branching Strategy)
-
-````markdown
-```mermaid
-gitGraph
-    commit id: "init"
-    commit id: "feat: core"
-    branch develop
-    checkout develop
-    commit id: "feat: api"
-    commit id: "feat: auth"
-    checkout main
-    merge develop id: "v1.0.0" tag: "v1.0.0"
-    branch hotfix
-    commit id: "fix: security"
-    checkout main
-    merge hotfix id: "v1.0.1" tag: "v1.0.1"
-```
-````
-
-### Pie Chart (Distribution)
-
-````markdown
-```mermaid
-pie title Language Distribution
-    "TypeScript" : 65
-    "Rust" : 20
-    "Python" : 10
-    "Shell" : 5
-```
-````
-
-### Timeline (Project History)
-
-````markdown
-```mermaid
-timeline
-    title Project History
-    2022 : Initial concept
-         : First prototype
-    2023 : v1.0 release
-         : 1000 stars
-    2024 : v2.0 rewrite
-         : Enterprise features
-         : 10K users
-```
-````
-
----
-
-## GIFs and Screenshots
-
-### Best Practices
-
-| Aspect | Recommendation |
+| Badge | Markdown |
 | :--- | :--- |
-| Format | GIF for short demos (<30s), MP4/WebM for longer |
-| Width | 600-800px (fits most screens without scrolling) |
-| Duration | 5-15 seconds ideal, loop if possible |
-| File size | Under 5MB (GitHub has a 10MB limit) |
-| Content | Show the "wow moment" — the thing that makes people want to use it |
+| npm version | `![npm](https://img.shields.io/npm/v/PACKAGE_NAME)` |
+| Build status (GitHub Actions) | `![Build](https://img.shields.io/github/actions/workflow/status/OWNER/REPO/ci.yml)` |
+| License | `![License](https://img.shields.io/github/license/OWNER/REPO)` |
+| Downloads (npm, monthly) | `![Downloads](https://img.shields.io/npm/dm/PACKAGE_NAME)` |
+| Tech stack (single language) | `![Go](https://img.shields.io/badge/Go-1.22-00ADD8?logo=go&logoColor=white)` |
 
-### Recording Tools
-
-- **Terminal**: [asciinema](https://asciinema.org/) (records as text, tiny files)
-- **Screen**: [Kap](https://getkap.co/) (macOS), [Peek](https://github.com/phw/peek) (Linux), [ScreenToGif](https://www.screentogif.com/) (Windows)
-- **Browser**: Chrome DevTools → Performance → Screenshot
-
-### Embedding Patterns
+Copy-paste examples, ready to drop under the title:
 
 ```markdown
-<!-- Centered GIF with caption -->
-<p align="center">
-  <img src="./docs/demo.gif" alt="Demo showing the main workflow" width="700" />
-  <br />
-  <em>Creating a new project in under 10 seconds</em>
-</p>
-
-<!-- Side-by-side comparison -->
-<table>
-  <tr>
-    <td align="center"><strong>Before</strong></td>
-    <td align="center"><strong>After</strong></td>
-  </tr>
-  <tr>
-    <td><img src="./docs/before.png" width="400" alt="Before: messy output" /></td>
-    <td><img src="./docs/after.png" width="400" alt="After: clean output" /></td>
-  </tr>
-</table>
+![Version](https://img.shields.io/npm/v/legendary-readme?style=flat-square&color=blueviolet)
+![License](https://img.shields.io/github/license/lerianstudio/legendary-readme?style=flat-square)
+![Build](https://img.shields.io/github/actions/workflow/status/lerianstudio/legendary-readme/ci.yml?style=flat-square)
+![Downloads](https://img.shields.io/npm/dm/legendary-readme?style=flat-square&color=orange)
+![Go Version](https://img.shields.io/badge/Go-1.22-00ADD8?style=flat-square&logo=go&logoColor=white)
 ```
+
+### Styling params
+
+Shields.io badges take a `style` query param that controls the visual weight of the whole row:
+
+| `style=` | Look | Best for |
+| :--- | :--- | :--- |
+| `flat` | Default, slight gradient | General use, no strong opinion needed |
+| `flat-square` | Flat, no gradient, sharp corners | Minimal/modern READMEs (most common choice) |
+| `for-the-badge` | Bold, uppercase, chunky | Personality level 3+, hero-row emphasis |
+| `plastic` | Glossy, rounded, 2013-era GitHub look | Retro/nostalgia themes only |
+| `social` | Rounded with a counter bubble (stars/followers) | Social-proof badges (GitHub stars, Twitter follow) |
+
+**Rule: never mix badge styles in one row.** A `for-the-badge` badge next to a `flat-square`
+badge looks like two different projects stitched together. Pick one `style=` value and apply it
+to every badge in the row — set it once as a shared query param, not per-badge by accident.
+
+### Grouping into one consistent row
+
+Put every badge on consecutive lines directly under the title (Markdown renders adjacent images
+as an inline-wrapping row) — don't scatter badges through the body of the README.
+
+```markdown
+# ProjectName
+
+![Version](https://img.shields.io/npm/v/project?style=flat-square)
+![Build](https://img.shields.io/github/actions/workflow/status/owner/project/ci.yml?style=flat-square)
+![License](https://img.shields.io/github/license/owner/project?style=flat-square)
+![Downloads](https://img.shields.io/npm/dm/project?style=flat-square)
+```
+
+Cap the row at **5-7 badges**. Past that, it stops reading as "trust signals" and starts reading
+as noise — fold anything extra (coverage %, code climate grade, sponsor count) into the body or a
+`docs/badges.md` if the project truly needs more.
 
 ---
 
-## Dark/Light Mode Support
+## 2. Banners
 
-GitHub supports theme-aware images using the `<picture>` element.
+A banner is the visual anchor right below (or replacing) the `# ProjectName` heading. Pick exactly
+one approach — don't stack a capsule-render banner AND an SVG typing headline AND an ASCII banner.
 
-### Pattern: Swap Entire Images
+### capsule-render (dynamic SVG header)
+
+**[capsule-render](https://github.com/kyechan99/capsule-render)** generates a hosted, parametrized
+SVG banner — no image file to commit, tunable via URL query params.
 
 ```markdown
+![Header](https://capsule-render.vercel.app/api?type=waving&color=0:6D28D9,100:06B6D4&height=180&section=header&text=ProjectName&fontSize=60&fontColor=ffffff&animation=fadeIn)
+```
+
+Key params:
+
+| Param | Values | Effect |
+| :--- | :--- | :--- |
+| `type` | `waving`, `rect`, `rounded`, `venom`, `soft`, `slice`, `transparent` | Shape of the banner |
+| `color` | hex, or gradient `0:HEX,100:HEX` | Fill color / gradient stops |
+| `height` | integer (px) | Banner height — keep it under the budget below |
+| `text` | URL-encoded string | Headline text rendered on the banner |
+| `fontSize` / `fontColor` | integer / hex | Text styling |
+| `animation` | `fadeIn`, `blink`, `twinkling` | Optional looping motion (still SVG, not a GIF) |
+| `section` | `header`, `footer` | Flip curvature direction — use `footer` to mirror the header at the bottom of the README |
+
+### svg-banners (alternative)
+
+**[svg-banners](https://github.com/Akshay090/svg-banners)** covers a similar niche with a
+different visual set (chisel, wave-2, hero). Same usage pattern: point an `![]()` at the generated
+URL with your text/theme baked into the query string.
+
+### No-tool fallback: plain centered heading
+
+When you don't want a third-party SVG dependency at all (offline builds, air-gapped docs, or a
+Corporate Geek tone that wants zero decoration risk), a centered `<h1>` + tagline is a perfectly
+legitimate banner:
+
+```markdown
+<h1 align="center">ProjectName</h1>
+<p align="center"><em>One line that says what this is, in plain English.</em></p>
+```
+
+**Rule: keep total banner height under ~200px.** A banner taller than that pushes the Big Three
+(What/Why/How) below the fold on a laptop screen, which defeats the entire purpose of a banner —
+it's supposed to earn attention, not consume the reader's 3-second budget.
+
+---
+
+## 3. ASCII Art (pointer)
+
+For static ASCII/Unicode wordmarks, box-drawing architecture sketches, and hand-built mascots, see
+[Char Art and Animation](char-art-and-animation.md) for the full toolkit, generation tools, and
+accessibility rules — don't duplicate that logic here.
+
+---
+
+## 4. Mermaid Diagrams (pointer)
+
+For Mermaid diagram syntax, captioning rules, and the decision of when to reach for Mermaid vs. D2
+vs. plain box-drawing, see [Tables, Diagrams, and Workflows](tables-diagrams-workflows.md) — that
+file owns diagram technique end to end.
+
+---
+
+## 5. GIFs
+
+GIFs are the highest-impact and highest-risk visual in a README: they sell "this actually works"
+better than prose, but a bloated or jarring one tanks load time and trust in the same breath.
+
+### Sourcing
+
+| Source | When to use | Trade-off |
+| :--- | :--- | :---: |
+| **Giphy embed** (`![](https://media.giphy.com/media/ID/giphy.gif)`) | A reaction/humor GIF, not project-specific | Depends on Giphy staying up; zero hosting cost |
+| **Self-hosted** (`docs/assets/*.gif`, committed) | Anything project-specific — demos, screenshots, UI walkthroughs | You own uptime and size, but it survives if a third party disappears |
+| **Terminal-recording GIF** (VHS/asciinema) | "Watch the CLI actually run" | Full technique — see [Char Art and Animation](char-art-and-animation.md) §2, don't duplicate here |
+
+Default to self-hosted for anything that demonstrates the product; reserve Giphy embeds for pure
+humor/personality beats where the exact GIF doesn't need to survive forever.
+
+### Etiquette
+
+- **One clear subject per GIF.** A GIF trying to show "install, then configure, then run, then
+  the dashboard" in one loop teaches nothing — split it into separate GIFs per Big-Three step, or
+  cut it down to the single most convincing moment.
+- **Don't autoplay something jarring above the fold.** GitHub GIFs autoplay and loop with no user
+  control — a flashing, fast-cut, or loud-color GIF as the very first thing a reader sees reads as
+  hostile, not exciting. Save high-energy GIFs for deeper sections (Contributing, Easter Eggs)
+  where the reader has already opted in to the vibe.
+- **Size/host discipline** — same budget as the terminal-recording rule in
+  [Char Art and Animation](char-art-and-animation.md): commit to `docs/assets/` (or
+  `.github/assets/`), run through `gifsicle -O3 --lossy=80`, target under 2MB with a hard cap of
+  5MB, and reference by relative path so forks keep working.
+
+---
+
+## 6. Responsive Images (Dark/Light Mode)
+
+GitHub renders READMEs in whatever theme the viewer has set. A banner or diagram with light text
+on a transparent background disappears in light mode; dark text on transparent disappears in dark
+mode. The fix is the `<picture>` tag with `prefers-color-scheme` media queries — GitHub's markdown
+sanitizer allows this pattern natively.
+
+```html
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./docs/logo-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="./docs/logo-light.svg">
-  <img alt="ProjectName Logo" src="./docs/logo-light.svg" width="300">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/banner-light.png">
+  <img alt="ProjectName banner" src="docs/assets/banner-light.png">
 </picture>
 ```
 
-### Pattern: Theme-Aware Diagrams
+- The trailing `<img>` is mandatory — it's the fallback for renderers that don't parse `<picture>`
+  (some markdown-to-PDF exporters, RSS readers, older clients), so it must point at whichever
+  variant is legible on a plain white background.
+- Always set a real `alt` on the fallback `<img>`, not on the `<source>` tags (`<source>` doesn't
+  support `alt`).
+- Works identically for diagrams: a Mermaid-rendered PNG export, a capsule-render banner with two
+  color params, or a screenshot taken once in each OS theme.
 
-```markdown
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./docs/architecture-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="./docs/architecture-light.png">
-  <img alt="System architecture diagram" src="./docs/architecture-light.png" width="100%">
-</picture>
-```
-
-### Tip: Mermaid Auto-Adapts
-
-Mermaid.js diagrams automatically adapt to GitHub's dark/light mode. This is another reason to prefer Mermaid over static images.
-
----
-
-## Custom HTML Layouts
-
-GitHub Markdown supports a subset of HTML for advanced layouts.
-
-### Centered Content Block
-
-```html
-<div align="center">
-
-  **ProjectName** — Your tagline here
-
-  [Website](https://example.com) · [Docs](https://docs.example.com) · [Discord](https://discord.gg/xxx)
-
-</div>
-```
-
-### Two-Column Layout
-
-```html
-<table>
-  <tr>
-    <td width="50%" valign="top">
-
-### 🎯 For Users
-
-- Easy installation
-- Zero configuration
-- Works out of the box
-
-    </td>
-    <td width="50%" valign="top">
-
-### 🔧 For Developers
-
-- Extensible plugin API
-- Full TypeScript support
-- Comprehensive test suite
-
-    </td>
-  </tr>
-</table>
-```
-
-### Feature Showcase Cards
-
-```html
-<table>
-  <tr>
-    <td align="center" width="33%">
-      <img src="./docs/icon-speed.png" width="60" alt="Speed" /><br />
-      <strong>Fast</strong><br />
-      <sub>Sub-ms latency</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="./docs/icon-secure.png" width="60" alt="Secure" /><br />
-      <strong>Secure</strong><br />
-      <sub>Zero-trust by default</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="./docs/icon-simple.png" width="60" alt="Simple" /><br />
-      <strong>Simple</strong><br />
-      <sub>3 lines to start</sub>
-    </td>
-  </tr>
-</table>
-```
+**Rule: every banner or diagram with a real contrast issue in one theme needs an explicit dark AND
+light variant — not a single image that happens to "look OK" in both.** A gray-on-transparent
+logo that's merely readable in dark mode and washed-out-but-technically-visible in light mode is
+not a fix; if you can articulate which theme looks worse, that's the signal to generate the second
+variant, not ship the compromise.
 
 ---
 
-## Visual Easter Eggs
+## 7. Visual Easter Eggs
 
-### The Hidden Image
+Small surprises reward the readers who actually explore the file — collapsible sections, jokes
+hidden where only the curious will find them, and content reachable only via a link, not the
+visible nav.
 
-```markdown
-<!-- This comment contains a secret message for source-code readers:
-     ___
-    /   \
-   | o o |
-    \_^_/
-   You found Blobby! The unofficial mascot.
-   Blobby says: "Star this repo and good things will happen."
--->
-```
-
-### The Expandable Art Gallery
+### Collapsible `<details>` surprise
 
 ```markdown
 <details>
-<summary>🎨 Click for unnecessary but delightful art</summary>
+<summary>🎉 You found the secret changelog haiku</summary>
 
-```
-    /\_/\
-   ( o.o )
-    > ^ <   "I helped write this README"
-   /|   |\
-  (_|   |_)
-```
+Code once broken now,
+tests are green, deploy at dawn —
+ship it, then go home.
 
 </details>
 ```
 
-### The Progress Bar (Fake but Fun)
+### Joke in alt text
+
+Nobody reads alt text except screen-reader users and the terminally curious who right-click →
+"Inspect" — perfect low-stakes real estate for a one-liner that doesn't interfere with the visible
+page:
 
 ```markdown
-**Project Completion:**
-
-```
-██████████████████████░░░░░ 84% — Almost there!
+![A very serious architecture diagram, drawn by someone who is clearly having a great time](docs/assets/architecture.png)
 ```
 
-**Documentation Quality:**
+### Hidden section reachable only via anchor link
 
-```
-████████████████████████████ 100% — You're reading proof
-```
-```
-
-### Star History Chart
+A section that exists in the file but is deliberately left out of the visible Table of Contents —
+discoverable only by a footnote, a comment in the code examples, or a link buried in the FAQ that
+says "there's more here" without saying what.
 
 ```markdown
-## ⭐ Star History
+<!-- Not listed in the ToC above. If you're reading the raw source, hi. -->
+## <a name="you-found-it"></a> The Room Behind the Bookshelf
 
-<a href="https://star-history.com/#user/repo&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=user/repo&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=user/repo&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=user/repo&type=Date" width="600" />
-  </picture>
-</a>
+If you made it this far by reading the markdown source instead of the rendered page, you're
+exactly the kind of person this project was built for.
 ```
+
+**Rule: Easter eggs never carry load-bearing information.** Anything a user actually needs to
+succeed (a required flag, a breaking-change warning) must live in the visible, linear flow — eggs
+are for delight, not documentation.
+
+---
+
+## Visual Arsenal Checklist
+
+- [ ] Every badge in the top row shares one `style=` value — no mixing `flat-square` with
+      `for-the-badge` in the same row
+- [ ] Badge row is 5-7 badges max; anything beyond that is moved into the body or a dedicated file
+- [ ] Banner height stays under ~200px so the Big Three stay above the fold
+- [ ] Exactly one banner technique is used (capsule-render, svg-banners, or plain heading) — not
+      stacked with an ASCII banner or typing SVG in the same header
+- [ ] Any banner or diagram with a real contrast problem in one theme ships both a dark AND a
+      light variant via `<picture>` — not a single "good enough" image
+- [ ] Every `<picture>` block has a fallback `<img>` with a real `alt`, not a filename
+- [ ] Every GIF has one clear subject; nothing jarring or autoplaying sits above the fold
+- [ ] All committed GIFs live in `docs/assets/` (or `.github/assets/`), are under 5MB (ideally
+      under 2MB), and were run through `gifsicle -O3`
+- [ ] Terminal-recording GIFs and ASCII art follow [Char Art and Animation](char-art-and-animation.md)
+      instead of being reinvented here
+- [ ] Easter eggs (collapsible `<details>`, alt-text jokes, hidden anchors) carry zero load-bearing
+      information — everything essential is also in the visible, linear flow
+- [ ] Total visual count still respects the Visual Budget Rule: 1 banner + 1 badge row + 2-3 GIFs
+      + 1-2 diagrams + 1 footer

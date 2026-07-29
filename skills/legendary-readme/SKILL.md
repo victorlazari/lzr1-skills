@@ -129,19 +129,21 @@ A legendary README is a visual experience. First, choose a **Visual Style** from
    - **Banner** — Dynamic SVG header (capsule-render, svg-banners, or typing effect)
    - **Badges** — Project health, tech stack, social proof (all same style!)
    - **Tech Stack Icons** — Skill Icons or Devicon for beautiful tech badges
-   - **GIFs/Screenshots** — Animated demos, coding GIFs, or product screenshots
+   - **Char art** — ASCII/Unicode wordmarks, box-drawing diagrams, or a mascot for personality level 3+ (no hosting needed, renders everywhere)
+   - **GIFs/Screenshots** — Animated demos, coding GIFs, terminal-recording GIFs, or product screenshots
    - **Diagrams** — Mermaid.js for architecture (renders natively on GitHub)
    - **Animated Dividers** — Rainbow lines, neon separators, or Pac-Man
    - **Stats Widgets** — GitHub stats, streak, trophies, activity graph
    - **Dark/Light mode** — Use `<picture>` tags for responsive assets
    - **Footer** — Matching wave/gradient that mirrors the header
 
-**Visual Budget Rule:** Max 1 banner + 1 badge row + 2-3 GIFs + 1-2 diagrams + 1 footer. More is noise.
+**Visual Budget Rule:** Max 1 banner + 1 badge row + 2-3 GIFs + 1-2 diagrams + 1 footer. More is noise. Char art and terminal-recording GIFs draw from this same budget — don't stack every technique into one README.
 
 For the complete visual toolkit, see:
 - [Theme Engine](references/theme-engine.md) — Build ONE cohesive theme (palette, animated banner, mascot, funny GIFs, catchphrase, themed section names) from the project's purpose, with 8 ready-to-use kits
 - [Visual Arsenal](references/visual-arsenal.md) — Badges, banners, ASCII art, Mermaid diagrams, dark/light mode
 - [Visual Style System](references/visual-style-system.md) — Color palettes, GIF libraries, design recipes, stats widgets, illustration sources, and complete copy-paste layout recipes
+- [Char Art and Animation](references/char-art-and-animation.md) — Static ASCII/Unicode art and box-drawing diagrams, scripted terminal-recording GIFs (VHS/asciinema), SVG typing/wave banners with no GIF file needed, and Matrix/glitch/retro-CRT effects for Full Nerd Mode readmes — with an accessibility checklist for all of it
 
 ### Step 7: Validate and Ship
 
@@ -161,6 +163,8 @@ Before delivering, run this checklist:
 - [ ] Heading hierarchy is strictly nested and sections follow a consistent order
 - [ ] No jargon is used without explanation
 - [ ] The README works in both light and dark mode
+- [ ] Any ASCII/char art is in a fenced code block, ≤80 columns, with a plain-text caption
+- [ ] Any terminal-recording GIF has a checked-in source script and is under 5MB (gifsicle-optimized)
 
 ---
 
@@ -199,6 +203,7 @@ This skill includes dedicated reference files for deep-dive guidance:
 - **[Tables, Diagrams, and Workflows](references/tables-diagrams-workflows.md)** — Master guide to perfect tables, diagrams/drawings (Mermaid + D2), sheets/data (CSV, charts), workflows (user steps + CI/CD), and well-structured sections, each with rules, patterns, and quality checklists
 - **[Visual Arsenal](references/visual-arsenal.md)** — Badges, banners, ASCII art, Mermaid diagrams, GIFs, responsive images, and visual Easter eggs
 - **[Visual Style System](references/visual-style-system.md)** — Color palettes, GIF libraries, animated assets, design recipes, stats widgets, illustration sources, typography, and complete visual layout recipes
+- **[Char Art and Animation](references/char-art-and-animation.md)** — Static ASCII/Unicode art and box-drawing diagrams, scripted terminal-recording GIFs (VHS/asciinema), no-file-needed SVG typing/wave banners, and Matrix/glitch/retro-CRT effects for Full Nerd Mode readmes, with an accessibility checklist
 - **[Hall of Fame](references/hall-of-fame.md)** — Curated legendary README examples with analysis of what makes them great
 
 ## Templates

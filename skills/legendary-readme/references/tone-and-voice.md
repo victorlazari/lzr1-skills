@@ -1,422 +1,283 @@
-# Tone and Voice: The Art of Funny, Smart Documentation
+# Tone and Voice
 
-> "Humor is the shortest distance between two people." — Victor Borge
+> "Comedy is just tragedy plus a working code sample."
 
-This reference covers how to inject personality, humor, and geek culture into README files without sacrificing clarity or alienating readers.
+This is the toolkit for **Step 4: Inject Personality and Humor** — the mechanics of making a
+README funny on purpose instead of funny by accident. It covers reusable joke patterns, how to
+use geek/pop-culture references without dating the doc or excluding readers, concrete Easter egg
+implementations, where personality is safe to inject, a pre-ship sanity check for every joke, and
+how to keep one voice across a document written in pieces.
 
----
-
-## Table of Contents
-
-- [The Golden Rule of README Humor](#the-golden-rule-of-readme-humor)
-- [Tone Spectrum Deep Dive](#tone-spectrum-deep-dive)
-- [Humor Techniques That Work](#humor-techniques-that-work)
-- [Geek Culture Reference Library](#geek-culture-reference-library)
-- [Easter Egg Patterns](#easter-egg-patterns)
-- [What NOT To Do](#what-not-to-do)
-- [Personality by Section](#personality-by-section)
+Everything here is downstream of the **Tone Spectrum** (Step 1 of the main workflow) — the
+techniques below scale in *density*, not in *kind*, from Corporate Geek (level 1, one dry aside
+per section) to Chaotic Genius (level 5, the joke is the architecture). Pick your level first,
+then use this file to execute it. Core principle, non-negotiable at every level: **clarity over
+jokes.** If a bit slows down comprehension, cut the bit, not the clarity.
 
 ---
 
-## The Golden Rule of README Humor
+## 1. Humor Mechanics
 
-**If removing the joke makes the documentation worse, the joke is doing its job. If removing the joke makes the documentation clearer, delete the joke.**
+Six reusable patterns. Each is a *mechanism*, not a one-off joke — learn the shape and you can
+generate a fresh instance for any project.
 
-Humor in documentation serves three purposes:
-1. **Retention** — People remember funny things longer
-2. **Approachability** — Humor signals "this project welcomes you"
-3. **Personality** — It differentiates your project from 10,000 others
-
-Google's style guide says: "Don't try to be super-entertaining, but also don't aim for super-dry. Be human." The Legendary README takes this further: be intentionally entertaining WHERE it helps, and crystal clear EVERYWHERE.
-
----
-
-## Tone Spectrum Deep Dive
-
-### Level 1: Corporate Geek
-
-Subtle intelligence. The reader smiles but couldn't point to a specific joke.
-
-**Techniques:**
-- Precise, elegant word choices that show expertise
-- Understated self-awareness ("Yes, another JavaScript framework.")
-- Smart analogies from science, math, or engineering
-
-**Example header:**
-```markdown
-## Installation
-
-Getting started takes less time than arguing about tabs vs. spaces.
-```
-
-**Example description:**
-```markdown
-> A blazingly fast API gateway that handles 100K req/sec.
-> (We measured. Twice. With different thermometers.)
-```
-
-### Level 2: Friendly Nerd
-
-Warm and welcoming. Like a senior engineer who actually enjoys mentoring.
-
-**Techniques:**
-- Occasional puns (sparingly!)
-- Friendly asides in parentheses
-- Self-deprecating humor about the project's history
-- Pop culture references that are widely known
-
-**Example header:**
-```markdown
-## Quick Start (We Promise It's Actually Quick)
-```
-
-**Example feature list:**
-```markdown
-| Feature | Status | Notes |
-| :--- | :---: | :--- |
-| Hot Reload | ✅ | Faster than your coffee gets cold |
-| Type Safety | ✅ | Catches bugs before they catch you |
-| Dark Mode | ✅ | Because we're not monsters |
-```
-
-### Level 3: Playful Hacker
-
-Creative, surprising, memorable. The README has its own character.
-
-**Techniques:**
-- Creative section names that still communicate purpose
-- Metaphors and storytelling
-- Unexpected comparisons
-- Interactive elements and hidden content
-- Code examples with personality
-
-**Example sections:**
-```markdown
-## 🏗️ Architecture (or: How the Sausage Gets Made)
-
-## 🚨 Breaking Changes (a.k.a. "Oops, We Did It Again")
-
-## 🧪 Testing (Trust, but Verify)
-```
-
-**Example code block:**
-```python
-# This function does the heavy lifting.
-# And by "heavy lifting" we mean it moves bytes around.
-# Computers are just very fast rock arrangements, after all.
-def process(data):
-    return transform(data)  # Magic happens here ✨
-```
-
-### Level 4: Full Nerd Mode
-
-The README is an experience. Easter eggs everywhere. Rewards deep reading.
-
-**Techniques:**
-- ASCII art headers or dividers
-- Hidden jokes in collapsible sections
-- Pop culture deep cuts (Star Wars, LOTR, Hitchhiker's Guide)
-- Meta-humor about documentation itself
-- Fake "classified" or "redacted" sections
-- Achievement unlocked patterns
-
-**Example intro:**
-```markdown
-# 🧙‍♂️ ProjectName
-
-```
- ____            _           _   _   _
-|  _ \ _ __ ___ (_) ___  ___| |_| \ | | __ _ _ __ ___   ___
-| |_) | '__/ _ \| |/ _ \/ __| __|  \| |/ _` | '_ ` _ \ / _ \
-|  __/| | | (_) | |  __/ (__| |_| |\  | (_| | | | | | |  __/
-|_|   |_|  \___// |\___|\___|\__|_| \_|\__,_|_| |_| |_|\___|
-               |__/
-```
-
-> "Any sufficiently advanced technology is indistinguishable from magic."
-> — Arthur C. Clarke (and also this library, probably)
-```
-
-**Example Easter egg:**
-```markdown
-<details>
-<summary>🔮 Click here if you believe in magic</summary>
-
-You found the secret section! Here's a mass of useless but delightful trivia:
-
-- This project was started at 3 AM after too much coffee
-- The variable `foo` was almost named `banana_for_scale`
-- Our CI pipeline plays the Final Fantasy victory fanfare on green builds
-
-Achievement Unlocked: 🏆 README Archaeologist
-</details>
-```
-
-### Level 5: Chaotic Genius
-
-The README IS the project. The documentation is performance art.
-
-**Techniques:**
-- The entire README is a joke that also works as documentation
-- Absurdist humor with a straight face
-- Over-engineering simple concepts for comedic effect
-- Breaking the fourth wall constantly
-
-**Example (inspired by FizzBuzz Enterprise Edition):**
-```markdown
-# FizzBuzz Enterprise Edition™
-
-> The most over-engineered FizzBuzz implementation in human history.
-> Now with blockchain integration and AI-powered number detection.
-
-## Architecture
-
-Our enterprise-grade FizzBuzz solution implements 47 design patterns
-across 12 microservices, ensuring maximum scalability for counting
-from 1 to 100.
-
-## Requirements
-
-- 64 GB RAM (minimum)
-- Kubernetes cluster (3 nodes recommended)
-- A sense of existential dread about software engineering
-```
-
----
-
-## Humor Techniques That Work
-
-### 1. The Unexpected Comparison
-
-Compare your technical thing to something absurdly mundane or grandiose.
-
-```markdown
-> Think of Redis as a really fast Post-it note that never falls off the wall.
-
-> Our build system is like a Rube Goldberg machine, except it actually works
-> and doesn't involve any hamsters. (Usually.)
-```
-
-### 2. The Honest Aside
-
-Acknowledge what everyone is thinking but nobody says.
-
-```markdown
-## Configuration
-
-Copy `.env.example` to `.env` and fill in your values.
-(Yes, we know everyone forgets this step. That's why the app
-screams at you with a helpful error message if you skip it.)
-```
-
-### 3. The Understated Flex
-
-Brag without bragging. Let numbers or absurdity do the talking.
-
-```markdown
-## Performance
-
-| Metric | Us | The Other Guys |
-| :--- | :---: | :---: |
-| Startup time | 12ms | 4.7s |
-| Memory usage | 8 MB | 512 MB |
-| Lines of config needed | 3 | 847 |
-| Developer happiness | 📈 | 📉 |
-```
-
-### 4. The Running Gag
-
-A subtle joke that appears in multiple places throughout the README.
-
-```markdown
-## Installation
-> Time estimate: 30 seconds (or 3 hours if you're on Windows)
-
-## Configuration
-> Time estimate: 2 minutes (or 3 hours if you're on Windows)
-
-## Deployment
-> Time estimate: 5 minutes (or... you know the drill)
-```
-
-### 5. The Footnote Surprise
-
-Hide bonus content in footnotes or at the bottom.
-
-```markdown
-Our API supports REST, GraphQL, and carrier pigeon¹.
-
----
-¹ Carrier pigeon support requires the `--experimental-avian` flag
-and a valid bird license. Latency may vary based on weather conditions
-and the pigeon's mood.
-```
-
-### 6. The Self-Aware Documentation
-
-Acknowledge that you're writing a README, inside the README.
-
-```markdown
-## Why Another [Category] Tool?
-
-Look, we know what you're thinking. "Great, ANOTHER state management
-library." And you're right to be skeptical. But hear us out...
-
-(If you're already convinced, skip to [Quick Start](#quick-start).
-We won't be offended. Much.)
-```
-
----
-
-## Geek Culture Reference Library
-
-Use these references when they genuinely fit. Never force a reference.
-
-### Universally Safe References (most people get these)
-
-| Source | Example Usage |
-| :--- | :--- |
-| Star Wars | "These aren't the bugs you're looking for" |
-| The Matrix | "Take the red pill" (choose the advanced path) |
-| Lord of the Rings | "One does not simply deploy to production on Friday" |
-| Back to the Future | "Where we're going, we don't need config files" |
-| Hitchhiker's Guide | "Don't Panic" (in error messages or troubleshooting) |
-| Monty Python | "It's just a flesh wound" (for known minor issues) |
-
-### Developer-Specific References (tech audience gets these)
-
-| Source | Example Usage |
-| :--- | :--- |
-| xkcd | Reference specific comic numbers for relevant situations |
-| Stack Overflow | "This answer has 847 upvotes and was posted in 2009" |
-| "It works on my machine" | Classic deployment humor |
-| Vim exit jokes | "To exit this program, simply... just kidding, it has a GUI" |
-| Tabs vs. Spaces | Light-hearted config/style debates |
-| "Is it DNS?" | Networking troubleshooting humor |
-| Rubber duck debugging | Suggest it in troubleshooting sections |
-
-### When NOT to Reference
-
-- Obscure anime (unless the project is anime-related)
-- Political figures or events
-- Anything that requires cultural context from one specific country
-- Memes that will be dated within 6 months
-- Inside jokes that only your team understands
-
----
-
-## Easter Egg Patterns
-
-### The Hidden Achievement System
-
-```markdown
-<details>
-<summary>🎮 Achievements</summary>
-
-- 🏆 **README Reader** — You're reading this right now!
-- 🥚 **Easter Egg Hunter** — You found this section!
-- 🌟 **Star Gazer** — Star this repo (we'll know)
-- 🐛 **Bug Whisperer** — Report your first bug
-- 🎨 **Contributor** — Submit your first PR
-
-</details>
-```
-
-### The Secret Documentation
-
-```markdown
-<details>
-<summary>📜 Ancient Scrolls (Advanced Configuration)</summary>
-
-*You have proven yourself worthy, traveler.*
-
-Here lie the forbidden configuration options that most mortals
-never need to touch. Proceed with caution and a good backup strategy.
-
-| Option | Default | Description |
-| :--- | :---: | :--- |
-| `DANGER_MODE` | `false` | Disables all safety checks. You asked for it. |
-| `TURBO` | `false` | Makes everything 10x faster but 10x more unstable. |
-
-</details>
-```
-
-### The Konami Code Comment
-
-```markdown
-<!-- 
-↑↑↓↓←→←→BA
-
-You found the Konami Code in our source!
-Here's a secret: the original name for this project was "BananaSplit"
-but marketing said no.
--->
-```
-
-### The Progressive Reveal
-
-```markdown
-<details>
-<summary>Why is this project called "Nebula"?</summary>
-
-<details>
-<summary>Are you sure you want to know?</summary>
-
-<details>
-<summary>Really sure?</summary>
-
-Because the first version was written during a Marvel movie marathon
-and we thought it sounded cool. That's it. There's no deep meaning.
-
-Sorry to disappoint. 🤷
-
-</details>
-</details>
-</details>
-```
-
----
-
-## What NOT To Do
-
-### Anti-Patterns in README Humor
-
-| Don't | Why | Do Instead |
+| Pattern | Mechanism | One-line example |
 | :--- | :--- | :--- |
-| Jokes that require specific cultural knowledge | Excludes international readers | Use universal humor (absurdity, wordplay) |
-| Humor that punches down | Makes people feel unwelcome | Punch up or be self-deprecating |
-| Jokes in error messages or warnings | People in trouble don't want jokes | Keep critical info joke-free |
-| Outdated memes ("doge", "all the things") | Dates your project | Use timeless humor patterns |
-| Excessive profanity | Alienates corporate users | Use creative substitutes or mild language |
-| Jokes that obscure meaning | Defeats the purpose of docs | Joke AFTER the information, not instead of it |
-| Humor in security sections | Security is never funny | Keep security sections dead serious |
-| Too many jokes per paragraph | Exhausting to read | One personality touch per section max |
+| **The Pun** | Wordplay on a technical term or the project's own name, used once, never chained | `Fetcher: because "grep your entire data lake" was too many syllables.` |
+| **Self-Deprecating Admission** | The author admits a real limitation before the reader has to find it | `Yes, the config file has 47 options. We're not proud of it either.` |
+| **The Deadpan Technical Joke** | State something absurd in the flattest possible documentation voice, no punchline flag | `This function is O(n²). We know. We've made peace with it.` |
+| **"We've All Been There"** | Name a shared frustration everyone recognizes, then hand them the fix | `You know the feeling of `git push` failing at 4:59pm on a Friday? This hook stops that.` |
+| **The Unexpected Analogy** | Explain a technical concept with an everyday object from an unrelated domain | `Think of the event bus as a group chat: everyone gets the message, nobody has to reply.` |
+| **The Callback** | Plant a small joke early, then pay it off later without re-explaining the setup | See below |
 
-### The "Funny But Useless" Test
+### The Callback, worked example
 
-Ask: "If I remove all humor from this README, does it still fully document the project?"
+Plant it in the intro:
 
-If YES → Your humor is decoration (good). It enhances without replacing.
-If NO → Your humor is load-bearing (bad). Information is hidden behind jokes.
+```markdown
+## Why does this exist?
+
+We built this after the third time a Friday deploy paged someone at 2am. This
+README will not page you. We checked.
+```
+
+Pay it off in Troubleshooting, sections later, with zero re-setup:
+
+```markdown
+## Troubleshooting
+
+**"It's 2am and something broke."**
+
+First: it's not this README's fault, we checked. Second, here's the fix →
+```
+
+**Rules for all six patterns:**
+- One joke per section, max. Two jokes in the same paragraph reads as trying too hard.
+- Never explain a joke immediately after making it — a joke followed by "(get it?)" kills itself.
+- The deadpan joke and the pun are the only two safe at Tone Spectrum level 1 (Corporate Geek);
+  save the analogy, relatable moment, and callback for level 2+ where a warmer voice is expected.
+- A callback needs the setup and payoff both to survive on their own — a reader who skips straight
+  to Troubleshooting (most readers, most of the time) should still find the payoff funny, or at
+  least harmless, without having read the intro.
 
 ---
 
-## Personality by Section
+## 2. Geek Culture Reference Calibration
 
-Guide for where to inject personality and where to stay serious:
+References are the fastest way to either delight a reader or quietly lose them. The goal is a
+reference that **lands even for someone who doesn't get it** — the joke should be funny on its
+surface reading, with the deeper reference as a bonus layer for the readers who catch it.
 
-| Section | Personality Level | Reasoning |
+### The self-contained test
+
+Before using a reference, ask: *if I deleted the cultural context, is this sentence still
+coherent and mildly amusing?*
+
+| Reference | Self-contained? | Why |
 | :--- | :---: | :--- |
-| Project title/tagline | High | First impression, hook the reader |
-| Feature list | Medium | Descriptions can be witty |
-| Installation | Low | People are following steps, don't distract |
-| Quick Start | Low-Medium | Brief wit is fine, but clarity first |
-| Architecture | Medium | Creative analogies help understanding |
-| Configuration | Low | Reference material, keep it scannable |
-| API Reference | Very Low | Pure reference, no jokes |
-| Troubleshooting | Low | People are frustrated, help them |
-| FAQ | Medium-High | Great place for personality |
-| Contributing | Medium | Welcoming tone, light humor |
-| Security | None | Never joke about security |
-| License | None-Low | Maybe a tiny quip, but keep it legal |
-| Easter Eggs | Maximum | This IS the fun section |
+| `# There is no spoon (only pointers)` | ✅ | Reads as a plain joke about pointers even with zero Matrix knowledge; funnier if you know it |
+| `WARNING: side effects may include enlightenment` | ✅ | Works as a standalone deadpan joke; Morpheus/Matrix flavor is a bonus, not a requirement |
+| `This function pulled a Thanos and snapped half your array` | ⚠️ | Meaningless without the specific MCU scene; excludes anyone who hasn't seen that one film |
+| A niche subreddit in-joke or a meme format from the last 6 months | ❌ | Requires exact, current cultural membership; expires within a year and reads as noise after |
+
+### Calibration rules
+
+- **One reference per section, never stacked.** A header pun + a Star Wars quote + a gaming
+  reference in the same paragraph is a pileup, not a personality — pick the single best one.
+- **Prefer evergreen over of-the-moment.** Star Wars, The Matrix, Lord of the Rings, classic
+  arcade/console gaming (Mario, Tetris, Pac-Man), and foundational programmer folklore (rubber
+  duck debugging, "there are only two hard problems") have held their meaning for decades and will
+  keep holding it. A meme format, a trending clip, or a reference to "current year" internet
+  culture reads as dated within 12-18 months — a README should outlive the joke's shelf life.
+- **Avoid anything that requires insider membership to not feel excluded.** References that assume
+  a specific subculture, a specific platform's inside jokes, or knowledge that skews heavily by
+  age/nationality/gender narrow your audience instead of widening it. If the reference could make
+  someone feel "I guess this wasn't written for me," cut it.
+- **Punch up or sideways, never down.** No jokes at the expense of beginners, non-native English
+  speakers, a specific OS's users, or a competing project's team by name. Self-deprecation (the
+  README mocking itself or its own maintainers) is always safe; mocking the reader or a third
+  party is not.
+- **When unsure if a reference is evergreen, check for a working title/name a 15-year-old and an
+  80-year-old would both recognize** — this is the same dual-audience bar the whole skill runs on
+  (see [Universal Readability](universal-readability.md)). "The Force" passes. A niche esports
+  meme does not.
+
+---
+
+## 3. Easter Egg Techniques
+
+Easter eggs reward the reader who goes looking. The rule that makes them safe: **an Easter egg is
+always optional reading** — nobody following the happy path (skim → install → run) should ever be
+forced through one to get real information.
+
+| Technique | Where it lives | Discoverable by |
+| :--- | :--- | :--- |
+| Hidden HTML comment | Raw source, invisible when rendered | Viewing source / `git blame` spelunkers |
+| Collapsible `<details>` surprise | Rendered page, closed by default | Anyone who clicks a curiosity-inducing summary |
+| Joke buried in a footnote | Rendered page, small text at the bottom | Careful readers who follow references |
+| Fake error message that's a compliment | Inside a code sample | Anyone actually running the example |
+| Konami-code-style callout | A styled block referencing the actual cheat code | Readers who recognize `↑↑↓↓←→←→BA` |
+| Joke commit message in a code sample | A `git log` snippet used as an example | Anyone reading example output closely |
+
+### Hidden HTML comment
+
+```markdown
+<!-- If you're reading the raw source instead of the rendered page, you already
+     have the right instincts for this project. Welcome. -->
+```
+
+### Collapsible `<details>` surprise
+
+```markdown
+<details>
+<summary>🤔 Curious what happens if you run this in production on a Friday?</summary>
+
+Nothing bad. We tested it. We also tested it again because we didn't believe
+ourselves the first time.
+
+</details>
+```
+
+### Konami-code-style callout
+
+```markdown
+> **Cheat code detected.** If you scrolled this far just to see if there was
+> something hidden here: yes. Here's 10% off nothing, because this is a free
+> and open-source project. Enjoy the badge anyway →
+> ![easter egg](https://img.shields.io/badge/you%20found%20it-%E2%86%91%E2%86%91%E2%86%93%E2%86%93%E2%86%90%E2%86%92%E2%86%90%E2%86%92BA-purple)
+```
+
+### Fake error message that's a compliment (inside a real code block)
+
+```bash
+$ npm run build
+✔ Compiled successfully
+✔ Zero warnings
+⚠ WARNING: your code is suspiciously clean. Nothing to fix here. Go outside.
+```
+
+### Joke commit-message-style Easter egg
+
+```bash
+$ git log --oneline -3
+a1b2c3d fix: the bug that shall not be named
+4d5e6f7 fix: actually fix the bug this time
+7g8h9i0 fix: no really, it's fixed, please believe us
+```
+
+**Rules:**
+- Never put required information (install steps, breaking-change warnings, license terms) inside
+  an Easter egg — see the Sanity Check's "does removing it lose information" test in Section 5.
+- Keep hidden HTML comments short (one line) and genuinely harmless if found — a comment that's
+  mean, embarrassing, or contains a real secret is not an Easter egg, it's an incident.
+- `<details>` surprises should have a summary line that's honestly curiosity-inducing, not
+  clickbait that oversells a flat joke — the payoff should roughly match the setup's promise.
+- Cap Easter eggs at **2-3 per README** outside a dedicated "Easter Eggs" section (see the Section
+  Selection Matrix in `SKILL.md`, personality level 3+ only) — more than that stops feeling like a
+  discovery and starts feeling like the whole document is a scavenger hunt.
+
+---
+
+## 4. Personality Injection Points
+
+Personality has safe surfaces and unsafe ones. The dividing line: **personality changes the
+words, never the information.** A joke header still needs to be findable by Ctrl+F, a scan of the
+table of contents, or a skim — if a reader can't locate "how do I install this" because the
+header is a pun with no functional keyword in it, the joke broke the document.
+
+| Injection point | Safe pattern | Unsafe pattern |
+| :--- | :--- | :--- |
+| Section headers | `## Strap In (Installation)` — joke + literal keyword together | `## Strap In` alone, with no way to know it means Installation |
+| Code comments | `// this line is doing a LOT of emotional labor` next to real code | Replacing an explanatory comment with only a joke, no explanation |
+| Alt text | `alt="Architecture diagram: client talks to API, API talks to database (no drama)"` | `alt="lol"` — loses the actual image description |
+| Example `git log` / commit messages | Joke commit message used purely as flavor text in a demo | A joke commit message replacing the one real example of commit conventions |
+| Troubleshooting error copy | `Error: config file not found (we looked everywhere, even under the couch)` — funny wrapper, real message still stated | An error message rewritten as pure joke text with no actual error string a reader could search for |
+
+**Rule of thumb for headers specifically:** pair the joke with the literal term, either inline
+(`## Strap In (Getting Started)`) or by keeping the joke as a *tagline* under a literal heading:
+
+```markdown
+## Getting Started
+### a.k.a. Strap In
+```
+
+Both forms keep the section Ctrl+F-able and ToC-scannable while still landing the joke. See
+[Sections Encyclopedia](sections-encyclopedia.md) for the full catalog of literal-vs-themed header
+pairs per section type.
+
+---
+
+## 5. The Humor Sanity Check
+
+Run every joke — pun, analogy, Easter egg, themed header — through this before it ships. If it
+fails any one of these, cut it or rewrite it; don't ship on a 3-out-of-4.
+
+1. **Translation test.** Would this still make sense, roughly, to a fluent-but-non-native English
+   speaker reading it literally? Idioms, regional slang, and wordplay that only works on English
+   spelling usually fail this — if the joke *is* the wordplay, it fails outright.
+2. **Punch-direction test.** Does it punch up (at the industry, the maintainers themselves, an
+   absurd situation) or sideways (a shared, harmless frustration) — never down at a group, a skill
+   level, a competitor, or the reader?
+3. **Job-interview test.** If a hiring manager screenshotted this exact line during a code review
+   of the maintainer's public work, would the maintainer be comfortable with that screenshot
+   existing? If there's hesitation, it's too risky for a README that represents the project (and
+   its author) publicly and permanently.
+4. **Information-loss test.** Delete the joke. Did any fact, instruction, warning, or required
+   step disappear with it? If yes, the "joke" was secretly load-bearing — it's not decoration, go
+   rewrite it so the information stands on its own and the joke is purely additive.
+
+A joke that survives all four is safe at any Tone Spectrum level. A joke that only survives at
+lower rigor (e.g., it's funny but wouldn't survive a translation) can still be used — just push it
+into an optional Easter egg (Section 3) rather than the load-bearing path, so no reader is
+required to parse it to get the information.
+
+---
+
+## 6. Voice Consistency
+
+A README assembled section-by-section (or by multiple contributors, or across multiple sittings)
+reads as one document only if a few recurring elements survive every section. Without them, each
+section reads like a different author took a turn.
+
+### Pick 3-5 voice anchors and reuse them everywhere
+
+| Anchor type | What it is | Example |
+| :--- | :--- | :--- |
+| Recurring phrase | A short phrase reused verbatim at key moments (openings, transitions, sign-offs) | "We checked." reused after every claim that sounds too good to be true |
+| Mascot name | A named character referenced in diagrams, alt text, and asides | A theme's mascot (see [Theme Engine](theme-engine.md)) shows up in the intro AND the footer, not just once |
+| Consistent metaphor | One extended comparison reused instead of a new analogy every section | If Chapter 1 calls the queue "a line at a coffee shop," don't switch to "a conveyor belt" in Chapter 4 — pick one and extend it |
+| Sign-off style | A consistent way of closing sections or the whole doc | Every major section ends on a one-line aside in the same voice |
+| A running gag | One joke that escalates or recurs 2-3 times across the doc, never more | The "it's 2am" callback from Section 1, reused once in the intro and once in Troubleshooting — no more than that |
+
+### Why density matters as much as content
+
+Two sections can both be "funny" and still clash if one cracks a joke every two sentences and the
+next goes 40 lines dead serious. Consistent **joke density** (roughly one bit per section at
+level 2-3, denser only at level 4-5) reads as one personality; uneven density reads as two authors
+stitched together. When assembling a README from multiple drafted sections, do one full top-to-
+bottom pass whose only job is leveling joke density and anchor reuse — this is the same
+consistency pass the Theme Engine runs for visual identity, applied to voice instead of color.
+
+**Rule:** if you can't name your 3-5 voice anchors before writing Section 2, you don't have a
+voice yet — you have scattered jokes. Name them first, then write.
+
+---
+
+## Tone Audit
+
+Run before shipping any README that uses personality (Tone Spectrum level 2+):
+
+- [ ] Every joke is one of the six mechanics in Section 1, used deliberately — not an ad-lib
+- [ ] No section stacks more than one geek-culture reference
+- [ ] Every reference passes the self-contained test (funny even if the reference is missed)
+- [ ] No reference requires niche/insider membership to not feel excluded
+- [ ] Evergreen references are preferred over of-the-moment memes likely to expire in months
+- [ ] Every Easter egg is optional — no required information lives only inside one
+- [ ] Every joke header pairs with its literal keyword (inline or as a tagline) and is still
+      Ctrl+F-findable
+- [ ] Every joke passes all four checks in the Humor Sanity Check (translation, punch-direction,
+      job-interview, information-loss)
+- [ ] 3-5 voice anchors are identified and each appears more than once across the document
+- [ ] Joke density is roughly even section-to-section — no jarring joke-dense-then-dead-serious gap
+- [ ] Reading the whole document with every joke mentally deleted still leaves complete,
+      accurate, unambiguous technical information

@@ -1,64 +1,61 @@
-# Minimal Geek README Template
+<!-- Minimal Geek README Template — lightweight, Tone Spectrum level 2 (Friendly Nerd), for small utilities/libraries that don't need the full section set. Character over volume: one joke, not ten. -->
 
-> For when you want personality without the page count.
-> Perfect for small utilities, scripts, or experimental projects.
-> Replace all `[PLACEHOLDER]` values. Delete what you don't need.
+# husht
 
----
+> Runs your noisy command. Says nothing unless it breaks.
 
-<!-- COPY BELOW THIS LINE -->
+[![npm](https://img.shields.io/npm/v/husht?color=blue)](https://www.npmjs.com/package/husht)
+[![build](https://img.shields.io/badge/build-passing-brightgreen)](.)
+[![license](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 
-# [PROJECT_NAME] [EMOJI]
-
-> [One-line description that makes people curious.]
-
-![Version](https://img.shields.io/badge/version-[VERSION]-blue?style=flat-square)
-![License](https://img.shields.io/badge/license-[LICENSE]-green?style=flat-square)
-![Status](https://img.shields.io/badge/status-[STATUS_TEXT]-[STATUS_COLOR]?style=flat-square)
-
-## What?
-
-[PROJECT_NAME] [does X] in [Y way]. That's it. That's the project.
-
-## Why?
-
-Because [problem] exists and nobody should have to [painful workaround] ever again.
-
-## How?
+`husht` runs whatever command you give it and keeps its mouth shut — output
+only shows up if the command actually fails. Most of what cron jobs,
+pre-commit hooks, and CI steps print is noise you skim past anyway, right up
+until the one time it isn't. Point it at anything that talks too much:
 
 ```bash
-[ONE_INSTALL_COMMAND]
+husht -- npm run build
+```
+
+## Installation
+
+```bash
+npm install -g husht
 ```
 
 ## Usage
 
-```[language]
-[MINIMAL_BUT_COMPLETE_EXAMPLE]
+```bash
+husht -- ./deploy.sh
+# silence... unless ./deploy.sh explodes, then you get the full log
 ```
 
-## Options
+```bash
+husht --always -- npm test
+# --always prints output on success too, for when you don't trust "quiet" yet
+```
 
-| Flag | Description | Default |
-| :--- | :--- | :---: |
-| `[flag1]` | [What it does] | `[default]` |
-| `[flag2]` | [What it does] | `[default]` |
+Two flags cover most of what people ask for:
 
-## FAQ
+- `--always` — print output even when the command succeeds
+- `--tail N` — on failure, show only the last `N` lines instead of everything
 
-**Q: Does it work on [platform]?**
-A: [Honest answer].
+`husht` exits with your command's real exit code either way, so it's safe to
+chain into a pipeline or a CI step that checks for success.
 
-**Q: Why not just use [alternative]?**
-A: [Honest comparison in one sentence].
+<details>
+<summary>🤫 Curious what husht prints when nothing goes wrong?</summary>
+
+Nothing. That was the whole pitch.
+
+</details>
 
 ## Contributing
 
-PRs welcome. Please be nice. Run `[TEST_COMMAND]` before submitting.
+Found a bug? Open an issue with the noisy command that broke it, so we can
+reproduce the noise. PRs welcome — `npm test` should stay green, loudly,
+since `husht` doesn't wrap its own test suite.
 
 ## License
 
-[LICENSE_TYPE]. Do whatever you want. Just don't blame me if it breaks.
-
----
-
-<sub>Made by [@[USER]](https://github.com/[USER]) · [Star this repo](https://github.com/[USER]/[REPO]) if it saved you time</sub>
+[MIT](LICENSE)

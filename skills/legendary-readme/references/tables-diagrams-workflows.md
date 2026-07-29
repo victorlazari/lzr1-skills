@@ -1,583 +1,503 @@
-# Perfect Tables, Diagrams, Sheets, and Workflows
+# Tables, Diagrams, and Workflows
 
-> "If a picture is worth a thousand words, a well-built table is worth a thousand bullet points — and a clear diagram is worth a thousand confused issues."
+> "A README with a 12-column table is not documentation. It's a cry for help."
 
-This reference is the master guide for the four hardest-to-get-right elements in a README: **tables**, **diagrams/drawings**, **sheets/data**, and **workflows**. Each section has rules, copy-paste patterns, and a quality checklist so every one of these elements comes out perfect.
+This is the structural toolkit: how to build tables that don't scroll off a phone screen,
+diagrams that render instead of rot, data sections that don't dump a spreadsheet into prose, and
+workflows a reader can actually follow without getting lost. Use it while assembling **Step 3:
+Build the Section Architecture** and while validating **Step 7** — every rule here maps to one of
+the five structural checklist items already in `SKILL.md`.
 
----
-
-## Table of Contents
-
-- [Part 1: Perfect Tables](#part-1-perfect-tables)
-- [Part 2: Perfect Diagrams and Drawings](#part-2-perfect-diagrams-and-drawings)
-- [Part 3: Perfect Sheets and Data](#part-3-perfect-sheets-and-data)
-- [Part 4: Perfect Workflows](#part-4-perfect-workflows)
-- [Part 5: Perfect Sections](#part-5-perfect-sections)
-- [Master Quality Checklist](#master-quality-checklist)
+Five areas, same shape each time: **Rules** (what's non-negotiable), **Patterns** (copy-paste
+markdown), **Quality Checklist** (what to verify before shipping). A combined audit closes the
+file.
 
 ---
 
-## Part 1: Perfect Tables
+## 1. Tables
 
-Tables are the fastest way for any reader — 15 or 80 years old — to scan and compare information. But a broken or bloated table hurts more than no table at all.
+### Rules
 
-### The 7 Rules of Perfect Tables
+1. **≤5 columns, hard limit.** A table wider than 5 columns forces horizontal scroll on mobile
+   GitHub and in most terminals/viewers — the reader either loses context scrolling right or
+   never sees the last columns at all. If the data genuinely needs more, split into multiple
+   focused tables (see Patterns below) or move it to a linked file (see Section 3).
+2. **Always include a header row**, even for a table that feels self-explanatory. Screen readers
+   and Markdown renderers use the header row to build the table's accessibility tree — a
+   headerless table (just pipes and dashes mimicking a table) breaks that entirely.
+3. **Use alignment markers deliberately, not by default.** `:---` (left) is the default and needs
+   no marker; `---:` (right) for anything numeric so digits line up; `:---:` (center) only for
+   short symbolic/status columns (✅/❌, single words like "Required"). Never center a column of
+   long prose — it ping-pongs visually as row lengths vary.
+4. **One unit per column, stated once.** If a column holds sizes, pick MB **or** GB for the whole
+   column and say which in the header (`Size (MB)`), not `File Size` with mixed `4MB` / `1.2GB` /
+   `800KB` rows — the reader has to do unit conversion in their head to compare rows.
+5. **Keep cell content short.** A table cell is not a paragraph. If a cell needs more than one
+   sentence, the content belongs in prose below the table, with the table holding a summary value
+   or a link (`[details](#section)`).
+6. **Sort or group meaningfully** — alphabetical for reference tables (config keys, CLI flags),
+   priority/sequence order for anything the reader acts on top-to-bottom (setup steps disguised as
+   a table, decision matrices).
 
-| # | Rule | Why |
-| :---: | :--- | :--- |
-| 1 | Always include alignment markers (`:---`, `:---:`, `---:`) | Controls left/center/right alignment cleanly |
-| 2 | Keep cells short — phrases, not paragraphs | Tables are for scanning, not reading |
-| 3 | Max 4-5 columns on GitHub | More columns cause horizontal scrolling on mobile |
-| 4 | Use a header row that describes, not just labels | "Time to Setup" beats "Time" |
-| 5 | Put the most important column first (left) | Eyes start at the left |
-| 6 | Be consistent with units and formats in a column | `12ms`, `8ms`, `40ms` — not `12 ms`, `0.008s`, `40` |
-| 7 | Never merge cells or nest tables in Markdown | GitHub doesn't support it; use HTML tables only if truly needed |
+### Patterns
 
-### Alignment Reference
+**Alignment marker syntax** (the row directly under the header, before any data row):
 
 ```markdown
-| Left (default) | Centered | Right |
+| Left (default) | Center | Right |
 | :--- | :---: | ---: |
-| Text     | Text   | 12ms  |
-| More     | More   | 4ms   |
+| Name | Status | Count |
 ```
 
-- `:---`  → left-aligned (use for text)
-- `:---:` → centered (use for status, icons, short values)
-- `---:`  → right-aligned (use for numbers, so decimals line up)
-
-### Table Pattern: Feature Comparison (Honest, Not Trash-Talking)
+**Bad: a 9-column table that should be split**
 
 ```markdown
-| Feature | This Project | Alternative A | Alternative B |
-| :--- | :---: | :---: | :---: |
-| Setup time | **30 sec** | 10 min | 5 min |
-| Zero config | ✅ | ❌ | ⚠️ partial |
-| Bundle size | **12 KB** | 88 KB | 45 KB |
-| TypeScript | ✅ | ✅ | ❌ |
-| Price | Free | $9/mo | Free |
+| Env | Region | Instance Type | vCPU | RAM | Disk | Cost/mo | Owner | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| prod | us-east-1 | m5.xlarge | 4 | 16GB | 100GB | $280 | @lazari | Active |
+| staging | us-east-1 | t3.large | 2 | 8GB | 50GB | $70 | @lazari | Active |
+| dev | us-west-2 | t3.medium | 2 | 4GB | 30GB | $35 | @team | Idle |
 ```
 
-Use `✅` / `❌` / `⚠️` for instant visual scanning. **Bold** your own winning cells — but stay honest about where you lose.
+This forces a mobile reader to scroll horizontally through nine columns just to find one row's
+cost, and it silently mixes readability concerns (identity, sizing, ownership, billing) that
+different readers care about for different reasons.
 
-### Table Pattern: Options / Configuration
+**Good: split by concern into focused tables, ≤5 columns each**
 
 ```markdown
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `port` | `number` | `3000` | Port the server listens on |
-| `host` | `string` | `localhost` | Hostname to bind to |
-| `debug` | `boolean` | `false` | Print verbose logs |
-| `mode` | `'dev' \| 'prod'` | `'prod'` | Runtime mode |
+**Environments**
+
+| Env | Region | Owner | Status |
+| :--- | :--- | :--- | :---: |
+| prod | us-east-1 | @lazari | Active |
+| staging | us-east-1 | @lazari | Active |
+| dev | us-west-2 | @team | Idle |
+
+**Instance sizing**
+
+| Env | Instance Type | vCPU | RAM (GB) | Disk (GB) |
+| :--- | :--- | ---: | ---: | ---: |
+| prod | m5.xlarge | 4 | 16 | 100 |
+| staging | t3.large | 2 | 8 | 50 |
+| dev | t3.medium | 2 | 4 | 30 |
+
+**Monthly cost (USD)**
+
+| Env | Cost/mo |
+| :--- | ---: |
+| prod | $280 |
+| staging | $70 |
+| dev | $35 |
 ```
 
-> **Tip:** Escape the pipe inside type unions with `\|` so it doesn't break the table: `'json' \| 'xml'`.
+Same information, three tables a reader can actually scan — and each stays under the 5-column
+cap with a single consistent unit per numeric column.
 
-### Table Pattern: Status / Roadmap
+### Quality Checklist
 
-```markdown
-| Feature | Status | Target |
-| :--- | :---: | :--- |
-| Core engine | ✅ Done | v1.0 |
-| Plugin API | 🚧 In progress | v1.2 |
-| Cloud sync | 📋 Planned | v2.0 |
-| AI assistant | 💭 Idea | TBD |
-```
-
-### Table Pattern: Keyboard Shortcuts / Commands
-
-```markdown
-| Command | Shortcut | What It Does |
-| :--- | :---: | :--- |
-| Save | `Ctrl` + `S` | Saves the current file |
-| Undo | `Ctrl` + `Z` | Reverses the last action |
-| Find | `Ctrl` + `F` | Opens search |
-```
-
-### When NOT to Use a Table
-
-- For a single list of items with no second dimension → use a bullet list
-- For long prose in each cell → use headers + paragraphs
-- For two items being compared on one axis → a sentence is clearer
-
-### HTML Tables (only when you need layout, not data)
-
-Markdown tables can't merge cells, embed block content, or do columns of images. For visual *layout* (feature cards, two-column sections), use an HTML `<table>` — but never for plain tabular data.
-
-```html
-<table>
-  <tr>
-    <td width="50%" valign="top">
-
-### For Users
-Plain markdown works **inside** cells if you leave blank lines around it.
-
-    </td>
-    <td width="50%" valign="top">
-
-### For Developers
-Great for side-by-side layouts that markdown tables can't do.
-
-    </td>
-  </tr>
-</table>
-```
-
-### Table Quality Checklist
-
-- [ ] Every column has an alignment marker
-- [ ] Numbers are right-aligned; status icons are centered
-- [ ] No cell exceeds ~6 words
-- [ ] 4-5 columns max (fits mobile)
-- [ ] Units/formats are consistent down each column
-- [ ] Pipes inside content are escaped (`\|`)
-- [ ] The header row describes the data clearly
+- [ ] No table exceeds 5 columns
+- [ ] Every table has a header row and an alignment-marker row
+- [ ] Numeric columns are right-aligned (`---:`); status/symbol columns are centered (`:---:`);
+      prose columns are left-aligned (`:---` or default)
+- [ ] Every column holds one unit, and the unit is named in the header when non-obvious
+- [ ] No cell contains more than roughly one sentence
+- [ ] A wide dataset was split into multiple focused tables, not squeezed into one
 
 ---
 
-## Part 2: Perfect Diagrams and Drawings
+## 2. Diagrams and Drawings (Mermaid + D2)
 
-GitHub renders **Mermaid** natively — no image hosting needed, and it auto-adapts to dark/light mode. **Always prefer Mermaid over screenshots of diagrams.** For very complex architecture, use **D2** rendered to an image.
+### Rules
 
-### Decision: Which Diagram Tool?
+1. **Default to Mermaid** when the diagram is a flowchart, sequence diagram, ER diagram, state
+   machine, or class diagram, and it needs to live inline and render on GitHub with zero setup.
+   GitHub, GitLab, and most modern Markdown viewers render ` ```mermaid ` fences natively — no
+   image file to host, no build step, and it stays diffable as text in git history.
+2. **Reach for box-drawing ASCII instead of Mermaid** only for a tiny 2-4 node sketch where the
+   ceremony of a Mermaid fence is overkill — see
+   [Char Art and Animation](char-art-and-animation.md) for that technique and its own 5-box
+   ceiling.
+3. **Reach for D2** ([github.com/terrastruct/d2](https://github.com/terrastruct/d2)) instead of
+   Mermaid when the diagram is a dense, many-node architecture map that needs polished manual
+   layout control, nested containers, or icon-heavy styling — the kind of diagram meant to be
+   rendered once and embedded as an exported PNG/SVG image, not read as live text. D2 does **not**
+   render natively on GitHub: generate the image (`d2 architecture.d2 architecture.svg`) and
+   commit both the `.d2` source (for future edits) and the rendered image, then embed the image
+   with `![](docs/assets/architecture.svg)`.
+4. **Every diagram needs a one-sentence plain-English caption immediately below it.** This is
+   non-negotiable and applies to Mermaid, D2-exported images, and ASCII diagrams alike — a diagram
+   alone fails a screen reader, a search/grep, and anyone unfamiliar with the notation.
+5. **Keep node/actor labels short** (2-4 words). A Mermaid node with a full sentence inside it
+   breaks the auto-layout and produces an ugly, oversized box.
+6. **One diagram per architectural concept.** Don't cram a data flow, a deployment topology, and a
+   sequence of API calls into a single mega-diagram — split into two or three smaller diagrams,
+   each captioned, rather than one diagram nobody can parse.
 
-| Need | Use | Why |
-| :--- | :--- | :--- |
-| Flow, sequence, state, ER, timeline, gantt, pie | **Mermaid** (in a code block) | Renders natively on GitHub, theme-aware |
-| Very complex/large architecture | **D2** → PNG/SVG | Cleaner auto-layout for big systems |
-| A real screenshot of the UI | PNG/GIF | Show the actual product |
-| Hand-style sketch | Excalidraw → export SVG/PNG | Friendly, approachable look |
+### Patterns
 
-> In this sandbox you can render either with: `manus-render-diagram input.mmd output.png` (Mermaid) or `manus-render-diagram input.d2 output.png` (D2). Use D2 for architecture/complex; default to Mermaid otherwise.
-
-### The 5 Rules of Perfect Diagrams
-
-1. **One idea per diagram** — don't cram the whole system into one picture
-2. **Label every node and arrow** — an unlabeled arrow is a riddle
-3. **Always add a plain-English caption** below the diagram (for non-visual readers and accessibility)
-4. **Color with meaning** — use `style` lines that match your theme palette; color = importance, not decoration
-5. **Left-to-right for flows, top-to-bottom for hierarchies**
-
-### Mermaid: Flowchart (Decision / Process)
+**Flowchart** (architecture / data flow — the most common Mermaid use in a README):
 
 ````markdown
 ```mermaid
-graph TD
-    A[User uploads file] --> B{File valid?}
-    B -->|Yes| C[Process file]
-    B -->|No| D[Show error]
-    C --> E[(Save to DB)]
-    E --> F[Done ✅]
-    style A fill:#8B5CF6,color:#fff
-    style F fill:#10B981,color:#fff
-    style D fill:#EF4444,color:#fff
+flowchart LR
+    Client[Client App] --> API[API Gateway]
+    API --> Auth[Auth Service]
+    API --> Orders[Orders Service]
+    Orders --> DB[(PostgreSQL)]
+    Orders --> Queue[[Message Queue]]
+    Queue --> Worker[Background Worker]
 ```
+
+*A client request hits the API gateway, which checks auth and forwards to the orders service,
+which writes to Postgres and queues async work for a background worker.*
 ````
 
-### Mermaid: Sequence Diagram (API / Interaction Flow)
+**Sequence diagram** (request/response over time — for auth flows, API call sequences, retries):
 
 ````markdown
 ```mermaid
 sequenceDiagram
-    actor User
-    participant App
-    participant API
-    participant DB
-    User->>App: Click "Save"
-    App->>API: POST /data
-    API->>DB: INSERT INTO...
-    DB-->>API: OK (id: 42)
-    API-->>App: 201 Created
-    App-->>User: "Saved! ✓"
-    Note over User,DB: ~15ms round trip
+    participant U as User
+    participant A as API
+    participant D as Database
+
+    U->>A: POST /login
+    A->>D: Verify credentials
+    D-->>A: User record
+    A-->>U: 200 OK + JWT
+    U->>A: GET /profile (with JWT)
+    A->>A: Validate JWT
+    A-->>U: 200 OK + profile data
 ```
+
+*The user logs in once to get a JWT, then reuses that token on later requests instead of
+re-sending credentials.*
 ````
 
-### Mermaid: State Diagram (Lifecycle)
-
-````markdown
-```mermaid
-stateDiagram-v2
-    [*] --> Draft
-    Draft --> Review : Submit
-    Review --> Approved : Accept
-    Review --> Draft : Request changes
-    Approved --> Published : Deploy
-    Published --> [*]
-```
-````
-
-### Mermaid: ER Diagram (Database Schema)
-
-````markdown
-```mermaid
-erDiagram
-    USER ||--o{ ORDER : places
-    ORDER ||--|{ LINE_ITEM : contains
-    PRODUCT ||--o{ LINE_ITEM : "appears in"
-    USER {
-        int id PK
-        string email
-        string name
-    }
-    ORDER {
-        int id PK
-        int user_id FK
-        datetime created_at
-    }
-```
-````
-
-### Mermaid: Class Diagram (OOP Structure)
-
-````markdown
-```mermaid
-classDiagram
-    class Animal {
-        +String name
-        +int age
-        +makeSound() void
-    }
-    class Dog {
-        +fetch() void
-    }
-    Animal <|-- Dog
-```
-````
-
-### Mermaid: Mindmap (Concept Map)
-
-````markdown
-```mermaid
-mindmap
-  root((MyProject))
-    Core
-      Parser
-      Engine
-    Plugins
-      Auth
-      Cache
-    Docs
-      Guides
-      API
-```
-````
-
-### D2: Complex Architecture (rendered to image)
-
-For large systems, D2 produces cleaner auto-layout. Write a `.d2` file, render it, and embed the PNG:
-
-```d2
-client: Client App {shape: rectangle}
-gateway: API Gateway {shape: hexagon}
-auth: Auth Service
-core: Core Engine
-db: Database {shape: cylinder}
-cache: Redis Cache {shape: cylinder}
-
-client -> gateway: HTTPS
-gateway -> auth: verify token
-gateway -> core: route request
-core -> cache: read
-cache -> db: cache miss
-```
+**D2, for a dense architecture map** (source checked in, image committed and embedded):
 
 ```markdown
-<!-- After: manus-render-diagram architecture.d2 docs/architecture.png -->
-<p align="center">
-  <img src="./docs/architecture.png" width="700" alt="System architecture: client to gateway to core engine, with auth, cache, and database" />
-</p>
+<!-- source: docs/assets/architecture.d2 -->
+![Architecture diagram showing three regions each running an API cluster behind a shared load balancer](docs/assets/architecture.svg)
 
-**In plain English:** The app talks to a gateway, which checks your login, then routes to the engine. The engine reads the cache first and only hits the database on a cache miss.
+*Three regional API clusters sit behind one global load balancer, all writing to a single
+primary database with regional read replicas.*
 ```
 
-### Diagram Quality Checklist
+### Quality Checklist
 
-- [ ] Prefer Mermaid; only use images for real screenshots or very complex D2 diagrams
-- [ ] Every node and arrow is labeled
-- [ ] There's a plain-English caption beneath the diagram
-- [ ] Colors come from the theme palette and carry meaning
-- [ ] The diagram shows ONE idea, not the entire system
-- [ ] If an image, it has descriptive `alt` text for screen readers
+- [ ] Mermaid is used for flowcharts/sequence/ER/state diagrams meant to render live on GitHub
+- [ ] D2 (or another exported-image tool) is used only for dense diagrams meant to ship as an
+      image, and its source file is committed alongside the rendered image
+- [ ] ASCII box-drawing is reserved for 2-4 node sketches only (see
+      [Char Art and Animation](char-art-and-animation.md))
+- [ ] Every diagram — Mermaid, D2, or ASCII — has a one-sentence plain-English caption directly
+      below it
+- [ ] Every node/actor label is short enough not to break auto-layout
+- [ ] No single diagram tries to represent more than one architectural concept
 
 ---
 
-## Part 3: Perfect Sheets and Data
+## 3. Sheets and Data (CSV, charts)
 
-When a README needs to show structured data — benchmarks, supported versions, pricing, environment variables — present it so it's both scannable and trustworthy.
+### Rules
 
-### Inline Data Tables (for small datasets)
+1. **Never paste a raw table with more than ~15 rows inline.** Past that point a reader is
+   scrolling through data instead of reading documentation, and the table dominates the page's
+   visual weight regardless of how important that section actually is.
+2. **Link to the source file, or collapse it.** If the data lives in a tracked file (`benchmarks/results.csv`,
+   `data/pricing.json`), link to it rather than duplicating it in the README. If it must be inline
+   (e.g. for a quick preview), wrap it in a `<details>` block so it doesn't dominate the scroll.
+3. **Every chart needs a title and labeled axes** — whether it's a screenshot of a generated chart
+   or an embedded image. A chart with unlabeled axes forces the reader to guess units and scale,
+   which defeats the entire purpose of visualizing the data instead of just stating it.
+4. **Prefer generated, reproducible charts over hand-made screenshots.** If a chart is generated
+   by a script, check the script in (`scripts/plot_benchmarks.py`) next to the image, the same way
+   a VHS `.tape` backs a terminal GIF — so the chart can be regenerated instead of going stale
+   silently.
+5. **Timestamp anything that changes over time.** Benchmark numbers, pricing tables, dependency
+   counts, star history — any data that isn't a fixed constant needs an explicit "as of" date so
+   a reader six months later knows to distrust it rather than assuming it's current.
+6. **State the source and method for any performance/benchmark number.** "40% faster" means
+   nothing without "than what, measured how, when."
 
-Use a Markdown table (see Part 1) for anything under ~10 rows. Right-align numbers so they compare cleanly:
+### Patterns
 
-```markdown
-| Benchmark | Ops/sec | Relative |
-| :--- | ---: | ---: |
-| This project | 1,240,000 | **1.00x** |
-| Alternative A | 620,000 | 0.50x |
-| Alternative B | 410,000 | 0.33x |
-```
-
-### Linking to Real Data Files (CSV / spreadsheets)
-
-For large datasets, don't paste hundreds of rows into the README. Link to the file and show a small preview:
-
-```markdown
-> Full results: [`benchmarks/results.csv`](./benchmarks/results.csv) (1,024 rows)
-
-**Top 3 (preview):**
-
-| Test | Median (ms) |
-| :--- | ---: |
-| cold-start | 42 |
-| warm-read | 3 |
-| bulk-write | 88 |
-```
-
-GitHub automatically renders `.csv` and `.tsv` files as interactive, searchable tables when clicked — so linking is often better than embedding.
-
-### Collapsible Data (keep the README short)
+**Collapsing a large table:**
 
 ```markdown
 <details>
-<summary><strong>📊 Full benchmark table (24 rows)</strong></summary>
+<summary>Full benchmark results (47 rows) — click to expand</summary>
 
-| Test | v1 | v2 | Change |
-| :--- | ---: | ---: | :---: |
-| ... | ... | ... | ... |
+| Test | ops/sec | Memory (MB) |
+| :--- | ---: | ---: |
+| ... 47 rows ... | | |
 
 </details>
+
+Full raw data: [`benchmarks/results.csv`](benchmarks/results.csv) — *as of 2026-06-01*.
 ```
 
-### Data Visualization Options
-
-| Option | How | Best For |
-| :--- | :--- | :--- |
-| Mermaid pie/xy chart | In a code block, renders natively | Simple distributions/trends |
-| Static chart image | Generate with Python/matplotlib, embed PNG | Rich, custom charts |
-| GitHub-rendered CSV | Link the `.csv` file | Large raw datasets |
-| Shields.io dynamic badge | Endpoint badge pulling live JSON | Live metrics (coverage, downloads) |
-
-### Mermaid: Pie Chart
-
-````markdown
-```mermaid
-pie title Language Distribution
-    "TypeScript" : 65
-    "Rust" : 20
-    "Python" : 10
-    "Shell" : 5
-```
-````
-
-### Mermaid: XY / Bar Chart (trends)
-
-````markdown
-```mermaid
-xychart-beta
-    title "Response time by version (ms)"
-    x-axis [v1.0, v1.5, v2.0, v2.5]
-    y-axis "Milliseconds" 0 --> 50
-    bar [42, 30, 18, 9]
-```
-````
-
-### Sheets/Data Quality Checklist
-
-- [ ] Numbers are right-aligned and use consistent units/precision
-- [ ] Datasets over ~10 rows are linked or collapsed, not pasted in full
-- [ ] Large raw data links to a `.csv`/`.tsv` (GitHub renders it interactively)
-- [ ] Any chart has a title and labeled axes
-- [ ] The data source/date is stated so readers trust it
-
----
-
-## Part 4: Perfect Workflows
-
-A "workflow" is a sequence the reader must follow (install → configure → run) OR an automated pipeline (CI/CD). Both must be unambiguous and copy-paste safe.
-
-### User Workflow: Numbered Steps + Visual
-
-Pair numbered steps with a small Mermaid flow so visual and text learners both succeed:
-
-````markdown
-## 🚀 Getting Started
-
-**1. Install**
-```bash
-npm install -g myproject
-```
-
-**2. Configure** — copy the example and add your key
-```bash
-cp .env.example .env
-```
-
-**3. Run**
-```bash
-myproject start
-```
-
-```mermaid
-graph LR
-    A[Install] --> B[Configure] --> C[Run] --> D[🎉 Live]
-    style D fill:#10B981,color:#fff
-```
-
-> **Result:** open `http://localhost:3000` — you should see the welcome screen.
-````
-
-### Rules for Command Workflows
-
-1. **One command per line** — never chain unrelated commands the reader can't debug
-2. **Show expected output** so readers know it worked: `# → Server running on :3000`
-3. **State prerequisites first** (Node 18+, Docker, etc.) in a callout
-4. **Make every block copy-paste safe** — no placeholders that crash (use `<your-key>` and explain it)
-5. **End with a "what success looks like"** line
-
-### CI/CD Workflow: Show the Pipeline
-
-Document an automated pipeline with a diagram AND the trigger table:
-
-````markdown
-## ⚙️ CI/CD Pipeline
-
-```mermaid
-graph LR
-    A[Push to main] --> B[Lint]
-    B --> C[Test]
-    C --> D[Build]
-    D --> E[Deploy]
-    style E fill:#10B981,color:#fff
-```
-
-| Stage | Trigger | Tool |
-| :--- | :--- | :--- |
-| Lint | every push | ESLint |
-| Test | every push | Vitest |
-| Build | on `main` | Vite |
-| Deploy | on tag `v*` | GitHub Actions |
-````
-
-### GitHub Actions Snippet (when documenting automation)
-
-````markdown
-```yaml
-# .github/workflows/ci.yml
-name: CI
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm ci
-      - run: npm test
-```
-````
-
-### Decision Workflow: Use a Flowchart
-
-For "which option should I pick?" guidance, a decision flowchart beats paragraphs:
-
-````markdown
-```mermaid
-graph TD
-    A{Need a database?} -->|No| B[Use web-static]
-    A -->|Yes| C{Need user login?}
-    C -->|No| D[Use web-db]
-    C -->|Yes| E[Use web-db-user]
-```
-````
-
-### Workflow Quality Checklist
-
-- [ ] Prerequisites are stated before step 1
-- [ ] Each step is one clear action with one command
-- [ ] Expected output / success state is shown
-- [ ] A visual (Mermaid flow) accompanies multi-step processes
-- [ ] Placeholders are obvious (`<your-key>`) and explained
-- [ ] Automated pipelines show both a diagram and a trigger table
-
----
-
-## Part 5: Perfect Sections
-
-Every section in a README should be self-contained, scannable, and consistent. (For the full catalog of *which* sections to include and themed naming, see [sections-encyclopedia.md](sections-encyclopedia.md) and [theme-engine.md](theme-engine.md).)
-
-### The Anatomy of a Perfect Section
-
-```
-## [Emoji] [Clear or Themed Title]      ← scannable heading
-
-[One-sentence purpose]                   ← what this section is for
-
-[Content: table, diagram, code, or       ← the actual value
- 2-3 short paragraphs]
-
-> [Optional callout: tip, warning, or     ← extra help / personality
-   plain-English summary]
-```
-
-### The 6 Rules of Perfect Sections
-
-1. **Heading hierarchy is strict** — one `#` (title) → `##` (sections) → `###` (subsections). Never skip levels.
-2. **Every `##` heading gets an emoji or icon** for visual scanning (optional in Minimal style).
-3. **Lead with the point** — the first sentence states why the section exists.
-4. **No wall of text** — break after 3-4 sentences with a header, list, table, or visual.
-5. **Consistent ordering** — follow the Section Selection Matrix so readers find things where they expect.
-6. **Each section earns its place** — if it has nothing useful, cut it.
-
-### Section Dividers
-
-Use a horizontal rule (`---`) or an animated divider between major sections for clear visual breaks:
+**Linking instead of duplicating:**
 
 ```markdown
----
+See the full pricing matrix in [`data/pricing.csv`](data/pricing.csv) (updated quarterly, last
+refreshed 2026-05-15). The table below shows only the three most common tiers.
 
-<!-- or an animated divider -->
-<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%" alt="divider" />
+| Tier | Price/mo (USD) | Requests/mo |
+| :--- | ---: | ---: |
+| Free | $0 | 10,000 |
+| Pro | $29 | 1,000,000 |
+| Scale | $199 | 50,000,000 |
 ```
 
-### Anchor Links and Table of Contents
-
-For READMEs longer than ~3 screens, add a Table of Contents. GitHub auto-generates anchors from headings (lowercase, spaces → hyphens, punctuation removed):
+**A chart with a title, labeled axes, and a freshness note:**
 
 ```markdown
-## Table of Contents
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [API Reference](#api-reference)
+![Bar chart titled "p99 latency by region", with the x-axis labeled "Region" and the y-axis
+labeled "Latency (ms)", showing us-east at 45ms, eu-west at 62ms, and ap-south at 98ms](docs/assets/latency-by-region.png)
+
+*p99 latency by region, generated by [`scripts/plot_latency.py`](scripts/plot_latency.py) — as
+of 2026-07-01. Re-run the script against fresh metrics before trusting this after a quarter.*
 ```
 
-> A heading `## Quick Start 🚀` becomes the anchor `#quick-start-` — test your links; trailing emojis can change the anchor.
+Note the alt text itself restates title/axes/values — this is what makes the chart usable to a
+screen reader, not just decorative.
 
-### Section Quality Checklist
+### Quality Checklist
 
-- [ ] Heading levels are strictly nested (no skips)
-- [ ] Each section opens with its purpose in one sentence
-- [ ] No section is a wall of text (broken by lists/tables/visuals)
-- [ ] Sections follow a predictable, consistent order
-- [ ] Long READMEs have a working Table of Contents
-- [ ] Anchor links are tested and resolve correctly
+- [ ] No inline table exceeds ~15 rows; anything larger is linked to a file or wrapped in
+      `<details>`
+- [ ] Every chart (screenshot or generated image) has a visible title and labeled axes
+- [ ] Chart alt text restates the title, axes, and key values, not just a filename
+- [ ] Any chart generated by a script has that script checked into the repo
+- [ ] Any data that changes over time carries an explicit "as of <date>" note
+- [ ] Any comparative/benchmark claim states what it's compared against and how it was measured
 
 ---
 
-## Master Quality Checklist
+## 4. Workflows (user steps + CI/CD)
 
-Run this final pass to confirm every structural element is perfect:
+### Rules
 
-**Tables**
-- [ ] Alignment markers present; numbers right-aligned; ≤5 columns; consistent units
+1. **State prerequisites up front, before step 1.** "You'll need Node 20+, Docker, and an AWS
+   account" belongs in a callout or short list before the numbered steps start — never discovered
+   by the reader failing on step 4.
+2. **One imperative action per numbered step.** "Install dependencies, then configure your `.env`,
+   then start the server" is three steps wearing a trenchcoat. Split it — a reader following along
+   needs to complete and verify one thing before moving to the next.
+3. **Show the expected output or result after each step, or at minimum at the end.** A step that
+   runs a command but never shows what success looks like leaves the reader guessing whether it
+   worked. This is the single most common way workflows fail silently.
+4. **Never assume a step happened that the reader can't verify.** Don't write "once your database
+   is running" without having shown, in an earlier step, the exact command and output that
+   confirms the database is running. If a step depends on external state (a running service, an
+   env var, a cloned repo), name it explicitly rather than assuming it.
+5. **Use imperative mood consistently** ("Run", "Open", "Set") — not a mix of imperative,
+   passive, and narrative ("You should probably run...").
+6. **For CI/CD pipeline descriptions**, name each stage in the order it actually executes, state
+   what triggers it (push, PR, tag, schedule), and state what happens on failure (blocks merge,
+   sends a Slack alert, rolls back) — a pipeline description with no failure behavior is only half
+   the story.
 
-**Diagrams / Drawings**
-- [ ] Mermaid preferred; every node/arrow labeled; plain-English caption; themed colors
+### Patterns
 
-**Sheets / Data**
-- [ ] Big datasets linked/collapsed; charts have titles + axes; source/date stated
+**Good: numbered Quick Start with expected output shown**
 
-**Workflows**
-- [ ] Prereqs first; one action per step; expected output shown; visual flow included
+```markdown
+## Quick Start
 
-**Sections**
-- [ ] Strict heading hierarchy; purpose-first; no walls of text; consistent order; TOC if long
+**Prerequisites:** Node 20+, npm, and a free [Supabase](https://supabase.com) account.
+
+1. Clone the repo and install dependencies:
+
+   \```bash
+   git clone https://github.com/you/project.git && cd project && npm install
+   \```
+
+   Expected output: `added 312 packages in 8s` (exact count varies by version).
+
+2. Copy the example environment file and add your Supabase keys:
+
+   \```bash
+   cp .env.example .env
+   \```
+
+   Open `.env` and fill in `SUPABASE_URL` and `SUPABASE_ANON_KEY` from your Supabase project
+   settings.
+
+3. Start the dev server:
+
+   \```bash
+   npm run dev
+   \```
+
+   Expected output:
+
+   \```
+   ▲ Ready on http://localhost:3000 in 1.2s
+   \```
+
+4. Open `http://localhost:3000` in a browser. You should see the login screen with the project
+   logo — if you see a blank page instead, check that step 2's env vars were saved correctly.
+```
+
+Every step ends with something the reader can check against reality. If step 3's terminal doesn't
+say `Ready`, they know exactly where things went wrong instead of discovering it three steps
+later.
+
+**Bad: a wall of steps with no way to tell if you're still on track**
+
+```markdown
+## Setup
+
+Clone the repo, install deps, set up your env file with your API keys, run migrations, seed the
+database, then start the server and the worker in separate terminals, and you should be good to
+go. If something doesn't work check your Node version.
+```
+
+This has no prerequisites section, bundles at least six actions into one paragraph, gives no
+command syntax, and never shows a single expected output — a reader who hits a wall on step 3 (of
+an implicit list they had to construct themselves) has no way to tell whether they're even on
+step 3.
+
+**CI/CD pipeline description pattern:**
+
+```markdown
+## CI/CD Pipeline
+
+| Stage | Trigger | What it does | On failure |
+| :--- | :--- | :--- | :--- |
+| Lint | Every push | Runs `eslint` + `prettier --check` | Blocks merge |
+| Test | Every push | Runs unit + integration suite | Blocks merge |
+| Build | Push to `main` | Builds and pushes Docker image | Slack alert to `#ci` |
+| Deploy | Tag `v*` | Deploys image to production | Auto-rollback to previous tag |
+```
+
+*Every push runs lint and tests; only a merge to `main` builds an image, and only a version tag
+ships it to production.*
+
+### Quality Checklist
+
+- [ ] Prerequisites are stated before the first numbered step, not discovered mid-way
+- [ ] Every numbered step contains exactly one imperative action
+- [ ] Every step (or at minimum the final step) shows the expected output/result
+- [ ] No step assumes state the reader has no way to verify
+- [ ] Steps use consistent imperative mood throughout
+- [ ] Any CI/CD description states trigger, action, and failure behavior for each stage
+
+---
+
+## 5. Well-Structured Sections
+
+### Rules
+
+1. **Never skip a heading level.** `#` → `##` → `###` in strict order. Going straight from `#`
+   (h1, the project title) to `###` breaks the document outline that screen readers, editors'
+   "outline" panes, and GitHub's own auto-generated table of contents all rely on to build
+   navigation.
+2. **Keep a consistent section order across similar projects.** A reader who has seen five of your
+   team's READMEs should be able to guess where "Configuration" lives in the sixth. Pick an order
+   (see the Quick Reference: Section Selection Matrix in `SKILL.md`, or the full catalog in
+   [Sections Encyclopedia](sections-encyclopedia.md)) and don't reshuffle it project to project
+   without a reason.
+3. **Use one consistent heading capitalization style for the whole document.** Sentence case
+   ("Getting started", "How it works") is recommended — it's easier to write consistently than
+   Title Case, and avoids the "which small words get capitalized" ambiguity (a/an/the/of/in).
+   Whichever style is chosen, apply it to every heading, including personality-injected ones
+   ("Strap in" not "Strap In" if the doc is otherwise sentence-case).
+4. **A heading should introduce content, not repeat it.** Avoid a heading that just restates the
+   first sentence under it — the heading is a signpost for scanning, the sentence is the payload.
+5. **Sections at the same depth should be roughly comparable in scope.** If `## Installation` is
+   two lines and `## Configuration` is four screens, consider whether `## Configuration` actually
+   contains three sub-topics that deserve their own `###` subheadings.
+
+### Patterns
+
+**Correct nesting — no skipped levels:**
+
+```markdown
+# ProjectName
+
+## Installation
+
+### Prerequisites
+
+### Install via npm
+
+## Configuration
+
+### Environment variables
+
+### Config file
+```
+
+**Broken nesting — h1 straight to h3, never fix this:**
+
+```markdown
+# ProjectName
+
+### Prerequisites   <!-- ✗ skipped h2 entirely -->
+
+##### Install via npm   <!-- ✗ skipped h3 and h4 -->
+```
+
+**Consistent order across a team's projects** (pin this order in a team template rather than
+reinventing it per README):
+
+```markdown
+# ProjectName
+## What it is / The Big Three
+## Key features
+## Quick start / Installation
+## Configuration
+## Usage examples
+## Architecture
+## Contributing
+## License
+```
+
+**Sentence case applied consistently:**
+
+```markdown
+## Getting started         <!-- not "Getting Started" -->
+## Frequently asked questions   <!-- not "Frequently Asked Questions" -->
+### Environment variables  <!-- not "Environment Variables" -->
+```
+
+### Quality Checklist
+
+- [ ] No heading level is skipped anywhere in the document (`#`→`##`→`###`, never `#`→`###`)
+- [ ] Section order matches the team's established convention (or the Section Selection Matrix)
+- [ ] One capitalization style (sentence case recommended) is applied to every heading, including
+      themed/personality headings
+- [ ] No heading merely repeats the sentence immediately beneath it
+- [ ] Sibling sections at the same heading depth are roughly comparable in scope
+
+---
+
+## Structure and Data Audit
+
+Run this combined checklist during Step 7 whenever the README contains tables, diagrams, data, or
+workflows:
+
+- [ ] No table exceeds 5 columns; wide datasets are split into multiple focused tables
+- [ ] Every table has a header row, correct alignment markers, and one consistent unit per column
+- [ ] Diagrams use Mermaid (native GitHub render) for flowcharts/sequences/ER/state, D2 for dense
+      architecture maps meant to ship as an image, and ASCII only for 2-4 node sketches
+- [ ] Every diagram has a one-sentence plain-English caption directly below it
+- [ ] No inline table exceeds ~15 rows; larger data is linked to a file or collapsed in `<details>`
+- [ ] Every chart has a visible title, labeled axes, and alt text that restates them
+- [ ] Time-sensitive data (benchmarks, pricing, stats) carries an explicit "as of <date>" note
+- [ ] Every workflow states prerequisites up front, uses one imperative action per step, and shows
+      expected output after each step (or at least at the end)
+- [ ] No workflow step assumes unverified state
+- [ ] Heading levels are never skipped, and one capitalization style is used throughout
+- [ ] Section order is consistent with the project's established convention
+
+For the full section catalog these structural rules slot into, see
+[Sections Encyclopedia](sections-encyclopedia.md). For the surrounding visual toolkit (badges,
+banners, screenshots, GIFs) these tables/diagrams share a visual budget with, see
+[Visual Arsenal](visual-arsenal.md). For static ASCII art and box-drawing diagrams as a lighter
+alternative to Mermaid, see [Char Art and Animation](char-art-and-animation.md).

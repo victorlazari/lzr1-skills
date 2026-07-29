@@ -1,821 +1,477 @@
-# Sections Encyclopedia: Every README Section You Could Ever Need
+# Sections Encyclopedia
 
-> "A great README is a buffet, not a fixed menu. Pick what serves your project."
+> "Every README is a house. These are the rooms. Not every house needs a billiard room, but every
+> house needs a front door."
 
-This reference provides complete, copy-adaptable templates for every possible README section, with examples at different personality levels.
+Copy-paste templates for every section in the Quick Reference Matrix, in typical page order. Each
+entry gives the section's job, its priority (Required/High/Medium/Low, matching `SKILL.md`), the
+same section written at 2-3 points on the [Tone Spectrum](tone-and-voice.md), and its most common
+failure mode. Pick one tone level for the whole README in Step 1 — the contrast below shows range,
+not a menu to mix within a single document.
+
+---
+
+## Header + Banner
+
+Name, tagline, and visual identity — the first three seconds of attention. **Required.**
+
+**Level 1 — Corporate Geek:**
+```markdown
+# Fiber
+
+**Express-inspired web framework built on Fasthttp — the fastest HTTP engine for Go.**
+
+[![Build](https://img.shields.io/github/actions/workflow/status/user/fiber/ci.yml)](.)
+```
+
+**Level 5 — Chaotic Genius:**
+```markdown
+# 🏢 FizzBuzz Enterprise Edition™
+
+*The world's foremost implementation of FizzBuzz, built with an eye toward guidelines established
+by Enterprise Architects the world over.*
+```
+
+**Don't:** ship a raster banner with the tagline baked into the pixels — a screen reader, search
+index, and dark mode all see nothing; put the tagline in real text too.
+
+---
+
+## The Big Three (What / Why / How)
+
+Answers what/why/how inside the first screen. **Required.**
+
+**Level 1 — Corporate Geek:**
+
+Stripe's official Go library for the Stripe API. Handles auth, retries, and idempotency so your
+integration doesn't have to.
+
+```bash
+go get -u github.com/stripe/stripe-go/v79
+```
+
+**Level 4 — Full Nerd Mode:**
+
+**What:** A language where "const const" makes a variable *extra* constant.
+**Why:** It doesn't need to exist. That's the point.
+
+```bash
+npm install -g dreamberd && dreamberd hello.db
+```
+
+**Don't:** answer "how" with a link to an install *guide* instead of a runnable command — the
+reader wants to paste something in the next five seconds, not open a new tab.
 
 ---
 
 ## Table of Contents
 
-- [1. Header and Identity](#1-header-and-identity)
-- [2. The Big Three (What/Why/How)](#2-the-big-three-whatwhyhow)
-- [3. Table of Contents](#3-table-of-contents)
-- [4. Key Features](#4-key-features)
-- [5. Architecture and Workflows](#5-architecture-and-workflows)
-- [6. Directory Structure](#6-directory-structure)
-- [7. Quick Start and Installation](#7-quick-start-and-installation)
-- [8. Usage Examples](#8-usage-examples)
-- [9. Configuration](#9-configuration)
-- [10. API Reference](#10-api-reference)
-- [11. Performance and Benchmarks](#11-performance-and-benchmarks)
-- [12. FAQ](#12-faq)
-- [13. Troubleshooting](#13-troubleshooting)
-- [14. Contributing](#14-contributing)
-- [15. Roadmap](#15-roadmap)
-- [16. Security](#16-security)
-- [17. Credits and Acknowledgments](#17-credits-and-acknowledgments)
-- [18. License](#18-license)
-- [19. Easter Eggs and Fun Sections](#19-easter-eggs-and-fun-sections)
+Lets readers jump to a section on a long README. **Required when the doc exceeds ~3 screens** —
+skip on short READMEs, it's furniture in an empty room.
 
----
-
-## 1. Header and Identity
-
-The first thing anyone sees. Must communicate project identity in under 2 seconds.
-
-### Template: Professional with Personality
-
+**Level 1 — Corporate Geek:**
 ```markdown
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=200&section=header&text=ProjectName&fontSize=50&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Your%20snappy%20tagline%20here&descAlignY=55&descSize=18" width="100%" alt="ProjectName Banner" />
-</p>
-
-<p align="center">
-  <a href="#quick-start"><img src="https://img.shields.io/badge/Get_Started-blue?style=for-the-badge" alt="Get Started"></a>
-  <a href="https://github.com/user/repo/stargazers"><img src="https://img.shields.io/github/stars/user/repo?style=for-the-badge&color=yellow" alt="Stars"></a>
-  <a href="https://github.com/user/repo/blob/main/LICENSE"><img src="https://img.shields.io/github/license/user/repo?style=for-the-badge&color=green" alt="License"></a>
-  <a href="https://github.com/user/repo/actions"><img src="https://img.shields.io/github/actions/workflow/status/user/repo/ci.yml?style=for-the-badge" alt="CI Status"></a>
-</p>
-
-<p align="center">
-  <strong>One killer sentence that explains what this does and why it matters.</strong>
-</p>
-```
-
-### Template: Full Nerd Mode
-
-```markdown
-```
-    ____            _           __  _   __
-   / __ \_______  (_)__  _____/ /_/ | / /___ _____ ___  ___
-  / /_/ / ___/ / / / _ \/ ___/ __/  |/ / __ `/ __ `__ \/ _ \
- / ____/ /  / /_/ /  __/ /__/ /_/ /|  / /_/ / / / / / /  __/
-/_/   /_/   \____/\___/\___/\__/_/ |_/\__,_/_/ |_/ |_/\___/
-```
-
-> *"In the beginning there was `main()`, and it was good."* — Genesis 1:1 (Developer Edition)
-
-![Version](https://img.shields.io/badge/version-42.0.0-blue)
-![Status](https://img.shields.io/badge/status-works_on_my_machine-green)
-![Coffee](https://img.shields.io/badge/powered_by-coffee-brown)
-```
-
----
-
-## 2. The Big Three (What/Why/How)
-
-The most critical 3 lines of your entire README. Answer immediately.
-
-### Template
-
-```markdown
-## What is ProjectName?
-
-**ProjectName** turns [complex thing] into [simple thing]. One command. Zero config. Works everywhere.
-
-## Why?
-
-Because [the current way] requires [painful thing], [another painful thing], and [sacrifice of your firstborn].
-We fixed that.
-
-## Try it now
-
-\```bash
-npx projectname init my-app && cd my-app && npm start
-\```
-
-That's it. You're running. Total time: ~30 seconds.
-```
-
-### Personality Variations
-
-**Level 1 (Corporate Geek):**
-```markdown
-ProjectName is a high-performance data pipeline framework that reduces
-ETL development time by 80%. Start in under a minute.
-```
-
-**Level 3 (Playful Hacker):**
-```markdown
-ProjectName eats messy data for breakfast and outputs clean, structured
-gold. It's like having a tiny data engineer living in your terminal.
-```
-
-**Level 5 (Chaotic Genius):**
-```markdown
-ProjectName does [THING]. We could explain why it's better than [OTHER THING],
-but honestly, just try it. We'll wait. *taps desk impatiently*
-```
-
----
-
-## 3. Table of Contents
-
-For READMEs longer than 3 screen heights. Keep it navigable.
-
-### Template: Clean and Functional
-
-```markdown
-<details open>
-<summary><strong>📖 Table of Contents</strong></summary>
-
-- [What is ProjectName?](#what-is-projectname)
-- [Features](#features)
-- [Quick Start](#quick-start)
+## Table of Contents
+- [Installation](#installation)
 - [Usage](#usage)
-- [Configuration](#configuration)
-- [Architecture](#architecture)
-- [Contributing](#contributing)
+- [API Reference](#api-reference)
 - [License](#license)
-
-</details>
 ```
 
-### Template: With Personality
-
+**Level 3 — Playful Hacker:**
 ```markdown
-## 🗺️ Navigation (a.k.a. "Where Am I?")
-
-| Section | What You'll Find | Time to Read |
-| :--- | :--- | :---: |
-| [Features](#features) | What this thing actually does | 2 min |
-| [Quick Start](#quick-start) | Get running immediately | 1 min |
-| [Architecture](#architecture) | How the magic works | 5 min |
-| [FAQ](#faq) | Answers before you ask | 3 min |
-| [Easter Eggs](#easter-eggs) | 🤫 | ??? |
+## Where Are We Going?
+- [🚀 Quick Start](#-quick-start) — 30 seconds, one command
+- [🆘 Troubleshooting](#-troubleshooting) — it's probably a typo
 ```
+
+**Don't:** hand-write anchors and never re-check after renaming a heading — a stale `#instalation`
+link is the single most common broken-ToC bug; grep every anchor against real heading slugs.
 
 ---
 
-## 4. Key Features
+## Key Features
 
-Never use a boring bullet list. Make features scannable and exciting.
+Skimmable list of what makes the project worth using, 4-8 specific, checkable items. **Required.**
 
-### Template: Feature Grid
-
-```markdown
-## ✨ Features
-
-| | Feature | Description |
-| :---: | :--- | :--- |
-| 🚀 | **Blazing Fast** | Sub-millisecond responses. We benchmarked it. Repeatedly. |
-| 🔒 | **Secure by Default** | Zero-trust architecture. Your data stays yours. |
-| 🧩 | **Plugin System** | Extend anything. Break nothing. Ship everything. |
-| 📱 | **Works Everywhere** | Browser, Node, Deno, Bun, your grandma's smart fridge. |
-| 🎨 | **Beautiful Output** | Because life is too short for ugly terminals. |
-| ♿ | **Accessible** | Screen reader friendly. Keyboard navigable. Color-blind safe. |
-```
-
-### Template: Feature Cards (for longer descriptions)
-
+**Level 1 — Corporate Geek:**
 ```markdown
 ## Features
-
-### 🚀 Lightning Performance
-
-Process 1 million records in under 3 seconds. How? We use [technique]
-instead of [old way]. The result: your coffee won't even have time to cool.
-
-### 🧩 Plugin Everything
-
-```javascript
-// Add any capability in 3 lines
-import { plugin } from 'projectname';
-
-plugin.register('my-feature', {
-  onData: (data) => transform(data)  // Your logic here
-});
+- **Type-safe** — Full TypeScript definitions, no `any` in the public API
+- **Zero dependencies** — 4kb gzipped
+- **Tree-shakeable** — Import only what you use
 ```
 
-### 🔒 Enterprise Security (Without the Enterprise Headache)
-
-AES-256 encryption, automatic key rotation, and audit logs.
-All enabled by default. No 47-page security configuration required.
-```
-
----
-
-## 5. Architecture and Workflows
-
-Visual explanations of how the system works. Always prefer Mermaid.js.
-
-### Template: System Architecture
-
-````markdown
-## 🏗️ Architecture
-
-Here's how the pieces fit together:
-
-```mermaid
-graph LR
-    A[Your App] -->|HTTP| B[API Gateway]
-    B --> C[Auth Service]
-    B --> D[Core Engine]
-    D --> E[(Database)]
-    D --> F[Cache Layer]
-    F -.->|Cache Miss| E
-```
-
-**In plain English:** Your app talks to our API Gateway. The gateway checks
-if you're allowed in (Auth Service), then routes your request to the Core
-Engine. The engine checks the cache first (fast!) and only hits the database
-if needed (slower, but always accurate).
-````
-
-### Template: Sequence Diagram
-
-````markdown
-## How a Request Flows
-
-```mermaid
-sequenceDiagram
-    participant U as You
-    participant A as API
-    participant D as Database
-
-    U->>A: "Hey, give me user #42"
-    A->>A: Check permissions
-    A->>D: SELECT * FROM users WHERE id=42
-    D-->>A: Here's the data
-    A-->>U: 200 OK + user data
-
-    Note over U,D: Total time: ~15ms
-```
-````
-
----
-
-## 6. Directory Structure
-
-Give readers instant spatial awareness of the codebase.
-
-### Template
-
+**Level 3 — Playful Hacker:**
 ```markdown
-## 📂 Project Structure
-
-```
-projectname/
-├── src/                    # Where the magic happens
-│   ├── core/              # Business logic (the brain)
-│   ├── api/               # HTTP routes (the mouth)
-│   ├── db/                # Database layer (the memory)
-│   └── utils/             # Shared helpers (the Swiss Army knife)
-├── tests/                  # Proof that it works
-├── docs/                   # Extended documentation
-├── .env.example            # Config template (copy this!)
-├── Dockerfile              # Container recipe
-└── README.md               # You are here 📍
-```
+## What's In The Box
+- ⚡ **Stupidly fast** — Fasthttp under the hood, benchmarks below
+- 🪶 **4kb gzipped** — lighter than the emoji in this bullet
+- 🌳 **Tree-shakeable** — import one function, ship one function
 ```
 
----
-
-## 7. Quick Start and Installation
-
-The most critical section for adoption. Make it IMPOSSIBLE to fail.
-
-### Template: Multi-Method Installation
-
+**Level 5 — Chaotic Genius:**
 ```markdown
-## 🚀 Quick Start
-
-### Option 1: The One-Liner (Recommended)
-
-\```bash
-curl -fsSL https://get.projectname.dev | sh
-\```
-
-### Option 2: Package Manager
-
-\```bash
-# npm
-npm install -g projectname
-
-# Homebrew
-brew install projectname
-
-# apt (Debian/Ubuntu)
-sudo apt install projectname
-\```
-
-### Option 3: From Source (for the adventurous)
-
-\```bash
-git clone https://github.com/user/projectname.git
-cd projectname
-make build
-\```
-
-### Verify It Works
-
-\```bash
-projectname --version
-# Expected output: projectname v2.1.0
-\```
-
-🎉 **You're ready!** Jump to [Usage Examples](#usage) to see what you can do.
-```
-
-### Template: With Prerequisites
-
-```markdown
-## 🚀 Getting Started
-
-### What You'll Need
-
-| Requirement | Version | Check Command |
+## Enterprise-Grade Capabilities
+| Feature | Business Value | Actual Function |
 | :--- | :--- | :--- |
-| Node.js | 18+ | `node --version` |
-| npm | 9+ | `npm --version` |
-| Git | Any | `git --version` |
-
-<details>
-<summary>Don't have these? Click here for install links.</summary>
-
-- **Node.js**: Download from [nodejs.org](https://nodejs.org) (pick the LTS version)
-- **Git**: Download from [git-scm.com](https://git-scm.com)
-
-</details>
-
-### Install & Run
-
-\```bash
-# 1. Clone the project
-git clone https://github.com/user/projectname.git
-
-# 2. Enter the directory
-cd projectname
-
-# 3. Install dependencies (this might take a minute)
-npm install
-
-# 4. Start the development server
-npm run dev
-\```
-
-Open http://localhost:3000 in your browser. You should see the dashboard.
+| AbstractFizzBuzzStrategyFactory | Synergizes stakeholder alignment | Prints "Fizz" |
 ```
+
+**Don't:** list features as unproven adjectives ("blazing fast," "enterprise-grade") — pair each
+claim with the number or example that backs it, or cut it.
 
 ---
 
-## 8. Usage Examples
+## Quick Start / Installation
 
-Show, don't tell. Real code that people can copy and run.
+Shortest path from "found this repo" to "have it running." **Required.**
 
-### Template: Progressive Complexity
+**Level 1 — Corporate Geek:** (heading: `## Installation`)
 
-```markdown
-## 📖 Usage
-
-### Basic (The "Hello World")
-
-\```javascript
-import { magic } from 'projectname';
-
-const result = magic('Hello, World!');
-console.log(result); // → "✨ Hello, World! ✨"
-\```
-
-### Intermediate (Real-World Use Case)
-
-\```javascript
-import { magic, configure } from 'projectname';
-
-// Configure once at app startup
-configure({
-  theme: 'dark',
-  locale: 'en-US',
-  cache: true
-});
-
-// Use anywhere in your app
-const report = await magic.generateReport({
-  data: myDataset,
-  format: 'pdf'
-});
-
-console.log(`Report saved to: ${report.path}`);
-\```
-
-### Advanced (Power User)
-
-<details>
-<summary>Click to expand advanced usage</summary>
-
-\```javascript
-import { magic, Pipeline, plugins } from 'projectname';
-
-// Build a custom processing pipeline
-const pipeline = new Pipeline()
-  .use(plugins.validate())
-  .use(plugins.transform({ rules: customRules }))
-  .use(plugins.output({ format: 'json', pretty: true }));
-
-// Process a stream of data
-const results = await pipeline.process(dataStream);
-\```
-
-</details>
+```bash
+npm install @vercel/analytics
 ```
+```tsx
+import { Analytics } from '@vercel/analytics/react';
+export default function RootLayout() { return <Analytics />; }
+```
+
+**Level 4 — Full Nerd Mode:** (heading: `## Strap In`)
+
+```bash
+npm install -g haunted-cli      # summon the package
+haunted init --sacrifice=node_modules   # perform the ritual
+# there is no step 3, you're already running it
+```
+
+**Don't:** ship an install snippet you haven't run since the last release — a stale flag or
+renamed package is the #1 reason someone closes the tab in the first 10 seconds.
 
 ---
 
-## 9. Configuration
+## Architecture Diagram
 
-Complete reference for all settings. Keep it scannable.
+Visual map of how the pieces fit, for anyone about to change the system. **High, for multi-
+component systems** — skip for a single-file script. Full toolkit in
+[Tables, Diagrams, and Workflows](tables-diagrams-workflows.md); box-drawing alternative in
+[Char Art and Animation](char-art-and-animation.md).
 
-### Template
-
-```markdown
-## ⚙️ Configuration
-
-Create a `.env` file in your project root (or copy `.env.example`):
-
-\```bash
-cp .env.example .env
-\```
-
-### Required Settings
-
-| Variable | Description | Example |
-| :--- | :--- | :--- |
-| `API_KEY` | Your API key ([get one here](https://example.com/keys)) | `sk_live_abc123` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgres://user:pass@localhost:5432/mydb` |
-
-### Optional Settings
-
-| Variable | Default | Description |
-| :--- | :---: | :--- |
-| `PORT` | `3000` | Server port |
-| `LOG_LEVEL` | `info` | Logging verbosity (`debug`, `info`, `warn`, `error`) |
-| `CACHE_TTL` | `3600` | Cache duration in seconds (1 hour) |
-| `MAX_WORKERS` | `4` | Parallel processing threads |
-
-<details>
-<summary>📋 Full .env.example file</summary>
-
-\```bash
-# Required
-API_KEY=your_api_key_here
-DATABASE_URL=postgres://user:password@localhost:5432/dbname
-
-# Optional
-PORT=3000
-LOG_LEVEL=info
-CACHE_TTL=3600
-MAX_WORKERS=4
-\```
-
-</details>
+**Level 1 — Corporate Geek:**
+```mermaid
+flowchart LR
+    Client --> API --> Database
+    API --> Cache
 ```
+
+**Level 3 — Playful Hacker:**
+```mermaid
+flowchart LR
+    You([You, 3am, debugging]) -->|desperate curl| API[Gateway]
+    API -->|"please work"| DB[(Database)]
+```
+
+**Don't:** skip the plain-English caption underneath — a diagram with no caption fails a
+screen-reader user and anyone skimming past the arrows without stopping.
 
 ---
 
-## 10. API Reference
+## Usage Examples
 
-For libraries and SDKs. Keep it precise and example-driven.
+Runnable, realistic code showing the thing doing its actual job — the most-copied section.
+**Required.**
 
-### Template
+**Level 1 — Corporate Geek:**
 
+```ts
+const result = await charge({ amount: 2000, currency: 'usd', source: 'tok_visa' });
+```
+
+**Level 4 — Full Nerd Mode:**
+
+```js
+// Summon a user from the database (no incantations required)
+const gandalf = await client.users.get('usr_you_shall_not_pass');
+if (gandalf.role === 'admin') console.log('You shall pass.');
+```
+
+**Don't:** show only the happy path with no error handling anywhere in the doc — one example with
+a `try/catch` teaches more than five that assume nothing ever fails.
+
+---
+
+## Configuration
+
+Documents every env var, config field, or flag the project reads. **High, when config exists** —
+skip for a zero-config tool.
+
+**Level 1 — Corporate Geek:**
 ```markdown
-## 📚 API Reference
+| Variable | Required | Default | Description |
+| :--- | :---: | :--- | :--- |
+| `DATABASE_URL` | Yes | — | Postgres connection string |
+| `PORT` | No | `3000` | HTTP port to listen on |
+```
 
-### `magic(input, options?)`
+**Level 3 — Playful Hacker:**
+```markdown
+| Variable | Required | Default | What happens if you skip it |
+| :--- | :---: | :--- | :--- |
+| `DATABASE_URL` | Yes | — | The app refuses to start, correctly |
+```
 
-Transform input data using the configured pipeline.
+**Don't:** let this table drift from the real config schema — grep every `process.env.*`/config
+key against the codebase before publishing; a stale row erodes trust fast.
 
-| Parameter | Type | Required | Description |
+---
+
+## API Reference
+
+Contract for every public function, class, or endpoint. **High, for libraries/SDKs** — skip for
+an end-user app.
+
+**Level 1 — Corporate Geek:**
+```markdown
+### `client.charges.create(params)`
+| Param | Type | Required | Description |
 | :--- | :--- | :---: | :--- |
-| `input` | `string \| Buffer` | Yes | The data to process |
-| `options.format` | `'json' \| 'xml' \| 'csv'` | No | Output format (default: `'json'`) |
-| `options.validate` | `boolean` | No | Run validation (default: `true`) |
+| `amount` | `number` | Yes | Amount in cents |
 
-**Returns:** `Promise<Result>`
-
-**Example:**
-\```javascript
-const result = await magic('raw data', { format: 'json' });
-// → { status: 'ok', data: {...}, processedAt: '2024-01-15T10:30:00Z' }
-\```
-
-**Throws:**
-- `ValidationError` — Input fails schema validation
-- `TimeoutError` — Processing exceeds 30s limit
+**Returns:** `Promise<Charge>`
 ```
+
+**Level 3 — Playful Hacker:** `app.Get(path, handler)`
+
+Registers a GET handler. Fiber doesn't care what else you were planning to do today.
+
+```go
+app.Get("/hello/:name", func(c *fiber.Ctx) error { return c.SendString("Hi " + c.Params("name")) })
+```
+
+**Don't:** describe a parameter's type as "obvious from the name" and skip it — every param needs
+an explicit type and required/optional flag; this is the section people paste into a linter.
 
 ---
 
-## 11. Performance and Benchmarks
+## Performance / Benchmarks
 
-Show why your project is worth choosing. Use data, not adjectives.
+Numbers backing a speed/efficiency claim, usually vs. alternatives. **Medium, in a competitive
+space** — skip if there's nothing to compare against.
 
-### Template
-
+**Level 1 — Corporate Geek:**
 ```markdown
-## 📊 Benchmarks
+| Framework | Requests/sec | Latency (p99) |
+| :--- | ---: | ---: |
+| Fiber | 148,302 | 1.2ms |
+| Express | 22,481 | 8.9ms |
 
-Tested on: MacBook Pro M2, 16GB RAM, Node.js 20.x
-
-| Operation | ProjectName | Alternative A | Alternative B |
-| :--- | :---: | :---: | :---: |
-| Parse 10K records | **45ms** | 320ms | 1,200ms |
-| Memory usage | **12 MB** | 89 MB | 256 MB |
-| Cold start | **8ms** | 150ms | 2,400ms |
-| Bundle size | **4.2 KB** | 48 KB | 312 KB |
-
-<details>
-<summary>How we measured (reproducible benchmarks)</summary>
-
-\```bash
-# Run benchmarks yourself
-git clone https://github.com/user/projectname-benchmarks.git
-cd projectname-benchmarks
-npm install && npm run bench
-\```
-
-Environment: Node.js 20.11, V8 11.8, no other processes running.
-Each test: 1000 iterations, median reported.
-
-</details>
+Reproduce with `make bench` — methodology in [`/benchmarks`](./benchmarks).
 ```
+
+**Level 5 — Chaotic Genius:**
+```markdown
+| Contender | Requests/sec | Dignity Retained |
+| :--- | ---: | :---: |
+| Our library | 148,302 | 100% |
+| A potato with two wires stuck in it | 0 | 100% (it wasn't trying) |
+```
+
+**Don't:** publish a number with no reproduction method — "10x faster" with no linked script,
+hardware spec, or dataset size is marketing, not engineering.
 
 ---
 
-## 12. FAQ
+## Contributing
 
-Answer questions before they become GitHub issues.
+Tells outside contributors how to propose a change and get it merged. **High, for open source.**
 
-### Template
+**Level 1 — Corporate Geek:** (heading: `## Contributing`)
 
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR. All contributors sign the [CLA](CLA.md).
+
+```bash
+git clone https://github.com/org/repo.git && cd repo && npm install && npm test
+```
+
+**Level 2 — Friendly Nerd:**
 ```markdown
-## ❓ FAQ
+## Contributing
+Found a bug? We'd love your help — we don't bite (most of us don't even have teeth, we're a
+Node project). Fork it, `npm test` should stay green, then open a small, focused PR.
+```
 
-<details>
-<summary><strong>Is this production-ready?</strong></summary>
+**Don't:** say "we welcome contributions" with no runnable test/build command underneath — that
+sentence with nothing to run is the top reason first-time contributors bounce.
 
-Yes! We've been running it in production at [Company] since 2023,
-handling 2M+ requests/day. See our [stability report](./docs/stability.md).
+---
 
-</details>
+## FAQ
 
-<details>
-<summary><strong>Does it work with [Framework X]?</strong></summary>
+Pre-answers questions that show up repeatedly, saving both reader and maintainer time. **Medium,
+when a genuine confusion pattern exists** — don't invent questions no one has asked.
 
-ProjectName is framework-agnostic. It works with React, Vue, Svelte,
-Angular, vanilla JS, and anything that runs JavaScript. See our
-[integration guides](./docs/integrations/) for specific examples.
+**Level 1 — Corporate Geek:**
+```markdown
+**Does this work with Webpack 4?**
+No — requires Webpack 5+ for Module Federation.
+```
 
-</details>
+**Level 3 — Playful Hacker:**
+```markdown
+**Q: Why is it called Choo?**
+A: Because it's a tiny thing that gets you somewhere, and "train" was taken by four other packages.
+```
 
-<details>
-<summary><strong>How is this different from [Competitor]?</strong></summary>
+**Don't:** restate the Usage or Configuration section word-for-word as a "question" — if it's
+already answered above, link to that section instead of duplicating it.
 
-Great question! Here's the honest comparison:
+---
 
-| | ProjectName | Competitor |
+## Troubleshooting
+
+Maps error messages/symptoms to cause and fix — found by pasting an error into search. **Medium,
+for complex setups** — skip for trivial installs.
+
+**Level 1 — Corporate Geek:**
+```markdown
+| Symptom | Likely Cause | Fix |
 | :--- | :--- | :--- |
-| Focus | Speed + simplicity | Feature completeness |
-| Bundle size | 4 KB | 120 KB |
-| Learning curve | 5 minutes | 2 hours |
-| Plugin system | Yes | No |
-
-We're not trying to replace [Competitor]. If you need [specific feature],
-they're a great choice. If you need [our strength], we're your tool.
-
-</details>
+| `ECONNREFUSED` on startup | Database isn't running | `docker compose up -d db` |
 ```
+
+**Level 3 — Playful Hacker:**
+```markdown
+| If you see... | It's not you, it's... | Fix |
+| :--- | :--- | :--- |
+| Blank page, no errors | ...a silently swallowed exception | `DEBUG=app:* npm start` |
+```
+
+**Don't:** write "just Google the error" energy into a row — every entry needs an actual command
+or config change, not a vague "check your setup."
 
 ---
 
-## 13. Troubleshooting
+## Roadmap
 
-Help frustrated users help themselves.
+Signals active development and direction, usually a checklist by status. **Low** — nice for
+momentum, easy to go stale, safe to omit.
 
-### Template
-
+**Level 1 — Corporate Geek:**
 ```markdown
-## 🔧 Troubleshooting
+## Roadmap
+- [x] Core API stable (v1.0)
+- [ ] Plugin system
 
-### "Command not found: projectname"
-
-Your PATH doesn't include the install location. Try:
-\```bash
-# Check where it was installed
-which projectname || npm bin -g
-
-# Add to PATH (add this to your ~/.bashrc or ~/.zshrc)
-export PATH="$PATH:$(npm bin -g)"
-\```
-
-### "Error: EACCES permission denied"
-
-Don't use `sudo` with npm. Fix permissions instead:
-\```bash
-mkdir ~/.npm-global
-npm config set prefix '~/.npm-global'
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
-\```
-
-### Still stuck?
-
-1. Check [existing issues](https://github.com/user/repo/issues)
-2. Search our [Discussions](https://github.com/user/repo/discussions)
-3. Open a [new issue](https://github.com/user/repo/issues/new) with:
-   - Your OS and version
-   - Node.js version (`node --version`)
-   - Full error message
-   - Steps to reproduce
+See the [public project board](https://github.com/org/repo/projects/1) for live status.
 ```
+
+**Level 3 — Playful Hacker:**
+```markdown
+## Coming Soon (No Promises)
+- [x] Works on your machine too, probably
+- [ ] Plugin system — it's in a branch, it's *fine*
+```
+
+**Don't:** attach dates ("Q3 2026: plugin system") with no funded commitment behind them — link a
+live project board instead of a promise that ages badly in a public file.
 
 ---
 
-## 14. Contributing
+## Credits / Contributors
 
-Welcome contributors warmly. Make the first PR easy.
+Recognizes the people and prior art the project is built on. **Medium, for open source** — include
+once there's more than one contributor.
 
-### Template
-
+**Level 1 — Corporate Geek:**
 ```markdown
-## 🤝 Contributing
-
-We love contributions! Whether it's:
-
-- 🐛 Bug reports
-- 💡 Feature suggestions
-- 📝 Documentation improvements
-- 🔧 Code contributions
-
-### Quick Contribution Guide
-
-\```bash
-# 1. Fork and clone
-git clone https://github.com/YOUR-USERNAME/projectname.git
-
-# 2. Create a branch
-git checkout -b feature/amazing-thing
-
-# 3. Make your changes and test
-npm test
-
-# 4. Push and open a PR
-git push origin feature/amazing-thing
-\```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
-### Contributors
-
-<a href="https://github.com/user/repo/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=user/repo" alt="Contributors" />
+## Contributors
+<a href="https://github.com/org/repo/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=org/repo" alt="Contributors" />
 </a>
 ```
 
----
-
-## 15. Roadmap
-
-Show where the project is heading. Build excitement.
-
-### Template
-
+**Level 3 — Playful Hacker:**
 ```markdown
-## 🗺️ Roadmap
-
-| Status | Feature | Target |
-| :---: | :--- | :--- |
-| ✅ | Core engine | Done |
-| ✅ | Plugin system | Done |
-| 🚧 | GraphQL support | Q2 2024 |
-| 📋 | Mobile SDK | Q3 2024 |
-| 💭 | AI integration | Exploring |
-
-See our [project board](https://github.com/user/repo/projects/1) for detailed progress.
-
-Have a feature request? [Tell us about it!](https://github.com/user/repo/issues/new?template=feature_request.md)
+## Hall of Fame
+Everyone below fixed something at 2am so you didn't have to:
+<a href="https://github.com/org/repo/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=org/repo" alt="Contributors" />
+</a>
 ```
 
+**Don't:** hand-maintain a bullet list of names that drifts from the real commit history — use an
+auto-generated widget (contrib.rocks, All Contributors bot) instead.
+
 ---
 
-## 16. Security
+## License
 
-Always serious. Never funny. Crystal clear.
+States the legal terms of use — short, but the section that decides if anyone can depend on this.
+**Required.**
 
-### Template
-
+**Level 1 — Corporate Geek:**
 ```markdown
-## 🔒 Security
-
-### Reporting Vulnerabilities
-
-**DO NOT** open a public issue for security vulnerabilities.
-
-Instead, please email security@projectname.dev or use our
-[Security Advisory](https://github.com/user/repo/security/advisories/new) page.
-
-We will respond within 48 hours and provide a fix timeline.
-
-### Security Practices
-
-- All dependencies are audited weekly via Dependabot
-- Code is scanned with CodeQL on every PR
-- Secrets are never logged or exposed in error messages
-- We follow [OWASP Top 10](https://owasp.org/www-project-top-ten/) guidelines
-
-See [SECURITY.md](SECURITY.md) for our full security policy.
+## License
+[MIT](LICENSE) © 2026 Acme, Inc.
 ```
 
----
-
-## 17. Credits and Acknowledgments
-
-Give credit generously. It costs nothing and builds community.
-
-### Template
-
+**Level 5 — Chaotic Genius:**
 ```markdown
-## 🙏 Acknowledgments
-
-Built on the shoulders of giants:
-
-- [Library A](https://example.com) — For making [thing] possible
-- [Library B](https://example.com) — The best [thing] implementation
-- [Person](https://github.com/person) — For the original idea and inspiration
-- [Community](https://discord.gg/xxx) — For testing, feedback, and encouragement
-
-Special thanks to all our [contributors](https://github.com/user/repo/graphs/contributors)
-who make this project better every day.
+## License
+MIT — also known as "Do Whatever You Want But If It Breaks Prod Don't Call Us."
+See [LICENSE](LICENSE) for the boring, legally-binding version of that sentence.
 ```
 
----
-
-## 18. License
-
-Short, clear, legally correct.
-
-### Template
-
-```markdown
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE) — do whatever you want,
-just keep the copyright notice. See the [LICENSE](LICENSE) file for details.
-```
+**Don't:** omit the license because "everyone knows it's open source" — no `LICENSE` file legally
+defaults to all rights reserved, almost never the actual intent.
 
 ---
 
-## 19. Easter Eggs and Fun Sections
+## Easter Eggs
 
-Optional sections that reward curious readers and add personality.
+Hidden rewards for readers who go looking — a joke in `<details>`, a hidden command, a raw-source
+comment. **Optional, personality level 3+** — never load-bearing. Full catalog in
+[Tone and Voice](tone-and-voice.md).
 
-### Template: The "Why This Name?" Section
-
+**Level 3 — Playful Hacker:**
 ```markdown
 <details>
-<summary>🤔 Why is it called "ProjectName"?</summary>
+<summary>🥚 Psst. Click here if you read this far.</summary>
 
-Funny story. At 2 AM during a hackathon, someone said "[random phrase]"
-and we all laughed so hard that it stuck. The original working title was
-"UntitledProject47" which, in hindsight, was not great for SEO.
+You found it. No prize, but you now know something the skimmers don't.
 
 </details>
 ```
 
-### Template: The Sponsor/Support Section with Personality
-
+**Level 4 — Full Nerd Mode:**
 ```markdown
-## ☕ Support This Project
-
-If ProjectName saved you time, consider:
-
-- ⭐ [Star this repo](https://github.com/user/repo) (free!)
-- 🐛 [Report bugs](https://github.com/user/repo/issues) (also free!)
-- ☕ [Buy me a coffee](https://buymeacoffee.com/user) ($3-5)
-- 💼 [Sponsor on GitHub](https://github.com/sponsors/user) (tax-deductible!)
-
-Every star makes a developer smile. It's science. Probably.
+<!-- If you're reading raw markdown source: hello, `View Source` enjoyer. The real Easter egg is
+`npm run --silent easter-egg`. Don't tell anyone. -->
 ```
 
-### Template: The Footer Wave
+**Don't:** hide anything actually needed (a required flag, a breaking-change warning) inside an
+egg — if skipping it breaks the reader's setup, it's a support ticket, not a joke.
 
-```markdown
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer" width="100%" />
-</p>
+---
 
-<p align="center">
-  Made with ❤️ and mass of ☕ by <a href="https://github.com/user">@user</a>
-</p>
-```
+## Before Shipping a Section, Confirm...
+
+- [ ] Heading depth is consistent — every top-level section is the same `##`, none nested a level
+      deeper or shallower than its siblings
+- [ ] Every Table of Contents link resolves to a real heading anchor — no orphaned `#anchor` links
+- [ ] Tone level is consistent *within* the section — no Corporate Geek line dropped into an
+      otherwise Chaotic Genius section, or vice versa
+- [ ] Every code block has actually been run, not written from memory
+- [ ] The section earns its place per its priority — a Low/Optional section adding nothing
+      specific to this project gets cut, not included out of habit
+- [ ] Claims are backed by something checkable (benchmark, link, version number) — no unverifiable
+      superlatives standing alone
+- [ ] Jargon introduced here is defined on first use, per [Universal Readability](universal-readability.md)
+- [ ] Tables follow [Tables, Diagrams, and Workflows](tables-diagrams-workflows.md) — alignment
+      markers, ≤5 columns
+- [ ] Diagrams/char art follow [Char Art and Animation](char-art-and-animation.md) — captioned,
+      ≤80 columns if ASCII, accessible fallback if animated
+- [ ] Visual elements stay inside the shared Visual Budget Rule quota rather than adding a new
+      banner/GIF/diagram on top of what Step 6 already spent
+- [ ] Nothing here contradicts another section — e.g., a Roadmap item already shipped per Key
+      Features, or a Configuration default that doesn't match the Quick Start example
