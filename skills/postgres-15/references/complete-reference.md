@@ -1,6 +1,15 @@
 # Advanced PostgreSQL 15+ Operations and Tech Support Complete Reference
 
-This document consolidates and enhances the comprehensive knowledge required for managing PostgreSQL 15+ in production environments, focusing on massive datasets, high concurrency, complex operational requirements, and worst-case scenarios.
+**Verified against upstream: 2026-08-07**
+
+This document consolidates the comprehensive knowledge required for managing PostgreSQL 15+ in production environments, focusing on massive datasets, high concurrency, complex operational requirements, and worst-case scenarios.
+
+## Source Map
+
+| Source | Governs | When to Consult |
+|---|---|---|
+| [PostgreSQL 15 Release Notes](https://www.postgresql.org/docs/release/15.0/) | New features, deprecations, changed defaults | Before upgrading or using PG15 specific features (MERGE, jsonlog, WAL compression). |
+| [PostgreSQL 15 Released!](https://www.postgresql.org/about/news/postgresql-15-released-2526/) | High-level feature overview | For a summary of major improvements in PG15. |
 
 ## 1. Core Architecture and Internals
 
@@ -20,7 +29,7 @@ PostgreSQL uses MVCC to handle concurrent transactions without locking. When a r
 ### 1.3 Write-Ahead Logging (WAL)
 WAL ensures data integrity. Changes are recorded in the WAL before being written to data files.
 - **Checkpoints**: A point in the WAL sequence where it's guaranteed that heap and index data files have been updated. Frequent checkpoints cause I/O spikes. Tune `checkpoint_timeout` (15-30min) and `max_wal_size` (16GB-64GB).
-- **WAL Compression**: PostgreSQL 15 supports LZ4 and Zstandard compression, reducing I/O bandwidth.
+- **WAL Compression**: PostgreSQL 15 supports LZ4 and Zstandard (zstd) compression, reducing I/O bandwidth and storage requirements.
 
 ## 2. Managing Massive Datasets (VLDBs)
 
@@ -67,18 +76,19 @@ Creates an exact byte-for-byte copy of the primary database.
 
 ### 4.2 Logical Replication
 Decodes WAL records into logical changes (INSERT, UPDATE, DELETE).
-- **PG 15 Enhancements**: Supports row filters and column lists for granular replication.
+- **PG 15 Enhancements**: Supports row filters and column lists for granular replication, reducing network traffic and storage requirements on subscribers.
 - **Use Cases**: Data warehousing, zero-downtime upgrades, replicating specific tables.
 - **Conflict Resolution**: Requires manual intervention (e.g., `pg_replication_origin_advance()`) if conflicts occur.
 
 ### 4.3 Automated Failover
 Use tools like **Patroni** (with etcd/Consul) for automated failover and cluster state management, paired with HAProxy for connection routing.
 
-## 5. Disaster Recovery and Worst-Case Scenarios
+## 5. Disaster Recovery and Emergency Response
 
 ### 5.1 Point-In-Time Recovery (PITR)
 Allows restoring the database to a specific microsecond. Requires base backups and WAL archives.
 - **Tooling**: Use `pgBackRest` or `WAL-G` for parallel backup/restore, encryption, and S3 integration.
+- **PG 15 Enhancements**: `pg_basebackup` now supports server-side compression using gzip, LZ4, or zstd.
 
 ### 5.2 TXID Wraparound
 If the database reaches the wraparound point, it shuts down.
@@ -94,19 +104,20 @@ If the database reaches the wraparound point, it shuts down.
 - Perform PITR to a temporary cluster to the exact timestamp before the deletion.
 - Extract data using `pg_dump` and restore to production.
 
-## 6. Security and Auditing
+## 6. Security and Compliance
 
 ### 6.1 Role-Based Access Control (RBAC)
 - Enforce the principle of least privilege. Application users must never be superusers.
 - Use group roles and grant specific permissions (`SELECT`, `INSERT`, `UPDATE`, `DELETE`).
+- **PG 15 Change**: The default `CREATE` permission on the `public` schema has been revoked from all users except the database owner.
 
 ### 6.2 Network Security
 - **`pg_hba.conf`**: Strictly control IP addresses and authentication methods. Enforce `scram-sha-256`.
 - **SSL/TLS**: Enforce encrypted connections (`hostssl`).
 
-### 6.3 Auditing (`pgaudit`)
-- Essential for compliance (HIPAA, SOC 2).
-- Configure `pgaudit.log` to capture relevant statement classes (`write`, `ddl`, `role`). Ship logs to a centralized system (e.g., ELK stack).
+### 6.3 Auditing and Logging
+- **`pgaudit`**: Essential for compliance (HIPAA, SOC 2). Configure `pgaudit.log` to capture relevant statement classes (`write`, `ddl`, `role`).
+- **PG 15 Enhancements**: Introduces a new structured JSON logging format (`jsonlog`), making it trivial to ingest logs into SIEM systems.
 
 ### 6.4 Row-Level Security (RLS)
 - Restrict row access based on role or session context. Ensure `relforcerowsecurity` is set appropriately.
@@ -116,8 +127,10 @@ If the database reaches the wraparound point, it shuts down.
 
 - **`MERGE` Command**: Simplifies complex "upsert" logic, improving performance for bulk data synchronization.
 - **Structured Server Log Output (JSON)**: Makes it trivial to ingest logs into SIEM systems.
-- **Improved Sorting Performance**: Reduces `work_mem` requirements for sorting-heavy workloads.
+- **Improved Sorting Performance**: Reduces `work_mem` requirements for sorting-heavy workloads, with speedups of 25% - 400% for in-memory and on-disk sorts.
 - **Logical Replication Enhancements**: Row filters and column lists reduce network traffic and storage requirements.
+- **WAL Compression**: Support for LZ4 and Zstandard (zstd) compression.
+- **Public Schema Permissions**: `CREATE` permission revoked from all users except the database owner by default.
 
 ## 8. CLI Reference and Advanced Queries
 

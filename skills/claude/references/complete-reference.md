@@ -1,86 +1,88 @@
-# Complete Reference: Mastering Claude 3.5 and Beyond
+# Complete Reference: Mastering Claude Models
 
-This document consolidates and enhances the comprehensive knowledge required to master Claude 3.5, including API usage, system prompt engineering, tool integrations, vision capabilities, extended cognitive tasks, prompt caching strategies, CLI usage, configuration schemas, advanced architecture, security auditing, and troubleshooting.
+This document consolidates and enhances the comprehensive knowledge required to master Claude models (Fable 5, Mythos 5, Opus 5, Sonnet 5), including API usage, system prompt engineering, tool integrations, vision capabilities, extended cognitive tasks, prompt caching strategies, Artifacts, CLI usage, configuration schemas, advanced architecture, security auditing, and troubleshooting.
+
+**Verified against upstream: 2026-08-07**
 
 ## Table of Contents
 
-1. [Claude 3.5: An Overview](#claude-35-an-overview)
+1. [Claude Models Overview](#claude-models-overview)
 2. [API Usage and Integration](#api-usage-and-integration)
 3. [System Prompts and Their Strategic Use](#system-prompts-and-their-strategic-use)
 4. [Leveraging Tool Use and Extensions](#leveraging-tool-use-and-extensions)
-5. [Vision Capabilities in Claude 3.5](#vision-capabilities-in-claude-35)
+5. [Vision Capabilities](#vision-capabilities)
 6. [Extended Thinking: Techniques and Best Practices](#extended-thinking-techniques-and-best-practices)
 7. [Prompt Caching for Performance and Consistency](#prompt-caching-for-performance-and-consistency)
-8. [Claude CLI Command Reference](#claude-cli-command-reference)
-9. [Claude Configuration Schemas Guide](#claude-configuration-schemas-guide)
-10. [Claude: Enterprise Deep Dive & Advanced Architecture](#claude-enterprise-deep-dive--advanced-architecture)
-11. [Comprehensive Security Audit Checklist for Claude](#comprehensive-security-audit-checklist-for-claude)
-12. [Claude Troubleshooting & Diagnostics Guide](#claude-troubleshooting--diagnostics-guide)
+8. [Artifacts](#artifacts)
+9. [Claude CLI Command Reference](#claude-cli-command-reference)
+10. [Claude Configuration Schemas Guide](#claude-configuration-schemas-guide)
+11. [Claude: Enterprise Deep Dive & Advanced Architecture](#claude-enterprise-deep-dive--advanced-architecture)
+12. [Comprehensive Security Audit Checklist for Claude](#comprehensive-security-audit-checklist-for-claude)
+13. [Claude Troubleshooting & Diagnostics Guide](#claude-troubleshooting--diagnostics-guide)
 
 ---
 
-## Claude 3.5: An Overview
+## Claude Models Overview
 
-Claude 3.5 builds upon the foundation of previous Claude models, incorporating improvements in contextual comprehension, safety mechanisms, and multi-modal integration. Unlike its predecessors, Claude 3.5 offers advanced vision capabilities, tighter API integration, and a more flexible prompt architecture enabling extended reasoning and multi-step task completion.
+Anthropic offers a family of Claude models, each optimized for different use cases:
 
-### Key Attributes of Claude 3.5
+- **Claude Fable 5:** One of Anthropic's most capable models, designed for complex reasoning and creative tasks.
+- **Claude Mythos 5:** Another highly capable model, excelling in deep analysis and nuanced understanding.
+- **Claude Opus 5:** A powerful model for a wide range of tasks, balancing performance and capability.
+- **Claude Sonnet 5:** Optimized for speed and efficiency, ideal for high-throughput applications.
 
-- **Enhanced Contextual Understanding:** Claude 3.5 can maintain coherence over longer conversations and documents, supporting up to 100k tokens in some configurations.
-- **Multi-Modal Input:** The model can process and interpret visual inputs alongside text, enabling richer interactions.
+### Key Attributes
+
+- **Enhanced Contextual Understanding:** Claude models can maintain coherence over longer conversations and documents.
+- **Multi-Modal Input:** The models can process and interpret visual inputs alongside text.
 - **Safety and Alignment:** Incorporates state-of-the-art alignment techniques to reduce harmful or biased outputs.
-- **Tool Use:** Supports dynamic invocation of external tools through API calls and plugin integrations.
-- **Extended Thinking:** Enables complex reasoning chains, multi-step workflows, and memory of user preferences.
+- **Tool Use:** Supports dynamic invocation of external tools through API calls.
+- **Extended Thinking:** Enables complex reasoning chains and multi-step workflows.
 - **Prompt Caching:** Facilitates improved efficiency and response consistency by reusing prompt contexts.
-
-### Architectural Innovations
-
-Claude 3.5 employs a transformer-based architecture enhanced with specialized attention mechanisms designed to improve long-range dependency modeling. It uses a combination of supervised fine-tuning and reinforcement learning from human feedback (RLHF) to balance creativity, accuracy, and safety.
+- **Artifacts:** Provides collaborative workspaces for interactive content generation.
 
 ---
 
 ## API Usage and Integration
 
-The Claude 3.5 API is the primary interface for programmatic interaction with the model. It enables developers to embed Claude's capabilities into applications, automate workflows, and create custom user experiences.
+The Claude API is the primary interface for programmatic interaction with the models.
 
 ### API Endpoint Structure
 
-Claude 3.5’s API is RESTful, accessible via HTTPS, and supports JSON-formatted requests and responses. The fundamental endpoint for text generation is:
+The fundamental endpoint for text generation is:
 
 ```
-POST https://api.anthropic.com/v1/complete
+POST https://api.anthropic.com/v1/messages
 ```
 
 ### Authentication and Security
 
-Access requires an API key provided by Anthropic. The key must be included in the `Authorization` header as a bearer token:
+Access requires an API key provided by Anthropic. The key must be included in the `x-api-key` header, along with the `anthropic-version` header:
 
 ```http
-Authorization: Bearer YOUR_API_KEY
+x-api-key: YOUR_API_KEY
+anthropic-version: 2023-06-01
 ```
-
-It is recommended to store API keys securely and rotate them periodically as a best security practice.
 
 ### Request Payload
 
 A typical request includes the following parameters:
 
-- `model`: Specifies the model name (`claude-3.5`).
-- `prompt`: The input prompt text or structured conversation history.
-- `max_tokens_to_sample`: Limits the number of tokens generated.
+- `model`: Specifies the model name (e.g., `claude-fable-5`, `claude-mythos-5`, `claude-opus-5`, `claude-sonnet-5`).
+- `messages`: An array of message objects containing the conversation history.
+- `max_tokens`: Limits the number of tokens generated.
 - `temperature`: Controls randomness in output (0 to 1).
-- `stop_sequences`: Defines sequences where output generation should halt.
-- `stream`: Enables streaming responses for real-time applications.
-- `additional_kwargs`: Allows passing experimental or extended parameters.
+- `system`: Optional system prompt to guide the model's behavior.
 
 **Example Request:**
 
 ```json
 {
-  "model": "claude-3.5",
-  "prompt": "Explain the significance of the Turing Test in AI development.",
-  "max_tokens_to_sample": 200,
-  "temperature": 0.7,
-  "stop_sequences": ["\n\n"]
+  "model": "claude-sonnet-5",
+  "max_tokens": 1024,
+  "messages": [
+    {"role": "user", "content": "Explain the significance of the Turing Test in AI development."}
+  ]
 }
 ```
 
@@ -88,88 +90,56 @@ A typical request includes the following parameters:
 
 The API returns a JSON object including:
 
-- `completion`: The text generated by Claude.
-- `stop_reason`: Why generation stopped (e.g., stop sequence matched, max tokens reached).
-- `log_id`: Identifier for the request, useful for debugging.
-- `token_usage`: Counts of input and output tokens, important for cost management.
+- `content`: An array of content blocks generated by Claude.
+- `stop_reason`: Why generation stopped (e.g., `end_turn`, `max_tokens`, `stop_sequence`, `tool_use`).
+- `usage`: Counts of input and output tokens.
 
 **Example Response:**
 
 ```json
 {
-  "completion": "The Turing Test, proposed by Alan Turing in 1950, is a benchmark for determining whether a machine can demonstrate intelligent behavior indistinguishable from a human...",
-  "stop_reason": "stop_sequence",
-  "log_id": "abc123xyz",
-  "token_usage": {
+  "id": "msg_01XFD...",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "The Turing Test, proposed by Alan Turing in 1950, is a benchmark for determining whether a machine can demonstrate intelligent behavior indistinguishable from a human..."
+    }
+  ],
+  "model": "claude-sonnet-5",
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
     "input_tokens": 20,
     "output_tokens": 180
   }
 }
 ```
 
-### Best Practices for API Usage
-
-- **Batch Requests:** Where possible, batch multiple prompts to reduce latency and optimize throughput.
-- **Rate Limiting:** Monitor your API usage and handle 429 (Too Many Requests) errors gracefully with exponential backoff.
-- **Streaming:** Use streaming for real-time applications to provide users with immediate feedback.
-- **Error Handling:** Implement retries for transient errors and detailed logging for debugging.
-- **Cost Management:** Track token usage per request to maintain budget constraints.
-
 ---
 
 ## System Prompts and Their Strategic Use
 
-System prompts are foundational instructions that define the behavior, tone, and constraints of Claude’s responses. Mastery of system prompt engineering is essential for tailoring Claude 3.5 to specialized tasks and user requirements.
-
-### What Are System Prompts?
-
-System prompts are initial messages or instructions embedded in the conversation history that guide Claude’s generation. Unlike user prompts, they are not part of the interactive dialogue but serve as meta-instructions.
-
-For example, a system prompt may specify the persona Claude should assume:
-
-```
-You are an expert legal advisor specializing in intellectual property law. Provide concise and accurate responses.
-```
+System prompts are foundational instructions that define the behavior, tone, and constraints of Claude’s responses.
 
 ### Engineering Effective System Prompts
-
-Creating effective system prompts requires clarity, specificity, and alignment with the intended use case. It involves:
 
 1. **Defining Role and Tone:** Explicitly state the persona, expertise level, and communication style.
 2. **Specifying Constraints:** Limit responses in length, complexity, or content scope.
 3. **Instructing on Format:** Prescribe output formats such as JSON, bullet points, or formal prose.
 4. **Safety and Compliance:** Enforce ethical guidelines and content filters.
 
-### Examples of System Prompts
-
-| Use Case                      | Example System Prompt                                                                                  |
-|-------------------------------|-----------------------------------------------------------------------------------------------------|
-| Technical Documentation Writer | "You are a technical writer specialized in software documentation. Use clear, concise language with examples." |
-| Customer Service Agent         | "You are a polite and empathetic customer support agent. Always confirm understanding before responding." |
-| Creative Writer               | "You are a creative storyteller focused on fantasy genre. Use vivid descriptions and imaginative plots." |
-
-### Dynamic System Prompting
-
-Claude 3.5 supports dynamic system prompts where instructions can be adapted based on user context or external data. This enables:
-
-- **Personalization:** Adjusting tone or content based on user profile.
-- **Multi-turn Adaptation:** Updating instructions mid-conversation to refine output.
-- **Context Injection:** Including relevant facts or prior conversation snippets to maintain coherence.
-
-### System Prompt in API Calls
-
-In API usage, system prompts are typically included as the first element in a structured prompt array or concatenated with user prompts, often separated by delimiters.
-
-**Example Structured Prompt:**
+**Example System Prompt in API Call:**
 
 ```json
 {
-  "model": "claude-3.5",
-  "prompt": [
-    {"role": "system", "content": "You are a helpful assistant specialized in coding."},
-    {"role": "user", "content": "Explain recursion with an example in Python."}
-  ],
-  "max_tokens_to_sample": 250
+  "model": "claude-opus-5",
+  "max_tokens": 1024,
+  "system": "You are an expert legal advisor specializing in intellectual property law. Provide concise and accurate responses.",
+  "messages": [
+    {"role": "user", "content": "What is the difference between a patent and a trademark?"}
+  ]
 }
 ```
 
@@ -177,251 +147,197 @@ In API usage, system prompts are typically included as the first element in a st
 
 ## Leveraging Tool Use and Extensions
 
-Claude 3.5’s tool use capabilities enable the invocation of external APIs, plugins, or custom functions during text generation. This fusion of language understanding with functional operations expands the model’s usefulness in real-world applications.
-
-### What is Tool Use in Claude?
-
-Tool use refers to the model’s ability to recognize when a query requires external data or computation and to trigger an associated tool or API to fulfill the request. The model then incorporates the tool’s output into its final response.
-
-### Types of Tools Supported
-
-- **Knowledge Bases:** Querying domain-specific databases or encyclopedias.
-- **Calculators:** Performing mathematical computations.
-- **APIs:** Accessing real-time data such as weather, stock prices, or news.
-- **Databases:** Retrieving user-specific or session-specific information.
-- **Custom Plugins:** Integrating proprietary services or workflows.
+Claude's tool use capabilities enable the invocation of external APIs or custom functions during text generation.
 
 ### How Tool Use Works
 
-1. **Detection:** Claude identifies a query requiring external data or action.
-2. **Invocation:** The system calls the appropriate tool with necessary parameters.
-3. **Integration:** Claude receives the tool’s output and synthesizes a coherent response.
-4. **Response Generation:** The enriched answer is returned to the user.
+1. **Definition:** Define the tools available to Claude in the API request.
+2. **Detection:** Claude identifies a query requiring external data or action and returns a `tool_use` block.
+3. **Invocation:** The application executes the tool and returns the result to Claude as a `tool_result` block.
+4. **Response Generation:** Claude synthesizes a coherent response based on the tool's output.
 
-### Example: Tool Use Flow with API Integration
+### Example: Tool Use Flow
 
-Suppose a user asks, “What is the current weather in Paris?” Claude detects the need for real-time data and calls a weather API. Here is a hypothetical flow:
+**1. Request with Tool Definition:**
 
-```python
-def get_weather(city):
-    weather_api_url = f"https://api.weather.com/v3/wx/conditions/current?city={city}&apiKey=YOUR_KEY"
-    response = requests.get(weather_api_url)
-    return response.json()
-
-prompt = "User: What is the current weather in Paris?\nAssistant:"
-
-# Claude identifies the need and triggers get_weather("Paris")
-weather_data = get_weather("Paris")
-
-final_response = f"The current weather in Paris is {weather_data['temperature']}°C with {weather_data['description']}."
+```json
+{
+  "model": "claude-fable-5",
+  "max_tokens": 1024,
+  "tools": [
+    {
+      "name": "get_weather",
+      "description": "Get the current weather in a given location",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "description": "The city and state, e.g. San Francisco, CA"
+          }
+        },
+        "required": ["location"]
+      }
+    }
+  ],
+  "messages": [
+    {"role": "user", "content": "What is the weather like in Paris?"}
+  ]
+}
 ```
 
-### Tool Use in API Calls
+**2. Claude's Response (Tool Use):**
 
-Advanced API parameters allow embedding tool invocation placeholders or directives within prompts. The runtime environment or middleware intercepts these and manages tool execution transparently.
+```json
+{
+  "role": "assistant",
+  "content": [
+    {
+      "type": "tool_use",
+      "id": "toolu_01A09q90qw90lq917835lq9",
+      "name": "get_weather",
+      "input": {"location": "Paris, France"}
+    }
+  ],
+  "stop_reason": "tool_use"
+}
+```
 
-### Best Practices
+**3. Application's Follow-up Request (Tool Result):**
 
-- **Define Clear Interfaces:** Standardize tool input/output formats for seamless integration.
-- **Fallback Handling:** Prepare for tool failures with graceful degradation strategies.
-- **Security:** Sanitize inputs and secure tool endpoints to prevent injection or data leakage.
-- **Latency Management:** Cache tool results when possible to reduce response times.
+```json
+{
+  "model": "claude-fable-5",
+  "max_tokens": 1024,
+  "messages": [
+    {"role": "user", "content": "What is the weather like in Paris?"},
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "tool_use",
+          "id": "toolu_01A09q90qw90lq917835lq9",
+          "name": "get_weather",
+          "input": {"location": "Paris, France"}
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "tool_result",
+          "tool_use_id": "toolu_01A09q90qw90lq917835lq9",
+          "content": "15 degrees Celsius and cloudy."
+        }
+      ]
+    }
+  ]
+}
+```
 
 ---
 
-## Vision Capabilities in Claude 3.5
+## Vision Capabilities
 
-One of the hallmark features of Claude 3.5 is its integrated vision capability, allowing it to process and interpret images alongside text. This multi-modal functionality unlocks new use cases in accessibility, data analysis, and interactive AI.
-
-### Supported Vision Inputs
-
-Claude 3.5 accepts image inputs encoded in base64 or via URLs, which it analyzes to extract textual descriptions, detect objects, read embedded text, or perform visual reasoning.
-
-### Types of Vision Tasks
-
-- **Image Captioning:** Generating descriptive captions for images.
-- **Object Recognition:** Identifying and classifying objects within images.
-- **Optical Character Recognition (OCR):** Extracting text from images.
-- **Visual Question Answering:** Responding to questions about the content of images.
-- **Scene Understanding:** Interpreting complex scenes with multiple elements and relationships.
+Claude models can process and interpret images alongside text.
 
 ### Vision API Usage
 
-Vision inputs are included in the prompt payload, typically as an array of image objects with associated metadata.
+Vision inputs are included in the `messages` array as `image` blocks, encoded in base64.
 
 **Example Vision Request:**
 
 ```json
 {
-  "model": "claude-3.5",
-  "prompt": [
-    {"role": "system", "content": "You are a visual assistant that describes images."},
-    {"role": "user", "content": "Describe the following image:"},
-    {"role": "image", "image_url": "https://example.com/image1.jpg"}
-  ],
-  "max_tokens_to_sample": 150
+  "model": "claude-mythos-5",
+  "max_tokens": 1024,
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "media_type": "image/jpeg",
+            "data": "/9j/4AAQSkZJRg..."
+          }
+        },
+        {
+          "type": "text",
+          "text": "Describe the following image:"
+        }
+      ]
+    }
+  ]
 }
 ```
-
-### Vision Output Format
-
-Claude returns a textual description or an answer to the user's question, referencing image content. The response may also include bounding box data or confidence scores if requested.
-
-### Use Case Example: Visual Question Answering
-
-**User Prompt:**  
-“Look at this image and tell me how many people are in it.”
-
-**Response:**  
-“There are three people visible in the image: two adults and one child.”
-
-### Limitations and Considerations
-
-- **Image Quality:** Low resolution or obscured images may reduce accuracy.
-- **Context Dependence:** Visual reasoning may require textual context for best results.
-- **Processing Time:** Vision tasks typically incur longer processing latency.
-- **Privacy:** Handle image data securely, especially when dealing with sensitive content.
 
 ---
 
 ## Extended Thinking: Techniques and Best Practices
 
-Extended thinking refers to Claude 3.5’s ability to perform deep, multi-step reasoning, engage in complex problem-solving, and maintain coherence over lengthy interactions. This section explores methodologies to harness this advanced cognitive capability.
+Extended thinking refers to Claude’s ability to perform deep, multi-step reasoning.
 
 ### Chain-of-Thought Prompting
 
-Chain-of-thought (CoT) prompting encourages Claude to articulate intermediate reasoning steps explicitly, improving accuracy in tasks requiring logic or calculation.
+Encourage Claude to articulate intermediate reasoning steps explicitly.
 
 **Example Prompt:**
 
 ```
-Q: If a train travels 60 miles in 1.5 hours, what is its average speed? Show your work.
-
-A:
+Q: If a train travels 60 miles in 1.5 hours, what is its average speed? Show your work step-by-step.
 ```
-
-Claude then generates a stepwise explanation before producing the final answer.
-
-### Decomposition and Modular Reasoning
-
-Breaking down complex tasks into smaller subtasks that Claude can solve sequentially enhances reliability. This can be done manually by the user or programmatically via prompt design.
-
-### Memory and Context Management
-
-Claude 3.5’s extended context windows allow it to retain information from earlier conversation turns or documents. Specialists should craft prompts that selectively include relevant context, avoiding noise.
-
-### Prompt Chaining and Recursive Reasoning
-
-Advanced workflows may involve chaining multiple prompts or recursive calls to Claude, each building upon previous outputs to refine answers or explore alternative solutions.
-
-### Example: Recursive Summarization
-
-For a lengthy document, Claude can be prompted to summarize individual sections recursively, then combine these summaries into a comprehensive overview.
-
-```python
-sections = ["Section 1 text...", "Section 2 text...", "Section 3 text..."]
-summaries = []
-
-for section in sections:
-    summary = call_claude_api(prompt=f"Summarize the following text:\n{section}")
-    summaries.append(summary)
-
-final_summary = call_claude_api(prompt="Combine these summaries into one concise summary:\n" + "\n".join(summaries))
-```
-
-### Debugging Extended Reasoning
-
-To improve output quality:
-
-- Request Claude to self-verify or explain its reasoning.
-- Introduce explicit checkpoints in prompts.
-- Use temperature adjustments to balance creativity and determinism.
 
 ---
 
 ## Prompt Caching for Performance and Consistency
 
-Prompt caching is an optimization strategy wherein previously processed prompts and their completions are stored and reused to reduce API calls, latency, and cost, as well as to ensure response consistency.
-
-### Importance of Prompt Caching
-
-- **Latency Reduction:** Avoids redundant computation for repeated queries.
-- **Cost Efficiency:** Minimizes token usage and API expenditure.
-- **Consistency:** Guarantees identical outputs for identical inputs, crucial in regulated environments.
-- **Scalability:** Supports high throughput applications.
+Prompt caching allows you to cache frequently used context (like large system prompts or documents) to reduce latency and costs.
 
 ### Implementing Prompt Caching
 
-Caching can be implemented at various levels:
+To use prompt caching, add a `cache_control` object to the blocks you want to cache. The API will automatically cache the content up to that point.
 
-- **Client-Side:** Simple cache within the application memory or local storage.
-- **Server-Side:** Centralized cache in databases or in-memory stores like Redis.
-- **Distributed Cache:** For multi-instance deployments to synchronize cache state.
+**Example Request with Prompt Caching:**
 
-### Cache Key Design
-
-The cache key must uniquely identify a prompt. For Claude 3.5, this typically involves:
-
-- The full prompt content (including system and user messages).
-- Model version and parameters (temperature, max tokens).
-- Any relevant contextual metadata.
-
-A common approach is to hash these components to create compact cache keys.
-
-```python
-import hashlib
-import json
-
-def generate_cache_key(prompt, model, params):
-    key_data = {
-        "prompt": prompt,
-        "model": model,
-        "params": params
+```json
+{
+  "model": "claude-sonnet-5",
+  "max_tokens": 1024,
+  "system": [
+    {
+      "type": "text",
+      "text": "You are an expert assistant. Here is a large document you need to reference: [LARGE DOCUMENT CONTENT]...",
+      "cache_control": {"type": "ephemeral"}
     }
-    key_string = json.dumps(key_data, sort_keys=True)
-    return hashlib.sha256(key_string.encode('utf-8')).hexdigest()
+  ],
+  "messages": [
+    {"role": "user", "content": "Summarize the key points of the document."}
+  ]
+}
 ```
 
-### Cache Invalidation and Expiration
+### Pricing and Efficiency
 
-- **Time-based Expiration:** Set TTL to refresh cached entries periodically.
-- **Versioning:** Invalidate cache when upgrading models or changing prompt templates.
-- **Manual Purge:** Provide mechanisms to clear cache entries when data changes.
+Prompt caching significantly reduces the cost of input tokens for cached content and improves response times for subsequent requests using the same cache.
 
-### Example: Simple Cache Wrapper
+---
 
-```python
-class ClaudeCache:
-    def __init__(self):
-        self.cache = {}
+## Artifacts
 
-    def get(self, key):
-        return self.cache.get(key)
+Artifacts are a feature that allows Claude to generate substantial, standalone content (like code snippets, documents, or websites) in a dedicated, collaborative workspace alongside the conversation.
 
-    def set(self, key, value):
-        self.cache[key] = value
+### Using Artifacts
 
-def call_claude_with_cache(prompt, model, params, cache: ClaudeCache):
-    key = generate_cache_key(prompt, model, params)
-    cached_response = cache.get(key)
-    if cached_response:
-        return cached_response
-    response = call_claude_api(prompt, model, params)
-    cache.set(key, response)
-    return response
-```
-
-### Challenges
-
-- **Cache Size:** Large prompt or response sizes may consume significant storage.
-- **Dynamic Prompts:** Prompts with random elements or user-specific data reduce cache hit rates.
-- **Security:** Sensitive information should not be cached in unsecured environments.
+When Claude generates content that is suitable for an Artifact (e.g., a complete HTML page or a long script), it will present it in a separate UI component, allowing users to view, edit, and interact with the content directly.
 
 ---
 
 ## Claude CLI Command Reference
 
-The Claude CLI is a command-line interface for interacting with the Claude system, providing a comprehensive set of commands for managing and operating Claude environments.
+The Claude CLI is a command-line interface for interacting with the Claude system.
 
 ### Installation
 
@@ -429,33 +345,23 @@ The Claude CLI is a command-line interface for interacting with the Claude syste
 pip install claude-cli
 ```
 
-### Configuration
-
-By default, Claude uses a configuration file located at `~/.claude/config.yaml`.
-
-```yaml
-api_key: YOUR_API_KEY
-endpoint: https://api.claude.example.com
-default_environment: production
-```
-
 ### Commands
 
-- **`help`**: Provides help information for Claude CLI commands.
-- **`version`**: Displays the current version of the Claude CLI.
-- **`init`**: Initializes a new Claude project in the current directory.
+- **`help`**: Provides help information.
+- **`version`**: Displays the current version.
+- **`init`**: Initializes a new Claude project.
 - **`start`**: Starts the Claude environment.
 - **`stop`**: Stops the Claude environment.
-- **`status`**: Checks the status of the Claude environment.
-- **`deploy`**: Deploys the latest code to the Claude environment.
-- **`logs`**: Fetches logs from the Claude environment.
-- **`config`**: Manages the Claude CLI configuration.
+- **`status`**: Checks the status.
+- **`deploy`**: Deploys the latest code.
+- **`logs`**: Fetches logs.
+- **`config`**: Manages configuration.
 
 ---
 
 ## Claude Configuration Schemas Guide
 
-Configuration files for Claude are designed to be comprehensive, offering fine-grained control over various aspects of the system's operation.
+Configuration files for Claude offer fine-grained control over the system's operation.
 
 ### General Configuration Settings
 
@@ -463,121 +369,36 @@ Configuration files for Claude are designed to be comprehensive, offering fine-g
 - **`version`**: Application version.
 - **`debug_mode`**: Enable or disable debug mode.
 - **`env`**: Application environment.
-- **`timezone`**: Default timezone for the application.
-
-### Network Configuration
-
-- **`host`**: Host address for the server.
-- **`port`**: Port number for the HTTP server.
-- **`proxy_enabled`**: Enable or disable proxy usage.
-- **`proxy_url`**: URL of the proxy server.
-
-### Database Configuration
-
-- **`database_url`**: URL for database connection.
-- **`max_connections`**: Maximum number of database connections.
-- **`pool_size`**: Size of the connection pool.
-- **`pool_timeout`**: Timeout for acquiring a connection from the pool.
-
-### Logging Configuration
-
-- **`log_level`**: Level of logging detail.
-- **`log_to_file`**: Enable or disable logging to a file.
-- **`log_file_path`**: Path to the log file.
-- **`log_to_console`**: Enable or disable logging to the console.
-
-### Security Configuration
-
-- **`auth_method`**: Authentication method to use.
-- **`token_expiry`**: Token expiration time.
-- **`enable_encryption`**: Enable or disable data encryption.
-- **`encryption_key`**: Key used for data encryption.
-
-### Performance Tweaks
-
-- **`cache_enabled`**: Enable or disable caching.
-- **`cache_ttl`**: Time-to-live for cache entries.
-- **`max_threads`**: Maximum number of threads.
-- **`max_memory_usage`**: Maximum memory usage limit.
 
 ---
 
 ## Claude: Enterprise Deep Dive & Advanced Architecture
 
-Claude leverages cutting-edge architecture and algorithmic innovations to deliver high performance across various use cases.
+Claude leverages cutting-edge architecture to deliver high performance.
 
 ### Core Model Design
 
-- **Layer Normalization**: Used extensively to stabilize training and improve convergence speed.
-- **Attention Mechanisms**: Employs multi-head attention with dynamic scaling to efficiently capture dependencies across large contexts.
-- **Feedforward Networks**: Utilizes position-wise feedforward networks with non-linear activation functions.
-
-### Safety and Robustness
-
-- **Constitutional AI**: Embeds ethical guidelines directly into its decision-making processes.
-- **Robustness to Adversarial Inputs**: Includes adversarial training strategies to improve resilience.
-- **Bias Mitigation**: Integrates bias detection and mitigation techniques.
-
-### Edge Cases
-
-- **Data Augmentation**: Trained using synthetic augmentation techniques to handle rare and ambiguous inputs.
-- **Uncertainty Estimation**: Implements Bayesian techniques to quantify uncertainty in predictions.
-- **Fallback Mechanisms**: Designed to use fallback mechanisms such as human-in-the-loop interventions.
-
-### Performance Tuning
-
-- **Distributed Training**: Utilizes distributed training paradigms to scale across multiple GPUs and TPUs.
-- **Model Parallelism**: Implements model parallelism techniques.
-- **Quantization and Pruning**: Employed to reduce latency without significant loss in accuracy.
-- **Caching Strategies**: Response caching and recurrent state caching are used to minimize redundancy.
-
-### Enterprise Patterns
-
-- **Cloud-Native Deployments**: Optimized for cloud-native environments.
-- **On-Premise Solutions**: Offers robust deployment scripts and configurations for local infrastructure.
-- **API and SDK Support**: Provides comprehensive API and SDK support.
-- **Security and Compliance**: Adheres to enterprise-grade security standards.
-- **Observability Tools**: Integrates with observability tools for monitoring.
-- **Automated Scaling**: Implements automated scaling protocols.
+- **Layer Normalization**: Stabilizes training.
+- **Attention Mechanisms**: Captures dependencies across large contexts.
+- **Feedforward Networks**: Utilizes position-wise networks.
 
 ---
 
 ## Comprehensive Security Audit Checklist for Claude
 
-Conducting a thorough security audit is essential to ensure that your systems are safe from unauthorized access, data breaches, and other security threats.
+Conducting a thorough security audit is essential.
 
 ### Step-by-Step Validation
 
-- **Network Security**: Firewall Configuration, IDPS, VPN and Remote Access, Network Segmentation.
-- **Application Security**: Code Review, Patch Management, Configuration Management.
-- **Data Security**: Data Encryption, DLP, Database Security.
-- **User Authentication and Authorization**: IAM, Access Control, Audit and Logging.
-- **Operational Security**: Incident Response Plan, Security Training, Physical Security.
-
-### Permission Models
-
-- **Role-Based Access Control (RBAC)**
-- **Attribute-Based Access Control (ABAC)**
-- **Policy-Based Access Control (PBAC)**
-
-### Identifying Vulnerabilities
-
-- **Vulnerability Scanning**
-- **Penetration Testing**
-- **Threat Modeling**
-
-### Hardening Strategies
-
-- **Operating System Hardening**
-- **Application Hardening**
-- **Network Hardening**
-- **Endpoint Security**
+- **Network Security**: Firewall Configuration, IDPS.
+- **Application Security**: Code Review, Patch Management.
+- **Data Security**: Data Encryption, DLP.
 
 ---
 
 ## Claude Troubleshooting & Diagnostics Guide
 
-This guide is designed to help technical professionals effectively troubleshoot and diagnose issues with Claude.
+This guide helps troubleshoot issues with Claude.
 
 ### Common Error Codes
 
@@ -586,39 +407,3 @@ This guide is designed to help technical professionals effectively troubleshoot 
 - **ERR03: Resource Exhaustion**
 - **ERR04: Authentication Failure**
 - **ERR05: Internal Server Error**
-
-### Recovery Strategies
-
-- **Automated Recovery**: Auto-Restart, Failover Clustering.
-- **Manual Recovery**: Log Analysis, System Reset.
-
-### Health Checks
-
-- **System Health Indicators**: CPU and Memory Utilization, Response Time Metrics, Error Rate Monitoring.
-- **Regular Maintenance**: Software Updates, Data Backup, Security Audits.
-
-### Common Issues and Solutions
-
-- **Performance Degradation**: Resource Scaling, Caching Strategies, Load Balancing.
-- **Network Connectivity Problems**: Network Configuration Review, Firewall Rules Check, DNS Configuration.
-- **Data Consistency Issues**: Data Synchronization, Transaction Management, Error Handling.
-
-### Advanced Architecture Considerations
-
-- **Scalability Patterns**: Horizontal Scaling, Microservices Architecture.
-- **Fault Tolerance**: Redundancy, Circuit Breaker Pattern.
-
-### Handling Edge Cases
-
-- **Uncommon Data Inputs**: Input Validation, Fallback Mechanisms.
-- **Resource Limitations**: Resource Throttling, Priority Queuing.
-
-### Performance Tuning
-
-- **Optimizing Resource Usage**: Efficient Algorithms, Asynchronous Processing.
-- **Latency Reduction Techniques**: Edge Computing, CDNs.
-
-### Enterprise Patterns
-
-- **Security Best Practices**: Encryption, Access Control.
-- **Integration Strategies**: API Management, Message Queues.

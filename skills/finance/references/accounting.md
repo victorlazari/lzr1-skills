@@ -1,5 +1,7 @@
 # Accounting & Treasury
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Revenue Recognition (ASC 606)
 2. Financial Reporting
@@ -30,6 +32,14 @@
 | Professional services | As services are delivered | Time-based or milestone |
 | Usage/consumption | As usage occurs | Monthly based on consumption |
 | Perpetual license | At delivery | Point-in-time |
+
+### Contract Modifications (Upgrades, Downgrades, Usage)
+
+Under ASC 606, contract modifications must be evaluated to determine if they should be accounted for as a separate contract or as a modification to the existing contract.
+
+- **Upgrades (Additional Services):** If the upgrade adds distinct services at their standalone selling price, account for it as a separate contract. If not at standalone selling price, account for it prospectively as a termination of the old contract and creation of a new one.
+- **Downgrades (Reduced Services):** Typically accounted for prospectively. The remaining unrecognized revenue is recognized over the remaining modified term.
+- **Usage-Based Pricing:** Revenue is recognized as the usage occurs. If there is a minimum commitment, that portion is recognized ratably, and overages are recognized as incurred.
 
 ### Deferred Revenue
 
@@ -124,15 +134,14 @@ Ending cash = Beginning cash + Net cash flow
 | International | Permanent establishment, withholding | Global structure |
 | State taxes | Nexus, apportionment | Multi-state compliance |
 
-### R&D Capitalization (Section 174)
+### R&D Capitalization (Section 174) - 2026 OB3 Update
 
 ```
-Since 2022 (US):
-- R&D expenses must be capitalized and amortized
-- Domestic R&D: 5-year amortization
-- Foreign R&D: 15-year amortization
-- Significantly impacts cash taxes for R&D-heavy companies
-- Increases taxable income in early years
+Under the 2026 One Big Beautiful Bill Act (OB3):
+- Domestic R&D: Immediate expensing is restored. Companies can fully deduct domestic R&D expenses in the year incurred.
+- Foreign R&D: Continues to require 15-year amortization.
+- Section 280C: Companies must carefully plan the interaction between the R&D tax credit and the immediate deduction under Section 280C to optimize cash tax benefits.
+- This significantly improves cash flow for R&D-heavy companies compared to the 2022-2025 rules.
 ```
 
 ---

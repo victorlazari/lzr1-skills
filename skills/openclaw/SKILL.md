@@ -1,93 +1,78 @@
 ---
 name: openclaw
-description: Advanced OpenClaw (ZeroClaw) operations, architecture, and troubleshooting specialist.
+description: Deploy, configure, and troubleshoot OpenClaw (Node.js) and ZeroClaw (Rust) AI agent runtimes.
 ---
 
-# OpenClaw (ZeroClaw) Operations & Architecture Specialist
+# OpenClaw and ZeroClaw Operations Specialist
 
-## When to Use
+## Scope and Triggers
 
 Use this skill when:
-- Deploying, configuring, or troubleshooting OpenClaw (ZeroClaw) AI agent runtimes in production environments.
-- Managing the `openclaw.json` configuration file, including LLM routing, channel credentials, and memory retention policies.
-- Interacting with or modifying OpenClaw Workspace Files (`SOUL.md`, `IDENTITY.md`, `USER.md`, `AGENTS.md`, `BOOT.md`, `HEARTBEAT.md`, `MEMORY.md`, `TOOLS.md`).
-- Diagnosing and resolving channel integration issues (e.g., WhatsApp 408 Timeouts, Signal RPC Failures, Telegram getUpdates Timeouts).
-- Managing the 3-Layer Memory System (Context Window, Workspace Files, Vector DB with SQLite and Gemini embeddings).
-- Orchestrating multi-agent background workers (Codex, Claude Code, Pi) and resolving "Cross-Context Messaging Denied" errors.
-- Developing, auditing, or troubleshooting custom TypeScript extensions and ClawdHub marketplace skills.
-- Performing security audits on OpenClaw deployments, including credential directory protection and cross-context messaging controls.
+- Deploying, configuring, or troubleshooting **OpenClaw** (Node.js) or **ZeroClaw** (Rust) AI agent runtimes.
+- Managing OpenClaw workspace bootstrap files (`AGENTS.md`, `SOUL.md`, `IDENTITY.md`, `USER.md`, `BOOTSTRAP.md`, `MEMORY.md`).
+- Managing ZeroClaw's `config.toml` configuration.
+- Diagnosing runtime issues, channel integration failures, or state corruption.
 
-## Sub-Agent Spawning
+**Non-goals:**
+- Do not use this skill for general Node.js or Rust development unrelated to these specific runtimes.
+- Do not conflate OpenClaw and ZeroClaw; they are distinct systems with different architectures.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple channel integrations to debug | Channel Specialist | Parallel troubleshooting of WhatsApp, Signal, and Telegram issues |
-| Multiple extensions/skills to audit | Extension Auditor | Parallel security and performance review of custom TypeScript plugins and ClawdHub skills |
-| Large JSONL session logs to analyze | Log Analyzer | Parallel parsing and extraction of insights from multiple session files |
-| Multi-agent topology validation | Orchestration Checker | Parallel validation of routing rules and cross-context messaging permissions |
+Before acting, determine the target runtime:
+1. **Identify Runtime:** Check the environment or user request to determine if the target is OpenClaw (Node.js) or ZeroClaw (Rust).
+2. **Locate Configuration:**
+   - For OpenClaw: Locate the workspace directory containing the bootstrap `.md` files and the SQLite state database (typically `~/.openclaw/state/openclaw.sqlite`).
+   - For ZeroClaw: Locate the `config.toml` file.
+3. **Verify Binaries:** Ensure the `openclaw` or `zeroclaw` CLI tools are installed and accessible in the system path.
 
-### Spawning Rules
-- Spawn when 3+ independent items (channels, extensions, logs, agents) need the same operation.
-- Each sub-agent receives: context (e.g., `openclaw.json` snippet), specific target (e.g., `whatsapp` channel config), success criteria.
-- Results are aggregated and cross-referenced for conflicts (e.g., ensuring consistent timeout settings across channels).
-- Maximum concurrent sub-agents: 10.
+## Source Freshness
+
+Volatile facts such as supported versions, configuration schemas, and specific CLI flags must be verified against official documentation at runtime.
+- **OpenClaw:** Verify against the [OpenClaw GitHub Repository](https://github.com/openclaw/openclaw) and [Documentation](https://docs.openclaw.ai/concepts/agent).
+- **ZeroClaw:** Verify against the [ZeroClaw GitHub Repository](https://github.com/zeroclaw-labs/zeroclaw) and [Official Website](https://zeroclaw.net/).
+- Consult the bundled `references/complete-reference.md` for baseline architecture and troubleshooting patterns (Verified: 2026-08-07).
 
 ## Workflow
 
-1.  **Configuration Assessment:** Always begin by validating the `openclaw.json` file against the official schema. This is the central nervous system of the runtime.
-2.  **Workspace Inspection:** Review the core Workspace Files (`SOUL.md`, `IDENTITY.md`, `AGENTS.md`, `TOOLS.md`) to understand the agent's persona, multi-agent topology, and available capabilities.
-3.  **Memory & State Verification:** Check the integrity of the 3-Layer Memory System. Use `sqlite3` to query the vector database and `jq` to parse JSONL session logs for anomalies.
-4.  **Channel Diagnostics:** If dealing with connectivity issues, isolate the specific channel (WhatsApp, Signal, Telegram) and review its specific error signatures (e.g., 408 Timeouts, RPC Failures).
-5.  **Orchestration & Routing:** For multi-agent setups, verify the routing pipeline and ensure cross-context messaging policies are correctly configured to prevent unauthorized data leakage.
-6.  **Security & Compliance:** Continuously audit filesystem permissions, credential encryption, and extension sandboxing to maintain a hardened environment.
+1. **Identify Target:** Determine if the task involves OpenClaw or ZeroClaw.
+2. **Discovery (Read-Only):**
+   - **OpenClaw:** Inspect the workspace bootstrap files (`AGENTS.md`, `SOUL.md`, etc.) and check SQLite database integrity using `sqlite3 ~/.openclaw/state/openclaw.sqlite "PRAGMA integrity_check;"`.
+   - **ZeroClaw:** Inspect `config.toml` and run `zeroclaw doctor` to validate the configuration.
+3. **Execution:** Perform the requested configuration, deployment, or troubleshooting task.
+   - Apply changes to the appropriate configuration files.
+   - Restart the runtime service if necessary.
+4. **Validation:**
+   - **OpenClaw:** Run `openclaw setup` to verify workspace initialization.
+   - **ZeroClaw:** Run `zeroclaw doctor` again to ensure the configuration remains valid.
+5. **Stop Condition:** The task is complete when the runtime is functioning correctly, configuration changes are applied and validated, and no errors are reported by the respective diagnostic tools.
 
-## Core Principles
+## Safety
 
--   **Configuration as Code:** Treat `openclaw.json` and Workspace Files as code. Version control them and validate changes before deployment.
--   **Strict Context Isolation:** Never disable context isolation in production. Ensure explicit communication pathways are defined in `AGENTS.md`.
--   **Asynchronous Operations:** Offload heavy synchronous operations (e.g., vector embeddings, complex data processing) from the main event loop to prevent event loop starvation and channel disconnects.
--   **Robust Error Handling:** Implement aggressive reconnection logic with exponential backoff for channel integrations, and strict execution timeouts for extensions and background workers.
--   **Continuous Monitoring:** Utilize JSONL session logs and the `HEARTBEAT.md` file to proactively monitor agent health, lane congestion, and memory synchronization.
+- **Read-Only First:** Always inspect configurations and run diagnostic commands (`zeroclaw doctor`, SQLite integrity checks) before making changes.
+- **Confirmation Required:** Require user confirmation before modifying configuration files, restarting production services, or executing destructive database operations.
+- **No Untrusted Code:** Do not download or execute untrusted extensions or skills without explicit user approval and verification.
 
-## Key References
+## Validation
 
--   `/home/ubuntu/specialist-skills/openclaw/references/complete-reference.md`: The definitive, consolidated guide to OpenClaw architecture, configuration, security, and troubleshooting.
--   `/home/ubuntu/specialist-skills/openclaw/references/reading-list.md`: A curated list of books and articles relevant to AI agent runtimes, multi-agent orchestration, and production operations.
+- **OpenClaw:** `openclaw setup` must complete without errors. SQLite integrity check must return `ok`.
+- **ZeroClaw:** `zeroclaw doctor` must report a healthy configuration.
+- **Syntax:** Any modified JSON or TOML files must pass syntax validation before restarting services.
 
----
+## Failure Handling
 
-## Adversarial Verification Panel
+- If `openclaw setup` or `zeroclaw doctor` fails, review the error output, correct the configuration syntax or missing dependencies, and retry.
+- If SQLite database corruption is detected in OpenClaw, attempt to restore from a backup before proceeding with destructive recovery.
+- Do not repeat the same failed command without modifying the configuration or environment.
 
-For each significant operational and security finding produced by the parallel sub-agents:
+## Output Contract
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+The final output must include:
+- The target runtime identified (OpenClaw or ZeroClaw).
+- A summary of configuration changes made or issues diagnosed.
+- The results of validation commands (`openclaw setup`, `zeroclaw doctor`, or SQLite integrity checks).
+- Any actionable next steps or unresolved warnings.
 
-> This prevents plausible-but-wrong operational and security findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Resources
 
-## Cross-System Consistency Validator
-
-After all parallel agents (Channel Specialist, Extension Auditor, Log Analyzer, Orchestration Checker) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Channel Specialist recommending aggressive reconnection timeouts while Orchestration Checker recommends conservative timeout thresholds to prevent cross-context message flooding)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified remediation plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+- [Complete Reference Guide](references/complete-reference.md): Architecture, configuration, and troubleshooting for OpenClaw and ZeroClaw.

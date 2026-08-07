@@ -198,7 +198,37 @@ Executive reports provide high-level summaries for senior management.
 
 ### 11.10 Financial & Business Impact
 - Cost per Ticket, Revenue Impact by Incident, Billable Hours by Client, Resource Utilization vs Capacity.
-
-### 11.11 Advanced Analytics & Forecasting
 - Sentiment Analysis, SLA Breach Risk Prediction, Auto-Categorization Accuracy.
 - Root Cause Clustering, Anomaly Detection, Executive Dashboard Summary.
+
+---
+
+## 12. ITIL 4 KPI Categories and Measurement Principles
+
+ITIL 4 emphasizes value co-creation and outcome-based KPIs over mere ticket volume. The following KPI categories should be used to measure IT Service Management effectiveness:
+
+### 12.1 Usage KPIs
+Measure how much a service is being used.
+- **Examples**: Number of active users, transaction volume, concurrent sessions.
+
+### 12.2 Performance KPIs
+Measure how well a service is performing against targets.
+- **Examples**: Mean Time to Resolve (MTTR), First Response Time (FRT), System Uptime.
+- **Trend Analysis & Outlier Handling**: When calculating MTTR, always include outlier analysis and segmentation by severity/service type. Relying solely on average MTTR without outlier analysis can distort reporting.
+
+### 12.3 Capacity KPIs
+Measure the resources available to deliver a service.
+- **Examples**: Server utilization, network bandwidth, storage capacity.
+
+### 12.4 Quality KPIs
+Measure the quality of the service delivered.
+- **Examples**: First Contact Resolution (FCR), Reopen Rate, Defect Density.
+- **Balancing Metrics**: FCR metrics must be balanced with reopen rates and customer satisfaction scores to prevent premature ticket closure or forcing complex incidents through first-line scripts.
+
+### 12.5 Experience KPIs
+Measure the user's perception of the service.
+- **Examples**: Customer Satisfaction (CSAT), Net Promoter Score (NPS), Customer Effort Score (CES).
+
+### 12.6 Value KPIs
+Measure the business value delivered by the service.
+- **Examples**: Cost per Ticket, Revenue Impact by Incident, Business Productivity Gained.

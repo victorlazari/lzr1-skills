@@ -67,3 +67,6 @@ Cron will fail silently if the script it tries to execute is not formatted corre
 - Ensure the script is executable (`chmod +x /opt/myapp/script.sh`).
 - Ensure the script has a valid shebang (e.g., `#!/bin/bash`).
 - Ensure the crontab file ends with an empty newline character (LF), especially when placing files in `/etc/cron.d/`.
+
+*Verified against upstream: 2026-08-07*
+[Linux cron(8) Manual Page](https://man7.org/linux/man-pages/man8/cron.8.html)

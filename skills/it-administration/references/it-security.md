@@ -1,21 +1,24 @@
 # IT Security
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
-1. Security Hardening
+1. Security Hardening (CIS Controls v8.1)
 2. Email Security
 3. Endpoint Detection and Response
 4. Security Monitoring
-5. Compliance and Audit
+5. Compliance and Audit (NIST CSF 2.0)
+6. Source Map
 
 ---
 
-## 1. Security Hardening
+## 1. Security Hardening (CIS Controls v8.1)
 
-### CIS Benchmark Essentials
+### CIS Benchmark Essentials (v8.1)
 
 | Category | Controls |
 |---|---|
-| Inventory | Hardware and software inventory |
+| Inventory | Hardware and software inventory (Asset Classes: Devices, Software, Data, Network, Users) |
 | Configuration | Secure configuration baselines |
 | Vulnerability | Continuous vulnerability management |
 | Access | Controlled use of admin privileges |
@@ -131,19 +134,19 @@ Progression:
 
 ---
 
-## 5. Compliance and Audit
+## 5. Compliance and Audit (NIST CSF 2.0)
 
-### IT Controls for SOC 2
+### IT Controls for SOC 2 & NIST CSF 2.0
 
-| Control Area | IT Admin Responsibility |
-|---|---|
-| Access control | SSO, MFA, access reviews, least privilege |
-| Change management | Approval workflows, audit trails |
-| System operations | Monitoring, alerting, incident response |
-| Risk management | Vulnerability scanning, patching |
-| Data protection | Encryption, backup, retention |
-| Physical security | Endpoint encryption, remote wipe |
-| HR security | Onboarding/offboarding, training |
+| Control Area | IT Admin Responsibility | NIST CSF 2.0 Function |
+|---|---|---|
+| Access control | SSO, MFA, access reviews, least privilege | Protect (PR) |
+| Change management | Approval workflows, audit trails | Protect (PR) |
+| System operations | Monitoring, alerting, incident response | Detect (DE), Respond (RS) |
+| Risk management | Vulnerability scanning, patching | Identify (ID) |
+| Data protection | Encryption, backup, retention | Protect (PR), Recover (RC) |
+| Physical security | Endpoint encryption, remote wipe | Protect (PR) |
+| HR security | Onboarding/offboarding, training | Govern (GV), Protect (PR) |
 
 ### Audit Evidence Collection
 
@@ -156,3 +159,23 @@ Progression:
 | Offboarding | Deprovisioning logs, timeline proof |
 | Training | Completion records, phishing sim results |
 | Monitoring | Alert configurations, response records |
+
+---
+
+## 6. Source Map
+
+- **NIST Cybersecurity Framework 2.0**: https://www.nist.gov/cyberframework
+- **CIS Critical Security Controls v8.1**: https://www.cisecurity.org/controls/v8-1
+- **Security Engineering**: Ross Anderson (3rd ed, 2020), Wiley.
+- **Defensive Security Handbook**: Brotherston & Berlin (2nd ed, 2024), O'Reilly.
+- **Blue Team Handbook**: Don Murdoch (2019). Incident response.
+- **Cybersecurity Ops with bash**: Troncone & Albing (2019), O'Reilly.
+- **Practical Cybersecurity Architecture**: Magnusson (2022), Packt.
+- **CrowdStrike Blog**: crowdstrike.com/blog. Threat intelligence.
+- **SentinelOne Blog**: sentinelone.com/blog. Endpoint security.
+- **SANS Reading Room**: sans.org/reading-room. Security research.
+- **Krebs on Security**: krebsonsecurity.com. Security news.
+- **The Hacker News**: thehackernews.com. Security news.
+- **Vanta Blog**: vanta.com/blog. Compliance automation.
+- **Drata Blog**: drata.com/blog. Security compliance.
+- **Secureframe Blog**: secureframe.com/blog. Compliance.

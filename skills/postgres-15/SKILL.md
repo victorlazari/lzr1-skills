@@ -5,7 +5,7 @@ description: Advanced PostgreSQL 15+ Operations and Tech Support Guide for manag
 
 # PostgreSQL 15+ Specialist
 
-## When to Use
+## Scope and Triggers
 
 Use this skill when dealing with PostgreSQL 15+ in production environments, specifically for:
 - Managing and optimizing massive datasets (terabytes/petabytes) using declarative partitioning and BRIN indexes.
@@ -15,100 +15,78 @@ Use this skill when dealing with PostgreSQL 15+ in production environments, spec
 - Implementing robust disaster recovery strategies, including Point-in-Time Recovery (PITR) and handling worst-case scenarios like Transaction ID (TXID) wraparound or data corruption.
 - Conducting comprehensive security audits, managing Role-Based Access Control (RBAC), Row-Level Security (RLS), and configuring `pgaudit`.
 
-## Sub-Agent Spawning
+**Escalation Boundaries:**
+- Route to `automation-and-scheduling` when the user needs to set up recurring maintenance tasks like `pg_partman` partition creation or `pg_repack` runs.
+- Route to `security-review` when the user needs a comprehensive security audit of the application code interacting with the database, beyond just the database configuration.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple massive tables to partition | Partitioning Specialist | Parallel implementation of declarative partitioning |
-| Multiple databases to audit | Security Auditor | Parallel security review of RBAC, RLS, and `pg_hba.conf` |
-| Multiple slow queries to optimize | Query Optimizer | Parallel analysis of `EXPLAIN ANALYZE` and index tuning |
-| Multiple replicas to monitor | Replication Monitor | Parallel health checks of streaming and logical replication |
-| Bulk data loading across tables | Data Migration Agent | Parallel execution of `COPY` and index recreation |
+Before executing any operations, the following preconditions must be met:
+1. **Version Validation:** PostgreSQL version must be 15 or higher.
+2. **Extension Availability:** Required extensions (e.g., `pg_stat_statements`, `pgaudit`) must be installed.
+3. **Permissions:** The executing user must have sufficient privileges for the intended operation (e.g., superuser for configuration changes, specific roles for data manipulation).
 
-### Spawning Rules
-- Spawn when 3+ independent items (tables, databases, queries) need the same operation.
-- Each sub-agent receives: context, specific target (e.g., table name, query), success criteria.
-- Results are aggregated and cross-referenced for conflicts (e.g., overlapping index creation).
-- Maximum concurrent sub-agents: 10.
+Run `scripts/check-pg-version.sh` to verify version and extension availability.
+
+## Source Freshness
+
+PostgreSQL configurations, default values, and command syntax can change between minor versions. Always consult the official documentation for the most current information.
+- For volatile facts, refer to the mapped sources in `references/complete-reference.md`.
+- Verify the installed version and current upstream documentation before applying destructive or production-impacting actions.
 
 ## Workflow
 
-1. **Initial Assessment & Monitoring:**
-   - Review PostgreSQL logs for warnings (e.g., TXID wraparound, frequent checkpoints).
-   - Analyze `pg_stat_activity` for active/blocking queries and `pg_stat_statements` for slow queries.
-   - Check system resources (CPU, Memory, Disk I/O) and PgBouncer pool statistics.
+1. **Assess the Environment:** Run `scripts/check-pg-version.sh` to confirm PostgreSQL 15+ and required extensions.
+2. **Identify the Requirement:** Determine the specific operational requirement (e.g., performance tuning, high availability, disaster recovery, security audit).
+3. **Consult References:** Review `references/complete-reference.md` for relevant configuration parameters, commands, and PostgreSQL 15 specific features (e.g., `MERGE`, `jsonlog`, WAL compression).
+4. **Diagnostic Analysis:** For performance issues, run `scripts/analyze-bloat.sql` and analyze `pg_stat_statements` to identify bottlenecks.
+5. **Formulate Remediation Plan:** Develop a plan, ensuring read-only discovery precedes any mutation.
+6. **Request Confirmation:** Require user confirmation for any destructive (e.g., `DROP TABLE`, `TRUNCATE`) or production-impacting actions (e.g., `REINDEX`, `VACUUM FULL`).
+7. **Execute Plan:** Execute the remediation plan, monitoring system resources and replication lag during execution.
+8. **Validate Outcome:** Use postcondition checks (e.g., verifying index usage, checking replication status) to confirm success.
+9. **Output Report:** Generate a structured report detailing findings, actions taken, and actionable next steps.
 
-2. **Performance Tuning & Optimization:**
-   - Adjust memory settings (`shared_buffers`, `work_mem`) based on workload.
-   - Tune autovacuum parameters (`autovacuum_vacuum_scale_factor`, `autovacuum_vacuum_cost_limit`) for massive tables.
-   - Implement or optimize indexes (B-Tree, BRIN, GIN) and analyze execution plans using `EXPLAIN (ANALYZE, BUFFERS)`.
+## Safety
 
-3. **High Availability & Replication Management:**
-   - Monitor replication lag using LSN math (`pg_wal_lsn_diff`).
-   - Manage replication slots to prevent WAL accumulation on the primary.
-   - Configure and troubleshoot logical replication (publications/subscriptions).
+- **Read-Only First:** Always perform read-only discovery (e.g., `EXPLAIN`, `SELECT`) before executing mutations.
+- **Confirmation Required:** Explicit user confirmation is mandatory for destructive commands (`DROP`, `TRUNCATE`) and production-impacting operations (`REINDEX`, `VACUUM FULL`).
+- **Version Specifics:** Verify PostgreSQL version is 15+ before applying version-specific features.
+- **Dry-Run:** Use dry-run mode for data migration scripts where possible.
+- **Backups:** Ensure PITR backups are available before major schema changes.
+- **Configuration Validation:** Validate `pg_hba.conf` syntax before reloading the server configuration.
 
-4. **Disaster Recovery & Emergency Response:**
-   - Handle TXID wraparound by starting in single-user mode and running `VACUUM FREEZE`.
-   - Resolve lock contention by identifying and terminating blocking PIDs (`pg_terminate_backend`).
-   - Perform Point-in-Time Recovery (PITR) using tools like `pgBackRest` for accidental data deletion.
+## Validation
 
-5. **Security & Compliance:**
-   - Audit `pg_hba.conf` for strict IP whitelisting and `scram-sha-256` authentication.
-   - Enforce SSL/TLS connections and review RBAC/RLS policies.
-   - Configure `pgaudit` for detailed session and object audit logging.
+- **Syntax Checks:** Run `bash -n` on shell scripts and ensure SQL scripts parse correctly.
+- **Dry Runs:** Execute scripts in dry-run mode when available to preview changes.
+- **Postconditions:** Verify the expected outcome (e.g., reduced bloat, improved query execution time, successful replication).
 
-## Core Principles
+## Failure Handling
 
-- **Never Guess, Always Measure:** Rely on `pg_stat_activity`, `pg_stat_statements`, and `EXPLAIN ANALYZE`. Do not make configuration changes based on intuition.
-- **Protect the Primary:** Use connection pooling (PgBouncer), set statement timeouts, and aggressively monitor replication slots and WAL accumulation.
-- **Automate Maintenance:** Rely on tools like `pg_partman` for partitioning and `pg_repack` for online bloat removal.
-- **Understand the OS:** PostgreSQL is deeply intertwined with the Linux kernel. Mastery of memory management (e.g., huge pages, swappiness), I/O subsystems, and network diagnostics is non-negotiable.
-- **Least Privilege:** Enforce strict RBAC. Application users must never be superusers.
+- **Diagnosis:** If an operation fails, review PostgreSQL logs and system metrics to identify the root cause.
+- **Alternatives:** If a specific approach fails (e.g., `REINDEX CONCURRENTLY` times out), consider alternatives (e.g., creating a new index and dropping the old one).
+- **Rollback:** Have a rollback plan ready for any mutation. Do not repeat a failed action unchanged.
 
-## Key References
+## Output Contract
 
-- `pg_stat_activity`: For monitoring active connections and queries.
-- `pg_stat_statements`: For identifying slow and resource-intensive queries.
-- `pg_locks`: For diagnosing lock contention and deadlocks.
-- `pg_replication_slots`: For monitoring and managing replication slots.
-- `pgstattuple`: For precise table and index bloat analysis.
-- `pg_hba.conf` & `postgresql.conf`: Core configuration files for security and performance tuning.
+The final output must be a structured report containing:
+- **Findings:** Clear description of the identified issues or current state.
+- **Actions Taken:** Detailed list of executed commands and configuration changes.
+- **Evidence:** Output from diagnostic queries (e.g., `EXPLAIN ANALYZE`, `pg_stat_statements`) supporting the findings and actions.
+- **Severity/Confidence:** Assessment of the issue's severity and confidence in the applied solution.
+- **Actionable Next Steps:** Recommendations for ongoing maintenance or further optimization.
 
----
+## Resources
 
-## Adversarial Verification Panel
+- `references/complete-reference.md`: Comprehensive guide to PostgreSQL 15+ architecture, tuning, and features.
+- `scripts/check-pg-version.sh`: Script to verify PostgreSQL version and required extensions.
+- `scripts/analyze-bloat.sql`: Deterministic SQL script to identify bloated tables and indexes.
 
-For each significant performance bottleneck produced by the parallel sub-agents:
+## Orchestration
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong performance bottlenecks from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Partitioning Specialist, Security Auditor, Query Optimizer, Replication Monitor, Data Migration Agent) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Query Optimizer recommends adding a GIN index on a large column for full-text search performance, while the Partitioning Specialist recommends dropping the same index before repartitioning to avoid locking and storage bloat)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified operational remediation plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+This skill supports parallel execution for independent dimensions:
+- **Inputs:** List of independent targets (e.g., multiple databases, distinct query sets).
+- **Schemas:** Standardized output format for each parallel task.
+- **Conflict Handling:** Synthesize results to identify and resolve conflicting recommendations (e.g., overlapping index creation).
+- **Synthesis:** Aggregate findings into a unified report, prioritizing critical issues.
+- **Termination:** Stop parallel execution when all targets have been processed or a critical failure occurs.

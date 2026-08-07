@@ -1,11 +1,14 @@
 # Identity & Access Management
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Identity Providers
 2. SSO Configuration
 3. SCIM Provisioning
 4. Access Control
-5. Zero Trust Architecture
+5. Zero Trust Architecture (CISA ZTMM V2.0)
+6. Source Map
 
 ---
 
@@ -125,7 +128,7 @@ For each application:
 
 ---
 
-## 5. Zero Trust Architecture
+## 5. Zero Trust Architecture (CISA ZTMM V2.0)
 
 ### Zero Trust Principles
 
@@ -137,12 +140,27 @@ For each application:
 | Never trust network | Network location doesn't grant trust | Identity-based access |
 | Continuous verification | Re-verify throughout session | Device posture, risk signals |
 
-### Zero Trust Implementation
+### Zero Trust Implementation (CISA ZTMM V2.0 Alignment)
 
-| Layer | Traditional | Zero Trust |
+| Pillar | Traditional | Advanced (Zero Trust) |
 |---|---|---|
-| Network | VPN, firewall perimeter | Identity-aware proxy, micro-segmentation |
-| Identity | Username/password | MFA, continuous auth, risk-based |
-| Device | Corporate network = trusted | Device posture check, MDM compliance |
-| Application | Network access = app access | Per-app authorization |
-| Data | Perimeter protection | Classification, DLP, encryption |
+| Identity | Password-based | Phishing-resistant MFA, continuous validation |
+| Devices | Managed vs Unmanaged | Device health/posture checks before access |
+| Networks | Perimeter-based | Micro-segmentation, encrypted traffic |
+| Applications | Static access | Dynamic, risk-based access control |
+| Data | Perimeter protection | Data categorization, encryption, DLP |
+
+---
+
+## 6. Source Map
+
+- **CISA Zero Trust Maturity Model V2.0**: https://www.cisa.gov/zero-trust-maturity-model
+- **Identity Attack Vectors**: Haber & Hibbert (2020), Apress. IAM security.
+- **Solving Identity Management in Modern Applications**: Hardt (2nd ed, 2022), Apress.
+- **OAuth 2 in Action**: Richer & Sanso (2017), Manning.
+- **Identity and Data Security for Web Development**: LeBlanc & Messerschmidt (2016), O'Reilly.
+- **Zero Trust Networks**: Gilman & Barth (2nd ed, 2024), O'Reilly.
+- **Okta Blog**: okta.com/blog. Identity management.
+- **Auth0 Blog**: auth0.com/blog. Authentication and identity.
+- **Microsoft Entra Blog**: techcommunity.microsoft.com. Azure AD/Entra.
+- **JumpCloud Blog**: jumpcloud.com/blog. Directory and IAM.

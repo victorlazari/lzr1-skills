@@ -1,3 +1,5 @@
+Verified against upstream: 2026-08-07
+
 # Real-Time Knowledge Grounding (RAG)
 
 A live meeting assistant must provide the *right* comment at the *right* moment, grounded in an authoritative knowledge base (KB) repository. This reference covers how to collect information in real time during the meeting and retrieve relevant context fast enough to fit within the conversational latency budget.

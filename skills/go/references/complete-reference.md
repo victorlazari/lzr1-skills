@@ -1,6 +1,8 @@
-# Advanced Go Specialist (13-Go Specialist) Complete Reference
+# Advanced Go Specialist Complete Reference
 
-This document consolidates and enhances the comprehensive knowledge required for a 13-Go Specialist. It covers advanced troubleshooting, scalability, security, configuration, architecture, performance tuning, and enterprise patterns in Go.
+**Verified against upstream: 2026-08-07**
+
+This document consolidates and enhances the comprehensive knowledge required for a Go Specialist. It covers advanced troubleshooting, scalability, security, configuration, architecture, performance tuning, and enterprise patterns in Go.
 
 ---
 
@@ -20,12 +22,13 @@ Goroutines start with a small, dynamically sized stack (typically 2KB) that grow
 ### 1.3 The Go Memory Model
 The memory model defines the rules for concurrent reads and writes to shared variables, based on "happens-before" relationships. Synchronization primitives (channels, mutexes) are essential to establish these relationships and ensure data consistency.
 
-### 1.4 Garbage Collection (Tricolor Mark-and-Sweep)
+### 1.4 Garbage Collection (Tricolor Mark-and-Sweep & Green Tea GC)
 Go uses a concurrent, incremental tricolor mark-and-sweep garbage collector designed for low pause times.
 - **White**: Unreachable objects.
 - **Grey**: Reachable objects, not fully processed.
 - **Black**: Reachable and fully processed objects.
-The GC runs concurrently with the application, using write barriers to maintain the tricolor invariant.
+
+**Go 1.26 Green Tea GC**: Enabled by default in Go 1.26, the Green Tea garbage collector introduces significant improvements in pause times and overall throughput, particularly for applications with large heaps. It optimizes the mark phase and reduces the impact of write barriers.
 
 ---
 
@@ -41,10 +44,13 @@ Analyze CPU, memory, and goroutine profiles using `go tool pprof`.
 
 ### 2.2 Goroutine Leaks and Deadlocks
 Goroutine leaks occur when goroutines block indefinitely (e.g., waiting on an unbuffered channel with no receiver). Use `runtime/pprof` to capture goroutine dumps and identify stuck routines.
+
+**Go 1.26 Experimental Goroutine Leak Profile**: Go 1.26 introduces an experimental profile specifically designed to detect goroutine leaks more accurately. It tracks goroutine creation and termination to identify long-lived, inactive goroutines.
+
 Deadlocks happen when goroutines wait on each other circularly. Ensure proper channel closure and use `context.Context` for timeouts.
 
 ### 2.3 Race Conditions
-Use the race detector (`go run -race`) to identify unsynchronized concurrent memory access. While powerful, it may produce false positives with low-level synchronization; manual review is sometimes necessary.
+Use the race detector (`go test -race` or `go run -race`) to identify unsynchronized concurrent memory access. While powerful, it may produce false positives with low-level synchronization; manual review is sometimes necessary.
 
 ### 2.4 Memory Leaks and GC Tuning
 Memory leaks often result from unintended references. Profile heap allocations to find objects remaining in memory.
@@ -69,9 +75,14 @@ Deploy multiple instances behind a load balancer. Implement Circuit Breakers (e.
 ## 4. Security Considerations
 
 ### 4.1 Secure Coding Practices
-Validate and sanitize all inputs to prevent injection attacks. Use parameterized queries for SQL and `html/template` for output encoding.
+Validate and sanitize all inputs to prevent injection attacks. Use parameterized queries for SQL and `html/template` for output encoding. Consult the [OWASP Go Secure Coding Practices Guide](https://owasp.org/www-project-go-secure-coding-practices-guide/) for comprehensive guidance.
 
-### 4.2 Cryptography and TLS
+### 4.2 Vulnerability Scanning with `govulncheck`
+`govulncheck` is the official Go vulnerability scanner. It analyzes your codebase and dependencies against the Go vulnerability database.
+- Run `govulncheck ./...` regularly as part of the CI/CD pipeline and security audits.
+- It provides actionable insights by identifying which specific functions in your code call vulnerable functions in dependencies.
+
+### 4.3 Cryptography and TLS
 Enforce strong TLS configurations:
 ```go
 tlsConfig := &tls.Config{
@@ -81,10 +92,13 @@ tlsConfig := &tls.Config{
 }
 ```
 
-### 4.3 Concurrency Safety
+### 4.4 Concurrency Safety
 Avoid race conditions by using `sync.Mutex`, `sync.RWMutex`, or channels. Avoid blocking operations within critical sections to prevent deadlocks.
 
-### 4.4 Handling the `unsafe` Package
+### 4.5 Randomized Heap Base Address
+**Go 1.26 Security Feature**: On 64-bit platforms, Go 1.26 introduces randomized heap base addresses. This mitigates certain classes of memory corruption vulnerabilities by making it harder for attackers to predict the location of objects in the heap.
+
+### 4.6 Handling the `unsafe` Package
 Minimize the use of `unsafe`. When unavoidable, encapsulate it, document assumptions, and test extensively.
 
 ---
@@ -136,13 +150,22 @@ Propagate `context.Context` across API boundaries for cancellation, timeouts, an
 
 ---
 
-## 8. Edge Cases and Pitfalls
+## 8. Code Modernization with `go fix`
 
-### 8.1 Nil Interfaces
+### 8.1 Revamped `go fix` (Go 1.26)
+The `go fix` command has been significantly revamped in Go 1.26 to serve as a powerful code modernizer. It can automatically update older Go code to use newer language features and standard library APIs.
+- Always run `go fix ./...` when upgrading to a new Go version.
+- Review the changes made by `go fix` before committing, as it may alter code structure.
+
+---
+
+## 9. Edge Cases and Pitfalls
+
+### 9.1 Nil Interfaces
 An interface holding a `nil` concrete value is not a `nil` interface. Always return explicit `nil` for errors, not a `nil` pointer of a custom error type.
 
-### 8.2 Slice Capacity and Append
+### 9.2 Slice Capacity and Append
 `append` may create a new underlying array if capacity is exceeded. Be cautious when passing slices to functions.
 
-### 8.3 Channel Anomalies
+### 9.3 Channel Anomalies
 Sending on a closed channel panics. Receiving from a closed channel returns the zero value. The sender should typically close the channel.

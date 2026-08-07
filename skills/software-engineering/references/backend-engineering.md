@@ -1,5 +1,7 @@
 # Backend Engineering
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Service Architecture
 2. API Design
@@ -20,7 +22,8 @@
 | Modular Monolith | Growing teams, clear domain boundaries | Best of both worlds, migration path |
 | Microservices | Large teams, independent scaling needs | Complex operations, network overhead |
 | Event-Driven | Async workflows, decoupled systems | Eventual consistency, debugging complexity |
-| Serverless | Variable traffic, event processing | Cold starts, vendor lock-in |
+| Serverless (v2) | Variable traffic, event processing, scale-to-zero | Cold starts (mitigated in v2), vendor lock-in |
+| Edge Computing | Low latency, distributed processing | Complex deployment, limited compute/state |
 | CQRS | Read/write asymmetry, complex queries | Complexity, eventual consistency |
 
 ### Service Design Principles
@@ -38,9 +41,11 @@
 |---|---|---|
 | REST/HTTP | Synchronous request-response | Simple, widely supported |
 | gRPC | High-performance, typed contracts | Fast, streaming, code generation |
+| gRPC-Web | Browser to gRPC backend | Enables gRPC in web clients |
 | Message Queue | Async, decoupled processing | Reliable, buffered, ordered |
 | Event Bus | Pub/sub, event sourcing | Decoupled, scalable |
 | GraphQL | Client-driven data fetching | Flexible, single endpoint |
+| GraphQL Federation | Distributed GraphQL APIs | Composes multiple graphs into one |
 
 ---
 

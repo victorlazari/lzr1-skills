@@ -1,6 +1,6 @@
 ---
 name: meeting-engineering
-description: "Extreme expertise for building live Google Meet virtual assistants that participate in real time with voice. Use for: Playwright/Chromium Meet automation, Xvfb virtual display, PulseAudio virtual audio routing (null sinks, monitor sources, parec/paplay), low-latency STT/LLM/TTS pipelines with VAD/barge-in, real-time knowledge-base grounding (RAG), calendar-driven scheduling, RabbitMQ task dispatch, and Docker Compose meeting-bot deployment."
+description: "Build and deploy live Google Meet virtual assistants using Playwright, PulseAudio, and low-latency STT/LLM/TTS pipelines."
 license: Complete terms in LICENSE.txt
 ---
 
@@ -8,94 +8,48 @@ license: Complete terms in LICENSE.txt
 
 Build high-performance virtual assistants that join Google Meet as live participants: hearing the room, retrieving knowledge-base context in real time, and speaking grounded responses with sub-second latency.
 
-The architecture is a cascaded real-time pipeline inside a container:
+## Scope and Triggers
+Use this skill when building, debugging, or deploying a Google Meet virtual assistant that requires real-time voice participation, Playwright automation, PulseAudio routing, or low-latency STT/LLM/TTS pipelines.
+Do not use for general Playwright automation outside of Google Meet (route to `playwright-automation`) or general calendar/task scheduling (route to `automation-and-scheduling`).
 
-```
-Calendar watcher ─→ RabbitMQ (tasks.meet) ─→ Worker container
-                                              ├─ tini (PID 1)
-                                              ├─ Xvfb :99 (virtual display)
-                                              ├─ PulseAudio (unix:/tmp/pulse-socket)
-                                              │   ├─ sindarian-out (TTS sink) ─ monitor → Chrome "mic"
-                                              │   └─ sindarian-meeting (Chrome output) → sindarian-meeting-source → STT
-                                              └─ Playwright → Chromium (non-headless on Xvfb) → Google Meet
-Meeting audio → parec → STT (scribe_v2_realtime → whisper fallbacks)
-             → VAD/endpointing → relevance gate → RAG retrieval → LLM (gpt-5-mini, Groq fast path)
-             → TTS (eleven_multilingual_v2 → tts-1 fallback) → paplay → sindarian-out → Meet
-State: PostgreSQL (registry, sessions) · Valkey (dedup, hot cache) · Slack (join/leave alerts)
-```
+## Preconditions
+- Target environment must support Xvfb and PulseAudio.
+- Valid Google account credentials (not a service account) must be available.
+- Docker and Docker Compose must be installed for infrastructure provisioning.
 
-## Non-Negotiable Rules
-
-1. **Real account, never a service account** — Google Meet blocks service accounts. Persist auth state (cookies + OAuth refresh token) to `workspace/config/meet-auth-state.json` and inject via Playwright `storage_state`.
-2. **Non-headless Chromium on Xvfb** — full WebRTC media only works reliably with `headless=False` on a virtual display. Never pass `--use-fake-device-for-media-stream` when PulseAudio devices must back `getUserMedia`.
-3. **Stream everything** — audio to STT, tokens from LLM, audio from TTS. Any stage that buffers a full payload destroys the latency budget (<1s mouth-to-ear).
-4. **Stay silent by default** — respond only on direct address, detected questions matching the KB, or configured triggers. A chatty bot gets removed.
-5. **Isolate per meeting** — one worker = one meeting (prefetch_count=1), segregated memory keyed by `meeting_id`, dedup via Valkey `SET NX EX MEET_DEDUP_TTL` before dispatch.
+## Source Freshness
+Google Meet UI selectors and external API endpoints (ElevenLabs, Groq, OpenAI) are volatile. Always verify current documentation and test selectors locally before production deployment. See referenced files for canonical URLs and verification dates.
 
 ## Workflow
+1. **Infrastructure**: Provision the containerized environment using `templates/docker-compose.meet.yml` and `templates/Dockerfile.meet`.
+2. **Audio Setup**: Execute `scripts/setup_pulse_devices.sh` to create virtual PulseAudio devices. Verify with `pactl list short sources`.
+3. **Join Automation**: Run a dry-run of the meeting join process using `scripts/meet_joiner.py` to verify Playwright selectors against the current Google Meet UI.
+4. **Voice Pipeline**: Verify the STT/TTS pipeline using `scripts/audio_bridge.py` with test audio and text.
+5. **Deployment**: Deploy the calendar watcher and worker containers. Monitor system logs for errors and latency bottlenecks.
 
-When building or debugging a Meet assistant, work through these layers in order:
+## Safety and Validation
+- **Read-only discovery**: Always run a dry-run of the meeting join process before deploying to production meetings.
+- **Confirmation**: Require user confirmation before deploying the bot to production meetings or executing destructive actions.
+- **Validation**: Verify PulseAudio routing with test commands (`parec`, `paplay`) before full execution. Monitor memory usage to prevent Chromium crashes.
+- **Syntax Checks**: Run `bash -n` on shell scripts and `python3 -m py_compile` on Python scripts before execution.
 
-1. **Infrastructure** — Container with tini, Xvfb, PulseAudio, and virtual devices. Start from `templates/Dockerfile.meet` and `templates/docker-compose.meet.yml`; the startup ordering lives in `scripts/meet-entrypoint.sh` and device creation in `scripts/setup_pulse_devices.sh`. Read [references/architecture_and_audio.md](references/architecture_and_audio.md) for the full routing model, pactl commands, and Chromium launch flags.
-2. **Join automation** — Playwright (Python) drives auth injection, CDP/context permission grants, the green-room flow (camera off, name fill, "Join now"/"Ask to join"), admission waiting, popup dismissal, participant monitoring, and graceful leave. `scripts/meet_joiner.py` is a working template. Read [references/playwright_automation.md](references/playwright_automation.md) for selectors, anti-bot mitigation, and caption-scraping fallback.
-3. **Real-time voice pipeline** — `parec` captures meeting audio from `sindarian-meeting-source`; chunks stream to STT; turn detection (Silero VAD + semantic endpointing) fires the LLM; streamed TTS plays via `paplay` to `sindarian-out` with instant barge-in cancellation. `scripts/audio_bridge.py` provides the capture/playback skeleton. Read [references/low_latency_pipelines.md](references/low_latency_pipelines.md) for the latency budget table, provider settings, and chunking strategy.
-4. **Knowledge grounding** — Run an ambient comprehension loop that pre-fetches KB chunks as the conversation evolves, so response-time retrieval is a cache hit. Hybrid (vector + keyword) search over a chunked KB repo, layered prompt assembly, relevance gating, rolling summarization. Read [references/knowledge_grounding.md](references/knowledge_grounding.md).
-5. **Orchestration & ops** — Calendar watcher polls Google Calendar (OAuth2) and publishes to `sindarian.tasks`/`tasks.meet` (with DLX); PostgreSQL is the system of record; Valkey handles dedup; Slack announces joins/leaves and failures; provider fallback chains keep the conversation alive. Read [references/orchestration_and_ops.md](references/orchestration_and_ops.md).
+## Failure Handling
+- **STT/TTS Failures**: Ensure graceful fallback mechanisms are in place (e.g., ElevenLabs -> OpenAI TTS).
+- **UI Changes**: If Playwright selectors fail, re-derive them using the current Google Meet DOM and update `scripts/meet_joiner.py`.
+- **Audio Issues**: If audio routing fails, restart PulseAudio and re-run `scripts/setup_pulse_devices.sh`.
 
-## Default Provider Stack
+## Output Contract
+The skill must produce a functional, containerized Google Meet bot capable of joining meetings, capturing audio, and responding with low latency. The output must include logs of the dry-run execution and validation checks.
 
-| Stage | Primary | Fallbacks | Notes |
-| --- | --- | --- | --- |
-| STT | ElevenLabs `scribe_v2_realtime` (WebSocket, ~150ms) | OpenAI `whisper-1`, Groq `whisper-large-v3-turbo` | Fallbacks are non-streaming: buffer ~3s windows |
-| LLM | Gateway → `gpt-5-mini` via Groq fast path (~1s) | Direct OpenAI | Always stream tokens; keep prompts <4k tokens |
-| TTS | ElevenLabs `eleven_multilingual_v2`, language-aware voice IDs | OpenAI `tts-1` | Use `eleven_flash_v2_5` when latency beats quality; LLM normalizes numbers/dates |
-
-## Debugging Quick Reference
-
-| Symptom | First checks |
-| --- | --- |
-| Bot joins but hears nothing | `pactl list short sources` — does `sindarian-meeting-source` exist? Is Chrome's output routed to `sindarian-meeting` (default sink)? Run `scripts/audio_bridge.py` smoke test. |
-| Bot speaks but Meet participants hear nothing | Is Chrome's input the `sindarian-out.monitor` (default source)? Is the bot's Meet mic muted in the UI? Did `--use-fake-device-for-media-stream` sneak into the flags? |
-| Join button never found | Google rotated the DOM. Re-derive role/aria-label locators; check for blocking dialogs; verify auth state hasn't expired (login redirect). |
-| "You can't join" / denied | Anti-bot heuristics or waiting-room denial. Use trusted-domain account, human-like delays, verify host admitted the bot. |
-| Chromium crashes in container | `shm_size: 2gb`, `--disable-dev-shm-usage`, memory limit ≥3GB. |
-| Latency feels slow | Measure per stage. Usual culprits: silence threshold too high (>800ms), non-streamed LLM/TTS, TTS text normalization enabled, oversized prompt. |
-| Double-joins after restart | Valkey dedup key must use TTL and never be deleted on shutdown. |
-
----
-
-## Parallel Execution Protocol
-
-> **All 5 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
-
-### Agent Roster
-
-| Agent | Dimension | Scope | Reference |
-|---|---|---|---|
-| **Audio/Transport Agent** | Audio & Transport Layer | WebRTC, codec selection, jitter buffers, packet loss, network topology | `references/architecture_and_audio.md` |
-| **Transcript Agent** | Transcript & NLP Pipeline | ASR accuracy, punctuation restoration, speaker diarization, latency | `references/low_latency_pipelines.md` |
-| **Knowledge Agent** | Knowledge Grounding | RAG integration, meeting context injection, entity resolution, factual accuracy | `references/knowledge_grounding.md` |
-| **Orchestration Agent** | Orchestration & Operations | Meeting lifecycle, bot management, scaling, error recovery, session state | `references/orchestration_and_ops.md` |
-| **Playwright Agent** | Playwright Automation | Browser-based meeting join, UI interaction, recording automation, resilience | `references/playwright_automation.md` |
-
-### Spawning Rules
-
-- **Trigger**: Every invocation of this skill — no exceptions
-- **Concurrency**: All 5 agents launch in a single `parallel()` call
-- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
-- **Maximum concurrent agents**: 5
-
-### Synthesis Agent
-
-After all 5 agents report, run one **Synthesis Agent** with all reports that:
-
-1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
-2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
-3. **Prioritizes** the merged set by severity/impact
-4. **Produces** a single unified output document
-
-> Synthesis note for this skill: Map latency contributions across all layers. Identify where a bottleneck in one layer (e.g., slow ASR) creates downstream degradation in another (e.g., knowledge grounding starts late). Produce end-to-end latency breakdown with root cause attribution.
-
-### Quality Gate
-
-A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.
+## Resources
+- [Architecture and Audio](references/architecture_and_audio.md): PulseAudio configuration and Chromium launch flags.
+- [Playwright Automation](references/playwright_automation.md): Google Meet UI selectors and anti-bot mitigation.
+- [Low Latency Pipelines](references/low_latency_pipelines.md): STT/TTS provider details and latency budgets.
+- [Knowledge Grounding](references/knowledge_grounding.md): RAG architecture and prompt assembly.
+- [Orchestration and Ops](references/orchestration_and_ops.md): RabbitMQ, PostgreSQL, and Valkey integration.
+- [Audio Bridge Script](scripts/audio_bridge.py): STT/TTS pipeline implementation.
+- [Meet Joiner Script](scripts/meet_joiner.py): Playwright automation script.
+- [Setup Pulse Devices Script](scripts/setup_pulse_devices.sh): PulseAudio configuration script.
+- [Meet Entrypoint Script](scripts/meet-entrypoint.sh): Container entrypoint script.
+- [Dockerfile](templates/Dockerfile.meet): Container image definition.
+- [Docker Compose](templates/docker-compose.meet.yml): Infrastructure provisioning template.

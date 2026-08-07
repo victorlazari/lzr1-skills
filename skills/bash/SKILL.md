@@ -1,11 +1,11 @@
 ---
 name: bash
-description: Specialist in advanced Bash and shell scripting, text processing, process management, and POSIX compliance.
+description: Specialist in advanced Bash and shell scripting, text processing, process management, and POSIX compliance. Triggers on requests to write, debug, or optimize shell scripts, or when tasks require complex text processing, process management, or POSIX-compliant automation.
 ---
 
 # Bash Specialist Skill
 
-## When to Use
+## Scope and Triggers
 
 Use this skill when you need to:
 - Write, debug, or optimize Bash scripts for system automation.
@@ -14,80 +14,72 @@ Use this skill when you need to:
 - Ensure scripts are POSIX compliant for maximum portability across different systems.
 - Handle file descriptors, redirections, and process substitutions efficiently.
 
-## Sub-Agent Spawning
+**Non-goals:**
+- Do not use this skill for tasks requiring long-running services, Docker, or heavy compute (route to `persistent-computing`).
+- Do not use this skill for recurring execution, background execution, or event-triggered execution (route to `automation-and-scheduling`).
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple scripts to review | Script Reviewer | Parallel code review and POSIX compliance check |
-| Multiple log files to parse | Log Analyzer | Parallel text processing using awk/sed/grep |
-| Multiple servers to configure | Config Deployer | Parallel execution of configuration scripts |
-| Bulk data files to transform | Data Transformer | Parallel data extraction and transformation |
+Before acting, ensure:
+- The target environment supports Bash or POSIX shell.
+- Required permissions are available for the intended operations.
+- User intent is clear, especially for destructive or production-impacting actions.
 
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+
+For version-sensitive facts, commands, and supported features, consult the official documentation or the bundled verified references.
+- GNU Bash Reference Manual
+- POSIX Shell Command Language specifications
+Verify installed versions (`bash --version`) before applying destructive actions.
 
 ## Workflow
 
-1. **Requirement Analysis**: Understand the automation or processing task, target environment, and portability requirements.
-2. **Script Design**: Outline the script structure, including functions, variables, and control flow. Choose appropriate tools (e.g., `awk` vs `sed`).
-3. **Implementation**: Write the script using best practices (e.g., `set -euo pipefail`, proper quoting).
-4. **Testing and Debugging**: Test the script in the target environment. Use `bash -x` for debugging.
-5. **Optimization**: Refine text processing pipelines for performance and ensure robust error handling.
-6. **Documentation**: Add comments and usage instructions to the script.
+1. **Analyze Requirements**: Understand the automation or processing task, target environment, and portability requirements.
+2. **Design Script**: Outline the script structure, including functions, variables, and control flow. Choose appropriate tools (e.g., `awk` vs `sed`).
+3. **Implement Script**: Write the script using robust templates (e.g., `templates/bash-script-template.sh` with `set -euo pipefail`).
+4. **Validate Syntax**: Run `scripts/validate-bash.sh` to validate the script syntax using `bash -n` and other checks.
+5. **Test/Dry-Run**: Test the script in a safe or dry-run mode where feasible.
+6. **Execute**: Execute the script. **Require confirmation** for destructive, external, privileged, or production-impacting actions.
+7. **Handle Failures**: Diagnose errors and adjust the approach. Do not repeat identical failed actions.
+8. **Output Result**: Output the final script and execution results according to the output contract.
 
-## Core Principles
+## Safety
 
-- **Safety First**: Always use `set -euo pipefail` to catch errors early and prevent unintended consequences.
-- **Quote Variables**: Always quote variables to prevent word splitting and globbing issues.
-- **Prefer Built-ins**: Use shell built-ins over external commands when possible for better performance.
-- **POSIX Compliance**: Write POSIX-compliant scripts (`#!/bin/sh`) when portability is a priority, avoiding Bash-specific extensions.
-- **Modular Design**: Break down complex scripts into smaller, reusable functions.
-- **Clear Error Messages**: Provide informative error messages and exit codes.
+- **Read-only Discovery**: Separate read-only discovery from mutations.
+- **Confirmation Required**: Require user confirmation for destructive, external, privileged, financial, legal, or production-impacting actions.
+- **Safe Defaults**: Always use `set -euo pipefail` in generated scripts to catch errors early. Quote variables to prevent word splitting and globbing issues.
 
-## Key References
+## Validation
 
-- [Advanced Bash-Scripting Guide](https://tldp.org/LDP/abs/html/)
-- [POSIX Shell Command Language](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
-- [GNU Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)
-- `man bash`, `man awk`, `man sed`, `man grep`
+- Define syntax checks using `bash -n`.
+- Use dry runs where applicable.
+- Capture evidence of successful execution or validation.
 
----
+## Failure Handling
 
-## Adversarial Verification Panel
+- Diagnose errors using exit codes and stderr output.
+- Choose alternative approaches if a command fails.
+- Provide rollback guidance for destructive actions.
+- Avoid repeating a failed action unchanged.
 
-For each significant shell scripting issue (bugs, POSIX compliance violations, optimization opportunities) produced by the parallel sub-agents:
+## Output Contract
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+The result must include:
+- The generated or modified script.
+- Evidence of validation (e.g., `bash -n` output).
+- Execution results or dry-run output.
+- Actionable next steps or rollback instructions if applicable.
 
-> This prevents plausible-but-wrong shell scripting issues (bugs, POSIX compliance violations, optimization opportunities) from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Resources
 
-## Cross-System Consistency Validator
+- [Complete Reference](references/complete-reference.md): Detailed technical guidance, commands, and POSIX compliance rules.
+- [Validate Bash Script](scripts/validate-bash.sh): Deterministic script to run syntax checks.
+- [Bash Script Template](templates/bash-script-template.sh): Reusable template for robust Bash scripts.
 
-After all parallel agents (Script Reviewer, Log Analyzer, Config Deployer, Data Transformer) complete, but **before** synthesis:
+## Orchestration
 
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Script Reviewer recommending strict POSIX compliance while Config Deployer uses Bash-specific extensions for a configuration script)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified script analysis report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+This skill supports spawning sub-agents for parallel execution when tasks can be decomposed (e.g., multiple scripts to review, multiple log files to parse).
+- Spawn when 3+ independent items need the same operation.
+- Each sub-agent receives: context, specific target, success criteria.
+- Results are aggregated and cross-referenced for conflicts.
+- Maximum concurrent sub-agents: 10.

@@ -1,11 +1,14 @@
 # People Operations
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Onboarding
 2. Offboarding
 3. HR Compliance
 4. HRIS and Tools
 5. People Analytics
+6. 2026 Compliance Updates
 
 ---
 
@@ -150,3 +153,24 @@
 | Succession planning | Annual | Bench strength for key roles |
 | Org design review | Annual | Structure optimization |
 | Compensation benchmarking | Annual | Market competitiveness |
+
+---
+
+## 6. 2026 Compliance Updates
+
+### 2026 HR Compliance Checklist
+
+| Area | Requirement | Action |
+|---|---|---|
+| Salary Transparency | Multi-state compliance for job postings and internal transfers | Update all job descriptions and internal processes |
+| Data Privacy | Enhanced employee data protection requirements | Review and update data handling policies |
+| AI in HR | Regulations on using AI for hiring and performance management | Audit AI tools for bias and compliance |
+| Remote Work | Updated tax and labor laws for remote employees | Review remote work policies and state registrations |
+| Leave Policies | Expanded paid family and medical leave in various states | Update leave policies to meet or exceed state requirements |
+
+### Guidelines
+
+- Regularly review state-specific employment laws, as they often change and may be stricter than federal laws.
+- Ensure all HR policies and handbooks are updated annually to reflect the latest legal requirements.
+- Train managers on compliance topics, such as interviewing legally, handling accommodation requests, and managing performance.
+- Conduct regular audits of HR practices, including payroll, classification (exempt vs. non-exempt), and I-9 compliance.

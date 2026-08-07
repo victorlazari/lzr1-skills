@@ -5,7 +5,7 @@
 2. Data Lineage
 3. Data Catalog
 4. Data Privacy
-5. Governance Framework
+5. Governance Framework & AI Compliance
 
 ---
 
@@ -128,7 +128,7 @@ expectations:
 
 ---
 
-## 5. Governance Framework
+## 5. Governance Framework & AI Compliance
 
 ### Data Ownership Model
 
@@ -149,3 +149,23 @@ expectations:
 | 3 - Defined | Standardized processes | Quality checks, lineage, policies |
 | 4 - Measured | Metrics-driven | SLAs, quality scores, compliance |
 | 5 - Optimized | Continuous improvement | Automated governance, self-service |
+
+### AI Compliance & Automated Governance
+
+In 2026, data governance frameworks must explicitly address AI compliance and utilize automated, metadata-driven models.
+
+- **AI Compliance Requirements**:
+  - **Provenance & Lineage**: Strict tracking of training data origins to ensure copyright compliance and bias mitigation.
+  - **Consent Management**: Automated tracking of user consent for data usage in AI model training.
+  - **Model Explainability**: Linking model outputs back to specific data versions and governance policies.
+  - **Regulatory Adherence**: Built-in checks for frameworks like the EU AI Act, ensuring data used for high-risk AI systems meets stringent quality and bias standards.
+
+- **Automated, Metadata-Driven Governance**:
+  - **Policy as Code**: Governance rules defined as code (e.g., OPA) and automatically enforced during CI/CD pipelines.
+  - **Active Metadata**: Catalogs that don't just document data, but actively trigger alerts, block access, or mask data based on real-time classification and usage patterns.
+  - **Automated Classification**: ML-driven scanning of new data assets to automatically tag PII, PHI, and apply appropriate access controls without manual intervention.
+
+---
+*Verified against upstream: 2026-08-07*
+*Sources:*
+* - Data Governance Frameworks for AI Compliance | 2026: https://www.dataversity.net/articles/data-governance-frameworks-ai-compliance/

@@ -1,3 +1,5 @@
+Verified against upstream: 2026-08-07
+
 # Low-Latency Pipelines and Turn Detection
 
 Achieving a natural, conversational feel in a voice agent requires minimizing "core latency"—the mouth-to-ear turn gap. This reference covers the best practices for configuring the Speech-to-Text (STT), Turn Detection, Large Language Model (LLM), and Text-to-Speech (TTS) pipeline.

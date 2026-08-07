@@ -1,89 +1,71 @@
 ---
 name: valkey-redis
-description: Specialist skill for architecting, deploying, troubleshooting, and securing highly optimized Redis environments integrated with ValKey.
+description: Specialist skill for managing Valkey (the open-source Redis fork), configuring valkey.conf, and executing safe migrations from Redis OSS to Valkey.
 ---
 
-# ValKey-Redis Specialist Skill
+# Valkey Database Administration and Migration Skill
 
-## When to Use
+## Scope and Triggers
 
-Use this skill when you need to architect, deploy, troubleshoot, or secure Redis environments that are integrated with ValKey. ValKey is a key management system that provides granular key-level access control, encryption at rest, and real-time auditing for Redis. This skill is essential for handling demanding production environments, resolving intricate issues, and designing scalable, secure data architectures that meet enterprise-grade security and compliance requirements.
+Use this skill when you need to architect, deploy, configure, troubleshoot, or secure Valkey databases, or when you need to migrate an existing Redis OSS deployment to Valkey. Valkey is an open-source, high-performance key-value data store that originated as a fork of Redis OSS 7.2.4.
 
-## Sub-Agent Spawning
+**Non-goals:** Do not use this skill for managing legacy Redis deployments prior to 7.2.4 or Redis Enterprise. For those, route to the `redis-admin` skill. Do not treat Valkey as a "key management system" (KMS) for Redis; Valkey is the database itself.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple Redis nodes to troubleshoot | Node Troubleshooter | Parallel investigation of latency, throughput, or connectivity issues across nodes |
-| Multiple ValKey policies to validate | Policy Validator | Parallel validation of RBAC policies and key access rules |
-| Multiple keys to encrypt/decrypt | Crypto Agent | Parallel batch encryption or decryption operations |
-| Multiple tenants to isolate | Tenant Configurator | Parallel configuration of multi-tenant isolation settings |
+Before executing any operations, detect the target environment:
+1. Identify existing Redis/Valkey instances, versions, and configurations.
+2. Verify the installed version via the `INFO` command (look for `valkey_version`).
+3. Ensure you have the necessary permissions to read configuration files (e.g., `valkey.conf`) and execute CLI commands (`valkey-cli`).
+4. For migrations, confirm the source Redis version is compatible (Redis OSS 7.2 or earlier).
 
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+
+Valkey is actively developed. Always verify volatile facts against the official documentation.
+- **Primary Source:** Valkey Documentation (https://valkey.io/docs/)
+- **Migration Guide:** https://valkey.io/topics/migration/
+- **Verified Date:** 2026-08-07
 
 ## Workflow
 
-1. **Validate Connectivity and Authentication**: Ensure Redis clients can authenticate and communicate with Redis and ValKey services using TLS certificates and access tokens.
-2. **Analyze Logs and Metrics**: Inspect Redis logs and ValKey audit logs for permission denials, encryption errors, and latency spikes.
-3. **Inspect Key Policies and Permissions**: Dump and review current ValKey key policies to identify conflicting or overly restrictive rules.
-4. **Verify Data Integrity**: Dump key data from Redis and test decryption with ValKey tools to ensure data consistency.
-5. **Test Failover and Replication**: Simulate node failures to verify ValKey policy consistency across the Redis cluster.
-6. **Scale and Optimize**: Implement appropriate architecture patterns (e.g., Sharded Redis Cluster, Proxy-based Access Layer) and optimize ValKey policy propagation and encryption overhead.
-7. **Secure the Environment**: Harden Redis configurations, enforce strict ValKey RBAC policies, and automate encryption key rotation.
+1. **Discover Environment:** Identify existing Redis/Valkey instances, versions, and configurations using `valkey-cli INFO` or `redis-cli INFO`.
+2. **Pre-flight Check (Migration):** Run `scripts/migration-helper.sh` in dry-run mode to assess migration readiness.
+3. **Plan Migration:** Determine the appropriate migration strategy (physical vs. replication) based on downtime tolerance and environment constraints.
+4. **Execute Migration:** Perform the migration. **Explicit user confirmation is required** before initiating any data migration or failover.
+5. **Validate:** Verify data integrity, client connectivity, and cluster health post-migration. Ensure `valkey-cli ping` succeeds.
+6. **Stop Condition:** Migration is complete, `valkey-cli` reports healthy status, and clients are successfully connected to the new Valkey instance.
 
-## Core Principles
+## Safety
 
-- **Security First**: Always enforce encryption at rest, RBAC, audit logging, and TLS encryption to protect sensitive data.
-- **High Availability**: Ensure ValKey policies are consistently propagated across all Redis nodes to maintain availability during failovers.
-- **Performance Optimization**: Minimize encryption overhead by using hardware acceleration and batch operations, and employ connection pooling to reduce handshake latency.
-- **Granular Access Control**: Define strict, least-privilege policies for key access based on user roles.
-- **Proactive Monitoring**: Continuously monitor CPU, memory, network IO, and latency metrics to detect and resolve bottlenecks early.
+- **Read-only Discovery:** Always perform read-only discovery (e.g., `INFO`, `CONFIG GET`) before attempting any mutations.
+- **Confirmation Required:** You MUST require explicit user confirmation before executing destructive, external, privileged, or production-impacting actions, including data migration, failover, or service restarts.
+- **Dry Runs:** Use dry-run modes for scripts where available.
 
-## Key References
+## Validation
 
-- Redis Official Documentation: https://redis.io/docs/
-- ValKey Security Framework: https://valkey.io/docs/
-- Redis Cluster and Sentinel Architecture: https://redis.io/docs/manual/scaling/
-- Advanced Redis Security Practices: https://redis.io/docs/manual/security/
-- Lua Scripting in Redis: https://redis.io/docs/manual/programmability/eval-intro/
+- **Syntax Checks:** Validate `valkey.conf` syntax before restarting services.
+- **Postconditions:** Ensure `valkey-cli ping` returns `PONG` and `INFO` reports the expected `valkey_version` after deployment or migration.
 
----
+## Failure Handling
 
-## Adversarial Verification Panel
+- If a migration step fails, do not repeat the same action unchanged.
+- Consult the logs (defined in `valkey.conf`) to diagnose errors.
+- If replication fails, verify network connectivity and firewall rules between the source and target nodes.
+- Rollback: If a migration cannot be completed, revert clients to the source Redis instance and ensure data consistency.
 
-For each significant configuration issue, security vulnerability, or performance bottleneck produced by the parallel sub-agents:
+## Output Contract
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+The result must include:
+- A summary of the actions performed (e.g., configuration updated, migration completed).
+- Evidence of success (e.g., output of `valkey-cli ping` or `INFO`).
+- Any warnings or non-critical issues encountered.
+- Actionable next steps for the user (e.g., update client connection strings).
 
-> This prevents plausible-but-wrong configuration issues, security vulnerabilities, or performance bottlenecks from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Resources
 
-## Cross-System Consistency Validator
+- [Complete Reference](references/complete-reference.md): Detailed architecture, configuration, and CLI reference for Valkey.
+- [Migration Helper Script](scripts/migration-helper.sh): Deterministic script to assist with migrating from Redis OSS to Valkey.
 
-After all parallel agents (Node Troubleshooter, Policy Validator, Crypto Agent, Tenant Configurator) complete, but **before** synthesis:
+## Orchestration
 
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Crypto Agent recommends enabling full envelope encryption on all keys to harden security, while the Node Troubleshooter recommends disabling per-key encryption to eliminate the CPU overhead causing latency spikes on the same node)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified remediation report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+Parallel work is generally not recommended for single-instance migrations to avoid race conditions. For cluster migrations, ensure operations on different shards are independent and synthesize the results to confirm overall cluster health.

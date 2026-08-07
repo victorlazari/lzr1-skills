@@ -93,5 +93,26 @@ After all specialists complete, run one **Executive Decision Synthesizer** with 
 2. **Identifies gaps** — requirements addressed by no specialist
 3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
 4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+5. **Integrates AI-driven synthesis** — Leverage AI to synthesize complex cross-domain insights and real-time data.
 
 > Synthesis focus for this skill: Surfaces where a CTO's technical recommendation conflicts with the CFO's financial model. Ensures strategic decisions account for org capacity to execute.
+
+## Safety and Validation
+
+- **Confirmation Required**: Require confirmation before generating final strategic recommendations that could impact company direction.
+- **Validation**: Validate that multi-specialist synthesis explicitly highlights contradictions between domains.
+- **Assumptions**: Ensure all financial models include explicit assumptions and limitations.
+
+## Source Verification
+
+- Verified against upstream: 2026-08-07
+
+## Authoritative sources
+
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
+
+## Package resource index
+
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

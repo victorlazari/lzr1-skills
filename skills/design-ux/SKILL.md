@@ -16,21 +16,15 @@ Expert-level design covering user experience, interface design, design systems, 
 - Creating information architecture and navigation
 - Establishing design principles and standards
 - Prototyping and wireframing
-- Design critique and review
 
 ## Workflow
 
 1. **Understand the problem** — Who are the users? What are their goals?
-2. **Select reference** — Choose the appropriate design domain:
-   - UX process and research → `references/ux-research.md`
-   - UI design and visual design → `references/ui-design.md`
-   - Design systems → `references/design-systems.md`
-   - Accessibility → `references/accessibility.md`
-   - Interaction design → `references/interaction-design.md`
-3. **Research** — Understand users, context, and constraints
-4. **Design** — Create solutions informed by principles and patterns
-5. **Validate** — Test with users, iterate based on feedback
-6. **Document** — Specifications, guidelines, and handoff materials
+2. **Detect applicable design domains** — Identify which domains apply (UX Research, UI Design, Design Systems, Accessibility, Interaction Design).
+3. **Spawn specialists** — If multiple domains apply, spawn relevant specialists simultaneously with full context and dedicated reference files.
+4. **Research, design, and validate** — Specialists conduct research, design, and validation based on updated references (including WCAG 2.2 and accessibility tokens).
+5. **Run Design System Synthesizer** — Unify recommendations, resolve contradictions, and explicitly validate WCAG 2.2 compliance across all outputs.
+6. **Document** — Specifications, guidelines, and handoff materials.
 
 ## Core Principles (All Design Work)
 
@@ -68,7 +62,7 @@ Expert-level design covering user experience, interface design, design systems, 
 
 ## Multi-Specialist Protocol
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
 
 ### Domain Detection Table
 
@@ -99,5 +93,16 @@ After all specialists complete, run one **Design System Synthesizer** with all s
 2. **Identifies gaps** — requirements addressed by no specialist
 3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
 4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+5. **Validates WCAG 2.2 compliance** — Explicitly checks that all combined outputs meet WCAG 2.2 standards.
 
 > Synthesis focus for this skill: Ensures accessibility requirements are baked into design system components before handoff, not retrofitted. Maps UX research findings to interaction design decisions.
+
+## Authoritative sources
+
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
+
+## Package resource index
+
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

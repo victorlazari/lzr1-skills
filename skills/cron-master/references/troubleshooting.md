@@ -52,3 +52,6 @@ If you still can't find the issue, force cron to tell you what's wrong:
    env -i /bin/bash -c '/path/to/script.sh'
    ```
    This simulates how cron runs your script. If it fails here, you know it's an environment variable issue.
+
+*Verified against upstream: 2026-08-07*
+[Linux cron(8) Manual Page](https://man7.org/linux/man-pages/man8/cron.8.html)

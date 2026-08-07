@@ -1,11 +1,14 @@
 # UX Research
 
+*Verified against upstream: 2026-08-07*
+
 ## Table of Contents
 1. Research Methods
 2. User Interviews
 3. Usability Testing
 4. Synthesis and Analysis
 5. Research Operations
+6. Measuring Research Impact
 
 ---
 
@@ -176,3 +179,17 @@ Needs: What would help them succeed
 - Share findings broadly (research newsletters, lunch-and-learns)
 - Build insight repositories searchable by anyone
 - Establish research review processes for quality
+
+---
+
+## 6. Measuring Research Impact
+
+### Quantitative Measurement Frameworks
+
+| Framework | Focus | Metrics |
+|---|---|---|
+| HEART (Google) | User experience quality | Happiness, Engagement, Adoption, Retention, Task success |
+| AARRR (Pirate Metrics) | Product lifecycle | Acquisition, Activation, Retention, Referral, Revenue |
+| ROI of UX | Business value | Conversion rate increase, support cost decrease, development time saved |
+| Research Ops Metrics | Team efficiency | Time to recruit, cost per participant, studies per quarter |
+| Decision Impact | Strategic value | % of product decisions backed by research, features killed/pivoted based on findings |

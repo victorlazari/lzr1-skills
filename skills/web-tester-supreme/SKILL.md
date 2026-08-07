@@ -5,108 +5,72 @@ description: Advanced web application testing specialist focusing on E2E automat
 
 # Web Tester Supreme
 
-## When to Use
-
+## Scope and Triggers
 Use this skill when you need to perform advanced, enterprise-grade web application testing. This includes:
 - Implementing deep end-to-end (E2E) automation using Playwright.
 - Validating complex Role-Based Access Control (RBAC) mechanisms and permission gates.
-- Testing Next.js App Router specific features like Server/Client Components, loading boundaries, and error boundaries.
-- Simulating state and cache degradation (e.g., Valkey cache failures, PostgreSQL replica lag) to ensure application resilience.
-- Verifying complex data displays, such as hierarchical tree views, Recharts canvas resizing, and grid-layout constraints.
-- Integrating observability into test flows by asserting OpenTelemetry traces and validating structured Pino logs.
-- Executing performance, load, security, and accessibility audits using the Web-Tester-Supreme CLI.
+- Testing Next.js App Router specific features like Server/Client Components, loading states, and edge middleware.
+- Verifying application behavior under degraded network conditions or partial service outages.
+- Validating complex data visualizations (charts, graphs, interactive dashboards).
+- Integrating observability (OpenTelemetry, structured logging) into the testing pipeline.
 
-## Sub-Agent Spawning
+**Escalation Boundaries:**
+- Route to `playwright-automation` when the task is solely to write or run basic Playwright scripts without Next.js, RBAC, or observability complexities.
+- Route to `nextjs-developer` when the task is to build or debug Next.js application code rather than test it.
+- Route to `security-review` when the task requires deep security auditing beyond basic client-side checks.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
+Before acting, verify:
+1. Target application URL and environment (local, staging, production).
+2. Playwright is installed (`npx playwright --version`).
+3. Next.js app is running (if applicable).
+4. Required permissions and authentication credentials for RBAC testing.
+5. User intent regarding destructive or production-impacting actions.
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple browsers/devices to test | Cross-Browser Tester | Parallel E2E test execution across different environments |
-| Multiple user roles to validate | RBAC Validator | Parallel permission and access control testing |
-| Multiple API endpoints to mock/test | API Mocking Agent | Parallel API test execution and schema validation |
-| Multiple UI components to verify | Visual Regression Tester | Parallel pixel-diffing and visual consistency checks |
-| Massive test suites to execute | Sharded Test Runner | Parallel execution of sharded test suites |
-
-### Spawning Rules
-- Spawn when 3+ independent items (browsers, roles, endpoints, components) need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+Consult the bundled reference files for version-specific syntax and commands. Verify installed versions and current upstream documentation before applying destructive or production-impacting actions.
 
 ## Workflow
+1. **Detect:** Identify target application, environment, and testing requirements.
+2. **Verify:** Check preconditions (e.g., Playwright installed, Next.js app running).
+3. **Select:** Choose appropriate testing strategy (E2E, RBAC, Next.js specific, observability).
+4. **Consult:** Read relevant reference files for syntax and best practices.
+5. **Develop:** Develop or update test scripts.
+6. **Run:** Execute tests using `scripts/run-tests.sh` (require confirmation if targeting production).
+7. **Analyze:** Review test results, traces, and logs.
+8. **Report:** Document findings, categorizing by severity and providing actionable remediation steps.
 
-1.  **Initialization and Configuration**:
-    - Initialize the testing environment using `web-tester-supreme init`.
-    - Configure the `.webtesterrc` file with project-specific settings, including timeouts, retries, and browser configurations.
-    - Set up environment variables for base URLs, authentication tokens, and CI/CD contexts.
+## Safety
+- Separate read-only discovery from mutations.
+- **Require confirmation** before running tests against production environments.
+- Use dry-run mode for test execution where possible.
+- Ensure network interception does not leak sensitive data.
+- Provide clear rollback or cleanup instructions for test data.
 
-2.  **Test Development and Automation**:
-    - Develop E2E tests using Playwright, leveraging network interception for API mocking and visual regression testing for UI consistency.
-    - Implement RBAC tests by alternating SSO roles and validating permission gates.
-    - Write Next.js specific tests to verify Server vs. Client Components and route interception.
+## Validation
+- Validate test scripts for syntax errors before execution.
+- Use `scripts/run-tests.sh` for deterministic execution.
+- Capture test evidence (traces, screenshots, logs).
+- Verify postconditions (e.g., test data cleaned up).
 
-3.  **Resilience and Complex UI Testing**:
-    - Simulate infrastructure faults (cache failures, database lag) to test graceful degradation.
-    - Validate complex UI components like tree views, charts, and grid layouts under various viewport sizes and interactions.
+## Failure Handling
+- If a test fails, diagnose the error using traces and logs.
+- Do not repeat a failed action unchanged.
+- Choose alternative locators or wait strategies if UI elements are flaky.
+- Roll back any test data created during a failed run.
 
-4.  **Execution and Debugging**:
-    - Run test suites using `web-tester-supreme run`, utilizing parallelization and sharding for speed.
-    - Debug failing tests interactively using `web-tester-supreme debug` or by analyzing generated trace files (`show-trace`).
+## Output Contract
+The result must include:
+- A structured report of test results (pass/fail/skip).
+- Evidence for failures (trace links, screenshots, log snippets).
+- Severity/confidence categorization for identified issues.
+- Actionable remediation steps for each issue.
 
-5.  **Observability and Reporting**:
-    - Integrate OpenTelemetry and Pino log assertions into critical test flows.
-    - Generate and review comprehensive test reports using `web-tester-supreme report`.
+## Resources
+- [Playwright Testing Guide](references/playwright-testing.md): Advanced Playwright E2E automation, network interception, and visual regression.
+- [Next.js Testing Guide](references/nextjs-testing.md): Testing Next.js App Router, Server/Client Components, and edge middleware.
+- [Observability Testing Guide](references/observability-testing.md): Integrating OpenTelemetry and structured logging into tests.
+- [Run Tests Script](scripts/run-tests.sh): Deterministic script to execute Playwright tests with safe defaults and error handling.
 
-## Core Principles
-
--   **Deterministic Execution**: Ensure tests are reliable by heavily utilizing network interception, API mocking, and HAR recording to eliminate external dependencies.
--   **Comprehensive Coverage**: Go beyond functional testing to include visual regression, performance benchmarking, security auditing, and accessibility checks.
--   **Resilience First**: Actively test how the application behaves under failure conditions (e.g., cache misses, network latency) to guarantee graceful degradation.
--   **Observability Driven**: Treat telemetry (traces, logs) as first-class citizens in the testing strategy to ensure the application is not only working but also observable.
--   **Scalability and Speed**: Leverage parallel execution, sharding, and state reuse (e.g., caching authentication state) to maintain fast feedback loops in CI/CD pipelines.
-
-## Key References
-
--   **Playwright Documentation**: For advanced browser automation, network interception, and visual regression testing.
--   **Next.js App Router Testing Guide**: For understanding Server/Client components and edge middleware testing.
--   **OpenTelemetry and Pino**: For integrating observability assertions into E2E test flows.
--   **Web-Tester-Supreme CLI Reference**: For mastering the extensive command set, flags, and configuration options available in the framework.
-
----
-
-## Parallel Execution Protocol
-
-> **All 5 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
-
-### Agent Roster
-
-| Agent | Dimension | Scope | Reference |
-|---|---|---|---|
-| **Functional Agent** | Functional Testing | Business logic correctness, user flows, edge cases, regression against spec | `references/complete-reference.md` |
-| **Visual Agent** | Visual Regression | Layout shifts, rendering differences across browsers/devices, snapshot deltas | `references/complete-reference.md` |
-| **A11y Agent** | Accessibility Audit | WCAG 2.1 AA compliance, ARIA, keyboard nav, screen reader compatibility | `references/complete-reference.md` |
-| **Performance Agent** | Performance Testing | Core Web Vitals, load time, bundle size, memory leaks, render blocking | `references/complete-reference.md` |
-| **Security Agent** | Client-Side Security | XSS, CSRF, CSP headers, sensitive data in localStorage, mixed content | `references/complete-reference.md` |
-
-### Spawning Rules
-
-- **Trigger**: Every invocation of this skill — no exceptions
-- **Concurrency**: All 5 agents launch in a single `parallel()` call
-- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
-- **Maximum concurrent agents**: 5
-
-### Synthesis Agent
-
-After all 5 agents report, run one **Synthesis Agent** with all reports that:
-
-1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
-2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
-3. **Prioritizes** the merged set by severity/impact
-4. **Produces** a single unified output document
-
-> Synthesis note for this skill: Cross-reference visual regressions with performance findings to surface component-level root causes (e.g., a new animation causing both layout shift and CPU spike). Map security findings to functional test gaps. Produce a prioritized defect matrix.
-
-### Quality Gate
-
-A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.
+## Orchestration
+Use parallel work only for independent dimensions (e.g., running tests across different browsers). Define inputs, schemas, conflict handling, synthesis, and termination conditions for parallel execution.

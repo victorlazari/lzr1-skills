@@ -1,98 +1,77 @@
 ---
 name: speedtest
-description: Comprehensive mastery of Speedtest (Ookla) methodologies, architecture, CLI integration, and network performance diagnostics. Use when testing 5G/fiber connections, configuring custom OoklaServer instances, analyzing latency/jitter, or troubleshooting network throughput issues.
+description: Execute Speedtest (Ookla) methodologies, architecture, CLI integration, and network performance diagnostics. Use when testing 5G/fiber connections, configuring custom OoklaServer instances, analyzing latency/jitter, or troubleshooting network throughput issues.
 ---
 
 # Speedtest (Ookla) Specialist
 
-## When to Use
+## Scope and Triggers
 
 Use this skill when you need to:
-- Measure or analyze network performance, including bandwidth, latency, and jitter.
+- Measure or analyze network performance, including bandwidth, latency (including UDP latency), and jitter.
 - Troubleshoot slow speeds, inconsistency, or timeouts in network connections.
 - Configure, automate, or integrate the Speedtest CLI into monitoring pipelines (e.g., Prometheus, Grafana).
 - Understand or deploy custom OoklaServer instances for enterprise testing.
 - Analyze 5G, fiber-optic, or super-fast connections (>10 Gbps) where traditional testing fails.
 - Perform security audits or hardening of Speedtest infrastructure.
 
-## Sub-Agent Spawning
+**Escalation Boundaries:**
+- Do not perform destructive or configuration-changing actions (like modifying firewall rules or deploying OoklaServer) without explicit user confirmation.
+- Do not execute untrusted downloaded artifacts.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple network paths to test | Network Tester | Parallel speed and latency tests across different interfaces or locations |
-| Multiple servers to audit | Security Auditor | Parallel security review and hardening of OoklaServer instances |
-| Bulk log analysis | Diagnostics Agent | Parallel parsing of Speedtest CLI JSON logs for anomaly detection |
-| Multi-region monitoring setup | Config Deployer | Parallel deployment of automated Speedtest monitoring scripts |
+Before executing tests or deploying servers:
+- Detect the target environment, OS, and network interfaces.
+- Verify the installed Speedtest CLI version.
+- Check firewall rules (ensure UDP 8080/5060 are open for UDP latency and server deployment).
+- Ensure required permissions are available for network binding or server deployment.
 
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation (e.g., testing 3+ network interfaces).
-- Each sub-agent receives: context, specific target (e.g., server IP, interface name), and success criteria.
-- Results are aggregated and cross-referenced for conflicts or network-wide patterns.
-- Maximum concurrent sub-agents: 10.
+## Source Freshness
+
+Volatile facts such as OpenSSL versions (requires 3.5.5+) and required ports must be checked at runtime.
+- Verify the current Speedtest CLI version and OoklaServer release notes before applying configurations.
+- Consult official Ookla documentation for the latest requirements.
+- Reference the bundled [Complete Reference](references/complete-reference.md) for architecture and commands.
 
 ## Workflow
 
-1. **Requirement Analysis**: Determine the goal (e.g., basic bandwidth test, automated monitoring, server deployment, security audit).
-2. **Methodology Selection**:
-   - For basic tests: Use standard Speedtest CLI commands.
-   - For high-speed (5G/Fiber): Ensure multi-threaded TCP testing is active to overcome TCP slow start.
-   - For monitoring: Configure JSON output and schedule via cron/systemd.
-3. **Execution & Diagnostics**:
-   - Run tests and collect metrics (Download, Upload, Latency, Jitter, Packet Loss).
-   - If issues arise (e.g., Error 100, 101), follow the troubleshooting steps (check connectivity, DNS, firewall).
-4. **Analysis & Reporting**:
-   - Parse JSON/CSV outputs.
-   - Correlate metrics with network events (e.g., bufferbloat, ISP throttling).
-   - Generate actionable insights or alerts.
+1. **Analyze requirement**: Determine the goal (e.g., basic bandwidth test, automated monitoring, server deployment, security audit).
+2. **Verify environment**: Check Speedtest CLI version, firewall rules for UDP 8080/5060, and OpenSSL version (3.5.5+ required).
+3. **For server deployment**: Generate configuration using [templates/OoklaServer.properties](templates/OoklaServer.properties).
+4. **Request user confirmation**: Explicitly ask the user before making firewall changes or deploying the server.
+5. **Execute deployment or tests**: Run the required Speedtest CLI commands or start the server.
+6. **Validation**: Run [scripts/verify-ooklaserver.sh](scripts/verify-ooklaserver.sh) to validate configuration, firewall rules, and security headers.
+7. **Parse output and report**: Analyze findings, stopping if critical errors (e.g., Error 100) occur.
 
-## Core Principles
+## Safety
 
-- **Foreground Testing**: Speedtest actively floods the network interface to measure realistic maximum Quality of Service (QoS), unlike passive background tests.
-- **Dynamic Connection Scaling**: Overcomes TCP slow start by dynamically spawning multiple threads (TCP connections) to saturate high-bandwidth links.
-- **Multi-Stage Latency**: Measures ping at Idle, Download, and Upload stages to accurately assess bufferbloat and network responsiveness under load.
-- **Security First**: Speedtest infrastructure must be hardened against DDoS, secured via TLS, and compliant with data privacy regulations (GDPR, CCPA).
+- **Read-only discovery**: Always perform read-only checks (e.g., checking versions, reading firewall rules) before proposing changes.
+- **Confirmation required**: Explicit user confirmation is required for destructive, external, privileged, or production-impacting actions (e.g., changing firewall rules, deploying OoklaServer).
+- **Dry-run**: Dry-run firewall changes where possible.
 
-## Key References
+## Validation and Failure Handling
 
-For detailed technical information, refer to the bundled reference files:
+- **Validation**: Use `scripts/verify-ooklaserver.sh` to validate the server configuration and security headers.
+- **Failure handling**: If OoklaServer fails to start, rollback firewall rules. If tests fail with Error 100 or 101, check connectivity, DNS, and firewall. Do not repeat a failed action unchanged.
+
+## Output Contract
+
+The result must include:
+- A structured summary of the network performance or deployment status.
+- Evidence of the tests run (e.g., parsed JSON output, script execution results).
+- Severity/confidence of any findings.
+- Actionable next steps or recommendations.
+
+## Resources
 
 - **[Complete Reference](references/complete-reference.md)**: Exhaustive documentation on Speedtest architecture, CLI commands, configuration schemas, deep-dive network analysis, security audit checklists, and troubleshooting guides.
-- **[Reading List](references/reading-list.md)**: Curated list of 30+ books and 30+ articles (2023-2026) covering network performance, 5G, TCP optimization, and network security.
+- **[verify-ooklaserver.sh](scripts/verify-ooklaserver.sh)**: Deterministic script to verify OoklaServer configuration, firewall rules (UDP 8080/5060), and security headers.
+- **[OoklaServer.properties](templates/OoklaServer.properties)**: Reusable configuration template with secure defaults, log rotation, and connection limits.
 
----
+## Orchestration
 
-## Adversarial Verification Panel
-
-For each significant network performance diagnostic finding produced by the parallel sub-agents:
-
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong network performance diagnostic findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Network Tester, Security Auditor, Diagnostics Agent, Config Deployer) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Security Auditor recommends disabling multi-threaded TCP connections to reduce attack surface while the Network Tester recommends enabling more TCP threads to saturate a high-bandwidth 5G link)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified network performance report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+This skill supports spawning sub-agents for parallel execution when tasks can be decomposed (e.g., testing multiple network paths, auditing multiple servers).
+- Spawn when 3+ independent items need the same operation.
+- Define inputs, schemas, conflict handling, synthesis, and termination conditions for parallel work.
+- Use a Consistency Validator Agent to flag contradictions before synthesis.

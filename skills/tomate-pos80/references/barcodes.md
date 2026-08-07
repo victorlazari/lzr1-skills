@@ -1,26 +1,28 @@
 # Tomate POS-80 Barcodes & QR Codes Guide
 
-The Tomate POS-80 supports native, high-speed printing of 1D barcodes and 2D QR codes [1]. Utilizing hardware-rendered codes is significantly faster and sharper than printing them as raster images.
+The Tomate POS-80 supports native, high-speed printing of 1D barcodes and 2D QR codes. Utilizing hardware-rendered codes is significantly faster and sharper than printing them as raster images.
+
+Verified against upstream: 2026-08-07
 
 ---
 
 ## 1. General Barcode Configuration Commands
 
-Before printing a barcode, configure its height, width, and text visibility using these commands [1]:
+Before printing a barcode, configure its height, width, and text visibility using these commands:
 
 ### GS h n (Select Barcode Height)
 - **ASCII**: `GS h n`
 - **Hex**: `1D 68 n`
 - **Decimal**: `29 104 n`
 - **Range**: `1 ≤ n ≤ 255`
-- **Description**: Sets the vertical height of the barcode in dots [1]. Default is `n = 162`.
+- **Description**: Sets the vertical height of the barcode in dots. Default is `n = 162`.
 
 ### GS w n (Select Barcode Width)
 - **ASCII**: `GS w n`
 - **Hex**: `1D 77 n`
 - **Decimal**: `29 119 n`
 - **Range**: `2 ≤ n ≤ 6`
-- **Description**: Sets the horizontal module width of the barcode elements [1].
+- **Description**: Sets the horizontal module width of the barcode elements.
   - `n = 2`: 0.25mm thin element width.
   - `n = 3`: 0.375mm thin element width (default).
   - `n = 4`: 0.50mm thin element width.
@@ -30,7 +32,7 @@ Before printing a barcode, configure its height, width, and text visibility usin
 - **Hex**: `1D 48 n`
 - **Decimal**: `29 72 n`
 - **Range**: `0 ≤ n ≤ 3`, `48 ≤ n ≤ 51`
-- **Description**: Selects where the Human Readable Interpretation (HRI) characters are printed [1]:
+- **Description**: Selects where the Human Readable Interpretation (HRI) characters are printed:
   - `n = 0, 48`: Not printed (default).
   - `n = 1, 49`: Printed above the barcode.
   - `n = 2, 50`: Printed below the barcode.
@@ -40,7 +42,7 @@ Before printing a barcode, configure its height, width, and text visibility usin
 
 ## 2. Printing 1D Barcodes (GS k)
 
-The printer supports two syntaxes for printing 1D barcodes. Syntax ② is highly recommended as it explicitly defines the data length `n`, preventing buffer reading issues [1].
+The printer supports two syntaxes for printing 1D barcodes. Syntax ② is highly recommended as it explicitly defines the data length `n`, preventing buffer reading issues.
 
 ### Command Syntax ②
 ```
@@ -49,9 +51,9 @@ Hex:     1D 6B m n d1...dn
 Decimal: 29 107 m n d1...dn
 ```
 
-- **`m`**: Selects the barcode system [1].
-- **`n`**: Specifies the number of characters in the barcode data [1].
-- **`d1...dn`**: The actual character bytes to be encoded [1].
+- **`m`**: Selects the barcode system.
+- **`n`**: Specifies the number of characters in the barcode data.
+- **`d1...dn`**: The actual character bytes to be encoded.
 
 | System `m` | Barcode Type | Data Length `n` | Valid Characters |
 | :---: | :--- | :--- | :--- |
@@ -68,7 +70,7 @@ Decimal: 29 107 m n d1...dn
 
 ## 3. Printing 2D QR Codes (ESC Z)
 
-The Tomate POS-80 utilizes a specific, highly efficient command `ESC Z` to print QR codes natively [1].
+The Tomate POS-80 utilizes a specific, highly efficient command `ESC Z` to print QR codes natively.
 
 ### Command Syntax
 ```
@@ -79,14 +81,14 @@ Decimal: 27 90 m n k dL dH d1...dn
 
 ### Parameters
 - **`m`**: Persist byte (usually set to `0` or `1`).
-- **`n`**: Error Correction Level [1]:
+- **`n`**: Error Correction Level:
   - `L` (7% recovery)
   - `M` (15% recovery)
   - `Q` (25% recovery)
   - `H` (30% recovery)
-- **`k`**: Enlarge multiple (size of QR code module in dots, usually `3` to `8`) [1].
-- **`dL dH`**: Data length specified as two bytes (`length = dL + dH * 256`) [1].
-- **`d1...dn`**: The actual string data to encode in the QR code [1].
+- **`k`**: Enlarge multiple (size of QR code module in dots, usually `3` to `8`).
+- **`dL dH`**: Data length specified as two bytes (`length = dL + dH * 256`).
+- **`d1...dn`**: The actual string data to encode in the QR code.
 
 ---
 
@@ -134,7 +136,7 @@ def print_qr_code(socket_conn, data: str, size=4, ec_level=b'M'):
     
     # 4. Build ESC Z command
     # \x1b\x5a = ESC Z
-    # \x00 = persist byte
+    # \x00 = persist b
     # ec_level = L, M, Q, or H
     # size = module size multiple
     command = b'\x1b\x5a\x00' + ec_level + bytes([size]) + bytes([dL, dH]) + data_bytes
@@ -146,4 +148,4 @@ def print_qr_code(socket_conn, data: str, size=4, ec_level=b'M'):
 ---
 
 ## References
-[1] ZKTECO Colombia, *POS-80-Series Printer Programmer Manual (Barcodes)*, Pages 44-46, https://zktecocolombia.com/wp-content/uploads/2025/08/Manual-de-Progamacion.pdf
+- ZKTECO Colombia, *POS-80-Series Printer Programmer Manual (Barcodes)*, Pages 44-46, https://zktecocolombia.com/wp-content/uploads/2025/08/Manual-de-Progamacion.pdf

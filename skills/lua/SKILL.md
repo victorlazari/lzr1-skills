@@ -1,109 +1,68 @@
 ---
 name: lua
-description: Comprehensive Lua specialist skill covering fundamentals, advanced tables, metatables, coroutines, C API integration, Redis Lua scripting, game development, security auditing, and performance tuning.
+description: Execute Lua tasks including syntax validation, C API integration, sandboxing, and Redis scripting.
 ---
 
 # Lua Specialist Skill
 
-## When to Use
-
+## Scope and Triggers
 Use this skill when you need to:
-- Write, debug, or optimize Lua scripts for embedded systems, game engines (e.g., Love2D, Defold, Corona SDK), or Redis.
-- Design advanced Lua architectures using tables, metatables, and metamethods for object-oriented or data-driven patterns.
-- Implement cooperative multitasking and asynchronous workflows using Lua coroutines.
-- Integrate Lua with C/C++ applications using the Lua C API, including stack management and userdata.
-- Perform security audits on Lua codebases, including sandboxing, environment hardening, and preventing injection attacks.
-- Troubleshoot performance bottlenecks, memory leaks, or garbage collection issues in Lua applications.
-- Create robust configuration schemas using Lua.
+- Write, debug, or optimize Lua scripts for embedded systems, game engines, or Redis.
+- Integrate Lua with C/C++ applications using the Lua C API.
+- Secure Lua execution environments and implement sandboxing.
+- Validate Lua script syntax.
 
-## Sub-Agent Spawning
+**Escalation Boundaries:**
+- For Redis cluster management or non-Lua Redis operations, route to `redis-admin`.
+- For primary C/C++ application development rather than Lua embedding, route to `c-cpp-developer`.
+- For building a complete browser game rather than specific Lua game logic, route to `game-dev`.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
+- Identify the target environment (standalone, embedded, Redis, game engine).
+- Verify installed Lua versions and available tools (`luac`, `luacheck`).
+- Determine if the code to be executed is trusted or untrusted.
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple Lua scripts to audit | Security Auditor | Parallel security review of each script for vulnerabilities and sandbox escapes |
-| Multiple game entities/components | Logic Implementer | Parallel implementation of entity behaviors or state machines |
-| Multiple Redis Lua scripts | Script Optimizer | Parallel optimization and validation of Redis scripts |
-| Bulk configuration files | Config Validator | Parallel schema validation and type checking of Lua config files |
-
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+- Volatile facts such as C API yielding rules or Redis script limitations are documented in focused references with explicit verification dates.
+- Verify current upstream documentation for specific version behaviors before applying destructive or production-impacting actions.
 
 ## Workflow
+1. Analyze the target environment (standalone, embedded, Redis, game engine) and constraints.
+2. Validate the Lua script syntax using `scripts/validate-lua.sh`.
+3. If embedding in C/C++, consult `references/c-api.md` for stack management and yielding rules.
+4. If executing untrusted code, apply sandboxing rules from `references/sandboxing.md`.
+5. If deploying to Redis, verify script constraints against `references/redis.md`.
+6. Execute the script or integration, capturing output and errors.
+7. Stop when the script executes successfully or fails with a clear diagnostic.
 
-1. **Requirement Analysis**: Determine the target environment (e.g., standalone CLI, embedded in C/C++, Redis, game engine) and specific constraints (e.g., memory limits, execution time limits).
-2. **Architecture Design**: 
-   - Choose appropriate data structures (arrays vs. hash tables).
-   - Decide on the use of metatables for custom behaviors or object-oriented patterns.
-   - Plan coroutine usage for asynchronous tasks.
-3. **Implementation**:
-   - Write clean, modular Lua code using local variables for performance.
-   - Implement error handling using `pcall` or `xpcall`.
-   - For C API integration, ensure strict stack balance and use `luaL_check*` for validation.
-4. **Security & Sandboxing**:
-   - If executing untrusted code, set up a secure sandbox by removing dangerous functions (`os`, `io`, `package`) and limiting memory/execution time.
-   - Validate all inputs crossing the C/Lua boundary or network.
-5. **Testing & Validation**:
-   - Use static analysis tools like `luacheck`.
-   - Write unit tests using frameworks like `busted`.
-6. **Performance Tuning**:
-   - Profile code to identify bottlenecks.
-   - Optimize table allocations (pre-sizing) and minimize global variable access.
-   - Tune garbage collection parameters (`collectgarbage`) if necessary.
+## Safety
+- Separate read-only discovery from mutations.
+- Require confirmation before executing untrusted Lua code.
+- Ensure strict sandboxing (removing `os`, `io`, `package`) when running external scripts.
+- Verify stack balance in C API integrations.
 
-## Core Principles
+## Validation
+- Validate all Lua scripts using `scripts/validate-lua.sh` (`luac -p` or `luacheck`) before execution.
+- Define syntax checks, dry runs, tests, evidence capture, and postcondition verification.
 
-- **Simplicity and Efficiency**: Leverage Lua's lightweight nature. Prefer simple procedural or functional approaches unless complex object-oriented patterns are strictly necessary.
-- **Local Over Global**: Always use `local` variables to prevent global namespace pollution and improve access speed.
-- **Table Optimization**: Understand the dual nature of Lua tables (array part vs. hash part). Use dense integer keys for arrays and pre-allocate tables when sizes are known.
-- **Safe C Integration**: When using the C API, meticulously manage the virtual stack. Every push must have a corresponding pop. Never yield across C boundaries unless using Lua 5.4 yieldable C functions.
-- **Secure Execution**: Treat all external Lua scripts as untrusted. Implement strict sandboxing and resource limits.
-- **Graceful Error Handling**: Use `pcall`/`xpcall` to catch runtime errors and prevent application crashes.
+## Failure Handling
+- If a script fails syntax validation, analyze the error message and correct the syntax.
+- If execution fails, capture the error output, diagnose the issue, and apply a fix.
+- Do not repeat a failed action unchanged.
 
-## Key References
+## Output Contract
+- Provide a clear summary of the executed Lua tasks.
+- Include the output of syntax validation and execution.
+- Specify any unresolved issues or required next steps.
 
-- [Lua 5.4 Reference Manual](https://www.lua.org/manual/5.4/)
-- [Programming in Lua (Fourth Edition)](https://www.lua.org/pil/contents.html)
-- [Redis Lua Scripting Documentation](https://redis.io/docs/manual/programmability/eval-intro/)
-- [Lua C API Guide](https://www.lua.org/manual/5.4/manual.html#4)
-- [LuaJIT Performance Tips](http://luajit.org/performance.html)
+## Resources
+- [Lua C API Integration](references/c-api.md): Focused reference on Lua C API integration, stack management, and yielding.
+- [Redis Lua Scripting](references/redis.md): Focused reference on Redis Lua scripting, performance, and security.
+- [Lua Sandboxing](references/sandboxing.md): Focused reference on securing Lua execution and sandboxing.
+- [Lua Performance](references/performance.md): Focused reference on Lua performance tuning, tables, and garbage collection.
+- [Validate Lua Script](scripts/validate-lua.sh): Deterministic script to run `luac -p` or `luacheck` for syntax validation.
 
----
-
-## Adversarial Verification Panel
-
-For each significant security vulnerability produced by the parallel sub-agents:
-
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong security vulnerabilities from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Security Auditor, Logic Implementer, Script Optimizer, Config Validator) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Security Auditor recommends removing all `os` and `io` globals to harden the sandbox, while the Script Optimizer recommends retaining `os.clock` for high-resolution profiling in the same script)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+## Source Map
+- Lua 5.4 Reference Manual: https://www.lua.org/manual/5.4/
+- Programming in Lua: https://www.lua.org/pil/
+- Redis Lua Scripting Documentation: https://redis.io/docs/manual/programmability/

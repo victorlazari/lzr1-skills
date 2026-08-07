@@ -18,10 +18,10 @@ Choose models based on task complexity, latency requirements, cost constraints, 
 
 | Model Tier | Use Case | Examples | Cost |
 |---|---|---|---|
-| Frontier (reasoning) | Complex analysis, architecture, research | Claude Opus, GPT-4, Gemini Ultra | Highest |
-| Standard | Most tasks: coding, analysis, writing | Claude Sonnet, GPT-4o, Gemini Pro | Medium |
-| Lightweight | Simple tasks, high volume, classification | Claude Haiku, GPT-4o-mini, Gemini Flash | Lowest |
-| Open-source | Privacy-sensitive, on-premise, fine-tuning | Llama 3, Mistral, Qwen | Infrastructure |
+| Frontier (reasoning) | Complex analysis, architecture, research | Claude 3.5 Sonnet, GPT-4o, Gemini 1.5 Pro | Highest |
+| Standard | Most tasks: coding, analysis, writing | Claude 3.5 Haiku, GPT-4o-mini, Gemini 1.5 Flash | Medium |
+| Lightweight | Simple tasks, high volume, classification | Llama 3.1 8B, Mistral NeMo | Lowest |
+| Open-source | Privacy-sensitive, on-premise, fine-tuning | Llama 3.1 70B/405B, Qwen 2.5 | Infrastructure |
 
 ### Key Decision Factors
 
@@ -45,7 +45,7 @@ Documents → Chunking → Embedding → Vector Store → Retrieval → Rerankin
 
 | Strategy | Best For | Chunk Size |
 |---|---|---|
-| Fixed-size | Homogeneous documents | 256-512 tokens |
+| Fixed-size | Homogeneous documents | 256-1024 tokens |
 | Semantic | Mixed content, articles | Variable (by topic) |
 | Recursive | Structured documents | Hierarchical |
 | Sentence-window | Q&A systems | Sentence + context |
@@ -87,7 +87,7 @@ Documents → Chunking → Embedding → Vector Store → Retrieval → Rerankin
 
 ## 3. AI Agent Design Patterns
 
-Based on Anthropic's production agent research (Dec 2024), the most successful implementations use simple, composable patterns rather than complex frameworks.
+Based on Anthropic's production agent research, the most successful implementations use simple, composable patterns rather than complex frameworks.
 
 ### Architectural Distinction
 
@@ -116,6 +116,12 @@ Based on Anthropic's production agent research (Dec 2024), the most successful i
 **5. Evaluator-Optimizer** — One LLM generates, another evaluates in a loop.
 - Use when: Clear evaluation criteria exist and iterative refinement adds value
 - Example: Translation with quality feedback loop
+
+### Multi-Agent Frameworks
+
+- **AutoGen**: Microsoft's framework for conversational multi-agent systems.
+- **CrewAI**: Role-based multi-agent framework built on top of LangChain.
+- **LangGraph**: LangChain's framework for building stateful, multi-actor applications with LLMs.
 
 ### Agent Design Principles
 
@@ -163,7 +169,7 @@ Based on Anthropic's production agent research (Dec 2024), the most successful i
 
 ### Guardrails
 
-- **Input guardrails**: Content filtering, PII detection, injection detection
+- **Input guardrails**: Content filtering, PII detection, injection detection (e.g., NeMo Guardrails)
 - **Output guardrails**: Toxicity filtering, hallucination detection, format validation
 - **Structural guardrails**: Token limits, cost caps, rate limits per user
 - **Monitoring guardrails**: Alert on quality degradation, cost spikes, latency increases

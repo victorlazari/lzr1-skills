@@ -1,6 +1,6 @@
 ---
 name: ticket-reports
-description: Comprehensive skill for generating, analyzing, and managing advanced ticket system reports, including JQL queries, BI integration, predictive analytics, and executive reporting.
+description: Comprehensive skill for generating, analyzing, and managing advanced ticket system reports, including JQL queries, BI integration, predictive analytics, and executive reporting aligned with ITIL 4 measurement principles.
 ---
 
 # Ticket System Reports Skill
@@ -13,8 +13,8 @@ Use this skill when you need to:
 - Extract, transform, and load (ETL) ticket data into data warehouses for longitudinal analysis.
 - Integrate ticket data with Business Intelligence (BI) tools like Tableau, Looker, or Power BI.
 - Apply predictive analytics and AI-driven forecasting to ticket volumes and SLA breaches.
-- Create custom reporting scripts via REST APIs for automated and tailored reporting.
-- Prepare executive-level reports summarizing ticket system performance and strategic insights.
+- Create custom reporting scripts via REST APIs.
+- Prepare executive-level reports summarizing ticket system performance and strategic insights, aligned with ITIL 4 value and outcome KPIs.
 - Troubleshoot and optimize ticket reporting systems, including database tuning and caching strategies.
 
 ## Sub-Agent Spawning
@@ -37,18 +37,21 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 
 ## Workflow
 
-1. **Requirement Gathering**: Understand the audience (e.g., operational team, executives) and the specific metrics needed (e.g., SLA compliance, MTTR, ticket volume trends).
+1. **Requirement Gathering**: Understand the audience (e.g., operational team, executives) and the specific metrics needed, focusing on ITIL 4 value and outcome KPIs.
 2. **Data Extraction & Querying**: Use advanced JQL or REST APIs to extract the necessary ticket data. Handle pagination and rate limits appropriately.
-3. **Data Transformation (ETL)**: Clean, normalize, and enrich the data. Calculate derived metrics like resolution time or SLA breach status.
+3. **Data Transformation (ETL)**: Clean, normalize, and enrich the data. Calculate derived metrics with outlier analysis and segmentation (e.g., MTTR by severity/service type).
 4. **Report Generation & Visualization**: 
    - For operational reports, use native ticketing system dashboards or custom scripts.
    - For advanced analytics, integrate with BI tools (Tableau, Looker, Power BI) and design clear, actionable visualizations.
+   - Generate reports with context and trend analysis, balancing metrics like FCR with reopen rates and CSAT.
 5. **Predictive Analytics (Optional)**: Apply machine learning models (e.g., ARIMA, Random Forest) to forecast future volumes or predict SLA breaches.
-6. **Executive Summarization**: Distill complex data into high-level KPIs, trend charts, and actionable recommendations for leadership.
+6. **Executive Summarization**: Distill complex data into high-level KPIs, trend charts, and actionable recommendations aligned with ITIL 4 principles.
 7. **Optimization & Troubleshooting**: Ensure the reporting system is performant by optimizing database queries, implementing caching, and handling edge cases like concurrency and data consistency.
 
 ## Core Principles
 
+- **ITIL 4 Measurement Principles**: Emphasize value co-creation and outcome-based KPIs over mere ticket volume.
+- **ITIL 4 KPI Categories**: Include Usage, Performance, Capacity, Quality, Experience, and Value KPIs.
 - **Relevance & Actionability**: Reports must be tailored to the audience and provide insights that drive action (e.g., highlighting SLA breaches for immediate attention).
 - **Accuracy & Consistency**: Ensure precise data extraction and consistent metric definitions across all reports to maintain trust in the data.
 - **Performance & Scalability**: Design reporting systems that can handle large data volumes efficiently using caching, indexing, and optimized queries.

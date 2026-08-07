@@ -1,11 +1,14 @@
 # Endpoint Management
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. MDM and Device Management
 2. SaaS Administration
 3. IT Onboarding/Offboarding
 4. Helpdesk Operations
 5. Asset Management
+6. Source Map
 
 ---
 
@@ -136,3 +139,16 @@
 | Warranty end | When warranty expires |
 | Cost | Purchase price |
 | Location | Office, remote, storage |
+
+---
+
+## 6. Source Map
+
+- **Endpoint Security**: Anson (2020), Syngress. Endpoint protection.
+- **macOS Security and Privacy Guide**: drduh (ongoing), GitHub. macOS hardening.
+- **Windows Security Monitoring**: Miroshnikov (2018), Wiley.
+- **The Art of Mac Malware**: Patrick Wardle (2022). macOS threats.
+- **Jamf Blog**: jamf.com/blog. Apple device management.
+- **Kandji Blog**: kandji.io/blog. Modern Apple MDM.
+- **Fleet Blog**: fleetdm.com/blog. Open-source device management.
+- **Intune Documentation**: learn.microsoft.com/intune. Microsoft MDM.

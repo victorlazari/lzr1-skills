@@ -1,11 +1,14 @@
 # Contracts & Commercial Law
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Contract Types
 2. Key Contract Clauses
 3. SaaS Agreement Structure
 4. Negotiation Strategy
 5. Contract Lifecycle Management
+6. Source Map
 
 ---
 
@@ -139,3 +142,12 @@
 | Template usage | >80% | % using approved templates |
 | Renewal rate | >90% | Contracts renewed vs expired |
 | Obligation compliance | 100% | Meeting contractual obligations |
+
+---
+
+## 6. Source Map
+
+- **Tech Contracts Academy**: techcontractsacademy.com
+- **Ironclad Blog**: ironcladapp.com/blog
+- **IACCM/World Commerce & Contracting**: worldcc.com
+- **Practical Law (Thomson Reuters)**: practicallaw.com

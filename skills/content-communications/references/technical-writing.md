@@ -6,6 +6,8 @@
 3. API Documentation
 4. Developer Experience
 5. Documentation Architecture
+6. Accessibility (WCAG 2.1)
+7. Inclusive Language
 
 ---
 
@@ -191,3 +193,22 @@ Tools:
 | Notion | Internal docs | Collaboration, databases |
 | Confluence | Enterprise | Integration with Jira |
 | Mintlify | Modern API docs | Beautiful defaults, MDX |
+
+---
+
+## 6. Accessibility (WCAG 2.1)
+
+- **Alt Text**: Provide descriptive alternative text for all images, diagrams, and charts.
+- **Color Contrast**: Ensure sufficient color contrast for text and interactive elements.
+- **Semantic HTML/Markdown**: Use proper heading levels (H1, H2, H3) to create a logical document structure.
+- **Link Text**: Use descriptive link text that makes sense out of context (avoid "click here").
+- **Readability**: Aim for a reading level appropriate for the target audience; use clear, simple language.
+
+---
+
+## 7. Inclusive Language
+
+- **Gender-Neutral**: Use "they/them" instead of "he/she" when referring to a generic user.
+- **Avoid Ableist Language**: Replace terms like "sanity check" or "blind spot" with "quick check" or "oversight."
+- **Avoid Racially Charged Terms**: Replace "master/slave" with "primary/replica" and "whitelist/blacklist" with "allowlist/denylist."
+- **Global Audience**: Avoid idioms, slang, and cultural references that may not translate well internationally.

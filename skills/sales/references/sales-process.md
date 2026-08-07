@@ -1,5 +1,7 @@
 # Sales Process
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Sales Methodologies
 2. Pipeline Management
@@ -45,13 +47,13 @@
 
 | Stage | Definition | Exit Criteria | Probability |
 |---|---|---|---|
-| Prospecting | Initial outreach, no response yet | Meeting booked | 5% |
-| Discovery | First meeting, understanding needs | Pain confirmed, next steps | 10% |
-| Qualification | MEDDIC validated | Champion, budget, timeline | 20% |
-| Solution | Demo/POC, solution presented | Technical win | 40% |
-| Proposal | Pricing/proposal delivered | Verbal agreement | 60% |
-| Negotiation | Terms discussion | Final terms agreed | 80% |
-| Closed Won | Contract signed | Revenue recognized | 100% |
+| Prospecting | Initial outreach, no response yet | Meeting booked, intent data verified | 5% |
+| Discovery | First meeting, understanding needs | Pain confirmed, stakeholders mapped, next steps | 10% |
+| Qualification | MEDDIC validated | Champion identified, budget confirmed, timeline set | 20% |
+| Solution | Demo/POC, solution presented | Technical win, all stakeholders aligned | 40% |
+| Proposal | Pricing/proposal delivered | Verbal agreement from Economic Buyer | 60% |
+| Negotiation | Terms discussion | Final terms agreed, legal/security cleared | 80% |
+| Closed Won | Contract signed | Revenue recognized, handoff to CS complete | 100% |
 
 ### Pipeline Metrics
 
@@ -80,7 +82,6 @@
 
 ### Discovery Call Structure
 
-```
 1. Opening (5 min)
    - Agenda, time check, rapport
    - "What would make this a good use of your time?"
@@ -102,7 +103,6 @@
 5. Next Steps (5 min)
    - Mutual action plan
    - "Based on what you've shared, here's what I'd suggest..."
-```
 
 ### Qualification Criteria
 
@@ -149,7 +149,7 @@
 
 | Day | Channel | Action |
 |---|---|---|
-| 1 | Email | Personalized value-based email |
+| 1 | Email | Personalized value-based email (leveraging intent data) |
 | 2 | LinkedIn | Connection request + note |
 | 4 | Phone | Call attempt #1 |
 | 5 | Email | Follow-up with relevant content |
@@ -161,12 +161,11 @@
 
 ### Cold Email Framework
 
-```
 Subject: [Specific, relevant, curiosity-driven]
 
 Hi [Name],
 
-[Observation about their company/role — shows research]
+[Observation about their company/role — shows research/intent data]
 
 [Problem statement — something they likely face]
 
@@ -175,7 +174,6 @@ Hi [Name],
 [Specific ask — meeting, not a pitch]
 
 [Signature]
-```
 
 ### Prospecting Metrics
 
@@ -186,3 +184,13 @@ Hi [Name],
 | Meeting rate | 2-5% | Meetings / Outreach sent |
 | Show rate | 80%+ | Meetings held / Meetings booked |
 | Pipeline generated | 3-4x quota | Value of opportunities created |
+
+## Source Map
+
+- **Highspot: 16 proven sales methodologies for successful teams**: Consult for comprehensive overview of sales methodologies.
+- **Monday.com: B2B sales process: 7 stages for predictable revenue growth**: Consult for defining sales stages and exit criteria.
+- **SPIN Selling** (Rackham): Consult for consultative selling methodology.
+- **The Challenger Sale** (Dixon & Adamson): Consult for teaching-based selling.
+- **MEDDICC** (Whyte): Consult for enterprise qualification framework.
+- **Fanatical Prospecting** (Blount): Consult for outbound methodology.
+- **Never Split the Difference** (Voss): Consult for negotiation tactics.

@@ -1,0 +1,12 @@
+# Observability Metrics and Logging
+metrics:
+  enabled: true
+  endpoint: /metrics
+  collectors:
+    - latency
+    - throughput
+    - gpu_utilization
+    - memory_usage
+logging:
+  level: debug
+  format: json

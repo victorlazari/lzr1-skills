@@ -18,52 +18,69 @@ Expert-level product management covering strategy, discovery, delivery, growth, 
 - Growth strategy and experimentation
 - Stakeholder communication and alignment
 
+## Preconditions
+
+- Detect the target product, stage, market, and constraints before acting.
+- Identify the specific product management domain (Strategy, Discovery, Delivery, Growth).
+- Ensure required inputs (e.g., user research, metrics, business goals) are available.
+
+## Source Freshness
+
+- Authoritative sources (SVPG, Reforge, Pragmatic Institute) are integrated into references.
+- Volatile facts (e.g., specific tool integrations, current industry benchmarks) must be verified against upstream documentation if older than 6 months.
+- Verified against upstream: 2026-08-07
+
 ## Workflow
 
-1. **Understand the context** — What product, stage, market, and constraints?
-2. **Select reference** — Choose the appropriate domain:
+1. **Analyze the user request** to determine the required product management domains (Strategy, Discovery, Delivery, Growth).
+2. **If multiple domains are detected**, spawn parallel specialists using the Multi-Specialist Protocol defined below.
+3. **For each domain**, consult the corresponding reference file to execute the specific framework or procedure:
    - Strategy and vision → `references/product-strategy.md`
    - Discovery and validation → `references/product-discovery.md`
    - Execution and delivery → `references/product-delivery.md`
    - Growth and metrics → `references/product-growth.md`
-3. **Frame the problem** — Define the opportunity clearly before solutions
-4. **Gather evidence** — Data, research, customer feedback
-5. **Decide and communicate** — Make decisions, align stakeholders
-6. **Measure and iterate** — Track outcomes, learn, adjust
+4. **If the task involves creating a PRD**, use `templates/prd-template.md` and validate the output using `scripts/validate-prd.py`.
+5. **Synthesize the outputs** from all domains, resolving any contradictions and ensuring all dependencies are addressed.
+6. **Present the final product decision**, roadmap, or document to the user, requesting confirmation for any high-impact actions.
+7. **Stop** when the user approves the final output or when all actionable findings have been addressed.
 
-## Core Principles (All Product Work)
+## Safety and Validation
 
-- Outcomes over outputs: Measure impact, not features shipped
-- Customer-centric: Every decision should trace back to user value
-- Evidence-based: Validate assumptions before building
-- Prioritize ruthlessly: Say no to most things to focus on what matters
-- Think in bets: Acknowledge uncertainty, size bets accordingly
-- Cross-functional: Product is a team sport (eng, design, data, business)
-- Iterate: Ship small, learn fast, compound improvements
-- Communicate clearly: Alignment is the PM's primary job
+- **Safety:** Require explicit user confirmation before finalizing strategic decisions, pricing changes, or feature launches. Separate read-only discovery from mutations.
+- **Validation:** Validate PRD structure using `scripts/validate-prd.py` before considering delivery planning complete. Ensure all metric definitions are cross-referenced with actual data sources before finalizing growth experiments.
 
-## Role Capabilities
+## Failure Handling
 
-| Role | Expertise | Reference |
-|---|---|---|
-| Product Manager | Strategy, discovery, delivery | All references |
-| Technical PM | APIs, platforms, developer experience | `references/product-delivery.md` |
-| Growth PM | Acquisition, activation, retention | `references/product-growth.md` |
-| Product Strategist | Vision, market, positioning | `references/product-strategy.md` |
+- If PRD validation fails, review the missing sections and update the document using the template.
+- If a strategic decision lacks sufficient evidence, pause and request further discovery or data analysis.
+- Do not repeat failed actions unchanged; adjust the approach based on the error or missing information.
 
-## Key References
+## Output Contract
 
-- **Product strategy**: See `references/product-strategy.md` for vision, positioning, and roadmaps.
-- **Product discovery**: See `references/product-discovery.md` for validation and research.
-- **Product delivery**: See `references/product-delivery.md` for execution, specs, and agile.
-- **Product growth**: See `references/product-growth.md` for metrics, experimentation, and growth.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+- A structured product document (e.g., PRD, roadmap, strategy memo) following the provided templates.
+- Explicit evidence supporting decisions (e.g., user research, metrics).
+- Actionable next steps for the team (e.g., engineering, design, marketing).
+
+## Resources
+
+- **Product strategy**: `references/product-strategy.md`
+- **Product discovery**: `references/product-discovery.md`
+- **Product delivery**: `references/product-delivery.md`
+- **Product growth**: `references/product-growth.md`
+- **PRD Template**: `templates/prd-template.md`
+- **PRD Validator**: `scripts/validate-prd.py`
+
+## Cross-Skill Routing
+
+- `software-engineering` — route when the task requires writing code, designing system architecture, or implementing technical solutions.
+- `ui-ux-design` — route when the task requires creating visual designs, wireframes, or detailed user interface specifications.
+- `data-analysis` — route when the task requires complex statistical analysis, writing SQL queries, or building data pipelines beyond basic product metrics.
 
 ---
 
 ## Multi-Specialist Protocol
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
 
 ### Domain Detection Table
 
@@ -71,14 +88,14 @@ Scan the task for signals that indicate which domains apply:
 
 | Task Signal (examples) | Domain | Specialist Agent | Reference |
 |---|---|---|---|
-| `discovery`, ... | **Product Discovery** | Discovery Specialist | `references/product-discovery.md` |
-| `delivery`, ... | **Product Delivery** | Delivery Specialist | `references/product-delivery.md` |
-| `strategy`, ... | **Product Strategy** | Strategy Specialist | `references/product-strategy.md` |
-| `growth`, ... | **Product Growth** | Growth Specialist | `references/product-growth.md` |
+| `discovery`, `research`, `interviews` | **Product Discovery** | Discovery Specialist | `references/product-discovery.md` |
+| `delivery`, `agile`, `sprint`, `prd` | **Product Delivery** | Delivery Specialist | `references/product-delivery.md` |
+| `strategy`, `vision`, `roadmap` | **Product Strategy** | Strategy Specialist | `references/product-strategy.md` |
+| `growth`, `metrics`, `retention` | **Product Growth** | Growth Specialist | `references/product-growth.md` |
 
 ### Spawning Logic
 
-**Single domain detected** → Fall back to original single-reference behavior (no change).
+**Single domain detected** → Fall back to original single-reference behavior.
 
 **Multiple domains detected** → Launch all relevant specialists simultaneously:
 - Each specialist receives: **full task context** + its dedicated reference file only
@@ -89,9 +106,19 @@ Scan the task for signals that indicate which domains apply:
 
 After all specialists complete, run one **Product Decision Synthesizer** with all specialist outputs that:
 
-1. **Identifies contradictions** between specialist recommendations for the same component
-2. **Identifies gaps** — requirements addressed by no specialist
-3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
-4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
+1. **Identifies contradictions** between specialist recommendations for the same component.
+2. **Identifies gaps** — requirements addressed by no specialist.
+3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation.
+4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions.
 
 > Synthesis focus for this skill: Ensures growth instrumentation is included in delivery planning. Flags where a strategy decision requires discovery validation before execution begins.
+
+## Authoritative sources
+
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
+
+## Package resource index
+
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

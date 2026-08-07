@@ -7,6 +7,7 @@
 4. Monitoring and Observability
 5. CI/CD for ML
 6. Infrastructure
+7. LLMOps
 
 ---
 
@@ -223,3 +224,30 @@ Tools: MLflow Model Registry, Vertex AI Model Registry, SageMaker Model Registry
 - Pin all dependencies (Python packages, system libraries, CUDA versions)
 - Separate training and serving infrastructure for cost optimization
 - Implement auto-scaling based on request queue depth
+
+---
+
+## 7. LLMOps
+
+### Prompt Versioning
+
+- Store prompts in version control (git)
+- Use semantic versioning (major.minor.patch)
+- Document changes and rationale for each version
+- Maintain a changelog with performance metrics
+- Tag prompts with associated model versions
+
+### LLM Observability
+
+- Monitor token usage and cost per user/feature
+- Track latency (time to first token, total generation time)
+- Log prompt inputs and model outputs for analysis
+- Implement user feedback loops (thumbs up/down)
+- Use tools like LangSmith, Braintrust, or Arize for LLM tracing
+
+### Guardrails
+
+- **Input guardrails**: Content filtering, PII detection, injection detection (e.g., NeMo Guardrails)
+- **Output guardrails**: Toxicity filtering, hallucination detection, format validation
+- **Structural guardrails**: Token limits, cost caps, rate limits per user
+- **Monitoring guardrails**: Alert on quality degradation, cost spikes, latency increases

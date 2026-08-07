@@ -1,47 +1,21 @@
-# trivy.yaml - Trivy Configuration File Template
-# Place this file in the root of your repository or specify with --config flag.
-# Documentation: https://trivy.dev/docs/latest/references/configuration/config-file/
+# Minimal Trivy configuration baseline.
+# Verified against the official v0.73.0 example and current config reference: 2026-08-07.
+# Re-validate with `trivy --config ./trivy.yaml config` or the current documented
+# equivalent before production use; configuration keys can change across releases.
+#
+# Security intent:
+# - JSON is the canonical local evidence format.
+# - Discovery does not fail only because findings exist; use a separate policy gate.
+# - All four scanners are selected explicitly.
+# - No directories/files are skipped and no ignore file is loaded by this template.
+# - The caller must choose an explicit target and output path.
 
-# ─── Global Options ───────────────────────────────────────────────────────────
-cache:
-  dir: "/tmp/trivy-cache"
-
-debug: false
-quiet: false
-timeout: 10m0s
-
-# ─── Database Options ─────────────────────────────────────────────────────────
-db:
-  download-only: false
-  skip-update: false
-  repository:
-    - mirror.gcr.io/aquasec/trivy-db:2
-    - ghcr.io/aquasecurity/trivy-db:2
-  java-repository:
-    - mirror.gcr.io/aquasec/trivy-java-db:1
-    - ghcr.io/aquasecurity/trivy-java-db:1
-
-# ─── Scan Options ─────────────────────────────────────────────────────────────
-scan:
-  # Scanners to enable: vuln, misconfig, secret, license
-  scanners:
-    - vuln
-    - misconfig
-    - secret
-
-  # Skip specific directories from scanning
-  skip-dirs:
-    - vendor
-    - node_modules
-    - .git
-    - __pycache__
-
-  # Skip specific files from scanning
-  # skip-files:
-  #   - "tests/fixtures/dummy-key.pem"
-
-# ─── Report Options ──────────────────────────────────────────────────────────
-# Severity levels to report: UNKNOWN, LOW, MEDIUM, HIGH, CRITICAL
+# Global/report options supported by the official v0.73.0 example.
+timeout: 10m
+format: json
+dependency-tree: false
+list-all-pkgs: true
+exit-code: 0
 severity:
   - UNKNOWN
   - LOW
@@ -49,147 +23,27 @@ severity:
   - HIGH
   - CRITICAL
 
-# Exit code when vulnerabilities are found (0 = don't fail, 1 = fail)
-exit-code: 0
+scan:
+  scanners:
+    - vuln
+    - misconfig
+    - secret
+    - license
+  skip-dirs: []
+  skip-files: []
 
-# Ignore file path
-ignorefile: ".trivyignore"
-
-# Show only fixed vulnerabilities
-# ignore-unfixed: false
-
-# ─── Vulnerability Options ────────────────────────────────────────────────────
 vulnerability:
-  # Vulnerability statuses to ignore
-  # ignore-status:
-  #   - will_not_fix
-  #   - end_of_life
-
-  # Vulnerability types to scan
   type:
     - os
     - library
+  ignore-unfixed: false
 
-# ─── Misconfiguration Options ────────────────────────────────────────────────
-misconfiguration:
-  # IaC scanners to enable
-  scanners:
-    - azure-arm
-    - cloudformation
-    - dockerfile
-    - helm
-    - kubernetes
-    - terraform
-    - terraformplan-json
-    - terraformplan-snapshot
+# Do not add `ignorefile` until the file is independently reviewed, tested with
+# the installed release, and reconciled with an approved governance ledger.
+# YAML ignore support was documented as experimental on 2026-08-07 and must be
+# selected explicitly where required by the installed release.
 
-  # Include passing checks in the report
-  include-non-failures: false
-
-  # Terraform-specific options
-  terraform:
-    exclude-downloaded-modules: false
-    # vars:
-    #   - "terraform.tfvars"
-
-  # Helm-specific options
-  # helm:
-  #   values:
-  #     - "values.yaml"
-  #   set: []
-
-# ─── Secret Options ──────────────────────────────────────────────────────────
-# Secret scanning configuration file
-# secret:
-#   config: "trivy-secret.yaml"
-
-# ─── License Options ─────────────────────────────────────────────────────────
-license:
-  # Enable full license scanning (scans source files, not just package metadata)
-  full: false
-
-  # Confidence level for license classification (0.0 - 1.0)
-  confidenceLevel: 0.9
-
-  # Licenses to ignore in results
-  # ignored:
-  #   - MIT
-  #   - Apache-2.0
-
-  # License classifications (Google License Classification)
-  forbidden:
-    - AGPL-1.0
-    - AGPL-3.0
-    - CC-BY-NC-1.0
-    - CC-BY-NC-2.0
-    - CC-BY-NC-2.5
-    - CC-BY-NC-3.0
-    - CC-BY-NC-4.0
-    - CC-BY-NC-ND-1.0
-    - CC-BY-NC-ND-2.0
-    - CC-BY-NC-ND-2.5
-    - CC-BY-NC-ND-3.0
-    - CC-BY-NC-ND-4.0
-    - CC-BY-NC-SA-1.0
-    - CC-BY-NC-SA-2.0
-    - CC-BY-NC-SA-2.5
-    - CC-BY-NC-SA-3.0
-    - CC-BY-NC-SA-4.0
-    - Commons-Clause
-    - Facebook-2-Clause
-    - Facebook-3-Clause
-    - Facebook-Examples
-    - WTFPL
-
-  restricted:
-    - BCL
-    - CC-BY-ND-1.0
-    - CC-BY-ND-2.0
-    - CC-BY-ND-2.5
-    - CC-BY-ND-3.0
-    - CC-BY-ND-4.0
-    - CC-BY-SA-1.0
-    - CC-BY-SA-2.0
-    - CC-BY-SA-2.5
-    - CC-BY-SA-3.0
-    - CC-BY-SA-4.0
-    - GPL-1.0
-    - GPL-2.0
-    - GPL-2.0-with-autoconf-exception
-    - GPL-2.0-with-bison-exception
-    - GPL-2.0-with-classpath-exception
-    - GPL-2.0-with-font-exception
-    - GPL-2.0-with-GCC-exception
-    - GPL-3.0
-    - GPL-3.0-with-autoconf-exception
-    - GPL-3.0-with-GCC-exception
-    - LGPL-2.0
-    - LGPL-2.1
-    - LGPL-3.0
-    - NPL-1.0
-    - NPL-1.1
-    - OSL-1.0
-    - OSL-1.1
-    - OSL-2.0
-    - OSL-2.1
-    - OSL-3.0
-    - QPL-1.0
-    - Sleepycat
-
-# ─── Package Options ─────────────────────────────────────────────────────────
-pkg:
-  # Include dev dependencies in scan
-  include-dev-deps: false
-
-  # Package relationship types to include
-  relationships:
-    - unknown
-    - root
-    - workspace
-    - direct
-    - indirect
-
-  # Package types to scan
-  types:
-    - os
-    - library
+# Database updates, offline mode, cache location, registry credentials, server
+# address, custom checks, modules, plugins, and output paths are intentionally
+# absent. Set them explicitly for the execution environment and record them in
+# the evidence manifest. CLI flags override this file.

@@ -71,3 +71,12 @@ This reading list provides a curated selection of recent (2023-2026) books and a
 30. "Troubleshooting Common Bottlenecks in Report Generation" (2023)
 31. "Leveraging LLMs for Automated Ticket Categorization and Tagging" (2026)
 32. "A Framework for Standardizing ITSM Metrics Across the Enterprise" (2025)
+
+## Authoritative Sources on ITIL 4 and ITSM Reporting
+
+- **Reporting in Jira** — [https://confluence.atlassian.com/jirakb/reporting-in-jira-461504615.html](https://confluence.atlassian.com/jirakb/reporting-in-jira-461504615.html)
+- **What is IT Service Management (ITSM)?** — [https://www.atlassian.com/itsm](https://www.atlassian.com/itsm)
+- **ITIL KPIs: The Complete Guide to Measuring What Actually Matters in IT Service Management** — [https://www.alloysoftware.com/blog/itil-kpi/](https://www.alloysoftware.com/blog/itil-kpi/)
+- **Top 10 KPIs to Track Incident Management Effectiveness With ITIL 4 Standards** — [https://www.ituonline.com/blogs/top-10-kpis-to-track-incident-management-effectiveness-with-itil-4-standards/](https://www.ituonline.com/blogs/top-10-kpis-to-track-incident-management-effectiveness-with-itil-4-standards/)
+
+> **Verified against upstream: 2026-08-07**

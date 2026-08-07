@@ -1,13 +1,13 @@
 ---
 name: mongodb
-description: Advanced MongoDB operations, performance tuning, and technical support guide for managing large-scale deployments.
+description: Advanced MongoDB operations, performance tuning, and technical support guide for managing large-scale deployments. Triggers on query optimization, sharding, backup/restore, and log analysis tasks.
 ---
 
 # MongoDB Advanced Operations and Tech Support Skill
 
-## When to Use
+## Scope and Triggers
 
-Use this skill when dealing with advanced MongoDB topics, particularly in production environments, worst-case scenarios, and practical troubleshooting. It is essential for:
+Use this skill when dealing with advanced MongoDB topics, particularly in production environments, worst-case scenarios, and practical troubleshooting. It activates for:
 - Optimizing complex aggregation pipelines to prevent performance degradation and memory exhaustion.
 - Managing and troubleshooting change streams in event-driven architectures.
 - Designing and debugging compound indexes following the ESR (Equality, Sort, Range) rule.
@@ -16,7 +16,69 @@ Use this skill when dealing with advanced MongoDB topics, particularly in produc
 - Utilizing MongoDB CLI tools (`mongosh`, `mongodump`, `mongorestore`, `mongoexport`, `mongoimport`) for advanced querying, backup, restoration, and data migration.
 - Diagnosing and resolving performance bottlenecks, high resource usage, and common errors like "Connection Refused".
 
-## Sub-Agent Spawning
+**Non-goals:** This skill does not cover basic CRUD operations, application-level driver usage, or general database design principles outside of performance tuning.
+
+## Preconditions
+
+Before executing any operations, the agent must:
+1. Detect the target environment (e.g., standalone, replica set, sharded cluster).
+2. Verify the MongoDB version using `scripts/verify-mongodb-version.sh`.
+3. Check permissions to ensure the agent has the necessary roles (e.g., `clusterMonitor`, `backup`, `restore`, `dbAdmin`).
+4. Understand the user intent and constraints (e.g., acceptable downtime, performance requirements).
+
+## Source Freshness
+
+Volatile facts, such as supported operators or default configurations, are verified against MongoDB 8.0 documentation as of 2026-08-07. If the target MongoDB version differs, the agent must verify the behavior against the official documentation for that specific version.
+
+## Workflow
+
+1. **Identify the Problem Domain:** Determine if the issue relates to query performance, data modeling (indexes, time series), data management (sharding, archiving), or operational tasks (backup, restore, migration).
+2. **Gather Diagnostics (Read-Only):** Use `mongosh` to collect data. Run `explain("executionStats")` for slow queries, check `rs.status()` for replica set health, or use `db.currentOp()` to identify long-running operations.
+3. **Analyze and Plan:** Based on the diagnostics, formulate a plan using the focused references.
+4. **Sub-Agent Spawning (Optional):** If applicable, spawn parallel sub-agents (Query Optimizer, Shard Manager, etc.) and run the Adversarial Verification Panel and Cross-System Consistency Validator.
+5. **Synthesize Findings:** Resolve contradictions and finalize the operation plan.
+6. **Request Confirmation:** Require explicit user confirmation for any destructive or production-impacting actions (e.g., dropping collections, killing operations, index creation).
+7. **Execute Operations:** Apply the planned solution. Use background operations where possible.
+8. **Verify and Monitor:** After execution, verify the fix. Check query plans again, monitor resource usage, and ensure the system is stable. Stop when the issue is resolved or escalate if progress stalls.
+
+## Safety
+
+- **Read-Only Discovery:** Always start with read-only commands (`explain()`, `rs.status()`, `db.currentOp()`) to gather diagnostics.
+- **Confirmation Required:** Explicit user confirmation is mandatory before executing destructive commands (e.g., dropping collections, killing operations) or production-impacting actions (e.g., index creation, chunk migration).
+- **Dry Runs:** Ensure all mutating CLI commands support a dry-run or are preceded by a read-only discovery phase.
+
+## Validation
+
+- Validate aggregation pipelines with `explain()` before execution.
+- Use `scripts/verify-mongodb-version.sh` to confirm the target environment version before applying version-specific optimizations.
+- Capture evidence of the issue (e.g., slow query logs, `explain()` output) before and after applying the fix.
+
+## Failure Handling
+
+- If an operation fails, diagnose the error using the output and logs.
+- Do not repeat a failed action unchanged.
+- If a destructive action fails, provide guidance on how to roll back or recover (e.g., restoring from backup).
+- Escalate to the user if the issue cannot be resolved after multiple attempts.
+
+## Output Contract
+
+The final output must include:
+- A summary of the issue and the diagnostics gathered.
+- The operations performed, including any scripts or commands executed.
+- Evidence of the fix (e.g., improved `explain()` output, resolved error logs).
+- Confidence level (HIGH/MEDIUM/LOW) based on the refuter panel outcomes (if applicable).
+- Actionable next steps or recommendations for future prevention.
+
+## Resources
+
+- [Aggregation Pipeline Optimization](references/aggregation.md)
+- [Change Streams](references/change-streams.md)
+- [Compound Indexes](references/indexing.md)
+- [Sharding](references/sharding.md)
+- [CLI Tools](references/cli-tools.md)
+- [Verify MongoDB Version Script](scripts/verify-mongodb-version.sh)
+
+## Orchestration
 
 This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
 
@@ -33,63 +95,23 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - Results are aggregated and cross-referenced for conflicts (e.g., ensuring index recommendations don't conflict).
 - Maximum concurrent sub-agents: 10.
 
-## Workflow
-
-1. **Identify the Problem Domain:** Determine if the issue relates to query performance, data modeling (indexes, time series), data management (sharding, archiving), or operational tasks (backup, restore, migration).
-2. **Gather Diagnostics:** Use `mongosh` to collect data. Run `explain("executionStats")` for slow queries, check `rs.status()` for replica set health, or use `db.currentOp()` to identify long-running operations.
-3. **Analyze and Plan:** Based on the diagnostics, formulate a plan. For example, if a query uses a `COLLSCAN`, plan to create a compound index following the ESR rule. If CPU usage is high, plan to kill long-running queries and optimize them.
-4. **Execute Operations:** Apply the planned solution. Use background index creation (`{ background: true }`) in production. Use `mongodump` and `mongorestore` for data recovery or migration.
-5. **Verify and Monitor:** After execution, verify the fix. Check query plans again, monitor resource usage, and ensure the system is stable. Set up profiling (`db.setProfilingLevel()`) if necessary to catch future slow queries.
-
-## Core Principles
-
-- **Early Filtering:** In aggregation pipelines, always use `$match` and `$limit` as early as possible to reduce the dataset size and utilize indexes.
-- **The ESR Rule:** Design compound indexes by placing Equality fields first, followed by Sort fields, and finally Range fields.
-- **Background Operations:** Always perform index creation and other heavy operations in the background to avoid locking the database in production.
-- **Oplog Awareness:** When working with change streams or point-in-time recovery, always monitor the oplog window size to prevent data loss.
-- **Security First:** Never hardcode passwords in CLI scripts, restrict access to backup files, and always use TLS/SSL for connections.
-
-## Key References
-
-- **Aggregation Pipeline Optimization:** Focus on early filtering, index utilization, and managing memory limits (`allowDiskUse: true`).
-- **Change Streams:** Require replica sets or sharded clusters. Monitor oplog size and manage resume tokens carefully.
-- **Compound Indexes:** Rely on the ESR rule and avoid relying on index intersection for critical queries.
-- **Time Series Collections:** Optimize by choosing the correct granularity and filtering by `timeField` and `metaField`.
-- **Sharding:** Choose a shard key with high cardinality and even distribution to avoid jumbo chunks.
-- **CLI Tools:** Master `mongosh` for querying and management, `mongodump`/`mongorestore` for backups and point-in-time recovery, and `mongoexport`/`mongoimport` for data integration.
-
----
-
-## Adversarial Verification Panel
-
+### Adversarial Verification Panel
 For each significant performance bottleneck produced by the parallel sub-agents:
+1. Spawn **3 independent Refuter Agents** per finding, each with the finding and instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it.
+3. A finding is **discarded** if ≥2 refuters succeed.
+4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label.
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+### Cross-System Consistency Validator
+After all parallel agents complete, but **before** synthesis, run one **Consistency Validator Agent** with all parallel outputs that:
+- Flags any pair of recommendations that logically contradict each other.
+- Notes where one agent's output is a prerequisite for another agent's recommendation.
+- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items.
+- Passes missing prerequisites as `SEQUENCING_REQUIRED` items.
 
-> This prevents plausible-but-wrong performance bottlenecks from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Query Optimizer, Shard Manager, Backup Specialist, Log Analyzer) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Query Optimizer recommends a compound index on a field while Shard Manager recommends that same field as the shard key, creating conflicting access patterns)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
+### Synthesis Agent
 The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified operations plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote.
+2. **`SEQUENCING_REQUIRED` items**: Re-order the unified operations plan so prerequisites appear before the steps that depend on them.
+3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes.
+4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents.

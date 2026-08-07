@@ -1,3 +1,4 @@
+
 # CEO Strategy & Leadership
 
 ## Table of Contents
@@ -10,6 +11,11 @@
 ---
 
 ## 1. Strategic Planning
+
+### 2026 Trends
+- **AI Adoption**: Rapid integration of AI into core business processes and decision-making.
+- **Agile Decision-Making**: Shifting from annual planning to continuous, data-driven strategic adjustments.
+
 
 ### Strategy Framework
 

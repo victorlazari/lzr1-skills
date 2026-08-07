@@ -1,11 +1,11 @@
 ---
 name: k8s-eks
-description: Advanced Kubernetes and AWS EKS operations, troubleshooting, and architecture specialist.
+description: Advanced Kubernetes and AWS EKS operations, troubleshooting, and architecture specialist. Triggers on complex EKS incidents, networking issues, and cluster management tasks.
 ---
 
 # Kubernetes and AWS EKS Specialist
 
-## When to Use
+## Scope and Triggers
 
 Use this skill when you need to:
 - Diagnose and resolve complex Kubernetes production incidents (e.g., CrashLoopBackOff, OOMKilled, Node NotReady).
@@ -15,89 +15,78 @@ Use this skill when you need to:
 - Architect, provision, and scale EKS clusters using Infrastructure as Code (Terraform), Karpenter, and advanced compute options (Spot, Fargate).
 - Perform deep system-level debugging using ephemeral containers, tcpdump, strace, and CloudWatch Logs Insights.
 
-## Sub-Agent Spawning
+**Explicit Non-Goals:**
+- Do not use for basic application deployment or simple `kubectl` commands that do not require deep EKS knowledge.
+- Do not use for managing AWS resources outside the context of EKS (e.g., general EC2 or VPC management).
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple clusters to upgrade | Cluster Upgrader | Parallel execution of EKS control plane and node group upgrades |
-| Fleet-wide security audit | Security Auditor | Parallel review of RBAC, IRSA, and Pod Security Standards across namespaces |
-| Distributed network troubleshooting | Network Diagnostics Agent | Parallel packet capture and connectivity testing across multiple nodes/pods |
-| Bulk log analysis | Log Analyzer | Parallel querying of CloudWatch Logs Insights for API server or application errors |
-| Multi-region GitOps sync | GitOps Reconciler | Parallel verification of ArgoCD/Flux synchronization status across regions |
+Before acting, detect the target cluster, environment, versions, permissions, inputs, constraints, and user intent:
+1. Verify `kubectl` and `aws` CLI are installed and configured.
+2. Check the current context and cluster access (`kubectl config current-context`).
+3. Verify the EKS cluster version and supported features.
+4. Confirm the user's intent and the specific issue or operation required.
 
-### Spawning Rules
-- Spawn when 3+ independent items (clusters, namespaces, nodes, applications) need the same operation.
-- Each sub-agent receives: context (cluster details, credentials), specific target (e.g., namespace or node ID), and success criteria.
-- Results are aggregated and cross-referenced for conflicts or systemic issues.
-- Maximum concurrent sub-agents: 10.
+## Source Freshness
+
+Volatile facts (e.g., supported versions, specific command flags) must be verified against current upstream documentation before applying destructive or production-impacting actions.
+- **Verified against upstream:** 2026-08-07
+- **Authoritative Sources:**
+  - Amazon EKS User Guide: https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
+  - Kubernetes Documentation: https://kubernetes.io/docs/home/
+  - Cilium Documentation: https://docs.cilium.io/en/stable/
+  - Karpenter Documentation: https://karpenter.sh/
+  - Argo CD Documentation: https://argo-cd.readthedocs.io/en/stable/
 
 ## Workflow
 
-1. **Incident Triage & Identification:**
-   - Gather symptoms (e.g., pods pending, network timeouts, API server unresponsive).
-   - Identify the scope (single pod, node, namespace, or cluster-wide).
-2. **Initial Diagnostics:**
-   - Use `kubectl describe`, `kubectl logs`, and `kubectl get events` to pinpoint immediate errors.
-   - Check node status and resource utilization (CPU/Memory/Disk).
-3. **Deep Dive Analysis:**
-   - **Networking:** Inspect VPC CNI logs, check IP availability, verify SNAT, and analyze CoreDNS performance.
-   - **Compute/Scaling:** Review Karpenter provisioner logs, ASG status, and HPA/VPA configurations.
-   - **Security/Access:** Validate IRSA annotations, trust policies, and RBAC permissions.
-   - **Advanced Components:** Check Operator logs, eBPF map utilization, and GitOps sync status.
-4. **Remediation & Recovery:**
-   - Apply targeted fixes (e.g., restart DaemonSets, patch finalizers, adjust resource limits).
-   - For severe issues, execute disaster recovery protocols (e.g., isolate clusters in a mesh, restore etcd, scale down destructive operators).
-5. **Post-Incident Review:**
-   - Document the root cause and remediation steps.
-   - Implement preventative measures (e.g., adjust alerts, update Network Policies, refine resource requests).
+1. **Detect Target and Intent:** Identify the target cluster, environment, and user intent.
+2. **Baseline Validation:** Run `scripts/verify-cluster-health.sh` to establish the baseline state of the cluster.
+3. **Identify Issue:** Pinpoint the specific issue or operation (e.g., Operator failure, eBPF exhaustion, Node NotReady).
+4. **Consult References:** Consult `references/advanced-operations.md` for specific troubleshooting steps and deep technical details if needed.
+5. **Propose Remediation:** Propose remediation actions to the user. **Require explicit confirmation for any destructive changes** (e.g., deleting namespaces, scaling operators to zero).
+6. **Execute Actions:** Execute the approved actions, using dry-run or preview modes where feasible.
+7. **Post-Validation:** Re-run `scripts/verify-cluster-health.sh` to validate the fix and ensure the cluster has returned to a healthy state.
+8. **Stop Condition:** Stop when the cluster returns to a healthy state or escalate if the issue persists.
 
-## Core Principles
+## Safety
 
-- **Declarative Infrastructure:** All cluster state and infrastructure must be defined as code (GitOps, Terraform) to ensure reproducibility and auditability.
-- **Least Privilege:** Enforce strict RBAC, IRSA, and Network Policies to minimize the blast radius of security incidents.
-- **Proactive Observability:** Rely on comprehensive metrics, logs, and traces (Prometheus, CloudWatch, Hubble) rather than reactive debugging.
-- **Automated Scaling:** Utilize Karpenter and HPA to dynamically adjust resources based on actual workload demands, avoiding manual intervention.
-- **Resilience by Design:** Architect for failure using multi-AZ deployments, Cluster Mesh for cross-region failover, and robust backup strategies.
+- **Read-only discovery must precede any mutation.**
+- **Destructive actions require explicit user confirmation.** This includes deleting namespaces, scaling operators to zero, or modifying critical cluster configurations.
+- All scripts and commands must support a dry-run mode or equivalent preview whenever feasible.
+- Provide explicit rollback instructions for failed operations.
 
-## Key References
+## Validation
 
-- [Complete Reference Guide](./references/complete-reference.md)
-- [Reading List](./references/reading-list.md)
+- Define syntax checks, dry runs, tests, evidence capture, and postcondition verification.
+- Verify cluster health before and after any significant change using `scripts/verify-cluster-health.sh`.
 
----
+## Failure Handling
 
-## Adversarial Verification Panel
+- If an operation fails, diagnose the error using logs and events.
+- Choose alternative remediation steps based on the diagnosis.
+- Roll back any partial changes to restore the previous state.
+- Do not repeat a failed action unchanged.
 
-For each significant cluster health finding, security vulnerability, or remediation recommendation produced by the parallel sub-agents:
+## Output Contract
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+The result must include:
+- A structured summary of the issue and the actions taken.
+- Evidence of the cluster state before and after the operation (e.g., output from `verify-cluster-health.sh`).
+- Severity/confidence level of the findings.
+- Actionable next steps or recommendations for preventing future occurrences.
 
-> This prevents plausible-but-wrong cluster health findings, security vulnerabilities, or remediation recommendations from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Resources
 
-## Cross-System Consistency Validator
+- [Advanced Operations Guide](./references/advanced-operations.md): Deep technical details, troubleshooting scenarios, and advanced CLI reference.
+- [Verify Cluster Health Script](./scripts/verify-cluster-health.sh): Deterministic script to perform read-only discovery and validation of cluster state.
 
-After all parallel agents (Cluster Upgrader, Security Auditor, Network Diagnostics Agent, Log Analyzer, GitOps Reconciler) complete, but **before** synthesis:
+## Orchestration (Sub-Agent Spawning)
 
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Security Auditor recommends rotating IRSA trust policies immediately while the Cluster Upgrader flags that a mid-upgrade IRSA change will break node bootstrapping)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified incident remediation report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+This skill supports spawning sub-agents for parallel execution when tasks can be decomposed (e.g., multiple clusters to upgrade, fleet-wide security audit).
+- **Cross-skill routing:**
+  - Route to `trivy-scanner` when scanning container images or Kubernetes manifests for vulnerabilities.
+  - Route to `security-review` when performing a comprehensive security audit of the cluster architecture or RBAC policies.
+- **Adversarial Verification Panel:** For each significant finding, spawn 3 independent Refuter Agents to challenge the finding. A finding is confirmed only if ≥2 refuters fail to refute it.
+- **Cross-System Consistency Validator:** Run a Consistency Validator Agent to flag contradictions and missing prerequisites before synthesis.
+- **Synthesis Agent:** Actively resolve contradictions, re-order recommendations based on prerequisites, calibrate confidence, and perform gap analysis.

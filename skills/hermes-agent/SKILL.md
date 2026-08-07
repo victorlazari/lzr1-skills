@@ -1,91 +1,74 @@
 ---
 name: hermes-agent
-description: Advanced configuration, multi-model orchestration, and deep skill development for Hermes Agent v0.14.0.
+description: Advanced configuration, multi-model orchestration, and deep skill development for Hermes Agent v0.20.0, including voice mode, A2A communication, and grounded citations.
 ---
 
 # Hermes Agent Skill
 
-## When to Use
+## Scope and Triggers
 
-Use this skill when you need to configure, operate, or troubleshoot Hermes Agent v0.14.0 in production environments. This includes setting up advanced provider configurations (failover, credential pools, auxiliary models), orchestrating multiple models (Mixture of Agents), developing advanced skills with conditional activation and fallback mechanisms, managing the background review system, configuring context engine plugins (Honcho), and setting up advanced Docker backends. It is also essential for managing the Hermes Agent CLI, configuring the `config.yaml` file, and handling complex integrations via the Gateway system and MCP servers.
+Use this skill when you need to configure, operate, or troubleshoot Hermes Agent v0.20.0 in production environments. This includes setting up advanced provider configurations (failover, credential pools, auxiliary models), orchestrating multiple models (Mixture of Agents), developing advanced skills with conditional activation and fallback mechanisms, managing the background review system, configuring context engine plugins (Honcho), and setting up advanced Docker backends. It is also essential for managing the Hermes Agent CLI, configuring the `config.yaml` file, handling complex integrations via the Gateway system and MCP servers, and utilizing v0.20.0 features like real-time conversational voice, Agent-to-Agent (A2A) communication, and grounded citations.
 
-## Sub-Agent Spawning
+**Escalation Boundaries:** Do not use this skill for modifying the core Hermes Agent source code or performing actions that violate the Tirith Security Module's `DANGEROUS_PATTERNS` without explicit user confirmation.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple provider configurations to validate | Config Validator | Parallel validation of provider API keys and endpoints |
-| Multiple skills to develop or review | Skill Developer | Parallel creation or auditing of `SKILL.md` files |
-| Multiple environments to deploy | Deployment Agent | Parallel setup of Docker backends and persistent volumes |
-| Bulk log analysis for troubleshooting | Diagnostics Agent | Parallel investigation of error logs and failover events |
+Before executing any configuration changes or advanced operations:
+1. Verify the target environment and permissions.
+2. Ensure the installed Hermes Agent version is v0.20.0 using the provided validation script.
+3. Confirm the user's intent, especially for destructive or production-impacting actions.
 
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+
+Hermes Agent is a rapidly evolving tool. Volatile facts, such as supported versions, CLI commands, and configuration schemas, must be verified against the official documentation at runtime.
+- **Primary Source:** [Hermes Agent Documentation](https://hermes-agent.nousresearch.com/docs/)
+- **Repository:** [NousResearch/hermes-agent](https://github.com/nousresearch/hermes-agent)
+- **Validation Script:** Run `scripts/verify-hermes-version.sh` to ensure the installed version matches the expected v0.20.0.
 
 ## Workflow
 
-1. **Assess the Environment**: Determine the current state of the Hermes Agent deployment. Check the `config.yaml` file, environment variables, and the status of the terminal backend (e.g., Docker, SSH).
-2. **Configure Providers**: Set up primary and failover providers, configure credential pools, and define auxiliary models for specific tasks to ensure high availability and optimal performance.
-3. **Develop and Deploy Skills**: Create or update `SKILL.md` files with required environment variables, configuration settings, conditional activation rules, and fallback mechanisms.
-4. **Orchestrate Models**: Utilize the Mixture of Agents (MoA) tool to delegate sub-tasks to different models and synthesize their outputs for complex problem-solving.
-5. **Manage Context and Memory**: Configure the Honcho context engine plugin and manage the Bounded Curation Strategy for the `MEMORY.md` file to optimize context window usage.
-6. **Ensure Security**: Enable the Tirith Security Module, configure the `DANGEROUS_PATTERNS` system, and set up the Command Approval Flow to protect the host environment.
-7. **Monitor and Troubleshoot**: Use the `hermes doctor` command and the `--debug` flag to diagnose issues. Analyze the error classification system and retry logic to handle transient failures gracefully.
+1. **Verify Installation:** Run `scripts/verify-hermes-version.sh` to confirm Hermes Agent v0.20.0 is installed and dependencies are met.
+2. **Assess the Environment:** Determine the current state of the Hermes Agent deployment. Check the `config.yaml` file, environment variables, and the status of the terminal backend (e.g., Docker, SSH).
+3. **Configure Providers:** Set up primary and failover mechanisms, credential pools, and auxiliary models.
+4. **Develop and Deploy Skills:** Create or update `SKILL.md` files, incorporating v0.20.0 features like voice mode, A2A communication, and grounded citations.
+5. **Orchestrate Models:** Utilize the Mixture of Agents (MoA) tool to delegate sub-tasks to different models and synthesize their outputs.
+6. **Manage Context and Memory:** Configure the Honcho context engine plugin and manage the Bounded Curation Strategy for the `MEMORY.md` file.
+7. **Ensure Security:** Enable the Tirith Security Module, configure the `DANGEROUS_PATTERNS` system, and set up the Command Approval Flow.
+8. **Monitor and Troubleshoot:** Use the `hermes doctor` command and CLI power commands (`!command`, `/init`, `/diff`, `/context`, `/focus`) to diagnose issues. Analyze the error classification system and tool self-recovery mechanisms.
+9. **Stop Condition:** The configuration is successfully applied, validated, and no further errors are reported.
 
-## Core Principles
+## Safety
 
-- **Resilience**: Always configure failover mechanisms and credential pools to ensure continuous operation in the face of provider outages or rate limits.
-- **Security First**: Strictly enforce the Tirith Security Module and exact-pinned dependencies to mitigate supply chain risks and prevent malicious actions.
-- **Efficiency**: Leverage advanced prompt caching, context compression, and auxiliary models to optimize token usage and reduce latency.
-- **Extensibility**: Utilize Gateway Hooks, the Plugin System, and MCP servers to integrate Hermes Agent with external tools and platforms seamlessly.
-- **Continuous Improvement**: Rely on the background review system and memory nudges to allow the agent to learn and adapt over time.
+- **Read-Only Discovery:** Always assess the environment and configuration state before making any changes.
+- **Confirmation Required:** Require explicit user confirmation before executing destructive commands, modifying production configurations, or bypassing the Tirith Security Module.
+- **Dry Runs:** Implement dry-run options for configuration changes where possible.
 
-## Key References
+## Validation
 
-- **Advanced Provider Configuration**: Details on failover mechanisms, credential pools, and auxiliary models.
-- **Multi-Model Orchestration**: Guide to using the Mixture of Agents (MoA) tool.
-- **Advanced Skills Development**: Instructions for creating robust `SKILL.md` files with conditional activation and fallbacks.
-- **Error Classification System**: Deep dive into the normalization pipeline and handling `CONTEXT_LENGTH_EXCEEDED` errors.
-- **Tirith Security Module**: Overview of the `DANGEROUS_PATTERNS` system and Command Approval Flow.
-- **Hermes Agent CLI Reference**: Comprehensive guide to the `hermes` command, subcommands, and interactive slash commands.
-- **Config.yaml Schema**: Complete breakdown of the configuration file, including advanced settings for models, terminals, memory, and gateways.
+- **Syntax Checks:** Ensure all generated configuration files (e.g., `config.yaml`) are valid YAML.
+- **Postcondition Verification:** After applying changes, run `hermes doctor` to verify the health of the installation.
 
----
+## Failure Handling
 
-## Adversarial Verification Panel
+- **Diagnosis:** Use `hermes doctor --debug` and analyze error logs to identify the root cause of failures.
+- **Alternatives:** If a provider fails, rely on the configured failover mechanisms and credential pools.
+- **Rollback:** Maintain backups of previous configurations and revert to them if a new configuration causes instability. Do not repeat a failed action unchanged.
 
-For each significant configuration issues, provider errors, and deployment recommendations produced by the parallel sub-agents:
+## Output Contract
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+The result of using this skill must include:
+- A summary of the actions taken and configurations applied.
+- Evidence of successful validation (e.g., output of `hermes doctor`).
+- Any warnings or non-critical errors encountered.
+- Actionable next steps for the user, if applicable.
 
-> This prevents plausible-but-wrong configuration issues, provider errors, and deployment recommendations from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Resources
 
-## Cross-System Consistency Validator
+- **[Complete Reference Guide](references/complete-reference.md):** Detailed technical material on advanced configurations, multi-model orchestration, and CLI commands.
+- **[Version Verification Script](scripts/verify-hermes-version.sh):** Script to validate the installed Hermes Agent version.
 
-After all parallel agents (Config Validator, Skill Developer, Deployment Agent, Diagnostics Agent) complete, but **before** synthesis:
+## Orchestration
 
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Config Validator recommending a failover provider while Diagnostics Agent flags that same provider as unstable)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified action plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+This skill supports spawning sub-agents for parallel execution when tasks can be decomposed (e.g., validating multiple provider configurations, developing multiple skills).
+- **Spawning Rules:** Spawn when 3+ independent items need the same operation. Each sub-agent receives context, specific target, and success criteria.
+- **Synthesis:** Results are aggregated and cross-referenced for conflicts using a Consistency Validator Agent and a Synthesis Agent.

@@ -1,11 +1,14 @@
 # Corporate Law & Intellectual Property
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Corporate Governance
 2. Entity Management
 3. Intellectual Property
 4. Open Source Compliance
 5. Employment Law Essentials
+6. Source Map
 
 ---
 
@@ -141,3 +144,20 @@ Formation documents:
 | Duration | Ongoing relationship | Project-based |
 | Benefits | Entitled to benefits | No benefits |
 | Taxes | Company withholds | Self-employment tax |
+
+---
+
+## 6. Source Map
+
+- **Cooley GO**: cooleygo.com
+- **Fenwick & West Startup Resources**: fenwick.com
+- **Wilson Sonsini Startup Resources**: wsgr.com
+- **Clerky**: clerky.com
+- **Stripe Atlas Guides**: stripe.com/atlas
+- **USPTO**: uspto.gov
+- **WIPO**: wipo.int
+- **OSI (Open Source Initiative)**: opensource.org
+- **SPDX**: spdx.dev
+- **SHRM Legal Resources**: shrm.org
+- **Littler Mendelson**: littler.com
+- **Fisher Phillips**: fisherphillips.com

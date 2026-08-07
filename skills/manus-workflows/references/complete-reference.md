@@ -1,164 +1,71 @@
-# Manus Workflows: Complete Expert Reference
+# n8n Workflows: Complete Expert Reference
 
-## 1. Introduction to Manus Workflows
+Verified against upstream: 2026-08-07
 
-Manus Workflows is an advanced orchestration framework designed to facilitate complex business process automation across distributed systems. It provides a robust platform for defining, executing, and monitoring workflows that span multiple services and technologies. This reference consolidates the architecture, configuration, CLI usage, security, and troubleshooting aspects of Manus Workflows.
+## 1. Introduction to n8n Workflows
+
+n8n is an advanced orchestration framework designed to facilitate complex business process automation across distributed systems. It provides a robust platform for defining, executing, and monitoring workflows that span multiple services and technologies.
 
 ## 2. Architecture Overview
 
-Manus Workflows is built on a microservices architecture, ensuring scalability and flexibility.
+n8n is built on a node-based architecture, ensuring scalability and flexibility.
 
 ### Core Components
 - **Workflow Engine**: The central orchestrator that interprets workflow definitions, manages state transitions, and schedules tasks.
-- **Task Executors**: Stateless, independently deployable microservices that perform specific operations (e.g., API calls, data transformation).
-- **Message Broker**: Facilitates asynchronous communication (AMQP, MQTT) between the engine and executors.
-- **Persistence Layer**: Stores workflow definitions, states, and logs using relational (PostgreSQL) and NoSQL databases.
-- **API Gateway**: Provides a unified entry point, handling authentication, routing, and rate limiting.
-- **Monitoring and Logging**: Integrates with Prometheus, Grafana, and ELK stack for observability.
-
-### Advanced Architecture Patterns
-- **Event-Driven Architecture**: Emits events at state changes for reactive processing.
-- **Saga Pattern**: Manages distributed transactions with compensating actions for failures.
-- **CQRS and Event Sourcing**: Separates read/write models to optimize performance and scalability.
+- **Nodes**: Stateless, independently deployable units that perform specific operations (e.g., API calls, data transformation).
+- **Execution Modes**:
+  - **Main Mode**: Standard execution mode for single-instance deployments.
+  - **Queue Mode**: Distributed execution mode using Redis for scaling across multiple workers.
 
 ## 3. Task Planning and Management
 
-Workflows are conceptualized as Directed Acyclic Graphs (DAGs).
-
-### Defining Tasks
-Tasks represent atomic operations. Key attributes include:
-- `id`, `type`, `inputs`, `outputs`, `depends_on`, `retries`, `timeout_seconds`.
+Workflows are conceptualized as Directed Acyclic Graphs (DAGs) of nodes.
 
 ### Execution Flow
-- **Sequential**: Tasks execute one after another based on `depends_on`.
-- **Parallel**: Independent tasks execute simultaneously (AND splits).
-- **Conditional**: Branching logic based on runtime data (OR splits).
-- **Dynamic Generation**: Tasks created at runtime using templates (e.g., processing batches).
+- **Sequential**: Nodes execute one after another based on connections.
+- **Parallel**: Independent nodes execute simultaneously.
+- **Conditional**: Branching logic based on runtime data (e.g., Switch node, IF node).
 
 ## 4. Message Communication
 
 Inter-task and inter-system communication is message-driven.
 
 ### Protocols and Patterns
-- **Protocols**: AMQP, MQTT, HTTP/HTTPS, WebSocket.
-- **Patterns**: Publish/Subscribe, Request/Reply, Work Queues.
 - **Webhooks**: Trigger workflows via external HTTP POST requests with authentication.
-- **Reliability**: Utilizes message acknowledgments, dead-letter queues (DLQ), and retries.
+- **Reliability**: Utilizes error handling nodes and retries.
 
 ## 5. File Operations and Search
 
 ### File Handling
-- Supports read, write, stream, upload, and download operations.
-- Integrates with cloud storage (AWS S3, Azure Blob).
-- Supports file format transformations (CSV to JSON).
-- **Security**: Encrypts files at rest and in transit (AES-256, SFTP, HTTPS).
-
-### Search Capabilities
-- Structured query language for querying workflow states and logs.
-- Indexes frequently queried fields for performance.
-- Supports cross-workflow federated search and custom plugins.
+- Supports read, write, stream, upload, and download operations via specific nodes.
+- Integrates with cloud storage (AWS S3, Google Cloud Storage).
 
 ## 6. Scheduling
 
 Automates time-based workflows.
 
 ### Features
-- **Cron Expressions**: Standard syntax for recurring schedules.
-- **Intervals**: Fixed time gaps between executions.
-- **Timezone Management**: Accommodates global operations.
-- **Recurrence Rules**: RFC 5545 standard support.
-- **Retry Policies**: Exponential backoff for transient failures.
+- **Cron Expressions**: Standard syntax for recurring schedules via the Cron node.
+- **Intervals**: Fixed time gaps between executions via the Interval node.
 
 ## 7. Multi-Tool Orchestration
 
 Integrates diverse systems into cohesive workflows.
 
 ### Connectors
-- Pre-built connectors for CRM, Cloud, Databases, CI/CD.
-- Custom connectors via SDK (REST, GraphQL, SOAP).
-- **Data Transformation**: JSONPath, JMESPath, custom scripting.
-- **Security**: OAuth 2.0, API keys, mutual TLS, Vault integration.
+- Pre-built nodes for hundreds of services.
+- Custom API calls via the HTTP Request node.
 
 ## 8. Configuration Schemas
 
-Configuration is managed via YAML/JSON files.
+Configuration is managed via environment variables.
 
-### `manus-global.yaml`
-Controls core engine behavior.
-- `core`: `node_id`, `environment`, `data_dir`.
-- `execution`: `max_concurrent_workflows`, `worker_thread_pool_size`, `default_timeout_seconds`.
-- `database`: `type` (postgres recommended), `connection_string`, `pool_size`.
-- `logging`: `level`, `format`.
+### Key Variables
+- `N8N_ENCRYPTION_KEY`: Secures credentials.
+- `EXECUTIONS_MODE`: Sets main or queue mode.
 
-### `workflow-schema.json`
-Defines individual workflows.
-- `version`, `name`, `description`.
-- `triggers`: `cron`, `webhook`, `event`.
-- `tasks`: Task definitions, dependencies, inputs, retries.
-
-### `connectors.yaml`
-Manages external integrations.
-- Defines connector `name`, `type` (rest, aws_s3, kafka), and `configuration` (urls, auth).
-
-### `rbac-config.yaml`
-Defines Role-Based Access Control.
-- `roles`: Name and permissions (`resource:action`).
-- `bindings`: Associates roles with users/groups.
-
-## 9. CLI Reference (`manus-workflows`)
-
-Command-line interface for workflow management.
-
-### Core Commands
-- `init`: Initialize a new workflow (`--template`, `--name`).
-- `run`: Execute a workflow (`--async`, `--input`).
-- `list`: List workflows (`--status`, `--limit`).
-- `describe`: Get detailed info.
-- `stop`: Stop a running workflow.
-- `delete`: Delete a workflow.
-- `logs`: Retrieve logs (`--tail`).
-
-### Advanced Commands
-- `schedule`: Schedule execution (`--cron`).
-- `trigger`: Manually trigger a scheduled workflow.
-- `export` / `import`: Move workflow definitions.
-- `validate`: Validate schema without executing.
-- `config`: Manage CLI settings (`set`, `get`, `list`).
-
-## 10. Security Audit and Hardening
-
-### Vulnerability Mitigation
-- **Injection**: Parameterized queries, input validation.
-- **XSS/CSRF**: Sanitization, CSP, anti-CSRF tokens.
-- **Authentication**: Strong policies, MFA, secure session management.
-
-### Hardening Strategies
-- **Network**: VLANs, firewalls, VPNs.
-- **Data**: TLS 1.2+, encryption at rest.
-- **Architecture**: Zero Trust, Service Mesh (mTLS), Container Security.
-
-## 11. Troubleshooting and Diagnostics
-
-### Common Error Codes
-- `E1001`: Initialization Error.
-- `E2002`: Data Fetch Timeout.
-- `E3003`: Integration Failure.
-- `E4004`: Resource Limit Exceeded.
-- `E5005`: Permission Denied.
+## 9. Troubleshooting and Diagnostics
 
 ### Diagnostic Tools
-- **Logs**: `/var/log/manus-workflows/`, ELK stack.
-- **Monitoring**: Grafana, Prometheus (CPU, Memory, Latency).
-- **Network**: Wireshark, Postman for API testing.
-
-### Recovery
-- **Automated**: Retry policies, checkpointing.
-- **Manual**: Identify failure point, correct issue, restart from checkpoint.
-
-## 12. Enterprise Patterns and Best Practices
-
-- **Modularity**: Reusable tasks.
-- **Idempotency**: Safe retries.
-- **Multi-Tenancy**: Namespace isolation, customizable quotas.
-- **CI/CD**: Infrastructure as Code (IaC), automated testing, blue-green deployments.
-- **Secret Management**: Use external stores like HashiCorp Vault or AWS Secrets Manager instead of hardcoding credentials.
+- **Execution Logs**: View detailed logs of each node's execution in the n8n UI.
+- **Error Trigger Node**: Catch and handle workflow errors gracefully.

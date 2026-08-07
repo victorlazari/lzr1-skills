@@ -7,100 +7,72 @@ description: Comprehensive AI and Machine Learning engineering skill covering ML
 
 Comprehensive expertise for building, deploying, and operating AI/ML systems in production. Covers the full spectrum from research to production: model development, LLM applications, NLP, computer vision, MLOps, prompt engineering, and AI agent design.
 
-## When to Use
+## Scope and Triggers
 
-- Building or fine-tuning ML models for production
-- Designing and implementing LLM-powered applications
-- Building RAG (Retrieval-Augmented Generation) systems
-- Implementing MLOps pipelines and model serving infrastructure
-- Designing AI agents and multi-agent systems
-- Prompt engineering and LLM optimization
-- Computer vision or NLP system development
-- ML system architecture and design decisions
+- **Triggers**: Building or fine-tuning ML models for production, designing and implementing LLM-powered applications, building RAG (Retrieval-Augmented Generation) systems, implementing MLOps pipelines and model serving infrastructure, designing AI agents, prompt engineering and LLM optimization, computer vision or NLP system development, ML system architecture and design decisions.
+- **Escalation Boundaries**: Route to `security-review` when the task involves evaluating LLM security guardrails, prompt injection defenses, or application security vulnerabilities.
+
+## Preconditions
+
+- Detect the target AI/ML domain (e.g., LLM, MLOps, NLP, CV, Prompt Engineering).
+- Identify the environment, versions, permissions, inputs, constraints, and user intent before acting.
+
+## Source Freshness
+
+Volatile facts, such as model versions and capabilities, are verified against upstream documentation. The current authoritative sources include official documentation for OpenAI, Anthropic, Meta Llama, Hugging Face, LangChain, LlamaIndex, PyTorch, and TensorFlow.
+**Verified against upstream: 2026-08-07**
+Always check current upstream documentation before making critical decisions.
 
 ## Workflow
 
-1. **Understand the problem** — Classify as ML research, ML engineering, LLM application, or MLOps task
-2. **Select approach** — Choose the right reference file based on the domain:
+1. **Understand the problem** — Classify as ML research, ML engineering, LLM application, or MLOps task.
+2. **Select approach** — Choose the single most relevant reference file based on the domain:
    - LLM applications and agents → `references/llm-applications.md`
    - ML model development and training → `references/ml-engineering.md`
    - MLOps and production deployment → `references/mlops-production.md`
    - NLP and text processing → `references/nlp-systems.md`
    - Computer vision → `references/computer-vision.md`
    - Prompt engineering → `references/prompt-engineering.md`
-3. **Read the relevant reference** — Load domain-specific guidance
-4. **Design the solution** — Apply patterns, principles, and best practices
-5. **Implement with production quality** — Follow the engineering standards in the reference
-6. **Validate and evaluate** — Use appropriate metrics and testing strategies
+3. **Read the relevant reference** — Load domain-specific guidance and authoritative sources.
+4. **Design the solution** — Apply patterns, principles, and best practices from the reference.
+5. **Implement with production quality** — Follow the engineering standards in the reference, incorporating necessary security guardrails.
+6. **Validate and evaluate** — Use appropriate metrics and testing strategies.
+7. **Stop** when the solution meets the defined acceptance criteria and production standards.
 
-## Core Principles (All AI/ML Work)
+## Safety
 
-- Start with the simplest solution that could work; add complexity only when measurably beneficial
-- Design for production from day one: monitoring, logging, versioning, rollback
-- Evaluate rigorously with appropriate metrics; never ship without quantitative validation
-- Consider cost, latency, and reliability alongside model performance
-- Document decisions, trade-offs, and known limitations
-- Use version control for everything: code, data, models, prompts, configurations
-- Design for failure: implement fallbacks, graceful degradation, and circuit breakers
-- Maintain reproducibility: fix random seeds, log hyperparameters, track experiments
+- Separate read-only discovery from mutations.
+- Require confirmation for any destructive, external, privileged, financial, legal, or production-impacting actions.
+- Do not download or execute untrusted artifacts.
 
-## Role Capabilities
+## Validation
 
-This skill encompasses six specialized AI/ML roles:
+- Define syntax checks, dry runs, tests, evidence capture, and postcondition verification.
+- Verify that all referenced models are currently available and supported.
+- Validate that all URLs in the source map are active and point to authoritative resources.
 
-| Role | Expertise | Reference |
-|---|---|---|
-| ML Engineer | Model development, training pipelines, feature engineering | `references/ml-engineering.md` |
-| AI Research Scientist | Deep learning, novel architectures, research | `references/ml-engineering.md` |
-| NLP Engineer | Text processing, RAG, embeddings, conversational AI | `references/nlp-systems.md` |
-| Computer Vision Engineer | Image classification, detection, segmentation | `references/computer-vision.md` |
-| Prompt Engineer | Prompt design, LLM applications, AI agents | `references/prompt-engineering.md` |
-| MLOps Engineer | ML pipelines, model serving, feature stores | `references/mlops-production.md` |
+## Failure Handling
 
-## Key References
+- Diagnose errors using logs and metrics.
+- Choose alternatives or roll back if an action fails.
+- Avoid repeating a failed action unchanged.
 
-- **LLM applications and AI agents**: See `references/llm-applications.md` for building with foundation models, RAG systems, agent architectures, and production LLM patterns.
-- **ML engineering and model development**: See `references/ml-engineering.md` for model training, feature engineering, experiment tracking, and deep learning.
-- **MLOps and production**: See `references/mlops-production.md` for deployment, monitoring, CI/CD for ML, and infrastructure.
-- **NLP systems**: See `references/nlp-systems.md` for text processing, embeddings, RAG pipelines, and conversational AI.
-- **Computer vision**: See `references/computer-vision.md` for image/video processing, detection, segmentation, and multimodal systems.
-- **Prompt engineering**: See `references/prompt-engineering.md` for systematic prompt design, evaluation, and optimization.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles (2024-2026).
+## Output Contract
 
----
+- Specify the structure, evidence, severity/confidence, and actionable next steps expected in the result.
+- Ensure the solution meets production standards and acceptance criteria.
 
-## Multi-Specialist Protocol
+## Resources
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+- `references/llm-applications.md`: LLM applications and AI agents.
+- `references/ml-engineering.md`: ML engineering and model development.
+- `references/mlops-production.md`: MLOps and production.
+- `references/nlp-systems.md`: NLP systems.
+- `references/computer-vision.md`: Computer vision.
+- `references/prompt-engineering.md`: Prompt engineering.
+- `references/source-map.md`: Actionable source map (replaces reading-list.md).
 
-### Domain Detection Table
+## Orchestration
 
-Scan the task for signals that indicate which domains apply:
-
-| Task Signal (examples) | Domain | Specialist Agent | Reference |
-|---|---|---|---|
-| `LLM`, ... | **LLM Applications** | LLM Apps Specialist | `references/llm-applications.md` |
-| `MLOps`, ... | **MLOps & Production** | MLOps Specialist | `references/mlops-production.md` |
-| `prompt engineering`, ... | **Prompt Engineering** | Prompt Specialist | `references/prompt-engineering.md` |
-| `NLP`, ... | **NLP Systems** | NLP Specialist | `references/nlp-systems.md` |
-| `computer vision`, ... | **Computer Vision** | CV Specialist | `references/computer-vision.md` |
-
-### Spawning Logic
-
-**Single domain detected** → Fall back to original single-reference behavior (no change).
-
-**Multiple domains detected** → Launch all relevant specialists simultaneously:
-- Each specialist receives: **full task context** + its dedicated reference file only
-- No specialist waits for another — all start at the same time
-- Maximum concurrent specialists: 5
-
-### Cross-Domain Synthesizer
-
-After all specialists complete, run one **ML Deployment Synthesizer** with all specialist outputs that:
-
-1. **Identifies contradictions** between specialist recommendations for the same component
-2. **Identifies gaps** — requirements addressed by no specialist
-3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
-4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
-
-> Synthesis focus for this skill: Ensures prompt engineering choices are observable in the MLOps pipeline. Flags where a model serving configuration limits the prompt patterns that can be safely used.
+- Use parallel work only for independent dimensions.
+- Define inputs, schemas, conflict handling, synthesis, and termination conditions.

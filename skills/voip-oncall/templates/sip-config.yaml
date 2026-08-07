@@ -1,0 +1,9 @@
+# Standardize SIP trunk configuration.
+sip_trunks:
+  - name: primary-trunk
+    transport: tls
+    codecs:
+      - OPUS
+      - PCMU
+    host: sip.example.com
+    port: 5061

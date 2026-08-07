@@ -1,72 +1,66 @@
 # Timezone Handling Guide
 
-When validating calendar events against external sources, timezone conversions are often the most complex and error-prone aspect. This guide provides procedures for handling complex conversions, particularly between North American timezones and global timezones like GMT.
+When validating calendar events against external sources, timezone conversions are often the most complex and error-prone aspect. This guide provides procedures for handling complex conversions using IANA time zone identifiers, as required by the Google Calendar API.
 
 ## 1. Identify the Source Timezone
 
-External sources often mix local time and standardized time (like ET) in the same document.
+External sources often mix local time and standardized time in the same document. Identify the correct IANA time zone identifier for the source.
 
-- **ET (Eastern Time)**: Usually EDT (UTC-4) in summer, EST (UTC-5) in winter.
-- **CT (Central Time)**: Usually CDT (UTC-5) in summer, CST (UTC-6) in winter. Note that Mexico abolished DST in 2022, so most of Mexico (including Mexico City and Guadalajara) is on CST (UTC-6) year-round.
-- **PT (Pacific Time)**: Usually PDT (UTC-7) in summer, PST (UTC-8) in winter.
-- **Local Time**: You must determine the timezone of the specific venue.
+- **ET (Eastern Time)**: `America/New_York`
+- **CT (Central Time)**: `America/Chicago` (Note: Mexico abolished DST in 2022, so most of Mexico is on `America/Mexico_City` year-round).
+- **PT (Pacific Time)**: `America/Los_Angeles`
+- **Local Time**: Determine the IANA time zone identifier for the specific venue (e.g., `Europe/London`, `Asia/Tokyo`).
 
 ## 2. Standardize to a Single Baseline
 
-Convert all times from the source document into a single baseline timezone (e.g., ET or UTC) before converting to the final target timezone.
+Convert all times from the source document into a single baseline timezone (e.g., UTC) before converting to the final target timezone. Use Python's `zoneinfo` module (available in Python 3.9+) for accurate conversions that automatically handle daylight saving time transitions.
 
 ```python
-# Example: Standardizing mixed source times to ET (EDT = UTC-4)
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+# Example: Standardizing mixed source times to UTC
 source_times = {
-    "Match 1": {"time": "15:00", "zone": "PDT"}, # 3 PM PDT
-    "Match 2": {"time": "13:00", "zone": "CST"}, # 1 PM CST (Mexico)
+    "Match 1": {"time": "2026-06-11 15:00:00", "zone": "America/Los_Angeles"},
+    "Match 2": {"time": "2026-06-11 13:00:00", "zone": "America/Mexico_City"},
 }
 
-et_times = {}
+utc_times = {}
 for match, data in source_times.items():
-    if data["zone"] == "PDT":
-        # PDT is UTC-7, EDT is UTC-4. PDT is 3 hours behind EDT.
-        # To get EDT: PDT + 3
-        et_times[match] = add_hours(data["time"], 3)
-    elif data["zone"] == "CST":
-        # CST is UTC-6, EDT is UTC-4. CST is 2 hours behind EDT.
-        # To get EDT: CST + 2
-        et_times[match] = add_hours(data["time"], 2)
+    # Create a timezone-aware datetime object in the source timezone
+    dt = datetime.strptime(data["time"], "%Y-%m-%d %H:%M:%S")
+    dt_aware = dt.replace(tzinfo=ZoneInfo(data["zone"]))
+
+    # Convert to UTC
+    dt_utc = dt_aware.astimezone(ZoneInfo("UTC"))
+    utc_times[match] = dt_utc
 ```
 
 ## 3. Convert to Target Timezone
 
-Once you have a standardized baseline, convert to the user's target timezone (e.g., GMT-3 / BRT).
+Once you have a standardized baseline, convert to the user's target timezone using its IANA identifier.
 
 ```python
-# Example: Convert ET (EDT = UTC-4) to BRT (UTC-3)
-# BRT is 1 hour ahead of EDT.
-# BRT = EDT + 1 hour
+# Example: Convert UTC to BRT (America/Sao_Paulo)
+target_zone = "America/Sao_Paulo"
 
-def convert_edt_to_brt(date_str, edt_time_str):
-    edt_hour = int(edt_time_str.split(":")[0])
-    edt_min = int(edt_time_str.split(":")[1])
-    
-    brt_hour = edt_hour + 1
-    brt_date = date_str
-    
-    # Handle day rollover
-    if brt_hour >= 24:
-        brt_hour -= 24
-        d = datetime.strptime(date_str, "%Y-%m-%d")
-        d += timedelta(days=1)
-        brt_date = d.strftime("%Y-%m-%d")
-        
-    brt_time = f"{brt_hour:02d}:{edt_min:02d}"
-    return f"{brt_date}T{brt_time}:00-03:00"
+brt_times = {}
+for match, dt_utc in utc_times.items():
+    dt_brt = dt_utc.astimezone(ZoneInfo(target_zone))
+    brt_times[match] = dt_brt
 ```
 
 ## 4. Formatting for Google Calendar
 
-Google Calendar expects times in RFC3339 format.
+The Google Calendar API expects times to be specified using the `dateTime` and `timeZone` fields in the `start` and `end` objects.
 
-- **Correct**: `2026-06-11T16:00:00-03:00`
-- **Correct (UTC)**: `2026-06-11T19:00:00Z`
-- **Incorrect**: `2026-06-11 16:00:00`
+- **Correct**:
+  ```json
+  "start": {
+    "dateTime": "2026-06-11T16:00:00",
+    "timeZone": "America/Sao_Paulo"
+  }
+  ```
+- **Incorrect**: Manually calculating offsets (e.g., `2026-06-11T16:00:00-03:00`).
 
-When updating events, always ensure the timezone offset matches the target timezone you calculated.
+When updating events, always provide the `dateTime` in the local time of the target timezone and specify the corresponding IANA `timeZone` identifier. The API will handle the offset calculation correctly, including daylight saving time rules.

@@ -1,13 +1,15 @@
 # Speedtest (Ookla) Complete Reference
 
+Verified against upstream: 2026-08-07
+
 This document consolidates advanced technical knowledge, architectural details, CLI command references, configuration schemas, troubleshooting guides, and security audit checklists for Speedtest (Ookla).
 
 ## 1. Core Measurement Methodology & Architecture
 
 Speedtest.net measures the **full throughput capacity** of a network connection using a **foreground testing** paradigm. It actively floods the network interface to determine the realistic maximum Quality of Service (QoS).
 
-### 1.1 TCP Test Components
-- **Latency/Jitter**: Measured via bidirectional round-trip time (RTT) of small packets. Multiple pings are sent, and the lowest RTT is selected. Jitter is the variance.
+### 1.1 TCP & UDP Test Components
+- **Latency/Jitter**: Measured via bidirectional round-trip time (RTT) of small packets. Multiple pings are sent, and the lowest RTT is selected. Jitter is the variance. **UDP latency support** is now included for more accurate real-time application simulation.
 - **Download Phase**: Establishes multiple concurrent TCP connections (port 8080). Dynamically adjusts chunk size and TCP buffer window to maximize utilization. Spawns additional threads if throughput exceeds thresholds (e.g., 4 Mbps) to overcome TCP slow start.
 - **Upload Phase**: Mirrors download but in reverse. Server measures incoming data streams to handle asymmetric paths and high latency.
 
@@ -139,12 +141,17 @@ When deploying custom OoklaServer instances or enterprise Speedtest infrastructu
 - [ ] Isolate test nodes from internal corporate networks.
 - [ ] Restrict administrative interfaces to trusted IPs.
 - [ ] Implement DDoS protection (rate limiting, Anycast routing).
+- [ ] **Firewall Requirements**: Ensure UDP ports 8080 and 5060 are open for UDP latency testing and server communication.
 
 ### 5.2 Server-Side Hardening
 - [ ] Apply OS security patches promptly.
 - [ ] Disable unnecessary services/ports.
 - [ ] Secure SSH access (key-based, disable root login).
 - [ ] Implement HIDS and File Integrity Monitoring (FIM).
+- [ ] **OpenSSL Requirement**: Ensure OpenSSL 3.5.5+ is installed for secure communication.
+- [ ] **Security Headers**: Configure strict security headers (e.g., HSTS, X-Frame-Options).
+- [ ] **Log Rotation**: Implement log rotation to prevent disk exhaustion.
+- [ ] **Connection Limits**: Set connection limits to mitigate abuse.
 
 ### 5.3 API & Client Security
 - [ ] Enforce strong authentication (OAuth 2.0, API keys) for APIs.

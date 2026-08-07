@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-Frontend menu design represents a critical intersection of usability, accessibility, security, and performance in modern web applications. Advanced menu architectures must accommodate complex user roles, intricate hierarchical data, responsive behaviors, and smooth, performant animations, all while maintaining rigorous security standards. This comprehensive reference delves deeply into the state-of-the-art patterns, techniques, and architectural decisions essential for building robust, scalable, and user-friendly frontend menus, with a focus on modern React ecosystems, Next.js App Router integration, and advanced UI primitives such as Radix UI and Framer Motion.
+Frontend menu design represents a critical intersection of usability, accessibility, security, and performance in modern web applications. Advanced menu architectures must accommodate complex user roles, intricate hierarchical data, responsive behaviors, and smooth, performant animations, all while maintaining rigorous security standards. This comprehensive reference delves deeply into the state-of-the-art patterns, techniques, and architectural decisions essential for building robust, scalable, and user-friendly frontend menus, with a focus on modern React ecosystems, Next.js App Router integration, and advanced UI primitives such as Radix UI and Motion.
 
 ## 2. Modern Architecture Patterns
 
@@ -102,15 +102,15 @@ The App Router's ability to define intercepting routes enables menus to trigger 
 
 ## 6. Advanced Animation Orchestration
 
-Animations in menus enrich user experience by providing visual cues and feedback for state changes such as opening, closing, and hovering. Framer Motion offers a powerful declarative API for orchestrating advanced menu animations.
+Animations in menus enrich user experience by providing visual cues and feedback for state changes such as opening, closing, and hovering. Motion offers a powerful declarative API for orchestrating advanced menu animations.
 
 ### Staggered Children and Variants
-One of the essential animation techniques involves staggering the entrance of child menu items to create a cascading effect. This is achieved using variants and the `staggerChildren` property in Framer Motion.
+One of the essential animation techniques involves staggering the entrance of child menu items to create a cascading effect. This is achieved using variants and the `staggerChildren` property in Motion.
 
 ### Spring Physics vs Tween Transitions
 For menus, spring physics are typically preferred for opening and closing animations, as they feel more organic and responsive. Tween transitions are suitable for subtle opacity or color changes.
 
-### Sample Radix UI Navigation Menu with Framer Motion Integration
+### Sample Radix UI Navigation Menu with Motion Integration
 
 ```tsx
 import React, { useState } from 'react';
@@ -171,8 +171,7 @@ Adherence to accessibility (a11y) standards ensures menus are usable by all user
 | Aspect | Menubar Pattern | Navigation Menu Pattern |
 |---|---|---|
 | Container Role | `role="menubar"` | `role="navigation"` with `aria-label` |
-| Menu Container | `role="menu"` for dropdown/submenu | Uses nested lists without explicit `menu` role |
-| Menu Item Roles | `role="menuitem"`, `menuitemcheckbox`, `menuitemradio` | Typically `<a>` elements with `aria-current` for active links |
+| Menu Container | `role="menu"` for dropdown/submenu | Uses nested lists (`<ul>`, `<li>`) |
 | Submenu Indication | `aria-haspopup="true"`, `aria-expanded` | Uses hover/focus with no explicit ARIA submenu |
 | Keyboard Navigation | Arrow keys to traverse items and submenus | Tab to move focus, arrow keys optional |
 | Use Case | Application action menus (e.g., File, Edit) | Site/page navigation menus |
@@ -182,7 +181,7 @@ Adherence to accessibility (a11y) standards ensures menus are usable by all user
 In the domain of frontend development, the design and implementation of menus play a crucial role in the user experience. However, they also represent a potential attack surface for malicious actors.
 
 ### Validation
-- **Sanitize User Inputs**: Ensure all user inputs that can influence the menu are properly sanitized. Use libraries like DOMPurify to clean HTML inputs.
+- **Sanitize User Inputs**: Ensure all user inputs that can influence the menu are properly sanitized. Use libraries like DOMPurify to clean HTML inputs. **Ensure DOMPurify version is 2.5.9/3.3.2 or higher to mitigate CVE-2024-47875.**
 - **Use Whitelisting**: Implement whitelisting strategies for user inputs.
 - **Client-Side and Server-Side Validation**: Always validate inputs both on the client side for user feedback and on the server side for security.
 

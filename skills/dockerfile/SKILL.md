@@ -1,12 +1,11 @@
 ---
 name: dockerfile
-description: Dockerfile Architect & Container Optimization Specialist. Expertise in advanced BuildKit features, multi-stage builds, layer caching, package management optimization, and image security.
+description: Dockerfile Architect & Container Optimization Specialist. Triggers when designing, refactoring, or auditing Dockerfiles for production, optimizing image sizes, implementing BuildKit features, or integrating Trivy/CodeRabbit scanning.
 ---
 
 # Dockerfile Mastery
 
-## When to Use
-
+## Scope and Triggers
 Use this skill when you need to:
 - Design, write, or refactor Dockerfiles for production environments.
 - Optimize Docker image sizes and build times using multi-stage builds and layer caching.
@@ -14,78 +13,66 @@ Use this skill when you need to:
 - Perform security audits on Dockerfiles, including running as non-root, managing secrets securely, and minimizing attack surfaces.
 - Troubleshoot Docker build failures, permission issues, and resource limitations.
 - Integrate Dockerfile linting (e.g., Hadolint) and vulnerability scanning (e.g., Trivy) into CI/CD pipelines.
+- Use CodeRabbit for automated PR reviews of Dockerfiles.
 
-## Sub-Agent Spawning
+## Preconditions
+- Target Dockerfile must exist and be accessible.
+- Environment must have Docker installed for building and testing.
+- For linting and scanning, `hadolint` and `trivy` should be available.
+- Verify user intent before applying destructive changes to production Dockerfiles.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
-
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple Dockerfiles to audit | Security Auditor | Parallel security review of each Dockerfile |
-| Multiple base images to evaluate | Base Image Evaluator | Parallel base image size and vulnerability analysis |
-| Multiple build stages to optimize | Build Optimizer | Parallel optimization of multi-stage builds |
-| Bulk linting and compliance checks | Linter Agent | Parallel Hadolint and compliance checks |
-
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+- Volatile facts like supported versions or specific flags require runtime verification against authoritative sources (Docker docs, Trivy docs, CodeRabbit docs).
+- Verified against upstream: 2026-08-07.
 
 ## Workflow
+1. Analyze the target Dockerfile and application requirements.
+2. Run `scripts/lint-dockerfile.sh` to identify syntax errors and basic vulnerabilities.
+3. Evaluate base image selection, multi-stage build design, and layer caching.
+4. Apply security hardening (non-root, secrets management).
+5. Integrate CodeRabbit path instructions for automated review.
+6. Run a comprehensive Trivy scan (including IaC and secrets).
+7. Synthesize findings and propose an optimized, secure Dockerfile.
+8. Stop when the Dockerfile passes all linting and security checks.
 
-1. **Analyze Requirements:** Understand the application's runtime dependencies, build tools, and security constraints.
-2. **Base Image Selection:** Choose the most appropriate minimal base image (e.g., Alpine, Debian Slim, Distroless) and pin to a specific version or digest.
-3. **Multi-Stage Design:** Separate the build environment from the runtime environment to minimize the final image size.
-4. **Layer Optimization:** Order instructions from least frequently changed to most frequently changed to maximize cache hits. Combine `RUN` commands where appropriate.
-5. **Package Management:** Use optimized package manager commands (e.g., `npm ci`, `apt-get install --no-install-recommends`, `apk add --no-cache`) and clean up caches in the same layer.
-6. **Security Hardening:** Ensure the container runs as a non-root user, handles secrets securely via BuildKit, and exposes only necessary ports.
-7. **Validation:** Lint the Dockerfile with Hadolint, scan the resulting image for vulnerabilities, and verify graceful shutdown handling.
+## Safety
+- Require confirmation before applying destructive changes to production Dockerfiles.
+- Use dry-runs for Trivy scans.
+- Validate Dockerfile syntax with Hadolint before building.
+- Ensure containers run as non-root.
+- Verify multi-stage builds reduce image size.
 
-## Core Principles
+## Validation
+- Run `scripts/lint-dockerfile.sh` to validate syntax and basic security.
+- Perform dry-run builds to verify multi-stage builds and caching.
+- Check that the final image runs as non-root.
 
-- **Immutability:** Images should be immutable and stateless. Persistent data must be stored externally.
-- **Least Privilege:** Always run containers as a non-root user and drop unnecessary capabilities.
-- **Single Concern:** Each container should have only one concern. Do not run multiple services (e.g., web server and database) in a single container.
-- **Determinism:** Pin all dependencies and base images to ensure reproducible builds.
-- **Ephemeral Containers:** Containers should be designed to be stopped, destroyed, rebuilt, and replaced with minimal setup.
+## Failure Handling
+- If linting fails, review the Hadolint output and correct syntax errors.
+- If Trivy scanning fails, check network connectivity and Trivy configuration.
+- If the build fails, review the Docker build logs for missing dependencies or incorrect paths.
+- Do not repeat a failed action unchanged; diagnose the root cause and apply a fix.
 
-## Key References
+## Output Contract
+- Provide a structured report of findings, including syntax errors, security vulnerabilities, and optimization opportunities.
+- Deliver an optimized, secure Dockerfile that passes all linting and security checks.
+- Include actionable next steps for integrating the Dockerfile into the CI/CD pipeline.
 
-- [Docker Build Best Practices](https://docs.docker.com/build/building/best-practices/)
-- [Docker Multi-stage Builds](https://docs.docker.com/build/building/multi-stage/)
-- [Hadolint GitHub Repository](https://github.com/hadolint/hadolint)
+## Resources
+- [Complete Reference](references/complete-reference.md): Detailed guidance on Dockerfile optimization, Trivy scanning, and CodeRabbit integration.
+- [Lint Dockerfile Script](scripts/lint-dockerfile.sh): Deterministic script to run Hadolint and basic Trivy scans on a Dockerfile.
+- [Dockerfile Template](templates/Dockerfile.template): A best-practice Dockerfile template demonstrating multi-stage builds, non-root execution, and caching.
 
-## Adversarial Verification Panel
+## Orchestration
+- Sub-agents can be spawned for parallel execution when tasks can be decomposed (e.g., auditing multiple Dockerfiles, evaluating multiple base images).
+- Ensure parallel tasks have clear inputs, schemas, and synthesis steps.
 
-For each significant security vulnerabilities produced by the parallel sub-agents:
+## Authoritative sources
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
 
-> This prevents plausible-but-wrong security vulnerabilities from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Package resource index
 
-## Cross-System Consistency Validator
-
-After all parallel agents (Security Auditor, Base Image Evaluator, Build Optimizer, Linter Agent) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Security Auditor recommending a minimal distroless base image while Base Image Evaluator recommends a larger image with debugging tools)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified hardened Dockerfile recommendation so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

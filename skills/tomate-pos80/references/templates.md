@@ -1,6 +1,8 @@
 # Tomate POS-80 Receipt Layout Templates
 
-Designing beautiful, well-aligned receipts is crucial for a professional point-of-sale experience. On an 80mm paper width printer with a 72mm printable area, the default font A (12x24 dots) provides exactly **48 characters per line** [1]. This document contains standard templates optimized for this 48-column layout.
+Designing beautiful, well-aligned receipts is crucial for a professional point-of-sale experience. On an 80mm paper width printer with a 72mm printable area, the default font A (12x24 dots) provides exactly **48 characters per line**. This document contains standard templates optimized for this 48-column layout.
+
+Verified against upstream: 2026-08-07
 
 ---
 
@@ -24,7 +26,7 @@ To design clean receipts, treat your line buffer as a 48-column grid. Standard s
 
 ## 2. Standard Retail Receipt Template
 
-Below is a Python generator that outputs raw ESC/POS bytes for a beautiful, standard retail receipt containing Portuguese text and accents [2] [3]:
+Below is a Python generator that outputs raw ESC/POS bytes for a beautiful, standard retail receipt containing Portuguese text and accents:
 
 ```python
 def generate_retail_receipt(items, subtotal, discount, total, payment_method):
@@ -111,7 +113,7 @@ def generate_retail_receipt(items, subtotal, discount, total, payment_method):
 
 ## 3. Food Delivery / Restaurant Order Template
 
-Restaurant orders require larger text for item quantities and modifiers to prevent preparation mistakes in noisy kitchen environments [1].
+Restaurant orders require larger text for item quantities and modifiers to prevent preparation mistakes in noisy kitchen environments.
 
 ```python
 def generate_kitchen_ticket(order_id, table, items):
@@ -162,6 +164,6 @@ def generate_kitchen_ticket(order_id, table, items):
 ---
 
 ## References
-[1] ZKTECO Colombia, *POS-80-Series Printer Programmer Manual (Formatting)*, Page 34, https://zktecocolombia.com/wp-content/uploads/2025/08/Manual-de-Progamacion.pdf  
-[2] Tomate Official Website, *Impressora Térmica de Recibos 80mm MDK-080*, https://tomate.tv/products/perifericos/impressoras/impressora-termica-de-recibos-80mm-mdk-080  
-[3] Loja Tomate, *Impressora Térmica 80mm Tomate MDK-08260*, https://www.lojatomate.com.br/impressora-termica-80mm-240v-25a-tomate-mdk-08260
+- ZKTECO Colombia, *POS-80-Series Printer Programmer Manual (Formatting)*, Page 34, https://zktecocolombia.com/wp-content/uploads/2025/08/Manual-de-Progamacion.pdf
+- Tomate Official Website, *Impressora Térmica de Recibos 80mm MDK-080*, https://tomate.tv/products/perifericos/impressoras/impressora-termica-de-recibos-80mm-mdk-080
+- Loja Tomate, *Impressora Térmica 80mm Tomate MDK-08260*, https://www.lojatomate.com.br/impressora-termica-80mm-240v-25a-tomate-mdk-08260

@@ -6,6 +6,7 @@
 3. Marketing Technology Stack
 4. Reporting and Dashboards
 5. Marketing Operations
+6. AI-Driven Analytics and Real-Time Decision Making
 
 ---
 
@@ -163,3 +164,25 @@ Definitions:
 | Launch | Activate, monitor initial performance | Live campaign |
 | Optimize | A/B test, adjust targeting/budget | Improved performance |
 | Report | Analyze results, document learnings | Campaign report |
+
+---
+
+## 6. AI-Driven Analytics and Real-Time Decision Making
+
+### Real-Time Decision Making
+
+- **Predictive Analytics**: Use AI models to forecast campaign performance, customer churn, and LTV.
+- **Anomaly Detection**: Automatically identify unusual patterns in traffic, conversions, or spend.
+- **Dynamic Budget Allocation**: AI-driven tools that automatically shift budget to the highest-performing channels and campaigns in real-time.
+
+### Unified Data Layers
+
+- **Data Integration**: Consolidate data from all marketing channels, CRM, and sales tools into a single source of truth (e.g., Data Warehouse or CDP).
+- **Identity Resolution**: Use AI to accurately stitch together user profiles across devices and platforms, overcoming cookie deprecation.
+
+### AI-Driven Attribution Models
+
+- **Algorithmic Attribution**: Move beyond static models (e.g., first/last touch) to machine learning models that assign fractional credit based on the actual impact of each touchpoint.
+- **Marketing Mix Modeling (MMM)**: Integrate AI-powered MMM to understand the holistic impact of marketing investments, including offline and untrackable channels.
+
+Verified against upstream: 2026-08-07

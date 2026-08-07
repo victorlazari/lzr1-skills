@@ -1,3 +1,5 @@
+Verified against upstream: 2026-08-07
+
 # Playwright Automation for Google Meet
 
 This reference details the specifics of automating a headless Chromium browser using Playwright to join and interact with Google Meet.

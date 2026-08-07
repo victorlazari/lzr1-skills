@@ -1,5 +1,7 @@
 # Comprehensive Reference Guide for Retrieval-Augmented Generation (RAG)
 
+Verified against upstream: 2026-08-07
+
 ## 1. Introduction to RAG Architecture
 
 Retrieval-Augmented Generation (RAG) combines the strengths of pre-trained generative models with external knowledge retrieval systems. It addresses the limitations of standalone Large Language Models (LLMs), such as hallucinations and outdated knowledge, by dynamically accessing external data at inference time.
@@ -12,6 +14,8 @@ Retrieval-Augmented Generation (RAG) combines the strengths of pre-trained gener
 - **RAG-Sequence**: Conditions the generator on the entire set of retrieved documents concatenated into a single input sequence.
 - **RAG-Token**: Conditions the generator at each output token on a weighted combination of the retrieved documents' embeddings.
 - **Modular RAG**: Introduces discrete, interchangeable components like query routing, query transformation, and post-retrieval processing (reranking).
+- **Adaptive RAG**: Dynamically adjusts the retrieval strategy based on query complexity, routing queries to different retrieval pipelines or LLMs.
+- **Agentic Workflows**: Uses LLMs as reasoning agents to iteratively retrieve, evaluate, and synthesize information, often involving multiple steps and tool use.
 
 ## 2. Data Ingestion and Preprocessing
 
@@ -44,9 +48,10 @@ Specialized data stores optimized for high-dimensional embeddings.
   - **HNSW (Hierarchical Navigable Small World)**: Graph-based ANN search for low latency.
   - **PQ (Product Quantization)**: Compresses vectors for memory efficiency.
 
-### 3.3 Similarity Search
+### 3.3 Similarity Search and Hybrid Retrieval
 - **Metrics**: Cosine similarity, Inner product, Euclidean distance.
-- **Hybrid Search**: Combining dense retrieval (embeddings) with sparse retrieval (BM25) using Reciprocal Rank Fusion (RRF).
+- **Hybrid Search**: Combining dense retrieval (embeddings) with sparse retrieval (e.g., BM25) to leverage both semantic understanding and exact keyword matching.
+- **Reciprocal Rank Fusion (RRF)**: A technique to combine the ranked results from dense and sparse retrievers into a single, unified ranking.
 
 ## 4. Advanced Architecture Patterns
 
@@ -99,19 +104,7 @@ Integrating Knowledge Graphs (KGs) with vector databases to handle complex queri
 - Use tools like Prometheus and Grafana for system health monitoring.
 - Implement distributed tracing (e.g., Jaeger, OpenTelemetry) to diagnose performance bottlenecks.
 
-## 8. RAG CLI Command Reference
-
-The `rag` CLI manages RAG deployments:
-- `rag init`: Initializes a new RAG project.
-- `rag deploy [environment]`: Deploys the RAG to a specified environment.
-- `rag status [environment]`: Displays the current status.
-- `rag update [environment]`: Updates configuration or codebase.
-- `rag rollback [environment]`: Rolls back to a previous state.
-- `rag logs [environment]`: Fetches logs.
-- `rag config`: Manages configuration settings.
-- `rag cleanup [environment]`: Cleans up resources.
-
-## 9. Configuration Schemas
+## 8. Configuration Schemas
 
 RAG systems use YAML/JSON configurations for various components:
 - **Vector Database**: Type, connection, index type (e.g., HNSW), storage path.

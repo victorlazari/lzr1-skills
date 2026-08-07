@@ -7,16 +7,21 @@ description: Comprehensive supply chain skill covering procurement, vendor manag
 
 Expert-level supply chain management covering procurement, vendor management, supply chain analytics, logistics, inventory management, and strategic sourcing.
 
-## When to Use
+## Scope and Triggers
 
-- Managing vendor relationships and contracts
-- Optimizing procurement processes
-- Analyzing supply chain data and costs
-- Managing inventory and demand planning
-- Developing sourcing strategies
-- Evaluating and selecting suppliers
-- Risk management in supply chain
-- Cost optimization and negotiation
+- **Triggers:** Managing vendor relationships and contracts, optimizing procurement processes, analyzing supply chain data and costs, managing inventory and demand planning, developing sourcing strategies, evaluating and selecting suppliers, risk management in supply chain, cost optimization and negotiation.
+- **Non-goals:** Deep financial modeling, valuation, or investment research (route to `finance-pro-playbooks`). Formal legal review or compliance assessment for contract negotiation (route to `legal-review`).
+
+## Preconditions
+
+- Identify the specific supply chain or procurement need.
+- Determine the target environment, permissions, inputs, and constraints.
+- Detect user intent and required domains (procurement, analytics, or both).
+
+## Source Freshness
+
+- Volatile facts and compliance rules must be verified against current official documentation before taking action.
+- Authoritative sources are documented in the respective reference files with a `Verified against upstream: 2026-08-07` marker.
 
 ## Workflow
 
@@ -24,44 +29,46 @@ Expert-level supply chain management covering procurement, vendor management, su
 2. **Select reference** — Choose the appropriate domain:
    - Procurement and sourcing → `references/procurement.md`
    - Supply chain analytics and optimization → `references/supply-chain-analytics.md`
-3. **Analyze** — Spend analysis, supplier assessment, risk evaluation
-4. **Plan** — Strategy, timeline, stakeholder alignment
-5. **Execute** — Negotiate, contract, implement
-6. **Optimize** — Monitor, measure, improve
+3. **Gather Data** — Collect necessary data and perform analysis (spend, risk, demand).
+4. **Plan** — Develop a strategy or plan based on the analysis, timeline, and stakeholder alignment.
+5. **Execute** — Negotiate, contract, and implement the plan after obtaining necessary confirmations.
+6. **Stop** — Stop when the objective is met or if a critical dependency or risk is identified that requires escalation.
 
-## Core Principles (All Supply Chain Work)
+## Safety
 
-- Total cost of ownership: Look beyond purchase price
-- Risk diversification: Avoid single points of failure
-- Data-driven: Decisions backed by analytics
-- Relationship-based: Long-term partnerships over transactions
-- Sustainable: Environmental and social responsibility
-- Compliant: Regulatory and policy adherence
-- Agile: Adapt to disruptions quickly
-- Transparent: Clear communication with stakeholders
+- **Read-only discovery:** Perform data gathering and analysis before any mutations.
+- **Confirmation required:** Require explicit user confirmation before executing any binding contracts, financial commitments, or production-impacting actions.
+- **Validation:** Validate vendor data against known authoritative sources.
 
-## Role Capabilities
+## Validation
 
-| Role | Expertise | Reference |
-|---|---|---|
-| Procurement Manager | Sourcing, negotiation, contracts | `references/procurement.md` |
-| Supply Chain Analyst | Analytics, optimization, forecasting | `references/supply-chain-analytics.md` |
+- Ensure all scripts have dry-run capabilities and fail safely on error.
+- Run `scripts/validate-vendor.sh` to perform basic vendor validation checks.
+- Use `templates/vendor-scorecard.md` for evaluating and scoring vendors.
 
-## Key References
+## Failure Handling
 
-- **Procurement**: See `references/procurement.md` for sourcing and vendor management.
-- **Supply chain analytics**: See `references/supply-chain-analytics.md` for optimization.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+- If a script fails, diagnose the error using the output, choose an alternative approach, and avoid repeating the failed action unchanged.
+- Roll back any partial changes if a critical step fails.
 
----
+## Output Contract
+
+- Provide a clear, structured output detailing the analysis, strategy, and executed actions.
+- Include evidence of vendor validation and risk assessment.
+- Specify actionable next steps and any unresolved uncertainties.
+
+## Resources
+
+- `references/procurement.md`: Procurement and sourcing processes, vendor selection, contract management, negotiation, and risk management.
+- `references/supply-chain-analytics.md`: Spend analysis, demand planning, inventory management, supply chain optimization, and performance metrics.
+- `scripts/validate-vendor.sh`: Script to perform basic vendor validation checks.
+- `templates/vendor-scorecard.md`: Template for evaluating and scoring vendors.
 
 ## Multi-Specialist Protocol
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
 
 ### Domain Detection Table
-
-Scan the task for signals that indicate which domains apply:
 
 | Task Signal (examples) | Domain | Specialist Agent | Reference |
 |---|---|---|---|
@@ -70,7 +77,7 @@ Scan the task for signals that indicate which domains apply:
 
 ### Spawning Logic
 
-**Single domain detected** → Fall back to original single-reference behavior (no change).
+**Single domain detected** → Fall back to original single-reference behavior.
 
 **Multiple domains detected** → Launch all relevant specialists simultaneously:
 - Each specialist receives: **full task context** + its dedicated reference file only
@@ -80,10 +87,7 @@ Scan the task for signals that indicate which domains apply:
 ### Cross-Domain Synthesizer
 
 After all specialists complete, run one **Supply Chain Synthesizer** with all specialist outputs that:
-
 1. **Identifies contradictions** between specialist recommendations for the same component
 2. **Identifies gaps** — requirements addressed by no specialist
 3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
 4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
-
-> Synthesis focus for this skill: Catches where an analytics-driven demand insight requires an immediate procurement contract amendment. Maps inventory optimization recommendations to supplier lead time constraints.

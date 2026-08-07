@@ -1,5 +1,7 @@
 # Talent Acquisition
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Recruiting Strategy
 2. Sourcing
@@ -45,7 +47,6 @@
 |---|---|---|---|
 | Employee referrals | All roles | Medium (bonus) | Highest |
 | LinkedIn Recruiter | Passive candidates | High | High |
-| Job boards (LinkedIn, Indeed) | Active candidates | Medium | Medium |
 | GitHub/Stack Overflow | Engineers | Low-Medium | High |
 | University recruiting | Entry-level | Medium | Variable |
 | Agencies/Headhunters | Executive, niche | Very High (20-30%) | High |

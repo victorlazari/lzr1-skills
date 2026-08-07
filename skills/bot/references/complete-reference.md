@@ -1,5 +1,7 @@
 # Advanced Bot Engineering: Complete Reference Guide
 
+Verified against upstream: 2026-08-07
+
 This document consolidates and enhances the technical knowledge required for advanced bot engineering using the OpenClaw, NemoClaw, and OpenShell ecosystems. It covers architecture, configuration, security, CLI operations, and enterprise deployment patterns.
 
 ## 1. OpenClaw Agent Architecture
@@ -157,3 +159,9 @@ Customizable interaction strings (e.g., greetings, farewells).
 8. **Configuration/Hardening**: Config management, disable unnecessary services, patch management.
 9. **Incident Response**: Documented plan, regular drills, continuous monitoring.
 10. **Compliance/Legal**: Regulatory audits, legal risk assessment (TOS/liability).
+
+## 9. Authoritative Sources
+
+- [NemoClaw GitHub Repository](https://github.com/NVIDIA/NemoClaw)
+- [OpenShell GitHub Repository](https://github.com/NVIDIA/OpenShell)
+- [OpenClaw Documentation](https://docs.openclaw.ai)

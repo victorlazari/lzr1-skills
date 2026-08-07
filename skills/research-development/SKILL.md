@@ -7,64 +7,69 @@ description: Comprehensive research and development skill covering innovation st
 
 Expert-level R&D covering innovation strategy, technical research methodology, R&D management, technology scouting, and emerging technology evaluation.
 
-## When to Use
+## Scope and Triggers
 
-- Conducting technical research and literature reviews
-- Evaluating emerging technologies for adoption
-- Developing innovation strategies and programs
-- Managing R&D portfolios and programs
-- Technology scouting and competitive intelligence
-- Patent analysis and IP strategy
-- Building research roadmaps
-- Academic-industry collaboration
+- **Handles:** Technical research, literature reviews, emerging technology evaluation, innovation strategy development, R&D portfolio management, technology scouting, and research roadmaps.
+- **Activates when:** Task involves technical research, evaluating emerging technologies, developing innovation strategies, managing R&D programs, or building technology roadmaps.
+- **Non-goals:** Not for financial modeling, valuation, or investment research (use `finance-pro-playbooks`). Not for adopting a specialized professional role for execution (use `ai-teammates`).
+
+## Preconditions
+
+- Detect the target domain (innovation strategy, research methodology, or technology evaluation).
+- Ensure the user intent is clear and the problem statement is defined before proceeding with technology evaluation.
+
+## Source Freshness
+
+- **ISO 56000:2025 Innovation management:** Verified against upstream 2026-08-07. See `references/innovation-strategy.md`.
+- **Technology Readiness Assessment Guidebook (Feb 2025):** Verified against upstream 2026-08-07. See `references/technology-evaluation.md`.
 
 ## Workflow
 
-1. **Understand the context** — What research question, technology, or innovation challenge?
-2. **Select reference** — Choose the appropriate domain:
-   - Innovation strategy and programs → `references/innovation-strategy.md`
-   - Technical research methodology → `references/research-methodology.md`
-   - Technology evaluation → `references/technology-evaluation.md`
-3. **Research** — Literature review, technology scan, competitive analysis
-4. **Analyze** — Synthesize findings, identify patterns
-5. **Recommend** — Actionable insights, roadmap, decisions
-6. **Communicate** — Reports, presentations, publications
+1. **Understand the context and define the specific problem statement** before any evaluation.
+2. **Select the appropriate domain reference** (innovation strategy, research methodology, or technology evaluation).
+3. **Conduct AI-powered technology scouting** and literature review.
+4. **Evaluate technologies** using the updated TRL definitions from the 2025 DoD TRA Guidebook.
+5. **Synthesize findings** and identify patterns or gaps.
+6. **Recommend actionable insights** and decisions based on the evaluation.
+7. **Stop** when a unified recommendation with explicit trade-offs is produced.
 
-## Core Principles (All R&D Work)
+## Safety
 
-- Evidence-based: Ground decisions in data and research
-- Systematic: Rigorous methodology, reproducible results
-- Forward-looking: Anticipate trends, not just react
-- Balanced: Short-term value and long-term bets
-- Collaborative: Cross-functional, open to external input
-- Measurable: Track innovation metrics and outcomes
-- Ethical: Responsible innovation, consider societal impact
-- Iterative: Rapid experimentation, fail fast, learn quickly
+- Separate read-only discovery from mutations.
+- Require confirmation for destructive, external, privileged, financial, legal, or production-impacting actions.
 
-## Role Capabilities
+## Validation
 
-| Role | Expertise | Reference |
-|---|---|---|
-| Innovation Strategist | Innovation programs, portfolio, culture | `references/innovation-strategy.md` |
-| Technical Researcher | Research methodology, publications | `references/research-methodology.md` |
-| Technology Scout | Emerging tech, evaluation, adoption | `references/technology-evaluation.md` |
+- Verify that all technology evaluations start with a documented problem statement.
+- Ensure TRL assessments follow the 2025 DoD guidelines.
+- Validate that innovation strategies align with ISO 56000:2025 principles.
+- Check that AI scouting is used before finalizing vendor shortlists.
 
-## Key References
+## Failure Handling
 
-- **Innovation strategy**: See `references/innovation-strategy.md` for programs and portfolio.
-- **Research methodology**: See `references/research-methodology.md` for technical research.
-- **Technology evaluation**: See `references/technology-evaluation.md` for emerging tech.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+- If evaluation fails, diagnose the issue, choose alternative technologies, and avoid repeating the same failed evaluation.
 
----
+## Output Contract
 
-## Multi-Specialist Protocol
+- A unified recommendation with explicit trade-offs.
+- Documented problem statement.
+- TRL assessments following 2025 DoD guidelines.
+- Innovation strategies aligned with ISO 56000:2025 principles.
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+## Resources
 
-### Domain Detection Table
+- `references/innovation-strategy.md`: Innovation strategy and programs.
+- `references/research-methodology.md`: Technical research methodology.
+- `references/technology-evaluation.md`: Technology evaluation and scouting.
+- `references/reading-list.md`: Recommended reading and resources.
 
-Scan the task for signals that indicate which domains apply:
+## Orchestration
+
+### Multi-Specialist Protocol
+
+When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+
+#### Domain Detection Table
 
 | Task Signal (examples) | Domain | Specialist Agent | Reference |
 |---|---|---|---|
@@ -72,7 +77,7 @@ Scan the task for signals that indicate which domains apply:
 | `research methodology`, `experiment design`, `hypothesis`, `qualitative study`, `quantitative analysis`, `user study`, `literature review`, `research protocol` | **Research Methodology** | Methodology Specialist | `references/research-methodology.md` |
 | `technology evaluation`, `build vs buy`, `proof of concept`, `POC`, `vendor selection`, `benchmark`, `evaluation criteria`, `due diligence`, `tech assessment` | **Technology Evaluation** | Tech Eval Specialist | `references/technology-evaluation.md` |
 
-### Spawning Logic
+#### Spawning Logic
 
 **Single domain detected** → Fall back to original single-reference behavior (no change).
 
@@ -81,7 +86,7 @@ Scan the task for signals that indicate which domains apply:
 - No specialist waits for another — all start at the same time
 - Maximum concurrent specialists: 3
 
-### Cross-Domain Synthesizer
+#### Cross-Domain Synthesizer
 
 After all specialists complete, run one **R&D Decision Synthesizer** with all specialist outputs that:
 
@@ -91,3 +96,13 @@ After all specialists complete, run one **R&D Decision Synthesizer** with all sp
 4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
 
 > Synthesis focus for this skill: Ensures the technology evaluation methodology is appropriate for the innovation strategy goals. Flags where evaluation criteria bias toward known solutions when the strategy calls for exploration.
+
+## Authoritative sources
+
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
+
+## Package resource index
+
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

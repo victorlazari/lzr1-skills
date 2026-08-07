@@ -1,5 +1,7 @@
 # Sales Engineering
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Technical Discovery
 2. Demos and Presentations
@@ -39,7 +41,6 @@
 
 ### Demo Structure
 
-```
 1. Recap and Agenda (2 min)
    - "Based on our discovery, you mentioned [pain points]..."
    - Set expectations for what you'll show
@@ -64,7 +65,6 @@
 6. Q&A and Next Steps (5 min)
    - Address concerns
    - Propose POC or next step
-```
 
 ### Demo Best Practices
 
@@ -96,7 +96,6 @@
 
 ### POC Success Criteria Template
 
-```markdown
 ## POC Success Criteria
 
 ### Must Pass (Required for success)
@@ -115,7 +114,6 @@
 
 ### Decision
 If all "Must Pass" criteria are met, [customer] will proceed to [next step].
-```
 
 ---
 
@@ -161,7 +159,6 @@ If all "Must Pass" criteria are met, [customer] will proceed to [next step].
 
 ### Architecture Diagram Components
 
-```
 Customer Environment:
   [Their App] ←→ [API/SDK] ←→ [Your Platform]
                                     ↓
@@ -175,4 +172,9 @@ Key considerations:
 - Network (VPN, IP allowlisting, private link)
 - High availability (SLA, failover)
 - Disaster recovery (RPO, RTO)
-```
+
+## Source Map
+
+- **Mastering Technical Sales** (Care & Bohlig): Consult for SE methodology and technical discovery.
+- **The Sales Engineer Manager's Handbook** (Care): Consult for managing SE teams and processes.
+- **Great Demo!** (Cohan): Consult for demo methodology and structure.

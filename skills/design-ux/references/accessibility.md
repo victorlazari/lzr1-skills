@@ -1,5 +1,7 @@
 # Accessibility
 
+*Verified against upstream: 2026-08-07*
+
 ## Table of Contents
 1. WCAG Guidelines
 2. ARIA
@@ -20,7 +22,7 @@
 | Understandable | Information and UI must be understandable | Readable, predictable, input assistance |
 | Robust | Content must work with assistive technologies | Parsing, name/role/value |
 
-### Key Success Criteria
+### Key Success Criteria (Including WCAG 2.2)
 
 | Criterion | Level | Requirement |
 |---|---|---|
@@ -31,8 +33,14 @@
 | 2.1.1 Keyboard | A | All functionality via keyboard |
 | 2.4.3 Focus Order | A | Logical focus sequence |
 | 2.4.7 Focus Visible | AA | Visible focus indicator |
-| 2.5.8 Target Size | AA | 24×24px minimum (WCAG 2.2) |
+| 2.4.11 Focus Not Obscured (Minimum) | AA | Focus indicator must not be entirely hidden by author-created content (WCAG 2.2) |
+| 2.4.12 Focus Not Obscured (Enhanced) | AAA | Focus indicator must not be hidden at all by author-created content (WCAG 2.2) |
+| 2.4.13 Focus Appearance | AAA | Focus indicator must have sufficient contrast and size (WCAG 2.2) |
+| 2.5.8 Target Size (Minimum) | AA | 24×24px minimum for pointer inputs (WCAG 2.2) |
+| 3.2.6 Consistent Help | A | Help mechanisms must be consistently located (WCAG 2.2) |
 | 3.3.2 Labels or Instructions | A | Labels for form inputs |
+| 3.3.7 Redundant Entry | A | Information previously entered must be auto-populated or available to select (WCAG 2.2) |
+| 3.3.8 Accessible Authentication (Minimum) | AA | Cognitive function tests must not be required for authentication without an alternative (WCAG 2.2) |
 | 4.1.2 Name, Role, Value | A | Programmatic name for controls |
 
 ### Conformance Levels

@@ -7,6 +7,7 @@
 4. Link Building
 5. Local SEO
 6. SEO Tools and Measurement
+7. AI Search Optimization (AEO/GEO)
 
 ---
 
@@ -212,3 +213,21 @@ Pillar page links to all cluster pages.
 | Indexed pages | Pages in Google's index | All important pages |
 | Core Web Vitals | Page experience metrics | All passing |
 | Backlink growth | New referring domains | Steady acquisition |
+
+---
+
+## 7. AI Search Optimization (AEO/GEO)
+
+### Answer Engine Optimization (AEO)
+
+- **Direct Answers**: Structure content to provide clear, concise answers to specific questions (e.g., using FAQ schema, bulleted lists).
+- **Conversational Queries**: Optimize for natural language queries and long-tail keywords that users might ask voice assistants or AI chatbots.
+- **Featured Snippets**: Target "Position Zero" by formatting content specifically for featured snippets (tables, lists, short paragraphs).
+
+### Generative Engine Optimization (GEO)
+
+- **Entity-First Ranking**: Focus on building topical authority around specific entities (people, places, concepts) rather than just keywords.
+- **Comprehensive Coverage**: Create in-depth content that covers a topic from multiple angles, as generative engines synthesize information from various sources.
+- **Zero-Click SERP Strategies**: Optimize for visibility even when users don't click through to the site (e.g., brand mentions in AI-generated summaries, optimized Google Business Profiles).
+
+Verified against upstream: 2026-08-07

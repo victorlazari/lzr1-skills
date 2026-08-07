@@ -1,5 +1,7 @@
 # Revenue Operations
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. RevOps Framework
 2. Sales Analytics
@@ -11,6 +13,8 @@
 
 ## 1. RevOps Framework
 
+The RevOps framework aligns sales, marketing, and customer success around shared goals, systems, and data to ensure predictable revenue growth and end-to-end customer lifecycle management.
+
 ### RevOps Functions
 
 | Function | Responsibility | Impact |
@@ -21,10 +25,10 @@
 | Analytics & Insights | Reporting, dashboards, analysis | Decision quality |
 | Enablement | Training, content, onboarding | Rep effectiveness |
 | Compensation | Plans, SPIFs, accelerators | Motivation and alignment |
+| Cross-functional Alignment | Aligning marketing, sales, and CS | Unified customer journey |
 
 ### Revenue Model
 
-```
 Revenue = Opportunities × Win Rate × Average Deal Size
 
 Pipeline needed = Quota / Win Rate
@@ -40,7 +44,6 @@ Example:
   Meetings needed: 267
   Outreach-to-meeting: 3%
   Outreach needed: 8,900
-```
 
 ---
 
@@ -147,6 +150,7 @@ Example:
 | E-signature | Contract signing | DocuSign, PandaDoc |
 | Forecasting | Revenue prediction | Clari, BoostUp |
 | Enablement | Content, training | Highspot, Seismic |
+| AI Integration | Intent data, deal prioritization | Gong, Clari, Outreach AI features |
 
 ### CRM Best Practices
 
@@ -158,3 +162,11 @@ Example:
 | Integration | Connect all tools to single source of truth |
 | Reporting | Standardized reports, dashboards, alerts |
 | Adoption | Training, accountability, value demonstration |
+
+## Source Map
+
+- **Gartner: Revenue Operations: The What, Best Practices & RevOps Guide**: Consult for authoritative RevOps framework and cross-functional alignment strategies.
+- **Revenue Operations** (Diorio & Hummel): Consult for comprehensive RevOps framework details.
+- **Sales Engagement** (Medina et al.): Consult for modern sales tech stack and engagement strategies.
+- **Blueprints for a SaaS Sales Organization** (van der Kooij & Pizarro): Consult for SaaS sales organization design.
+- **AI for Sales** (Gong, Clari, Outreach AI features documentation): Consult for integrating AI into sales processes and deal management.

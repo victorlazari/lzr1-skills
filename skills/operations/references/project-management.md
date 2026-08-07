@@ -1,5 +1,10 @@
 # Project & Program Management
 
+**Verified against upstream:** 2026-08-07
+**Primary Sources:**
+- PMI Standards (https://www.pmi.org/standards/about)
+- PMBOK Guide 8th Edition (https://www.pmi.org/standards/pmbok)
+
 ## Table of Contents
 1. Methodologies
 2. Planning and Execution
@@ -35,7 +40,9 @@
 
 ---
 
-## 2. Planning and Execution
+## 2. Planning and Execution (PMBOK 8th Edition Alignment)
+
+Focus on value delivery and the seven performance domains.
 
 ### Project Planning Framework
 
@@ -167,3 +174,16 @@ Project
 | Technical | System A needed by System B | Integration planning |
 | External | Third-party delivery | Contract, buffer time |
 | Organizational | Approval or decision needed | Escalation path |
+
+## Recommended Reading (Source Map)
+- **Inspired** — Marty Cagan (2nd ed, 2018), Wiley. Product development.
+- **Shape Up** — Ryan Singer (2019, Basecamp). Project shaping methodology.
+- **Project Management for the Unofficial Project Manager** — Kory Kogon et al. (2015), BenBella.
+- **Making Things Happen** — Scott Berkun (2008), O'Reilly. Project management.
+- **Agile Estimating and Planning** — Mike Cohn (2005), Prentice Hall.
+- **Scrum** — Jeff Sutherland (2014), Currency. Scrum methodology.
+- **Atlassian Agile Coach** — atlassian.com/agile. Agile methodology.
+- **Scrum.org Resources** — scrum.org. Scrum framework.
+- **PMI (Project Management Institute)** — pmi.org. PM standards.
+- **Monday.com Blog** — monday.com/blog. Project management.
+- **Asana Guide to Work** — asana.com/guide. Work management.

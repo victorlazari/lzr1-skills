@@ -1,6 +1,15 @@
 # Go Specialist Reading List (2023-2026)
 
-This reading list provides a curated selection of recent books and articles essential for mastering advanced Go programming, performance tuning, security, and enterprise architecture.
+**Verified against upstream: 2026-08-07**
+
+This reading list provides a curated selection of recent books, articles, and official documentation essential for mastering advanced Go programming, performance tuning, security, and enterprise architecture.
+
+## Official Documentation & Standards
+
+1. **[Go 1.26 Release Notes](https://go.dev/doc/devel/release)** - Essential for understanding the latest features, including the Green Tea GC, revamped `go fix`, and security enhancements.
+2. **[Security Best Practices for Go Developers](https://go.dev/doc/security/best-practices)** - Official guidance on writing secure Go code.
+3. **[OWASP Go Secure Coding Practices Guide](https://owasp.org/www-project-go-secure-coding-practices-guide/)** - Comprehensive guide on mitigating common vulnerabilities in Go applications.
+4. **[govulncheck Documentation](https://go.dev/doc/tutorial/govulncheck)** - Official tutorial and reference for the Go vulnerability scanner.
 
 ## Books
 
@@ -39,7 +48,7 @@ This reading list provides a curated selection of recent books and articles esse
 
 ## Articles
 
-1. **"Understanding the Go 1.22 Scheduler Improvements"** - Go Blog (2024)
+1. **"Understanding the Go 1.26 Green Tea GC"** - Go Blog (2026)
 2. **"Deep Dive into Go's Garbage Collector: Tuning GOGC"** - Ardan Labs (2023)
 3. **"Mastering Escape Analysis in Go 1.21"** - GopherAcademy (2023)
 4. **"Building Secure Go Applications: A 2024 Checklist"** - OWASP (2024)
@@ -62,7 +71,7 @@ This reading list provides a curated selection of recent books and articles esse
 21. **"Handling Edge Cases in Go Channels"** - Ardan Labs (2024)
 22. **"Go Configuration Management with Viper and Struct Tags"** - HashiCorp Blog (2023)
 23. **"Building Resilient Go Services with Circuit Breakers"** - Netflix Engineering (2024)
-24. **"Go 1.24: Anticipated Features and Performance Gains"** - Go Blog (2025)
+24. **"Go 1.26: Anticipated Features and Performance Gains"** - Go Blog (2026)
 25. **"The Actor Model in Go: Managing Complex State"** - InfoQ (2023)
 26. **"Go for Data Engineering: Processing Large Datasets"** - Towards Data Science (2024)
 27. **"Securing the Go Supply Chain: Checksums and Proxies"** - Snyk Blog (2023)

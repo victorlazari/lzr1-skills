@@ -1,0 +1,492 @@
+{
+  "schema_version": "1.0",
+  "review": {
+    "id": "REV-FIXTURE-001",
+    "target_revision": "synthetic-fixture@package",
+    "generated_at": "2026-08-07T15:00:00Z",
+    "authorization": {
+      "owner_or_authorizer": "lzr1-skills package maintainer; synthetic fixture only",
+      "allowed_actions": [
+        "read",
+        "local-static-analysis"
+      ],
+      "environment": "local",
+      "constraints": [
+        "Do not execute, import, deploy, or pass real data to the fixture"
+      ]
+    },
+    "scope": {
+      "included": [
+        "tests/fixtures/vulnerable_sample.py"
+      ],
+      "excluded": []
+    },
+    "coverage": {
+      "reviewed": 1,
+      "mechanically_inventoried": 0,
+      "generated": 0,
+      "vendored": 0,
+      "binary_or_opaque": 0,
+      "inaccessible": 0,
+      "excluded": 0,
+      "not_applicable": 0
+    },
+    "source_freshness": [
+      {
+        "source": "OWASP Application Security Verification Standard 5.0.0",
+        "retrieved_at": "2026-08-07T15:00:00Z",
+        "url": "https://owasp.org/www-project-application-security-verification-standard/"
+      },
+      {
+        "source": "OWASP API Security Top 10 2023",
+        "retrieved_at": "2026-08-07T15:00:00Z",
+        "url": "https://owasp.org/API-Security/editions/2023/en/0x00-header/"
+      },
+      {
+        "source": "MITRE CWE",
+        "retrieved_at": "2026-08-07T15:00:00Z",
+        "url": "https://cwe.mitre.org/"
+      },
+      {
+        "source": "OWASP Top 10 for LLM Applications 2025",
+        "retrieved_at": "2026-08-07T15:00:00Z",
+        "url": "https://genai.owasp.org/llm-top-10/"
+      }
+    ]
+  },
+  "findings": [
+    {
+      "id": "SR-FIXTURE-AUTHZ",
+      "title": "Tenant context is accepted without an authorization decision",
+      "status": "confirmed",
+      "asset": "Synthetic tenant record",
+      "locations": [
+        {
+          "path": "tests/fixtures/vulnerable_sample.py",
+          "line_start": 12,
+          "line_end": 14,
+          "symbol": "load_tenant_record",
+          "artifact_digest": null,
+          "unavailable_reason": null
+        }
+      ],
+      "evidence": [
+        {
+          "type": "code-excerpt",
+          "summary": "The function receives requested_tenant but returns record without comparing tenant or principal context.",
+          "redacted": false,
+          "reference": "tests/fixtures/vulnerable_sample.py:12-14",
+          "digest": null
+        }
+      ],
+      "reasoning": {
+        "model": "authorization-decision",
+        "narrative": "The requested tenant is caller-controlled, but no principal, resource ownership, or policy decision constrains the returned object.",
+        "steps": [
+          "Caller supplies requested_tenant and a record",
+          "No authenticated principal or tenant ownership is evaluated",
+          "The record is returned regardless of tenant context"
+        ]
+      },
+      "preconditions": [
+        "The function is reachable with a record belonging to another tenant",
+        "No upstream authorization control exists outside the fixture"
+      ],
+      "impact": {
+        "dimensions": [
+          "confidentiality",
+          "privacy"
+        ],
+        "narrative": "A real implementation with this invariant failure could disclose another tenant's record. This fixture does not contain real data."
+      },
+      "taxonomy": {
+        "cwe": [
+          "CWE-862"
+        ],
+        "capec": [],
+        "attack": []
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "The synthetic fixture deliberately omits any authorization branch and documents that omission.",
+        "uncertainties": [
+          "A production caller could enforce authorization before invoking this function"
+        ]
+      },
+      "cvss_v4": null,
+      "live_context": [],
+      "remediation": {
+        "recommendation": "Require the authenticated principal and resource tenant, then deny unless an explicit centralized policy permits the action.",
+        "alternatives": [
+          "Replace the function with a repository method that derives tenant scope from the authenticated session rather than caller input"
+        ],
+        "compatibility": "Callers must provide authenticated identity context and handle authorization denial.",
+        "rollout": "Add negative cross-tenant tests before changing the interface, then deploy behind monitoring.",
+        "rollback": "Revert the interface change only if the prior access path is disabled by an equivalent policy control."
+      },
+      "validation": {
+        "method": "Static negative-case inspection of the synthetic fixture",
+        "expected": "No branch validates principal, action, resource, or tenant before return",
+        "performed": true,
+        "result": "passed",
+        "evidence": [
+          "tests/fixtures/vulnerable_sample.py:12-14"
+        ]
+      },
+      "residual_risk": {
+        "summary": "Upstream authorization remains an unknown outside this isolated fixture.",
+        "owner": "fixture maintainer",
+        "review_by": "2027-08-07"
+      },
+      "conflicts": []
+    },
+    {
+      "id": "SR-FIXTURE-SQL",
+      "title": "Untrusted user name is concatenated into a SQL statement",
+      "status": "confirmed",
+      "asset": "Synthetic user query",
+      "locations": [
+        {
+          "path": "tests/fixtures/vulnerable_sample.py",
+          "line_start": 17,
+          "line_end": 19,
+          "symbol": "build_user_query",
+          "artifact_digest": null,
+          "unavailable_reason": null
+        }
+      ],
+      "evidence": [
+        {
+          "type": "code-excerpt",
+          "summary": "The user_name parameter is concatenated directly between SQL quote characters.",
+          "redacted": false,
+          "reference": "tests/fixtures/vulnerable_sample.py:17-19",
+          "digest": null
+        }
+      ],
+      "reasoning": {
+        "model": "source-to-sink",
+        "narrative": "Caller-controlled text is inserted into query syntax without a parameter-binding boundary.",
+        "steps": [
+          "Caller controls user_name",
+          "String concatenation places user_name inside SQL syntax",
+          "A downstream database execution sink would interpret injected syntax"
+        ]
+      },
+      "preconditions": [
+        "A caller controls user_name",
+        "A downstream component executes the returned string as SQL"
+      ],
+      "impact": {
+        "dimensions": [
+          "confidentiality",
+          "integrity"
+        ],
+        "narrative": "A real caller that executes this string could expose or modify database records. The fixture does not connect to a database."
+      },
+      "taxonomy": {
+        "cwe": [
+          "CWE-89"
+        ],
+        "capec": [
+          "CAPEC-66"
+        ],
+        "attack": []
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "The data-to-query-syntax path is explicit in the synthetic function.",
+        "uncertainties": [
+          "The fixture does not include a downstream execution call"
+        ]
+      },
+      "cvss_v4": null,
+      "live_context": [],
+      "remediation": {
+        "recommendation": "Return a parameterized query and values separately, or use a data-access API that binds parameters.",
+        "alternatives": [
+          "Replace free-form lookup with an allowlisted identifier type"
+        ],
+        "compatibility": "The database caller must support parameter binding.",
+        "rollout": "Add injection-oriented negative tests and migrate each call site to bound parameters.",
+        "rollback": "Retain the prior query only in a disabled test fixture; do not restore concatenation in runtime code."
+      },
+      "validation": {
+        "method": "Static source-to-sink inspection",
+        "expected": "Input is concatenated into SQL syntax without a binding boundary",
+        "performed": true,
+        "result": "passed",
+        "evidence": [
+          "tests/fixtures/vulnerable_sample.py:19"
+        ]
+      },
+      "residual_risk": {
+        "summary": "Other dynamic query builders would require separate coverage.",
+        "owner": "fixture maintainer",
+        "review_by": "2027-08-07"
+      },
+      "conflicts": []
+    },
+    {
+      "id": "SR-FIXTURE-SHELL",
+      "title": "Caller-controlled command reaches a shell interpreter",
+      "status": "confirmed",
+      "asset": "Synthetic local process authority",
+      "locations": [
+        {
+          "path": "tests/fixtures/vulnerable_sample.py",
+          "line_start": 22,
+          "line_end": 24,
+          "symbol": "unsafe_shell",
+          "artifact_digest": null,
+          "unavailable_reason": null
+        }
+      ],
+      "evidence": [
+        {
+          "type": "code-excerpt",
+          "summary": "The command parameter is passed directly to os.system.",
+          "redacted": false,
+          "reference": "tests/fixtures/vulnerable_sample.py:22-24",
+          "digest": null
+        }
+      ],
+      "reasoning": {
+        "model": "source-to-sink",
+        "narrative": "A caller-controlled string crosses directly into a shell interpreter with the process's authority.",
+        "steps": [
+          "Caller controls command",
+          "No allowlist or structured argument boundary is applied",
+          "os.system delegates the string to a shell"
+        ]
+      },
+      "preconditions": [
+        "An attacker influences command",
+        "A real application invokes the function"
+      ],
+      "impact": {
+        "dimensions": [
+          "confidentiality",
+          "integrity",
+          "availability"
+        ],
+        "narrative": "A real invocation could execute commands with the application's privileges. This fixture is never executed by package tests."
+      },
+      "taxonomy": {
+        "cwe": [
+          "CWE-78"
+        ],
+        "capec": [
+          "CAPEC-88"
+        ],
+        "attack": []
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "The synthetic source and operating-system sink are directly connected.",
+        "uncertainties": [
+          "Production reachability and privilege are outside the fixture"
+        ]
+      },
+      "cvss_v4": null,
+      "live_context": [],
+      "remediation": {
+        "recommendation": "Remove shell interpretation and call a fixed executable with a structured argument array after strict allowlisting.",
+        "alternatives": [
+          "Replace operating-system execution with an internal library operation"
+        ],
+        "compatibility": "Behavior that depends on shell expansion must be redesigned explicitly.",
+        "rollout": "Introduce structured commands, negative metacharacter tests, and least-privilege execution before switching call sites.",
+        "rollback": "Disable the feature rather than restoring shell interpretation."
+      },
+      "validation": {
+        "method": "Static source-to-sink inspection without execution",
+        "expected": "Caller input reaches os.system directly",
+        "performed": true,
+        "result": "passed",
+        "evidence": [
+          "tests/fixtures/vulnerable_sample.py:24"
+        ]
+      },
+      "residual_risk": {
+        "summary": "Other process-launch paths would require separate review.",
+        "owner": "fixture maintainer",
+        "review_by": "2027-08-07"
+      },
+      "conflicts": []
+    },
+    {
+      "id": "SR-FIXTURE-AGENT",
+      "title": "Untrusted model output crosses directly into operating-system authority",
+      "status": "confirmed",
+      "asset": "Synthetic agent tool boundary",
+      "locations": [
+        {
+          "path": "tests/fixtures/vulnerable_sample.py",
+          "line_start": 32,
+          "line_end": 34,
+          "symbol": "agent_execute",
+          "artifact_digest": null,
+          "unavailable_reason": null
+        }
+      ],
+      "evidence": [
+        {
+          "type": "code-excerpt",
+          "summary": "The model_output parameter is sent directly to os.system without policy validation or approval.",
+          "redacted": false,
+          "reference": "tests/fixtures/vulnerable_sample.py:32-34",
+          "digest": null
+        }
+      ],
+      "reasoning": {
+        "model": "trust-chain",
+        "narrative": "Probabilistic, potentially attacker-influenced model output is treated as an authorization decision and executable command.",
+        "steps": [
+          "Model output may incorporate untrusted prompt or retrieval content",
+          "No typed tool contract, policy check, or human approval constrains the output",
+          "The output reaches an operating-system shell with application authority"
+        ]
+      },
+      "preconditions": [
+        "An attacker can influence model context or output",
+        "The agent function is invoked with operating-system privileges"
+      ],
+      "impact": {
+        "dimensions": [
+          "confidentiality",
+          "integrity",
+          "availability",
+          "safety"
+        ],
+        "narrative": "A real agent could convert prompt injection into unauthorized operating-system actions. The synthetic fixture is not executed."
+      },
+      "taxonomy": {
+        "cwe": [
+          "CWE-78",
+          "CWE-284"
+        ],
+        "capec": [],
+        "attack": []
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "The authority transition is explicit and intentionally lacks an intermediate policy decision.",
+        "uncertainties": [
+          "The fixture does not model upstream prompt controls or runtime sandboxing"
+        ]
+      },
+      "cvss_v4": null,
+      "live_context": [],
+      "remediation": {
+        "recommendation": "Expose only typed, allowlisted tools; validate arguments and policy independently of model output; require approval for high-impact actions; and sandbox execution.",
+        "alternatives": [
+          "Remove operating-system access from the agent entirely"
+        ],
+        "compatibility": "Free-form command behavior must be replaced with explicit tool schemas.",
+        "rollout": "Add adversarial prompt and retrieval tests, policy-denial tests, sandbox boundaries, and action audit logs before enabling the tool.",
+        "rollback": "Disable the tool and revoke its credentials or workload identity."
+      },
+      "validation": {
+        "method": "Static authority-transition inspection without model or shell execution",
+        "expected": "Model output reaches os.system without an independent decision point",
+        "performed": true,
+        "result": "passed",
+        "evidence": [
+          "tests/fixtures/vulnerable_sample.py:34"
+        ]
+      },
+      "residual_risk": {
+        "summary": "Typed tools still require authorization, least privilege, monitoring, and adversarial evaluation.",
+        "owner": "fixture maintainer",
+        "review_by": "2027-08-07"
+      },
+      "conflicts": []
+    },
+    {
+      "id": "SR-FIXTURE-DEMO-TOKEN",
+      "title": "Explicit demo token marker is not a credential",
+      "status": "false-positive",
+      "asset": "Synthetic fixture constant",
+      "locations": [
+        {
+          "path": "tests/fixtures/vulnerable_sample.py",
+          "line_start": 9,
+          "line_end": 9,
+          "symbol": "DEMO_API_TOKEN",
+          "artifact_digest": null,
+          "unavailable_reason": null
+        }
+      ],
+      "evidence": [
+        {
+          "type": "code-excerpt",
+          "summary": "The value begins with NOT_A_REAL_DEMO and the fixture documentation explicitly identifies it as fictional.",
+          "redacted": true,
+          "reference": "tests/fixtures/vulnerable_sample.py:9 and tests/fixtures/README.md",
+          "digest": null
+        }
+      ],
+      "reasoning": {
+        "model": "other",
+        "narrative": "The token-shaped string is an intentionally recognizable synthetic marker, not evidence of a live secret.",
+        "steps": [
+          "A pattern-based detector may flag the variable name or token shape",
+          "The value carries an explicit non-secret marker",
+          "The fixture guide confirms the value is fictional",
+          "No provider, account, or live validation target exists"
+        ]
+      },
+      "preconditions": [
+        "A detector treats token shape as proof without contextual validation"
+      ],
+      "impact": {
+        "dimensions": [
+          "confidentiality"
+        ],
+        "narrative": "No credential impact exists because the value is synthetic; the review risk is a false alarm."
+      },
+      "taxonomy": {
+        "cwe": [
+          "CWE-798"
+        ],
+        "capec": [],
+        "attack": []
+      },
+      "confidence": {
+        "level": "high",
+        "rationale": "The value and surrounding documentation explicitly declare a non-secret synthetic fixture.",
+        "uncertainties": []
+      },
+      "cvss_v4": null,
+      "live_context": [],
+      "remediation": {
+        "recommendation": "Keep the explicit non-secret marker and suppress only this exact fixture path if a scanner cannot distinguish it.",
+        "alternatives": [
+          "Generate the marker during tests while preserving a deterministic non-secret prefix"
+        ],
+        "compatibility": "No runtime behavior changes because the fixture is never executed.",
+        "rollout": "Document any exact-path suppression with an owner and expiry.",
+        "rollback": "Remove the suppression if the fixture path or semantics change."
+      },
+      "validation": {
+        "method": "Context review of the value and fixture documentation",
+        "expected": "The marker is explicitly fictional and has no external account or provider",
+        "performed": true,
+        "result": "passed",
+        "evidence": [
+          "tests/fixtures/vulnerable_sample.py:1-9",
+          "tests/fixtures/README.md"
+        ]
+      },
+      "residual_risk": {
+        "summary": "A future maintainer must not replace the marker with a real credential.",
+        "owner": "fixture maintainer",
+        "review_by": "2027-08-07"
+      },
+      "conflicts": []
+    }
+  ],
+  "conflicts": [],
+  "unknowns": []
+}

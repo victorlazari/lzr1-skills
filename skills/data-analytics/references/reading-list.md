@@ -52,50 +52,59 @@
 
 ---
 
-## Essential Articles & Resources (32)
+## Essential Articles & Resources (34)
 
 ### Data Engineering
 1. **The Rise of the Analytics Engineer** — dbt Labs (2020). Defining the analytics engineer role.
 2. **Data Mesh Principles** — Zhamak Dehghani, martinfowler.com (2020). Data mesh architecture.
-3. **Emerging Architectures for Modern Data Infrastructure** — a16z (2024 update).
-4. **The Modern Data Stack** — Preset blog (2024). Current state of data tools.
-5. **Apache Iceberg Documentation** — iceberg.apache.org. Open table format.
-6. **Delta Lake Documentation** — delta.io. Lakehouse table format.
+3. **The 4 principles of data mesh** — dbt Labs (2026). Data mesh maturity and implementation.
+4. **Emerging Architectures for Modern Data Infrastructure** — a16z (2024 update).
+5. **What is the modern data stack** — Fivetran (2026). Current state of data tools.
+6. **Data Engineering Design Patterns You Must Learn in 2026** — AWS Plain English (2026).
+7. **Apache Iceberg Documentation** — iceberg.apache.org. Open table format.
+8. **Delta Lake Documentation** — delta.io. Lakehouse table format.
 
 ### dbt & Analytics Engineering
-7. **dbt Documentation** — docs.getdbt.com. Official dbt guide.
-8. **dbt Best Practices** — docs.getdbt.com/best-practices. Official best practices.
-9. **How We Structure Our dbt Projects** — dbt Labs (2024). Project structure guide.
-10. **The dbt Style Guide** — dbt Labs. SQL and YAML conventions.
-11. **dbt Semantic Layer** — docs.getdbt.com. Metrics layer documentation.
+9. **dbt Documentation** — docs.getdbt.com. Official dbt guide.
+10. **dbt Best Practices** — docs.getdbt.com/best-practices. Official best practices.
+11. **How We Structure Our dbt Projects** — dbt Labs (2024). Project structure guide.
+12. **The dbt Style Guide** — dbt Labs. SQL and YAML conventions.
+13. **dbt Semantic Layer Documentation** — docs.getdbt.com (2026). Metrics layer and API capabilities.
 
 ### Data Quality & Governance
-12. **Data Observability: The Next Frontier** — Barr Moses, Monte Carlo (2024).
-13. **Great Expectations Documentation** — greatexpectations.io. Data validation.
-14. **OpenLineage Specification** — openlineage.io. Lineage standard.
-15. **DataHub Documentation** — datahubproject.io. Data catalog.
+14. **Data Observability: The Next Frontier** — Barr Moses, Monte Carlo (2024).
+15. **Data Governance Frameworks for AI Compliance | 2026** — Dataversity (2026).
+16. **Great Expectations Documentation** — greatexpectations.io. Data validation.
+17. **OpenLineage Specification** — openlineage.io. Lineage standard.
+18. **DataHub Documentation** — datahubproject.io. Data catalog.
 
 ### SQL & Performance
-16. **Modern SQL** — modern-sql.com. Advanced SQL features by standard.
-17. **Use The Index, Luke** — use-the-index-luke.com. SQL indexing and performance.
-18. **Snowflake Performance Optimization** — Snowflake docs (2024).
-19. **BigQuery Best Practices** — Google Cloud (2024).
+19. **Modern SQL** — modern-sql.com. Advanced SQL features by standard.
+20. **Use The Index, Luke** — use-the-index-luke.com. SQL indexing and performance.
+21. **Snowflake Performance Optimization** — Snowflake docs (2024).
+22. **BigQuery Best Practices** — Google Cloud (2024).
 
 ### Visualization & BI
-20. **Storytelling with Data Blog** — storytellingwithdata.com. Visualization best practices.
-21. **From Data to Viz** — data-to-viz.com. Chart selection decision tree.
-22. **Looker Best Practices** — cloud.google.com/looker. LookML patterns.
-23. **Evidence Documentation** — evidence.dev. Code-based BI.
+23. **Storytelling with Data Blog** — storytellingwithdata.com. Visualization best practices.
+24. **From Data to Viz** — data-to-viz.com. Chart selection decision tree.
+25. **Looker Best Practices** — cloud.google.com/looker. LookML patterns.
+26. **Evidence Documentation** — evidence.dev. Code-based BI.
 
 ### Streaming & Real-time
-24. **Kafka Documentation** — kafka.apache.org. Event streaming platform.
-25. **Flink Documentation** — flink.apache.org. Stream processing.
-26. **Materialize Documentation** — materialize.com. Streaming SQL.
-27. **The Log: What Every Engineer Should Know** — Jay Kreps (2013). Event log fundamentals.
+27. **Kafka Documentation** — kafka.apache.org. Event streaming platform.
+28. **Flink Documentation** — flink.apache.org. Stream processing.
+29. **Materialize Documentation** — materialize.com. Streaming SQL.
+30. **The Log: What Every Engineer Should Know** — Jay Kreps (2013). Event log fundamentals.
 
 ### Data Science & Experimentation
-28. **Causal Inference: The Mixtape** — Scott Cunningham (free online). Causal methods.
-29. **Statistical Rethinking** — Richard McElreath (lectures free online). Bayesian statistics.
-30. **Eppo Experimentation Guide** — eppo.com/resources. Modern A/B testing.
-31. **Statsig Documentation** — statsig.com. Feature flags + experimentation.
-32. **Netflix Tech Blog: Experimentation** — netflixtechblog.com. A/B testing at scale.
+31. **Causal Inference: The Mixtape** — Scott Cunningham (free online). Causal methods.
+32. **Statistical Rethinking** — Richard McElreath (lectures free online). Bayesian statistics.
+33. **Eppo Experimentation Guide** — eppo.com/resources. Modern A/B testing.
+34. **Statsig Documentation** — statsig.com. Feature flags + experimentation.
+35. **Netflix Tech Blog: Experimentation** — netflixtechblog.com. A/B testing at scale.
+
+---
+*Verified against upstream: 2026-08-07*
+*Sources:*
+* - The 4 principles of data mesh: https://www.getdbt.com/blog/the-four-principles-of-data-mesh
+* - What is the modern data stack: https://www.fivetran.com/blog/what-is-the-modern-data-stack

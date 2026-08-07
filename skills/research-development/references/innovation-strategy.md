@@ -1,5 +1,7 @@
 # Innovation Strategy
 
+**Verified against upstream: 2026-08-07** (ISO 56000:2025 Innovation management — Fundamentals and vocabulary)
+
 ## Table of Contents
 1. Innovation Framework
 2. Innovation Portfolio
@@ -11,13 +13,23 @@
 
 ## 1. Innovation Framework
 
-### Three Horizons of Innovation
+### ISO 56000:2025 Principles
+- Realization of value
+- Future-focused leaders
+- Strategic direction
+- Culture
+- Exploiting insights
+- Managing uncertainty
+- Adaptability
+- Systems approach
 
-| Horizon | Focus | Timeline | Investment | Risk |
-|---|---|---|---|---|
-| H1: Core | Optimize existing business | 0-12 months | 70% | Low |
-| H2: Adjacent | Extend into new areas | 12-36 months | 20% | Medium |
-| H3: Transformational | Create new markets | 36+ months | 10% | High |
+### Three Horizons of Innovation (Updated with AI-driven innovation)
+
+| Horizon | Focus | Timeline | Investment | Risk | AI Integration |
+|---|---|---|---|---|---|
+| H1: Core | Optimize existing business | 0-12 months | 70% | Low | AI for operational efficiency |
+| H2: Adjacent | Extend into new areas | 12-36 months | 20% | Medium | AI for new product features |
+| H3: Transformational | Create new markets | 36+ months | 10% | High | AI-driven disruptive business models |
 
 ### Innovation Types
 

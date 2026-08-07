@@ -23,9 +23,15 @@ Moving beyond simple zero-shot prompting, enterprise applications adopt complex 
 | **Plan-and-Solve** | Dividing reasoning into a planning phase and a solving phase. |
 | **Reflexion** | Iteratively evaluating previous outputs and generating revised responses. |
 
-## 3. Automated Prompt Optimization
+## 3. Automated Prompt Optimization and Evaluation
 
-As models become more capable, the nature of prompt engineering is shifting from manual string manipulation to programmatic orchestration. **DSPy (Declarative Self-improving Python)** is a framework for algorithmically optimizing LM prompts and weights by defining task signatures and compiling optimized prompts. **OPRO (Optimization by PROmpting)** uses the LLM itself to optimize prompts based on a history of prompt-score pairs. **Meta-Prompting** uses the model to generate or improve prompts in a feedback loop.
+As models become more capable, the nature of prompt engineering is shifting from manual string manipulation to programmatic orchestration and automated evaluation.
+
+- **DSPy (Declarative Self-improving Python)**: A framework for algorithmically optimizing LM prompts and weights by defining task signatures and compiling optimized prompts.
+- **OPRO (Optimization by PROmpting)**: Uses the LLM itself to optimize prompts based on a history of prompt-score pairs.
+- **Meta-Prompting**: Uses the model to generate or improve prompts in a feedback loop.
+- **LLM-as-a-Judge**: Using a strong LLM (like GPT-4) to evaluate the outputs of other models or prompts based on specific criteria (e.g., relevance, accuracy, tone). This is crucial for scalable, automated evaluation.
+- **Braintrust/LangSmith**: Platforms for managing prompt versions, running evaluations against datasets, and tracking performance over time.
 
 ## 4. Context Window Management
 

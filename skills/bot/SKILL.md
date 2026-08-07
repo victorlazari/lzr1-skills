@@ -5,7 +5,7 @@ description: Advanced Bot Engineering with OpenClaw, NemoClaw, and OpenShell
 
 # Bot Specialist Skill
 
-## When to Use
+## Scope and Triggers
 
 Use this skill when tasked with designing, developing, deploying, or auditing advanced autonomous AI agents and bots using the OpenClaw, NemoClaw, and OpenShell ecosystems. This includes:
 - Building and managing native or bundle plugins for OpenClaw.
@@ -15,7 +15,65 @@ Use this skill when tasked with designing, developing, deploying, or auditing ad
 - Conducting comprehensive security audits for bot deployments.
 - Troubleshooting bot lifecycles, session locking, and plugin hooks.
 
-## Sub-Agent Spawning
+**Escalation Boundaries:**
+- For comprehensive code or application security audits beyond bot configuration, route to `security-review`.
+- For setting up general automated workflows not specific to OpenClaw/NemoClaw bots, route to `automation-and-scheduling`.
+
+## Preconditions
+
+Before acting, verify:
+- Target environment and bot configuration requirements.
+- Permissions to modify network policies or deploy bots.
+- User intent for destructive or production-impacting actions.
+
+## Source Freshness
+
+Bot ecosystems evolve rapidly. Always verify current capabilities and supported flags before executing commands:
+- Run runtime checks (e.g., `bot --version`).
+- Consult official upstream documentation for OpenClaw, NemoClaw, and OpenShell.
+- Refer to `references/complete-reference.md` for verified facts.
+
+## Workflow
+
+1. **Discover**: Identify target environment and bot configuration requirements.
+2. **Validate**: Use `scripts/validate-bot-config.sh` to dry-run and validate configurations before application.
+3. **Confirm**: If deploying or modifying network policies, request explicit user confirmation.
+4. **Execute**: Apply deployment or configuration changes using the `bot` CLI or OpenShell.
+5. **Verify**: Confirm successful deployment via `bot status` and `bot logs`.
+6. **Finalize**: Stop and report success, or rollback and report failure if verification fails.
+
+## Safety
+
+- **Read-only Discovery**: Always separate read-only discovery from mutations.
+- **Confirmation Required**: Require explicit user confirmation before deploying bots, modifying network policies, or performing any destructive/external/privileged actions.
+- **Credential Handling**: Ensure all credentials are injected via L7 proxy and never stored in the sandbox filesystem.
+
+## Validation
+
+- Use `scripts/validate-bot-config.sh` to validate bot configuration files (e.g., openclaw.json, bot-config.yml).
+- Run safe local syntax checks on files created (`bash -n`, Python compilation, JSON/YAML parsing).
+
+## Failure Handling
+
+- If deployment fails, use `bot logs` and OpenShell diagnostics to identify the issue.
+- Provide rollback instructions for failed deployments.
+- Do not repeat a failed action unchanged.
+
+## Output Contract
+
+The final output must include:
+- A summary of actions taken.
+- Evidence of successful validation and deployment.
+- Any known limits or unresolved uncertainties.
+- Actionable next steps for the user.
+
+## Resources
+
+- [Complete Reference Guide](references/complete-reference.md): Technical knowledge for advanced bot engineering.
+- [Validate Bot Config Script](scripts/validate-bot-config.sh): Deterministic validation of bot configuration files.
+- [Network Policy Template](templates/network-policy.yaml): Reusable template for OpenShell network policies with safe defaults.
+
+## Orchestration
 
 This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
 
@@ -27,69 +85,23 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 | Bulk security auditing | Security Auditor | Parallel security review of bot components (auth, data, network) |
 
 ### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+- Spawn when 3+ independent items need the same operation.
+- Each sub-agent receives: context, specific target, success criteria.
+- Results are aggregated and cross-referenced for conflicts.
+- Maximum concurrent sub-agents: 10.
 
-## Workflow
+### Adversarial Verification Panel
+For each significant security vulnerability produced by parallel sub-agents:
+1. Spawn 3 independent Refuter Agents per finding.
+2. A finding is confirmed only if ≥2 refuters fail to refute it.
+3. A finding is discarded if ≥2 refuters succeed.
+4. Include dissenting arguments for confirmed findings with 1 successful refuter (labeled `CONTESTED`).
 
-1. **Architecture & Design**: Define the bot's purpose, required plugins, memory engine, and multi-agent routing rules.
-2. **Environment Setup**: Use OpenShell to create secure sandboxes (`openshell sandbox create`), configure network policies, and set up credential providers.
-3. **Plugin Development**: Develop native or bundle plugins, utilizing OpenClaw lifecycle hooks (e.g., `before_model_resolve`, `before_agent_reply`).
-4. **Memory Configuration**: Configure the appropriate memory engine (Builtin, QMD, Honcho, LanceDB) and set up dreaming/consolidation schedules.
-5. **Deployment & Orchestration**: Deploy the bot using the `bot` CLI or OpenShell, managing scaling, persistent storage, and port forwarding.
-6. **Security Audit**: Perform a comprehensive security audit covering authentication, data privacy, network segmentation, and input validation.
-7. **Monitoring & Troubleshooting**: Utilize `bot status`, `bot logs`, and OpenShell diagnostics to monitor performance and resolve issues.
+### Cross-System Consistency Validator
+Run one Consistency Validator Agent with all parallel outputs before synthesis to flag contradictions (`MUST_RESOLVE`) and missing prerequisites (`SEQUENCING_REQUIRED`).
 
-## Core Principles
-
-- **Defense-in-Depth Security**: Always utilize Landlock, seccomp, and network namespace isolation via OpenShell. Never store credentials in the sandbox filesystem; use L7 proxy credential injection.
-- **Modular Extensibility**: Leverage the plugin architecture and ClawHub ecosystem for capabilities rather than building monolithic agents.
-- **State and Memory Management**: Ensure robust session locking to prevent race conditions. Use appropriate memory engines and background dreaming for long-term context retention.
-- **Least Privilege**: Apply strict network policies (default deny) and operator approval flows for egress traffic.
-- **Cost and Performance Optimization**: Utilize complexity-based model routing (e.g., NVIDIA LLM Router) to balance inference costs and latency.
-
-## Key References
-
-- [NemoClaw GitHub Repository](https://github.com/NVIDIA/NemoClaw)
-- [OpenShell GitHub Repository](https://github.com/NVIDIA/OpenShell)
-- [OpenClaw Documentation](https://docs.openclaw.ai)
-- [VoltAgent Awesome NemoClaw](https://github.com/VoltAgent/awesome-nemoclaw)
-- [VoltAgent Awesome OpenClaw Skills](https://github.com/VoltAgent/awesome-openclaw-skills)
-
----
-
-## Adversarial Verification Panel
-
-For each significant security vulnerabilities produced by the parallel sub-agents:
-
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong security vulnerabilities from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Plugin Engineer, Policy Validator, Deployment Specialist, Security Auditor) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Security Auditor recommends enabling strict egress deny-all network policies while the Deployment Specialist recommends opening outbound ports for plugin bundle fetching from ClawHub)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified aggregated cross-referenced report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+### Synthesis Agent
+1. Resolve `MUST_RESOLVE` contradictions.
+2. Re-order `SEQUENCING_REQUIRED` items.
+3. Label confidence (`HIGH` / `MEDIUM` / `LOW`).
+4. Note gap analysis (blind spots).

@@ -117,7 +117,7 @@ Query Processing:
 
 **Retrieval Enhancement**:
 - Hybrid search: Combine BM25 (keyword) + dense (vector) retrieval
-- Multi-index: Separate indexes for different document types
+- Multi-index: Separate indices for different document types
 - Recursive retrieval: Retrieve summaries first, then drill into details
 - Knowledge graph augmentation: Use entity relationships to expand context
 

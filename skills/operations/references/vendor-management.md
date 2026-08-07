@@ -1,5 +1,10 @@
 # Vendor Management
 
+**Verified against upstream:** 2026-08-07
+**Primary Sources:**
+- Vendor Management Best Practices (https://www.zycus.com/blog/supplier-management/vendor-management-101-best-practices-and-key-considerations)
+- Vendor Management Best Practices for Businesses (https://anthropmanagement.com/vendor-management-best-practices-for-businesses/)
+
 ## Table of Contents
 1. Vendor Selection
 2. Procurement Process
@@ -9,7 +14,7 @@
 
 ---
 
-## 1. Vendor Selection
+## 1. Vendor Selection (Strategic Sourcing & Digital Procurement)
 
 ### Evaluation Criteria
 
@@ -148,3 +153,11 @@ Hidden costs:
   + Compliance/audit
   + Switching costs at end
 ```
+
+## Recommended Reading (Source Map)
+- **Strategic Sourcing Management** — Sherry Gordon (2008), Kogan Page.
+- **Procurement and Supply Chain Management** — Kenneth Lysons (10th ed, 2020), Pearson.
+- **G2 Research** — g2.com/research. Software reviews and data.
+- **Gartner** — gartner.com. Technology research.
+- **Zylo Blog** — zylo.com/blog. SaaS management.
+- **Productiv Blog** — productiv.com/blog. SaaS intelligence.

@@ -1,0 +1,9 @@
+# Global AI Service Settings
+version: "1.0"
+services:
+  global:
+    environment: production
+    log_level: info
+security:
+  iam_role: ai-service-role
+  enable_audit_logging: true

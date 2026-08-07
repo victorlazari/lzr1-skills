@@ -1,71 +1,44 @@
-# Prompt Engineering Reading List (2023-2026)
+# Prompt Engineering Reading List (2025-2026)
 
-## Books
+This reading list serves as a source map for the prompt engineering skill. It identifies authoritative sources and explains what each source governs and when to consult it.
 
-1. **"Prompt Engineering for Generative AI"** by James Phoenix and Mike Taylor (2023)
-2. **"The Art of Prompt Engineering with ChatGPT"** by Nathan Hunter (2023)
-3. **"Mastering Prompt Engineering"** by John Doe (2024)
-4. **"Advanced Prompt Architecture for Enterprise LLMs"** by Jane Smith (2025)
-5. **"Prompt Injection and LLM Security"** by Alice Johnson (2024)
-6. **"Building LLM Applications: From Prototype to Production"** by Bob Williams (2024)
-7. **"The Prompt Engineer's Handbook"** by Charlie Brown (2023)
-8. **"Designing Conversational AI with Large Language Models"** by Diana Prince (2025)
-9. **"Retrieval-Augmented Generation in Practice"** by Evan Wright (2024)
-10. **"Optimizing LLM Performance: Tokens, Latency, and Cost"** by Fiona Davis (2025)
-11. **"Prompt Engineering Patterns and Best Practices"** by George Miller (2024)
-12. **"Securing Generative AI Systems"** by Hannah Wilson (2025)
-13. **"The DSPy Framework: Algorithmic Prompt Optimization"** by Ian Taylor (2026)
-14. **"Multi-Agent Systems and Prompt Routing"** by Julia Moore (2025)
-15. **"Evaluating LLM Outputs: Metrics and Methodologies"** by Kevin Anderson (2024)
-16. **"Context Window Management Strategies"** by Laura Thomas (2025)
-17. **"Adversarial Testing for Language Models"** by Michael Jackson (2024)
-18. **"Prompt Configuration and Schema Design"** by Nina White (2025)
-19. **"Troubleshooting Prompt-Based Systems"** by Oscar Harris (2026)
-20. **"The Future of Prompting: Implicit vs. Explicit"** by Paul Martin (2026)
-21. **"Generative AI in the Enterprise"** by Quinn Thompson (2024)
-22. **"Prompt Engineering for Developers"** by Rachel Garcia (2023)
-23. **"Building Autonomous Agents with ReAct"** by Sam Martinez (2025)
-24. **"Tree of Thoughts: Advanced Problem Solving with LLMs"** by Tina Robinson (2024)
-25. **"Prompt Caching and Infrastructure"** by Uma Clark (2025)
-26. **"Defensive Prompting Techniques"** by Victor Rodriguez (2024)
-27. **"LLM-as-a-Judge: Automated Evaluation"** by Wendy Lewis (2025)
-28. **"Prompt Drift and Version Control"** by Xavier Lee (2026)
-29. **"Multimodal Prompt Engineering"** by Yara Walker (2025)
-30. **"The Economics of Prompt Engineering"** by Zachary Hall (2024)
-31. **"Prompt Engineering: A Comprehensive Guide"** by Aaron Young (2023)
-32. **"Advanced LLM Workflows"** by Bella King (2025)
+## Authoritative Guides and Frameworks
 
-## Articles and Papers
+1. **[Prompt Engineering Guide by DAIR.AI](https://www.promptingguide.ai/)**
+   - **Governs**: Core prompt engineering techniques, reasoning frameworks (CoT, ToT, ReAct), and model-specific prompting strategies.
+   - **When to consult**: When designing new prompt architectures or seeking to understand the fundamental mechanics of different prompting techniques.
+   - **Verified against upstream**: 2026-08-07
 
-1. **"Large Language Models are Zero-Shot Reasoners"** by Kojima et al. (2023)
-2. **"Chain-of-Thought Prompting Elicits Reasoning in Large Language Models"** by Wei et al. (2023)
+2. **[OpenAI Prompt Engineering Guide](https://platform.openai.com/docs/guides/prompt-engineering)**
+   - **Governs**: Best practices for OpenAI models, including clear instructions, providing reference text, splitting complex tasks, and using external tools.
+   - **When to consult**: When optimizing prompts specifically for GPT-4 or other OpenAI models, or when implementing tool use (function calling).
+   - **Verified against upstream**: 2026-08-07
+
+3. **[Anthropic Prompt Engineering Interactive Tutorial](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)**
+   - **Governs**: Best practices for Claude models, including XML tag usage, long context window management, and system prompt design.
+   - **When to consult**: When optimizing prompts for Claude models, especially for tasks involving large documents or complex formatting requirements.
+   - **Verified against upstream**: 2026-08-07
+
+4. **[Braintrust: The Data-Driven Prompt Engineering Guide](https://www.braintrust.dev/docs/guides/prompt-engineering)**
+   - **Governs**: Automated evaluation, LLM-as-a-judge methodologies, dataset management, and iterative prompt optimization.
+   - **When to consult**: When setting up evaluation pipelines, defining scoring metrics, or transitioning from manual testing to automated, data-driven prompt optimization.
+   - **Verified against upstream**: 2026-08-07
+
+5. **[IBM: What is Prompt Engineering?](https://www.ibm.com/topics/prompt-engineering)**
+   - **Governs**: Enterprise applications of prompt engineering, security considerations, and integration with broader AI strategies.
+   - **When to consult**: When designing prompt systems for enterprise environments, focusing on security, compliance, and scalability.
+   - **Verified against upstream**: 2026-08-07
+
+## Key Papers and Research
+
+1. **"Large Language Models are Zero-Shot Reasoners"** by Kojima et al. (2022)
+   - **Governs**: The foundational concept of zero-shot Chain-of-Thought prompting ("Let's think step by step").
+
+2. **"Chain-of-Thought Prompting Elicits Reasoning in Large Language Models"** by Wei et al. (2022)
+   - **Governs**: The mechanics and benefits of few-shot Chain-of-Thought prompting for complex reasoning tasks.
+
 3. **"Tree of Thoughts: Deliberate Problem Solving with Large Language Models"** by Yao et al. (2023)
+   - **Governs**: Advanced reasoning architectures that explore multiple paths and evaluate intermediate steps.
+
 4. **"ReAct: Synergizing Reasoning and Acting in Language Models"** by Yao et al. (2023)
-5. **"Large Language Models as Optimizers" (OPRO)** by Yang et al. (2023)
-6. **"DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines"** by Khattab et al. (2024)
-7. **"Lost in the Middle: How Language Models Use Long Contexts"** by Liu et al. (2023)
-8. **"Prompt Injection Attacks and Defenses in LLM-Integrated Applications"** by Greshake et al. (2023)
-9. **"Jailbreaking ChatGPT via Prompt Engineering: An Empirical Study"** by Liu et al. (2023)
-10. **"Evaluating Large Language Models: A Comprehensive Survey"** by Chang et al. (2023)
-11. **"Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks"** by Lewis et al. (2023)
-12. **"Self-Consistency Improves Chain of Thought Reasoning in Language Models"** by Wang et al. (2023)
-13. **"Reflexion: Language Agents with Verbal Reinforcement Learning"** by Shinn et al. (2023)
-14. **"Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models"** by Wang et al. (2023)
-15. **"Prompt Caching: Optimizing LLM Inference Latency"** by Anthropic Research (2024)
-16. **"The Economics of Large Language Models"** by OpenAI Research (2024)
-17. **"Defending Against Indirect Prompt Injection Attacks"** by Security Researchers (2024)
-18. **"Dynamic Context Management in RAG Systems"** by Data Science Institute (2025)
-19. **"A/B Testing Prompts in Production Environments"** by Tech Engineering Blog (2024)
-20. **"Managing Prompt Drift in Enterprise Applications"** by AI Operations Weekly (2025)
-21. **"Token Optimization Strategies for Cost-Effective LLM Deployment"** by Cloud Computing Journal (2024)
-22. **"Building Robust Prompt Configuration Schemas"** by Software Architecture Review (2025)
-23. **"Troubleshooting Delayed Responses in Prompt Systems"** by Systems Engineering Magazine (2026)
-24. **"The Role of Vector Databases in Prompt Engineering"** by Data Engineering Today (2024)
-25. **"Semantic Chunking for Improved Context Injection"** by NLP Research Group (2025)
-26. **"Multimodal Prompting: Best Practices and Challenges"** by Vision-Language AI Journal (2024)
-27. **"Automated Prompt Optimization Techniques"** by Machine Learning Monthly (2025)
-28. **"Red Teaming Large Language Models"** by Cybersecurity Quarterly (2024)
-29. **"Prompt Routing in Multi-Agent Architectures"** by AI Systems Design (2025)
-30. **"The Future of Prompt Engineering: From Manual to Programmatic"** by Tech Trends Review (2026)
-31. **"Evaluating Prompt Effectiveness with LLM-as-a-Judge"** by AI Evaluation Standards (2025)
-32. **"Handling Non-Determinism in LLM Outputs"** by Reliability Engineering Journal (2024)
+   - **Governs**: The integration of reasoning traces with external tool use and action execution.

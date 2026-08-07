@@ -6,6 +6,7 @@
 3. Brand Identity
 4. Brand Messaging
 5. Brand Management
+6. AI-Driven Brand Authority
 
 ---
 
@@ -150,3 +151,17 @@ CTA: [What we want them to do next]
 | Brand loyalty | Repeat purchase, advocacy | NPS, retention, referral |
 | Brand equity | Financial value of brand | Revenue premium, valuation |
 | Share of voice | Brand mentions vs competitors | Social listening, media monitoring |
+
+---
+
+## 6. AI-Driven Brand Authority
+
+### Building Brand Authority for AI Engines
+
+- **Trust Signals**: Ensure consistent NAP (Name, Address, Phone) data across all platforms.
+- **Entity Recognition**: Establish the brand as a recognized entity in knowledge graphs (e.g., Google Knowledge Graph).
+- **Authoritative Content**: Publish high-quality, original research and thought leadership that AI engines can cite.
+- **Digital PR**: Secure mentions and backlinks from high-authority domains to build trust.
+- **Reviews and Sentiment**: Actively manage online reviews and brand sentiment, as AI engines use these as trust signals.
+
+Verified against upstream: 2026-08-07

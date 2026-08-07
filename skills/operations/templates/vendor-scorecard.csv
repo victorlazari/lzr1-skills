@@ -1,0 +1,4 @@
+Vendor Name,Functionality Score (0-5),Cost Score (0-5),Security Score (0-5),Integration Score (0-5),Support Score (0-5),Scalability Score (0-5),Viability Score (0-5)
+Vendor A,4,3,5,4,5,4,4
+Vendor B,5,2,4,3,3,5,5
+Vendor C,3,4,4,2,2,3,3

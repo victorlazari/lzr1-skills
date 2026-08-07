@@ -1,3 +1,4 @@
+
 # CFO Financial Strategy
 
 ## Table of Contents
@@ -10,6 +11,12 @@
 ---
 
 ## 1. Financial Planning
+
+### 2026 Trends
+- **Shift to Strategy**: CFOs are increasingly acting as strategic partners rather than just financial controllers.
+- **AI Adoption**: Utilizing AI for predictive analytics, risk assessment, and automated reporting.
+- **Real-Time Data**: Moving from month-end close to continuous, real-time financial visibility.
+
 
 ### Annual Planning Process
 
@@ -50,7 +57,7 @@ Cash Flow:
   - Expenses (cash spent)
   - CapEx
   = Net cash flow
-  
+
   Beginning cash + Net cash flow = Ending cash
 ```
 

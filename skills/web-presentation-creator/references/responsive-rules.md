@@ -2,6 +2,8 @@
 
 Premium landing pages must feel like native applications across all devices. This requires strict adherence to responsive design principles and Core Web Vitals optimization.
 
+Verified against upstream: 2026-08-07
+
 ---
 
 ## 1. Responsive Layout Rules
@@ -15,7 +17,7 @@ Use `clamp()` for responsive typography to avoid abrupt jumps at media queries.
 :root {
   /* Scales smoothly from 2.5rem on mobile to 5rem on desktop */
   --font-size-hero: clamp(2.5rem, 5vw + 1rem, 5rem);
-  
+
   /* Scales from 1rem to 1.25rem */
   --font-size-body: clamp(1rem, 1vw + 0.75rem, 1.25rem);
 }
@@ -71,8 +73,8 @@ Every image and video container MUST have an explicit aspect ratio.
   overflow: hidden;
 }
 
-.media-wrapper img, 
-.media-wrapper video, 
+.media-wrapper img,
+.media-wrapper video,
 .media-wrapper iframe {
   width: 100%;
   height: 100%;
@@ -81,10 +83,14 @@ Every image and video container MUST have an explicit aspect ratio.
 ```
 
 ### Content Visibility
-For extremely long scrollytelling pages (like Apple/DJI), tell the browser to skip rendering off-screen sections until they are needed.
+For extremely long scrollytelling pages (like Apple/DJI), tell the browser to skip rendering off-screen sections until they are needed. Note that `content-visibility` is not universally supported, so provide a fallback.
 
 ```css
 .scroll-section {
+  /* Fallback for older browsers */
+  display: block;
+
+  /* Modern browsers */
   content-visibility: auto;
   contain-intrinsic-size: 1000px; /* Estimate of the section's height */
 }

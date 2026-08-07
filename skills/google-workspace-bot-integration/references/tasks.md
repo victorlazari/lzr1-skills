@@ -17,3 +17,5 @@ The bot creates new tasks, assigning titles, detailed notes, and specific due da
 ## Official Documentation
 
 * [Google Tasks API Reference](https://developers.google.com/workspace/tasks/reference/rest)
+
+> Verified against upstream: 2026-08-07

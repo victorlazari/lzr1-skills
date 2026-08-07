@@ -17,3 +17,5 @@ The bot creates new contacts, populating fields such as names, email addresses, 
 ## Official Documentation
 
 * [Google People API Reference](https://developers.google.com/people/api/rest)
+
+> Verified against upstream: 2026-08-07

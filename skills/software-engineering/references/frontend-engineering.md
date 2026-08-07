@@ -1,5 +1,7 @@
 # Frontend & Mobile Engineering
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Modern Frontend Architecture
 2. React & Next.js
@@ -23,7 +25,7 @@
 | Islands Architecture | Static HTML + interactive islands | Content-heavy sites |
 | Micro-frontends | Independent frontend modules | Large teams, legacy migration |
 
-### Build Tooling (2024-2025)
+### Build Tooling (2026)
 
 | Tool | Purpose | Strengths |
 |---|---|---|
@@ -46,7 +48,7 @@
 
 ## 2. React & Next.js
 
-### React Best Practices (2024-2025)
+### React Best Practices (2026)
 
 - Use Server Components by default; Client Components only when needed (interactivity, browser APIs)
 - Prefer `use` hook for data fetching in Server Components

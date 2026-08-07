@@ -1,114 +1,92 @@
 ---
 name: software-engineering
-description: Comprehensive software engineering skill covering backend, frontend, fullstack, mobile, API design, systems architecture, database engineering, performance engineering, and language-specific expertise (Go, Rust, blockchain, embedded systems, game development). Use when writing production code, designing systems, building APIs, optimizing performance, or making architectural decisions.
+description: Comprehensive software engineering skill covering backend, frontend, fullstack, mobile, API design, systems architecture, database engineering, performance engineering, security, and language-specific expertise. Use when writing production code, designing systems, building APIs, optimizing performance, or making architectural decisions. Triggers on tasks involving software development, system design, or code review.
 ---
 
 # Software Engineering
 
-Expert-level software engineering covering the full stack: backend services, frontend applications, mobile development, API design, systems architecture, database engineering, performance optimization, and specialized domains including blockchain, embedded systems, and game development.
+Expert-level software engineering covering the full stack: backend services, frontend applications, mobile development, API design, systems architecture, database engineering, performance optimization, security, and specialized domains including blockchain, embedded systems, and game development.
 
-## When to Use
+## Scope and Triggers
 
-- Writing or reviewing production code in any language
-- Designing system architecture or making technology decisions
-- Building APIs (REST, GraphQL, gRPC)
-- Database schema design, query optimization, migrations
-- Frontend development (React, Next.js, Vue, Angular)
-- Mobile development (React Native, Flutter, Swift, Kotlin)
-- Performance engineering and optimization
-- Systems programming (Go, Rust, C/C++)
-- Blockchain/smart contract development
-- Embedded systems and firmware
+- **Handles**: Writing or reviewing production code, designing system architecture, building APIs, database schema design, frontend/mobile development, performance optimization, and security engineering.
+- **Activates**: When tasks involve software development, system design, code review, or architectural decisions.
+- **Non-goals**: Not for general IT support, hardware troubleshooting, or non-technical project management.
+- **Escalation boundaries**: Route to `security-review` for deep security auditing, `trivy-scanner` for container/dependency vulnerability scanning, `legendary-readme` for project documentation, and `coderabbit-reviewer` for automated code review.
+
+## Preconditions
+
+1. Detect the target domains based on task signals (e.g., backend, frontend, database, security).
+2. Identify the environment, language versions, and permissions required.
+3. Clarify functional and non-functional requirements before acting.
+
+## Source Freshness
+
+Volatile facts (e.g., supported versions, specific API endpoints) must be verified against official current documentation or the bundled verified references. Each reference includes a `Verified against upstream` date.
 
 ## Workflow
 
-1. **Understand requirements** — Clarify functional and non-functional requirements
-2. **Select reference** — Choose the appropriate domain reference:
-   - Backend services and APIs → `references/backend-engineering.md`
-   - Frontend and UI development → `references/frontend-engineering.md`
-   - System design and architecture → `references/systems-architecture.md`
-   - Database engineering → `references/database-engineering.md`
-   - Performance optimization → `references/performance-engineering.md`
-   - Language-specific guidance → `references/language-guides.md`
-3. **Design the solution** — Apply architectural patterns and best practices
-4. **Implement** — Write clean, tested, production-ready code
-5. **Review and optimize** — Apply code review standards and performance analysis
-6. **Document** — Record decisions, trade-offs, and usage instructions
+1. **Understand requirements** — Clarify functional and non-functional requirements.
+2. **Detect domains** — Scan the task for signals indicating which domains apply.
+3. **Spawn specialists** — If multiple domains are detected, spawn relevant domain specialists concurrently (up to 6).
+4. **Apply guidance** — Each specialist applies domain-specific guidance from its reference file.
+5. **Synthesize** — Run the Stack Synthesizer to identify contradictions, gaps, and dependencies.
+6. **Produce recommendation** — Generate a unified recommendation with explicit trade-off annotations.
+7. **Stop condition** — Stop when a complete, consistent implementation plan is generated.
 
-## Core Principles (All Engineering Work)
+## Safety
 
-- Write code for humans first, computers second — clarity over cleverness
-- Design for change: loose coupling, high cohesion, clear interfaces
-- Test at the right level: unit tests for logic, integration tests for contracts, e2e for critical paths
-- Fail fast, fail loudly: validate inputs early, use typed errors, never swallow exceptions
-- Automate everything repeatable: builds, tests, deployments, formatting
-- Measure before optimizing: profile first, optimize the bottleneck, verify improvement
-- Security by default: validate all inputs, use parameterized queries, follow least privilege
-- Document the "why" not the "what": code shows what, comments explain why
+- **Read-only discovery**: Always perform read-only discovery (e.g., reading code, checking configurations) before making any mutations.
+- **Confirmation required**: Require user confirmation for destructive, external, privileged, financial, legal, or production-impacting actions.
 
-## Role Capabilities
+## Validation
 
-| Role | Expertise | Reference |
-|---|---|---|
-| Backend Engineer | Services, APIs, data processing, distributed systems | `references/backend-engineering.md` |
-| Frontend Engineer | UI/UX implementation, state management, accessibility | `references/frontend-engineering.md` |
-| Fullstack Engineer | End-to-end feature development | Both backend + frontend |
-| Systems Architect | Large-scale design, trade-offs, technology selection | `references/systems-architecture.md` |
-| Database Engineer | Schema design, query optimization, migrations | `references/database-engineering.md` |
-| API Engineer | API design, versioning, documentation | `references/backend-engineering.md` |
-| Performance Engineer | Profiling, optimization, load testing | `references/performance-engineering.md` |
-| Mobile Engineer | iOS, Android, cross-platform development | `references/frontend-engineering.md` |
-| Go Engineer | Go services, concurrency, stdlib patterns | `references/language-guides.md` |
-| Rust Engineer | Systems programming, safety, performance | `references/language-guides.md` |
-| Blockchain Engineer | Smart contracts, DeFi, consensus | `references/language-guides.md` |
-| Embedded Systems Engineer | Firmware, RTOS, hardware interfaces | `references/language-guides.md` |
-| Game Developer | Game engines, real-time systems, ECS | `references/language-guides.md` |
+- Define syntax checks for generated code (e.g., `bash -n` for shell scripts, compilation for compiled languages).
+- Run a dry run on a full-stack task to confirm end-to-end functionality.
+- Capture evidence of successful execution (e.g., test results, logs).
 
-## Key References
+## Failure Handling
 
-- **Backend engineering**: See `references/backend-engineering.md` for service design, API patterns, distributed systems, and microservices.
-- **Frontend engineering**: See `references/frontend-engineering.md` for React, Next.js, state management, accessibility, and mobile.
-- **Systems architecture**: See `references/systems-architecture.md` for large-scale design, patterns, and trade-offs.
-- **Database engineering**: See `references/database-engineering.md` for schema design, optimization, and migrations.
-- **Performance engineering**: See `references/performance-engineering.md` for profiling, optimization, and load testing.
-- **Language guides**: See `references/language-guides.md` for Go, Rust, blockchain, embedded, and game development.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+- If an action fails, diagnose the error using logs and error messages.
+- Choose alternative approaches or tools; do not repeat the same failed action unchanged.
+- Roll back any partial changes if a multi-step process fails.
 
----
+## Output Contract
 
-## Multi-Specialist Protocol
+- **Structure**: A unified implementation plan or code artifacts.
+- **Evidence**: Test results, validation checks, or logs demonstrating success.
+- **Actionable next steps**: Clear instructions for deployment, further testing, or maintenance.
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+## Resources
+
+- **Backend engineering**: `references/backend-engineering.md`
+- **Frontend engineering**: `references/frontend-engineering.md`
+- **Systems architecture**: `references/systems-architecture.md`
+- **Database engineering**: `references/database-engineering.md`
+- **Performance engineering**: `references/performance-engineering.md`
+- **Security engineering**: `references/security-engineering.md`
+- **Language guides**: `references/language-guides.md`
+
+## Orchestration (Multi-Specialist Protocol)
+
+When multiple domains are detected, spawn all relevant specialists simultaneously (up to 6).
 
 ### Domain Detection Table
 
-Scan the task for signals that indicate which domains apply:
-
 | Task Signal (examples) | Domain | Specialist Agent | Reference |
 |---|---|---|---|
-| `backend`, `API`, `service`, `REST`, `gRPC`, `microservice`, `server-side`, `HTTP handler`, `middleware` | **Backend Engineering** | Backend Specialist | `references/backend-engineering.md` |
-| `frontend`, `UI`, `React`, `Next.js`, `Vue`, `Angular`, `CSS`, `browser`, `component`, `client-side`, `SSR` | **Frontend Engineering** | Frontend Specialist | `references/frontend-engineering.md` |
-| `architecture`, `system design`, `distributed`, `scalability`, `trade-off`, `monolith`, `event-driven`, `CQRS`, `saga` | **Systems Architecture** | Architecture Specialist | `references/systems-architecture.md` |
-| `database`, `SQL`, `schema`, `migration`, `query`, `index`, `ORM`, `Postgres`, `MySQL`, `MongoDB`, `normalization` | **Database Engineering** | DB Specialist | `references/database-engineering.md` |
-| `performance`, `profiling`, `latency`, `throughput`, `benchmark`, `bottleneck`, `memory leak`, `cache`, `optimize` | **Performance Engineering** | Performance Specialist | `references/performance-engineering.md` |
-| `Go`, `Rust`, `blockchain`, `smart contract`, `Solidity`, `embedded`, `firmware`, `RTOS`, `game engine`, `ECS` | **Language-Specific Guidance** | Language Specialist | `references/language-guides.md` |
-
-### Spawning Logic
-
-**Single domain detected** → Fall back to original single-reference behavior (no change).
-
-**Multiple domains detected** → Launch all relevant specialists simultaneously:
-- Each specialist receives: **full task context** + its dedicated reference file only
-- No specialist waits for another — all start at the same time
-- Maximum concurrent specialists: 6
+| `backend`, `API`, `service`, `REST`, `gRPC`, `microservice` | **Backend Engineering** | Backend Specialist | `references/backend-engineering.md` |
+| `frontend`, `UI`, `React`, `Next.js`, `Vue`, `Angular` | **Frontend Engineering** | Frontend Specialist | `references/frontend-engineering.md` |
+| `architecture`, `system design`, `distributed`, `scalability` | **Systems Architecture** | Architecture Specialist | `references/systems-architecture.md` |
+| `database`, `SQL`, `schema`, `migration`, `query`, `index` | **Database Engineering** | DB Specialist | `references/database-engineering.md` |
+| `performance`, `profiling`, `latency`, `throughput` | **Performance Engineering** | Performance Specialist | `references/performance-engineering.md` |
+| `security`, `vulnerability`, `auth`, `encryption` | **Security Engineering** | Security Specialist | `references/security-engineering.md` |
+| `Go`, `Rust`, `blockchain`, `embedded`, `game engine` | **Language-Specific Guidance** | Language Specialist | `references/language-guides.md` |
 
 ### Cross-Domain Synthesizer
 
 After all specialists complete, run one **Stack Synthesizer** with all specialist outputs that:
-
-1. **Identifies contradictions** between specialist recommendations for the same component
-2. **Identifies gaps** — requirements addressed by no specialist
-3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
-4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
-
-> Synthesis focus for this skill: Resolves contradictions between domain specialists (e.g., backend recommends Redis caching while DB specialist recommends materialized views). Ensures cross-domain consistency in the final implementation plan.
+1. Identifies contradictions between specialist recommendations.
+2. Identifies gaps (requirements addressed by no specialist).
+3. Identifies dependencies between domains.
+4. Produces a unified recommendation with explicit trade-off annotations.

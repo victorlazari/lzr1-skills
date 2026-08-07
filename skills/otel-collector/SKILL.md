@@ -36,16 +36,16 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 ## Workflow
 
 1.  **Requirement Analysis**: Determine the telemetry signals (traces, metrics, logs) to collect, process, and export. Identify the source and destination backends.
-2.  **Architecture Design**: Choose the appropriate scaling pattern (Stateless, Scrapers, Stateful) based on the processing requirements (e.g., tail sampling requires stateful).
+2.  **Architecture Design**: Choose the appropriate scaling pattern (Stateless, Scrapers, Stateful) based on the processing requirements (e.g., tail sampling requires stateful). Emphasize L7 load balancers for gRPC traffic and the sidecar pattern for Kubernetes deployments.
 3.  **Configuration Development**:
     - Define receivers to ingest data.
     - Configure processors (always start with `memory_limiter` and `batch`).
-    - Write OTTL statements for `transform` or `filter` processors if data manipulation is needed.
+    - Write OTTL statements for `transform` or `filter` processors if data manipulation is needed. Account for feature gates like `ottl.set.allowNil`.
     - Define exporters to send data to backends.
     - Use connectors to bridge pipelines if necessary.
 4.  **Custom Build (Optional)**: If specific components are needed or to reduce binary size, create a `builder-config.yaml` and use OCB to build a custom binary.
 5.  **Deployment**: Deploy the Collector using Docker, systemd, Helm, or the OpenTelemetry Operator. Ensure proper memory limits (`GOMEMLIMIT`) and resource requests/limits are set.
-6.  **Validation and Troubleshooting**: Use `otelcol validate`, `telemetrygen`, and internal telemetry (zPages, pprof, debug exporter) to verify the pipeline and troubleshoot issues like OOM kills or dropped data.
+6.  **Validation and Troubleshooting**: Use `otelcol validate`, `telemetrygen`, and internal telemetry (zPages, pprof, debug exporter) to verify the pipeline and troubleshoot issues like OOM kills or dropped data. Run the validation script to check pipeline configuration.
 
 ## Core Principles
 
@@ -58,7 +58,7 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 ## Key References
 
 -   `references/complete-reference.md`: Comprehensive guide on OTTL, scaling, connectors, OCB, CLI commands, configuration schemas, and deep-dive architecture.
--   `references/reading-list.md`: Curated list of books and articles for further learning on OpenTelemetry and observability.
+-   `scripts/validate-pipeline.sh`: Validates that memory_limiter is the first processor and GOMEMLIMIT is set.
 
 ---
 
@@ -95,3 +95,13 @@ The synthesis step actively resolves rather than aggregates:
 2. **`SEQUENCING_REQUIRED` items**: Re-order the unified configuration/deployment plan so prerequisites appear before the steps that depend on them
 3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
 4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+
+## Authoritative sources
+
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
+
+## Package resource index
+
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

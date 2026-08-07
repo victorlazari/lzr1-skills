@@ -1,3 +1,5 @@
+Verified against upstream: 2026-08-07
+
 # Architecture and Virtual Audio Routing
 
 This reference provides a deep dive into the infrastructure and audio routing required to build a high-performance, low-latency Google Meet virtual assistant. The core challenge is bridging a headless Chromium browser (running via Playwright) with real-time audio processing pipelines without physical audio hardware.
@@ -75,7 +77,7 @@ const browser = await chromium.launch({
     '--autoplay-policy=no-user-gesture-required', // Allows audio to play immediately without user interaction
     // The following flags can sometimes interfere with PulseAudio routing if not careful.
     // Only use if specifically providing fake file streams, otherwise rely on PulseAudio default sinks.
-    // '--use-fake-device-for-media-stream', 
+    // '--use-fake-device-for-media-stream',
   ],
   env: {
     ...process.env,

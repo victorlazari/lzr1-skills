@@ -1,98 +1,91 @@
 ---
 name: oncall-master-supreme
-description: Advanced guide to modern on-call systems, covering high availability, ChatOps, postmortems, runbook automation, SLO tracking, and multi-region handoffs.
+description: Operational playbook for managing on-call systems, incidents, ChatOps, runbooks, and SLOs. Triggers on incident response, schedule management, or on-call configuration tasks.
 ---
 
 # On-Call Master Supreme
 
-## When to Use
+## Scope and Triggers
 
-Use this skill when you need to:
-- Design or audit high availability (HA) and disaster recovery (DR) architectures for on-call systems.
-- Integrate ChatOps (Slack, Microsoft Teams) for incident war rooms and automated notifications.
-- Conduct blameless post-incident reviews (postmortems) and integrate with tools like Jeli.
-- Automate runbooks and implement auto-remediation workflows to reduce MTTR.
-- Define, track, and report on Service Level Objectives (SLOs) and Service Level Indicators (SLIs).
-- Implement and manage follow-the-sun multi-region on-call schedules and handoffs.
-- Utilize the `oncall-master-supreme` CLI for incident management, scheduling, and configuration.
-- Manage JSON-based configuration schemas for notifications, escalations, users, integrations, and security.
+**Triggers:**
+- Designing or auditing high availability (HA) and disaster recovery (DR) architectures for on-call systems.
+- Integrating ChatOps (Slack, Microsoft Teams) for incident war rooms and automated notifications.
+- Conducting blameless post-incident reviews (postmortems) and integrating with tools like Jeli.
+- Automating runbooks and implementing auto-remediation workflows to reduce MTTR.
+- Defining, tracking, and reporting on Service Level Objectives (SLOs) and Service Level Indicators (SLIs).
+- Implementing and managing follow-the-sun multi-region on-call schedules and handoffs.
+- Utilizing the `oncall-master-supreme` CLI for incident management, scheduling, and configuration.
+- Managing JSON-based configuration schemas for notifications, escalations, users, integrations, and security.
 
-## Sub-Agent Spawning
+**Non-Goals & Escalation Boundaries:**
+- Does not handle general system administration outside of on-call/incident context.
+- Does not perform arbitrary code execution or infrastructure provisioning without explicit runbook definitions.
+- Escalate to `automation-and-scheduling` when setting up recurring schedules or background processes.
+- Escalate to `post-mortem-master` when writing customer-facing incident post-mortems.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple services to configure | Configuration Agent | Parallel setup of service integrations and policies |
-| Multiple incidents to analyze | Incident Analyst | Parallel root cause analysis and postmortem generation |
-| Multiple regions to schedule | Scheduling Agent | Parallel creation of follow-the-sun rotations |
-| Bulk runbook automation | Automation Engineer | Parallel scripting of auto-remediation workflows |
+1.  **Environment:** Ensure access to the target on-call platform (e.g., PagerDuty, Opsgenie, incident.io).
+2.  **Permissions:** Verify sufficient privileges to modify schedules, trigger incidents, or update configurations.
+3.  **Inputs:** Gather necessary details (e.g., service IDs, user IDs, incident severity, configuration JSON).
 
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+
+Volatile facts (e.g., API endpoints, supported versions) must be verified against official documentation at runtime.
+-   [PagerDuty API Documentation](https://developer.pagerduty.com/api-reference/)
+-   [incident.io API Documentation](https://api-docs.incident.io/)
+-   [Datadog API Documentation](https://docs.datadoghq.com/api/latest/)
 
 ## Workflow
 
-1. **Assessment & Planning**: Evaluate the current on-call architecture, identify gaps in HA/DR, and define SLOs/SLIs.
-2. **Configuration Management**: Use the CLI or JSON schemas to configure global settings, schedules, notifications, and escalations.
-3. **Integration Setup**: Connect monitoring tools (Datadog, Prometheus) and ChatOps platforms (Slack, Teams) to the on-call system.
-4. **Automation Implementation**: Develop and deploy runbook automation and auto-remediation scripts for common incidents.
-5. **Incident Response**: Utilize the CLI and ChatOps war rooms to acknowledge, investigate, and resolve active incidents.
-6. **Post-Incident Review**: Conduct blameless postmortems, leverage Jeli for timeline reconstruction, and track remediation actions.
-7. **Continuous Improvement**: Review SLO compliance, adjust alert thresholds, and refine follow-the-sun handoff protocols.
+1.  **Assess and Define:** Assess current architecture and define SLOs/SLIs. Consult [SLO/SLI Tracking](references/slo-sli.md) and [HA/DR](references/ha-dr.md).
+2.  **Configure:** Configure global settings, schedules, and notifications using validated JSON schemas. Consult [Configuration Schemas](references/config-schemas.md) and [Follow-the-Sun](references/follow-the-sun.md).
+    -   *Validation:* Run `scripts/validate-config.sh <config.json>` before applying.
+3.  **Integrate:** Set up integrations with monitoring and ChatOps tools. Consult [ChatOps Integration](references/chatops.md).
+4.  **Automate:** Implement and test runbook automations with dry-runs. Consult [Runbook Automation](references/runbooks.md).
+5.  **Respond:** Respond to incidents using CLI and ChatOps. Consult [CLI Reference](references/cli-reference.md).
+6.  **Review:** Conduct postmortems and track remediation actions. Consult [Postmortems](references/postmortems.md).
+7.  **Stop Condition:** Stop when SLOs are met, incidents are resolved, and postmortems are completed.
 
-## Core Principles
+## Safety
 
-- **High Availability**: On-call systems must be resilient, utilizing multi-zone deployments and automated failover.
-- **Blameless Culture**: Postmortems focus on systemic failures, not human error, to foster continuous learning.
-- **Automation First**: Reduce manual toil and MTTR through runbook automation and auto-remediation.
-- **Data-Driven Reliability**: Use SLOs and SLIs to objectively measure service health and prioritize engineering efforts.
-- **Sustainable Operations**: Implement follow-the-sun models to prevent burnout and ensure continuous global coverage.
+-   **Read-Only First:** Always perform read-only discovery (e.g., listing schedules, viewing incidents) before making changes.
+-   **Confirmation Required:** Require explicit user confirmation for destructive actions (e.g., resolving incidents, overriding schedules, deleting configurations).
+-   **Dry-Runs:** Use dry-run support for configuration changes where available.
 
-## Key References
+## Validation
 
-- **Google Site Reliability Engineering** (2016). Betsy Beyer et al.
-- **The DevOps Handbook** (2016). Gene Kim et al.
-- **ChatOps: Collaboration at Scale** (2016). Paul Hammond.
-- **Service Level Objectives: A Practical Guide** (2020). Cindy Sridharan.
-- **Incident Management at Scale** (2020). Charity Majors et al.
+-   **Syntax Checks:** Validate JSON configuration schemas using `scripts/validate-config.sh`.
+-   **Postcondition Verification:** Verify that changes (e.g., schedule updates, incident resolution) are reflected in the target system.
 
----
+## Failure Handling
 
-## Parallel Execution Protocol
+-   **Diagnosis:** Check API response codes and error messages.
+-   **Rollback:** Revert to the previous configuration or schedule state if an update fails.
+-   **Retry:** Do not repeat a failed action unchanged. Adjust inputs or configuration based on error diagnostics.
 
-> **All 4 agents launch simultaneously.** Do not wait for one to finish before starting the next. Each agent receives the full task context and its dedicated reference file only.
+## Output Contract
 
-### Agent Roster
+-   **Structure:** Provide a structured summary of actions taken, including IDs of created/modified resources.
+-   **Evidence:** Include relevant logs, API responses, or CLI output.
+-   **Next Steps:** Suggest actionable next steps (e.g., reviewing a generated postmortem, verifying a schedule change).
 
-| Agent | Dimension | Scope | Reference |
-|---|---|---|---|
-| **Infra Investigator** | Infrastructure Layer | Network, DNS, load balancers, node health, disk I/O, CPU/memory saturation | `references/complete-reference.md` |
-| **App Investigator** | Application Layer | Error rates, latency percentiles, dependency failures, deploy correlation, code regression | `references/complete-reference.md` |
-| **Data Investigator** | Data Layer | Database saturation, replication lag, slow queries, lock contention, connection pool exhaustion | `references/complete-reference.md` |
-| **Runbook Lookup** | Runbook & Historical Correlation | Match error signatures to known incidents, retrieve applicable runbooks, check recent changes | `references/complete-reference.md` |
+## Resources
 
-### Spawning Rules
+-   [High Availability and Disaster Recovery](references/ha-dr.md)
+-   [ChatOps Integration](references/chatops.md)
+-   [Postmortems](references/postmortems.md)
+-   [Runbook Automation](references/runbooks.md)
+-   [SLO/SLI Tracking](references/slo-sli.md)
+-   [Follow-the-Sun Models](references/follow-the-sun.md)
+-   [CLI Reference](references/cli-reference.md)
+-   [Configuration Schemas](references/config-schemas.md)
+-   [Validate Config Script](scripts/validate-config.sh)
 
-- **Trigger**: Every invocation of this skill — no exceptions
-- **Concurrency**: All 4 agents launch in a single `parallel()` call
-- **Context per agent**: Full task input + its dedicated reference file only (no cross-agent sharing during analysis)
-- **Maximum concurrent agents**: 4
+## Orchestration
 
-### Synthesis Agent
-
-After all 4 agents report, run one **Synthesis Agent** with all reports that:
-
-1. **Cross-references** findings across dimensions for interaction effects that no single agent could see
-2. **Deduplicates** overlapping findings (same issue detected by multiple agents → one canonical entry)
-3. **Prioritizes** the merged set by severity/impact
-4. **Produces** a single unified output document
-
-> Synthesis note for this skill: Produce a unified blast radius map. Cross-reference Infra, App, and Data findings to determine whether the infra signal is root cause or a cascade from the app or data layer. Link matched runbooks to the confirmed root cause.
-
-### Quality Gate
-
-A finding from one agent that **contradicts** a finding from another agent must be flagged as `CONFLICT` and passed to the Synthesis Agent as a `MUST_RESOLVE` item — never silently dropped.
+When parallel execution is required (e.g., configuring multiple services):
+1.  **Input List:** Define an explicit list of target services or configurations.
+2.  **Bounded Concurrency:** Limit concurrent operations to avoid rate limits.
+3.  **Evidence:** Collect success/failure status for each operation.
+4.  **Synthesis:** Provide a consolidated report of all parallel operations.

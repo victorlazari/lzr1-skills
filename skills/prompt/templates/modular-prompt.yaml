@@ -1,0 +1,64 @@
+# Modular Prompt Template
+# This template demonstrates a structured approach to prompt design,
+# separating persona, context, instructions, and output schema.
+
+name: "Data Extraction and Summarization"
+version: "1.0.0"
+description: "Extracts key entities and summarizes a given text document."
+
+model_config:
+  provider: "openai"
+  model: "gpt-4o"
+  temperature: 0.2
+  max_tokens: 1024
+  top_p: 0.95
+
+prompt_components:
+  system_persona: |
+    You are an expert data analyst and summarizer. Your task is to accurately extract information from the provided text and present it in a structured format.
+    You must remain objective, concise, and strictly adhere to the requested output schema. Do not hallucinate information not present in the source text.
+
+  context_injection: |
+    <document>
+    {{ document_text }}
+    </document>
+
+  task_instructions: |
+    Analyze the document provided above and perform the following tasks:
+    1. Extract all named entities (people, organizations, locations).
+    2. Identify the main topic or theme of the document.
+    3. Write a concise summary of the document (maximum 3 sentences).
+
+  few_shot_examples:
+    - input: |
+        <document>
+        Apple Inc. announced today that CEO Tim Cook will be visiting their new facility in Austin, Texas next week to discuss the upcoming product launch.
+        </document>
+      output: |
+        ```json
+        {
+          "entities": {
+            "people": ["Tim Cook"],
+            "organizations": ["Apple Inc."],
+            "locations": ["Austin, Texas"]
+          },
+          "main_topic": "Apple CEO visit to new facility",
+          "summary": "Apple Inc. CEO Tim Cook is scheduled to visit the company's new facility in Austin, Texas next week. The purpose of the visit is to discuss an upcoming product launch."
+        }
+        ```
+
+  output_schema: |
+    Format your response strictly as a JSON object matching the following structure:
+    ```json
+    {
+      "entities": {
+        "people": ["list of people"],
+        "organizations": ["list of organizations"],
+        "locations": ["list of locations"]
+      },
+      "main_topic": "string",
+      "summary": "string"
+    }
+    ```
+
+# The final prompt is assembled by concatenating these components in the application logic.

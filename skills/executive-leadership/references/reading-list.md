@@ -1,6 +1,12 @@
+
 # Executive Leadership Recommended Reading (2024-2026)
 
 ## Essential Books (32)
+
+### 2026 Additions
+- **Heidrick & Struggles: Route to the Top Europe 2026** — Insights on CEO experience and strategy.
+- **Epicflow: CFO Trends 2025-2026** — The evolving role of the CFO and real-time data.
+
 
 ### CEO & Strategy
 1. **The Hard Thing About Hard Things** — Ben Horowitz (2014), Harper Business. CEO challenges.

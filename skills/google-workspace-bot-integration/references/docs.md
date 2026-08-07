@@ -17,3 +17,5 @@ The bot creates new, blank documents and reads existing content, extracting full
 ## Official Documentation
 
 * [Google Docs API Reference](https://developers.google.com/workspace/docs/api/reference/rest)
+
+> Verified against upstream: 2026-08-07

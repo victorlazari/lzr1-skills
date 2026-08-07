@@ -1,5 +1,8 @@
 # Performance Testing
 
+**Verified against upstream: 2026-08-07**
+**Normative Guidance**: ISO/IEC/IEEE 29119
+
 ## Table of Contents
 1. Performance Test Types
 2. Load Testing

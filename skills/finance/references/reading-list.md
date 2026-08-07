@@ -1,3 +1,4 @@
+
 # Finance Recommended Reading (2024-2026)
 
 ## Essential Books (32)

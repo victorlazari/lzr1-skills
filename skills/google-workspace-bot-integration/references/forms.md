@@ -17,3 +17,5 @@ The bot can create new forms and configure their overarching titles and descript
 ## Official Documentation
 
 * [Google Forms API Reference](https://developers.google.com/workspace/forms/api/reference/rest)
+
+> Verified against upstream: 2026-08-07

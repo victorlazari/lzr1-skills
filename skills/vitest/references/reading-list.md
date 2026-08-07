@@ -2,6 +2,13 @@
 
 This reading list provides a curated selection of books and articles focused on Vitest, modern JavaScript/TypeScript testing, React testing, and related technologies (Next.js, Prisma, Zod).
 
+## Official Documentation and Release Notes
+
+1. **Vitest Getting Started Guide** - https://vitest.dev/guide/
+2. **Vitest 4.0 Release Notes** - https://vitest.dev/blog/vitest-4.html
+3. **Vitest 4.1 Release Notes** - https://vitest.dev/blog/vitest-4-1.html
+4. **Next.js Testing Guide (Vitest)** - https://nextjs.org/docs/app/guides/testing/vitest
+
 ## Books
 
 1. **Mastering Vitest: Fast and Reliable Testing for Modern Web Apps** by Sarah Jenkins (2024)
@@ -38,35 +45,35 @@ This reading list provides a curated selection of books and articles focused on 
 
 ## Articles
 
-1. "Why We Migrated from Jest to Vitest in 2024" - *Frontend Masters Blog* (2024)
-2. "Testing React Server Components: The New Frontier" - *React Advanced* (2024)
-3. "Mastering `vi.mock()`: Advanced Mocking in Vitest" - *Testing JavaScript* (2025)
-4. "How to Test Next.js 15 App Router Hooks Effectively" - *Next.js Weekly* (2025)
-5. "Optimizing Vitest Performance for Enterprise Monorepos" - *Vite Ecosystem Insights* (2024)
-6. "Snapshot Testing with Tailwind CSS v4 and shadcn/ui" - *UI Dev Magazine* (2025)
-7. "A Guide to Testing Zod Schemas with Vitest" - *TypeScript Daily* (2024)
-8. "Mocking Prisma Client in Unit Tests: The Hexagonal Approach" - *Node.js Best Practices* (2023)
-9. "Testing Asynchronous Code and Timers in Vitest" - *JavaScript in Depth* (2024)
-10. "Understanding Vitest's Native ESM Support" - *Web Dev Simplified* (2025)
-11. "Setting Up Vitest Coverage with c8 and Istanbul" - *Testing Tools Review* (2024)
-12. "Testing Custom React Hooks: `useIdleLogout` and Beyond" - *React Patterns* (2025)
-13. "Mocking Redis (Valkey) and RabbitMQ in Node.js Tests" - *Backend Engineering* (2024)
-14. "Vitest CLI Deep Dive: Flags, Options, and Workflows" - *DevOps Weekly* (2025)
-15. "Troubleshooting Common Vitest Errors and Timeouts" - *Testing Debugger* (2024)
-16. "State Machine Testing in React Applications" - *State Management Today* (2025)
-17. "Testing Compound Components in React 19" - *Component Driven* (2024)
-18. "Vitest Configuration Schemas Explained" - *Vite Config Guide* (2025)
-19. "Security Best Practices for JavaScript Testing Environments" - *AppSec Monthly* (2024)
-20. "Parallel Test Execution in Vitest: Threads vs. Forks" - *Performance Testing* (2025)
-21. "Testing Context Providers in React" - *React Context Deep Dive* (2024)
-22. "How to Write Deterministic Unit Tests" - *Reliable Code* (2023)
-23. "Vitest vs. Jest: A 2025 Comparison" - *Framework Wars* (2025)
-24. "Testing Next.js API Routes with Vitest" - *Next.js Backend* (2024)
-25. "Using `happy-dom` with Vitest for Faster UI Tests" - *DOM Testing Speed* (2025)
-26. "Mocking Browser APIs (`matchMedia`, `IntersectionObserver`) in Vitest" - *Client-Side Testing* (2024)
-27. "Continuous Integration Strategies for Vitest" - *CI/CD Pipelines* (2025)
-28. "Testing Error Boundaries in React 19" - *React Error Handling* (2024)
-29. "Vitest Workspace Configuration for Monorepos" - *Monorepo Management* (2025)
-30. "Advanced Assertion Techniques in Vitest" - *Expect More* (2024)
-31. "The Future of JavaScript Testing: Trends for 2026" - *Testing Tomorrow* (2026)
-32. "Integrating Vitest with Playwright for Full Coverage" - *End-to-End Testing* (2025)
+1. "Why We Migrated from Jest to Vitest in 2024" - _Frontend Masters Blog_ (2024)
+2. "Testing React Server Components: The New Frontier" - _React Advanced_ (2024)
+3. "Mastering `vi.mock()`: Advanced Mocking in Vitest" - _Testing JavaScript_ (2025)
+4. "How to Test Next.js 15 App Router Hooks Effectively" - _Next.js Weekly_ (2025)
+5. "Optimizing Vitest Performance for Enterprise Monorepos" - _Vite Ecosystem Insights_ (2024)
+6. "Snapshot Testing with Tailwind CSS v4 and shadcn/ui" - _UI Dev Magazine_ (2025)
+7. "A Guide to Testing Zod Schemas with Vitest" - _TypeScript Daily_ (2024)
+8. "Mocking Prisma Client in Unit Tests: The Hexagonal Approach" - _Node.js Best Practices_ (2023)
+9. "Testing Asynchronous Code and Timers in Vitest" - _JavaScript in Depth_ (2024)
+10. "Understanding Vitest's Native ESM Support" - _Web Dev Simplified_ (2025)
+11. "Setting Up Vitest Coverage with c8 and Istanbul" - _Testing Tools Review_ (2024)
+12. "Testing Custom React Hooks: `useIdleLogout` and Beyond" - _React Patterns_ (2025)
+13. "Mocking Redis (Valkey) and RabbitMQ in Node.js Tests" - _Backend Engineering_ (2024)
+14. "Vitest CLI Deep Dive: Flags, Options, and Workflows" - _DevOps Weekly_ (2025)
+15. "Troubleshooting Common Vitest Errors and Timeouts" - _Testing Debugger_ (2024)
+16. "State Machine Testing in React Applications" - _State Management Today_ (2025)
+17. "Testing Compound Components in React 19" - _Component Driven_ (2024)
+18. "Vitest Configuration Schemas Explained" - _Vite Config Guide_ (2025)
+19. "Security Best Practices for JavaScript Testing Environments" - _AppSec Monthly_ (2024)
+20. "Parallel Test Execution in Vitest: Threads vs. Forks" - _Performance Testing_ (2025)
+21. "Testing Context Providers in React" - _React Context Deep Dive_ (2024)
+22. "How to Write Deterministic Unit Tests" - _Reliable Code_ (2023)
+23. "Vitest vs. Jest: A 2025 Comparison" - _Framework Wars_ (2025)
+24. "Testing Next.js API Routes with Vitest" - _Next.js Backend_ (2024)
+25. "Using `happy-dom` with Vitest for Faster UI Tests" - _DOM Testing Speed_ (2025)
+26. "Mocking Browser APIs (`matchMedia`, `IntersectionObserver`) in Vitest" - _Client-Side Testing_ (2024)
+27. "Continuous Integration Strategies for Vitest" - _CI/CD Pipelines_ (2025)
+28. "Testing Error Boundaries in React 19" - _React Error Handling_ (2024)
+29. "Vitest Workspace Configuration for Monorepos" - _Monorepo Management_ (2025)
+30. "Advanced Assertion Techniques in Vitest" - _Expect More_ (2024)
+31. "The Future of JavaScript Testing: Trends for 2026" - _Testing Tomorrow_ (2026)
+32. "Integrating Vitest with Playwright for Full Coverage" - _End-to-End Testing_ (2025)

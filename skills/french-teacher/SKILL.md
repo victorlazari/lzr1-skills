@@ -1,93 +1,74 @@
 ---
 name: french-teacher
-description: Comprehensive French language course covering all CEFR levels from absolute beginner (A1) to mastery (C2), including pronunciation, grammar, vocabulary, conversation patterns, cultural context, linguistics, CLI tools, and NLP.
+description: Assess CEFR levels, generate targeted French exercises, and validate linguistic alignment using official Council of Europe descriptors.
 ---
 
 # French Teacher Skill
 
-This skill provides a comprehensive guide to teaching and learning the French language, covering all Common European Framework of Reference for Languages (CEFR) levels from A1 to C2. It includes foundational grammar, advanced linguistics, computational tools for language education, and troubleshooting strategies for common learner errors.
+This skill provides an operational workflow for generating, assessing, and validating French language materials strictly aligned with the Common European Framework of Reference for Languages (CEFR).
 
-## When to Use
+## Scope and Triggers
 
-Use this skill when you need to:
-- Generate French language learning materials, exercises, or assessments for any CEFR level.
-- Explain complex French grammar rules, such as the subjunctive mood, past tenses (passé composé vs. imparfait), or object pronouns.
-- Provide guidance on French pronunciation, phonetics, and prosody (liaison, enchaînement).
-- Analyze French texts for readability, vocabulary frequency, or grammatical complexity.
-- Develop or configure language learning platforms, including LMS settings, spaced repetition algorithms, and automated grading rubrics.
-- Troubleshoot common learner errors and provide targeted remediation strategies.
-- Utilize CLI tools (grep, sed, awk) or NLP libraries (spaCy, NLTK, CamemBERT) for French text processing and corpus linguistics.
+**Use this skill when:**
+- Assessing a learner's French proficiency against CEFR levels (A1-C2).
+- Generating targeted French exercises, reading passages, or grammar explanations for a specific CEFR level.
+- Validating existing French materials for CEFR alignment.
+- Analyzing French texts using CLI tools or NLP libraries.
 
-## Sub-Agent Spawning
+**Do NOT use this skill for:**
+- Deep linguistic analysis or corpus linguistics beyond standard CEFR assessment (route to `text-analyzer`).
+- Generating generic language exercises not tied to a specific CEFR progression (route to `exercise-generator`).
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple texts to analyze for CEFR level | Text Analyzer | Parallel readability and vocabulary profiling |
-| Multiple grammar topics to generate exercises for | Exercise Generator | Parallel creation of targeted grammar drills |
-| Multiple student essays to grade | Automated Grader | Parallel evaluation using specific rubrics |
-| Bulk audio files to transcribe and assess | Pronunciation Scorer | Parallel speech-to-text and error detection |
+Before generating or assessing content, you must:
+1. Identify the target CEFR level (A1, A2, B1, B2, C1, or C2).
+2. Identify the pedagogical goal (e.g., grammar, vocabulary, reading comprehension).
+3. Consult `references/grammar-curriculum.md` to ensure the target structures are appropriate for the level.
 
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+
+This skill relies on the official Council of Europe CEFR descriptors and established grammar curricula (e.g., CCFS Sorbonne, Lawless French). These are documented in `references/source-map.md` with verification dates. Always refer to these authoritative sources rather than relying on general knowledge.
 
 ## Workflow
 
-1. **Assess the Learner's Level:** Determine the target CEFR level (A1-C2) to ensure appropriate vocabulary, grammar, and complexity.
-2. **Identify the Pedagogical Goal:** Determine whether the focus is on grammar, vocabulary, pronunciation, reading comprehension, or cultural competence.
-3. **Select the Appropriate Tools:** Choose between manual explanation, CLI text processing, or advanced NLP analysis depending on the task's complexity.
-4. **Generate Content/Analysis:** Create exercises, explanations, or analytical reports tailored to the specific goal and level.
-5. **Review and Refine:** Ensure the content is culturally sensitive, accurate, and aligned with pedagogical best practices.
+1. **Assess Target Level:** Determine the target CEFR level using official descriptors in `references/source-map.md`.
+2. **Identify Goal:** Define the pedagogical goal (e.g., teaching the subjunctive, practicing past tenses).
+3. **Consult Curriculum:** Review `references/grammar-curriculum.md` for level-appropriate structures and vocabulary.
+4. **Generate Content:** Create the materials, explanations, or assessments.
+5. **Run Consistency Validator:** Ensure the generated content strictly aligns with the target CEFR level. Flag any mismatches (e.g., using B2 vocabulary in an A1 text).
+6. **Run Refuter Agents:** If applicable, use Refuter Agents to challenge the content using CEFR criteria.
+7. **Synthesize and Output:** Finalize the materials and output them according to the Output Contract.
 
-## Core Principles
+## Safety and Validation
 
-- **CEFR Alignment:** All materials and assessments must be strictly aligned with the appropriate CEFR level criteria.
-- **Communicative Approach:** Prioritize practical communication skills and authentic language use over rote memorization.
-- **Cultural Inclusivity:** Reflect the diversity of the global Francophonie, avoiding stereotypes and Eurocentric biases.
-- **Data-Driven Learning:** Utilize corpus linguistics and frequency lists to inform vocabulary instruction and grammar explanations.
-- **Constructive Feedback:** Provide clear, actionable feedback that addresses the root cause of learner errors rather than just correcting the surface mistake.
+- **Read-only Discovery:** Always consult the curriculum and source map before generating content.
+- **Validation:** Verify generated exercises against the CEFR grammar map. The Consistency Validator must flag level mismatches. Refuter Agents must cite official CEFR descriptors.
+- **Dry Run:** When spawning sub-agents for CEFR criteria application, perform a dry run to ensure they understand the constraints.
 
-## Key References
+## Failure Handling
 
-- `references/complete-reference.md`: The definitive guide containing all grammar rules, vocabulary lists, conversation templates, linguistic deep dives, and CLI/NLP tool documentation.
-- `references/reading-list.md`: A curated list of recent books and articles on French linguistics, pedagogy, and educational technology.
+- If the Consistency Validator flags a level mismatch, revise the content to use simpler (or more complex) structures as dictated by `references/grammar-curriculum.md`.
+- If a Refuter Agent identifies an error, correct it and re-run the validation step.
+- Do not repeat a failed generation attempt without adjusting the constraints or consulting the reference materials.
 
----
+## Output Contract
 
-## Adversarial Verification Panel
+The final output must include:
+- The generated French materials (exercises, texts, explanations).
+- The target CEFR level.
+- A brief justification of how the materials align with the CEFR level, citing specific grammar points or vocabulary from `references/grammar-curriculum.md`.
+- Any actionable next steps for the learner.
 
-For each significant language assessment finding (grammar errors, pronunciation issues, vocabulary gaps, CEFR level evaluations) produced by the parallel sub-agents:
+## Resources
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+- [Grammar Curriculum](references/grammar-curriculum.md): Detailed A1-C2 grammar progression map.
+- [Advanced Linguistics](references/advanced-linguistics.md): Advanced topics (C1-C2), literature, and pragmatics.
+- [CLI Tools](references/cli-tools.md): CLI and NLP tool reference for French text processing.
+- [Source Map](references/source-map.md): Authoritative sources and verification rules.
 
-> This prevents plausible-but-wrong language assessment findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Package resource index
 
-## Cross-System Consistency Validator
-
-After all parallel agents (Text Analyzer, Exercise Generator, Automated Grader, Pronunciation Scorer) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Text Analyzer rates a learner's text as B2 level while the Automated Grader assigns exercises targeting A2 grammar — the diagnosed level and the remediation difficulty are misaligned)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified learning report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+| Resource | Purpose |
+|---|---|
+| [scripts/validate-cefr.sh](scripts/validate-cefr.sh) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

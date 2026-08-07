@@ -1,89 +1,110 @@
 ---
 name: one-page
-description: Create perfect one-page presentations and reports tailored to specific audiences. Use for generating one-pagers, executive summaries, status updates, and business cases.
+description: Create perfect one-page presentations and reports tailored to specific audiences and use cases. Use for generating one-pagers, executive summaries, status updates, business cases, startup pitches, and product launches.
 ---
 
 # One-Page Presentations
 
-This skill guides the creation of highly effective, audience-tailored one-page presentations and reports. It enforces a structured discovery process to understand the target audience before generating the artifact, ensuring the right information density, focus, and tone.
+This skill guides the creation of highly effective, audience-tailored one-page presentations and reports. It enforces a structured discovery process to understand the target audience and use case before generating the artifact, ensuring the right information density, focus, and tone.
+
+## Scope and Triggers
+
+- **Triggers:** When the user asks to create a one-pager, executive summary, status update, business case, startup pitch, or product launch document.
+- **Scope:** Gathering requirements, determining audience and use case, aligning with specifications, and generating the final HTML or PDF artifact.
+- **Non-goals:** This skill does not perform deep data analysis or generate multi-page reports.
+
+## Preconditions
+
+1.  Identify the user's intent and the core topic of the one-pager.
+2.  Ensure you have enough context to draft the content. If not, ask the user for the necessary details.
+
+## Source Freshness
+
+The guidelines in this skill are based on authoritative sources (Adobe, Canva, Zapier) verified on 2026-08-07. See `references/specifications.md` for details.
 
 ## Workflow
 
-### 1. Audience Discovery (Mandatory)
+### 1. Audience and Use Case Discovery (Mandatory)
 
-Before writing any content or designing the layout, you **MUST** ask the user to identify the target audience for the one-page presentation. 
+Before writing any content or designing the layout, you **MUST** ask the user to identify the target audience and specific use case for the one-page presentation.
 
 Ask the user:
-> "To ensure the presentation is perfectly tailored, who is the primary target audience for this one-pager?"
+> "To ensure the presentation is perfectly tailored, who is the primary target audience and what is the specific use case for this one-pager?"
+>
+> **Audiences:**
 > - **Internal Teams** (Focus: Operational details, blockers, next steps)
 > - **Managers** (Focus: Tactical performance, resource allocation, decisions)
 > - **C-Level Executives** (Focus: Strategic impact, high-level metrics, recommendations)
-> - **Customers** (Focus: Value proposition, benefits, proof points)
+> - **Customers/Investors** (Focus: Value proposition, benefits, proof points)
+>
+> **Use Cases:**
+> - **Status Update / Operational Report**
+> - **Executive Summary / Business Case**
+> - **Startup Pitch**
+> - **Product Launch**
 
 Wait for the user's response before proceeding to the next step.
 
 ### 2. Specification Alignment
 
-Once the audience is identified, read the detailed specifications in `references/specifications.md` for the chosen audience.
+Once the audience and use case are identified, read the detailed specifications in `references/specifications.md`.
 
 Apply the specific rules for:
 - **Focus:** Operational, Tactical, Strategic, or Value-driven.
 - **Information Density:** High (Teams), Medium (Managers/Customers), or Low (C-Level).
 - **Tone:** Informal, Professional, Formal, or Engaging.
-- **Key Elements:** Ensure the required elements for that audience are present in the content outline.
+- **Key Elements:** Ensure the required elements for that audience and use case are present in the content outline.
 
-### 3. Visual Generation
+### 3. Output Format Determination
 
-This skill relies on the `ring:visualize` skill to generate the final artifact. 
+Ask the user for their preferred output format:
+> "Would you prefer the final output as an interactive HTML file or a printable PDF?"
 
-**IMPORTANT:** You must use the `ring:visualize` template and workflow to create the HTML output.
+### 4. Visual Generation and Routing
 
-Follow these steps to generate the artifact:
-1. Load the `ring:visualize` skill by reading `/home/ubuntu/skills/ring/default/skills/visualize/SKILL.md` (or the equivalent path if using the Ring marketplace). If the skill is not locally available, follow the `ring:visualize` workflow conceptually.
-2. Draft an Artifact Brief as required by `ring:visualize` (Audience, Physical scene, Source facts, Entities, Relationships, Hierarchy, One-sentence message, Non-invention boundary).
-3. Use the `standard.html` template foundation from `ring:visualize`.
-4. Choose the appropriate diagram/layout type based on the audience specifications (e.g., operational dashboards for teams, high-level scorecards for C-levels).
-5. Generate the self-contained HTML file and deliver it to the user.
+Based on the chosen output format, route to the appropriate skill:
 
-If you cannot access the `ring:visualize` templates directly, ensure your generated HTML strictly follows these visual principles:
-- **Visual Hierarchy:** Use size, weight, and color to guide the eye.
-- **Strategic White Space:** Do not overcrowd the page.
-- **Clear Typography:** Use sans-serif fonts (e.g., Inter, Arial, Helvetica).
-- **Actionable Titles:** Use headlines that state a conclusion.
-- **Self-Contained:** Generate a single `.html` file with inline styles or CDN links.
+**If HTML:**
+1.  Use the appropriate template from `templates/` (e.g., `templates/startup_one_pager.html` or `templates/product_one_pager.html`) as a foundation.
+2.  If complex interactive or visual layouts are needed, route to `ring:visualize`.
+3.  Ensure the generated HTML strictly follows the visual principles in `references/specifications.md`.
 
----
+**If PDF:**
+1.  Route to `typst-pdf-maker` with the generated content.
+2.  Instruct `typst-pdf-maker` to adhere to the visual principles in `references/specifications.md`.
 
-## Adversarial Verification Panel
+### 5. Validation
 
-For each significant audience-tailored one-page presentation recommendation produced by the parallel sub-agents:
+Before delivering the final artifact, validate it against the following criteria:
+- Includes all required elements for the selected use case (e.g., value proposition, problem/solution, proof points, CTA).
+- Output format matches the user's request (HTML or PDF).
+- Visual layout adheres to best practices (visual hierarchy, white space, typography).
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+### 6. Delivery
 
-> This prevents plausible-but-wrong audience-tailored one-page presentation recommendations from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+Deliver the final self-contained one-pager to the user.
 
-## Cross-System Consistency Validator
+## Safety
 
-After all parallel agents (Audience Discovery Agent, Specification Alignment Agent, and Visual Generation Agent) complete, but **before** synthesis:
+- **Read-only discovery:** Always gather requirements and confirm the audience/use case before generating content.
+- **No untrusted execution:** Do not execute downloaded code or scripts from untrusted sources.
 
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Specification Alignment Agent recommends high information density for an Internal Teams audience while the Visual Generation Agent recommends strategic white space and low density for visual clarity)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+## Failure Handling
 
-## Synthesis Agent (Upgraded)
+- If the user provides insufficient information, prompt them for the missing details.
+- If generation fails, review the error, adjust the content or layout, and retry. Do not repeat the exact same failed action.
 
-The synthesis step actively resolves rather than aggregates:
+## Output Contract
 
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified final one-page HTML presentation so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+The final output must be a self-contained HTML file or a PDF document that strictly adheres to the aligned specifications and visual best practices.
+
+## Resources
+
+- `references/specifications.md`: Detailed specifications for audiences, use cases, and visual best practices.
+- `templates/startup_one_pager.html`: Template for startup pitch one-pagers.
+- `templates/product_one_pager.html`: Template for product launch one-pagers.
+- `scripts/validate_html.py`: Script to perform basic validation on generated HTML files.
+
+## Orchestration
+
+If using parallel agents for content generation and visual design, ensure the Synthesis Agent resolves any contradictions and enforces the required sequencing (content before design).

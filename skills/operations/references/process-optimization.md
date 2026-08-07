@@ -1,5 +1,9 @@
 # Process Optimization
 
+**Verified against upstream:** 2026-08-07
+**Primary Sources:**
+- ITIL 4 Foundation (https://www.axelos.com/certifications/itil-service-management/itil-4-foundation)
+
 ## Table of Contents
 1. Process Design
 2. Lean Methodology
@@ -9,7 +13,7 @@
 
 ---
 
-## 1. Process Design
+## 1. Process Design (ITIL 4 Service Value System Integration)
 
 ### Process Documentation Framework
 
@@ -175,3 +179,25 @@ Efficiency: 80%
 | Finance | Expense approval, vendor payment, month-end close |
 | Legal | Contract review, NDA processing, compliance check |
 | IT | Access provisioning, equipment, security incident |
+
+## Recommended Reading (Source Map)
+- **The Lean Startup** — Eric Ries (2011), Crown. Lean methodology for startups.
+- **Lean Thinking** — James Womack & Daniel Jones (2003), Free Press. Lean principles.
+- **The Toyota Way** — Jeffrey Liker (2nd ed, 2021), McGraw-Hill. Toyota production system.
+- **Value Stream Mapping** — Karen Martin & Mike Osterling (2014), McGraw-Hill.
+- **This Is Lean** — Niklas Modig & Par Ahlstrom (2012). Lean fundamentals.
+- **The Machine That Changed the World** — Womack, Jones & Roos (2007), Free Press.
+- **Switch** — Chip Heath & Dan Heath (2010), Crown. Change methodology.
+- **Leading Change** — John Kotter (2012), HBR Press. Change leadership.
+- **The Lean Change Method** — Jeff Anderson (2013). Agile change management.
+- **Accelerate** — John Kotter (2014), HBR Press. Dual operating system.
+- **Lean Enterprise Institute** — lean.org. Lean resources.
+- **Process Street Blog** — process.st/blog. Process documentation.
+- **Tallyfy Blog** — tallyfy.com/blog. Workflow automation.
+- **Kissflow Blog** — kissflow.com/blog. Process management.
+- **Zapier Blog** — zapier.com/blog. Automation ideas and guides.
+- **Make (Integromat) Blog** — make.com/blog. Workflow automation.
+- **n8n Blog** — n8n.io/blog. Open-source automation.
+- **UiPath Blog** — uipath.com/blog. RPA and automation.
+- **Prosci** — prosci.com. ADKAR change management.
+- **McKinsey Operations** — mckinsey.com/business-functions/operations. Operations research.

@@ -1,5 +1,7 @@
 # UI Design
 
+*Verified against upstream: 2026-08-07*
+
 ## Table of Contents
 1. Visual Design Principles
 2. Typography

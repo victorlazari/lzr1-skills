@@ -29,7 +29,8 @@ RUN wget -q "https://github.com/aptible/supercronic/releases/download/v${SUPERCR
 COPY crontab /etc/crontab
 
 # Set Supercronic as the main process
-CMD ["supercronic", "/etc/crontab"]
+# Use -inotify to automatically reload the crontab when it changes
+CMD ["supercronic", "-inotify", "/etc/crontab"]
 ```
 
 ### 2. Crontab File
@@ -72,3 +73,7 @@ services:
 - **Environment Variables:** `DATABASE_URL` and others are fully available to the cron scripts.
 - **Logging:** Supercronic logs job output directly to `stdout`/`stderr`, so `docker logs my_cron_container` works perfectly.
 - **Graceful Shutdown:** Supercronic handles SIGTERM properly, allowing jobs to finish or terminate cleanly when the container stops.
+- **Dynamic Reloading:** The `-inotify` flag allows Supercronic to automatically reload the crontab file if it is modified, which is highly useful in dynamic environments like Kubernetes.
+
+*Verified against upstream: 2026-08-07*
+[Supercronic GitHub Repository](https://github.com/aptible/supercronic)

@@ -6,6 +6,8 @@
 3. Content Types and Formats
 4. Distribution and Promotion
 5. Content Metrics
+6. Modern Digital Marketing Trends
+7. AI Writing Tools
 
 ---
 
@@ -178,3 +180,22 @@ Post-publish:
 | Engagement | 25% | Time on page, scroll depth |
 | Conversion | 30% | CTR, form submissions |
 | SEO value | 20% | Rankings, backlinks earned |
+
+---
+
+## 6. Modern Digital Marketing Trends
+
+- **Personalization**: Tailoring content to specific user segments or behaviors.
+- **Interactive Content**: Quizzes, calculators, and interactive infographics to boost engagement.
+- **Video-First Strategy**: Prioritizing short-form video (TikTok, Reels, Shorts) and live streaming.
+- **Voice Search Optimization**: Optimizing content for conversational queries and smart speakers.
+- **Community-Led Growth**: Building and nurturing owned communities (Discord, Slack, specialized forums).
+
+---
+
+## 7. AI Writing Tools
+
+- **Usage Guidelines**: Use AI tools for ideation, outlining, drafting, and summarizing, but always require human review and editing for tone, accuracy, and nuance.
+- **Transparency**: Disclose the use of AI in content creation where appropriate or required by policy.
+- **Prompt Engineering**: Develop standardized prompts to ensure consistent output quality and alignment with brand voice.
+- **Fact-Checking**: AI-generated content must be rigorously fact-checked against authoritative sources.

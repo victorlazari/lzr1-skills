@@ -5,7 +5,7 @@ description: Advanced Playwright End-to-End (E2E) testing techniques, configurat
 
 # Playwright E2E Specialist
 
-## When to Use
+## Scope and triggers
 
 Use this skill when you need to:
 - Set up, configure, or optimize Playwright for End-to-End (E2E) testing.
@@ -14,8 +14,72 @@ Use this skill when you need to:
 - Integrate Playwright tests into CI/CD pipelines (e.g., GitHub Actions).
 - Diagnose and resolve flaky tests, timeouts, and other Playwright execution errors.
 - Write robust, accessible, and maintainable tests using Playwright's web-first assertions and semantic locators.
+- Utilize new features like component testing (stories and galleries), WebAuthn passkeys, and `AbortSignal`.
 
-## Sub-Agent Spawning
+**Non-goals:**
+- General web scraping without testing intent.
+- Testing frameworks other than Playwright (e.g., Cypress, Selenium).
+
+## Preconditions
+
+Before executing Playwright actions, ensure:
+- The target application is accessible.
+- Node.js is installed (verify with `node -v`).
+- Playwright CLI is installed (verify with `npx playwright --version`).
+- The environment is verified using `scripts/verify-playwright-env.sh`.
+
+## Source freshness
+
+Volatile facts, such as supported browser versions and CLI flags, are verified against upstream documentation.
+- **Verified against upstream:** 2026-08-07
+- **Primary Sources:**
+  - Playwright Installation: https://playwright.dev/docs/intro
+  - Playwright Release Notes: https://playwright.dev/docs/release-notes
+
+## Workflow
+
+1. **Discover:** Identify the target application and testing requirements.
+2. **Verify:** Run `scripts/verify-playwright-env.sh` to ensure Node.js, Playwright CLI, and browsers are correctly installed.
+3. **Configure:** Use `templates/playwright.config.ts` to set up or update the Playwright configuration, including safe defaults and `retryStrategy: 'isolated'`.
+4. **Develop:** Write tests using semantic locators, web-first assertions, and new features like WebAuthn passkeys or component testing.
+5. **Execute:** Run tests locally or in CI/CD. Use dry runs (`--list` or `--debug`) to validate test discovery before full execution.
+6. **Diagnose:** If tests fail, use Trace Viewer (`--trace on`) and Inspector (`PWDEBUG=1`) to investigate.
+7. **Stop:** Terminate the workflow when all tests pass or actionable findings are reported.
+
+## Safety
+
+- **Read-only discovery:** Always use dry runs (`--list`) to verify test configuration before executing tests.
+- **Confirmation:** Require user confirmation before running tests against production environments or performing destructive actions.
+- **No untrusted code:** Do not download or execute untrusted artifacts.
+
+## Validation
+
+- Run syntax checks on created files (e.g., `bash -n` for scripts, `npx tsc` for TypeScript files if applicable).
+- Verify test execution using dry runs.
+- Capture evidence of test failures using Trace Viewer and screenshots.
+
+## Failure handling
+
+- **Diagnosis:** Analyze common errors (TimeoutError, TargetClosedError) using Trace Viewer.
+- **Alternatives:** If a locator fails, try a more semantic alternative (e.g., `getByRole` instead of `getByTestId`).
+- **Rollback:** Provide clear guidance for reverting failed test runs or configuration changes.
+- **Avoid repetition:** Do not repeat the same failed action without modifying the approach.
+
+## Output contract
+
+The final output must include:
+- A summary of the actions performed (e.g., tests created, configuration updated).
+- Evidence of test execution (e.g., pass/fail status, trace links).
+- Actionable next steps for resolving any remaining issues.
+- Confidence level of the findings (HIGH/MEDIUM/LOW).
+
+## Resources
+
+- `references/complete-reference.md`: Comprehensive technical guide with verification dates.
+- `scripts/verify-playwright-env.sh`: Deterministic script to verify the environment.
+- `templates/playwright.config.ts`: Reusable configuration template with safe defaults.
+
+## Orchestration
 
 This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
 
@@ -27,82 +91,19 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 | Large-scale visual regression | Visual Reviewer | Parallel comparison of visual snapshots |
 
 ### Spawning Rules
-- Spawn when 3+ independent items need the same operation
-- Each sub-agent receives: context, specific target, success criteria
-- Results are aggregated and cross-referenced for conflicts
-- Maximum concurrent sub-agents: 10
+- Spawn when 3+ independent items need the same operation.
+- Each sub-agent receives: context, specific target, success criteria.
+- Results are aggregated and cross-referenced for conflicts.
+- Maximum concurrent sub-agents: 10.
 
-## Workflow
+### Adversarial Verification Panel
+For significant test failures and flakiness findings:
+1. Spawn 3 independent Refuter Agents per finding.
+2. A finding is confirmed only if ≥2 refuters fail to refute it.
+3. A finding is discarded if ≥2 refuters succeed.
 
-1.  **Environment & Configuration Setup:**
-    -   Ensure Node.js is installed and configure `playwright.config.ts`.
-    -   Define global settings, projects (browsers/devices), and web server configurations.
-    -   Set up session persistence (e.g., `storageState`) for authenticated flows.
-2.  **Test Development:**
-    -   Use semantic locators (`getByRole`, `getByLabel`, `getByText`) to interact with elements.
-    -   Implement web-first assertions (`expect(locator).toBeVisible()`) to leverage auto-waiting.
-    -   Utilize network interception (`page.route()`) to mock APIs and isolate tests from backend volatility.
-3.  **Advanced Testing Scenarios:**
-    -   Implement visual regression testing using `toHaveScreenshot()`.
-    -   Configure mobile emulation and test responsive layouts.
-    -   Integrate accessibility testing using `@axe-core/playwright`.
-4.  **Execution & CI/CD Integration:**
-    -   Run tests locally using the Playwright CLI (`npx playwright test`).
-    -   Configure GitHub Actions or other CI/CD tools to run tests automatically on push/PR.
-    -   Utilize parallel workers and retries to optimize execution time and handle transient failures.
-5.  **Troubleshooting & Diagnostics:**
-    -   Use Playwright Trace Viewer (`--trace on`) and Inspector (`PWDEBUG=1`) to debug failures.
-    -   Analyze common errors (TimeoutError, TargetClosedError) and apply recovery strategies.
-    -   Address flaky tests by ensuring strict locators, waiting for specific states, and isolating test data.
+### Cross-System Consistency Validator
+Run one Consistency Validator Agent with all parallel outputs to flag contradictions and missing prerequisites before synthesis.
 
-## Core Principles
-
--   **Web-First Assertions:** Always use Playwright's built-in assertions that automatically wait and retry, rather than manual DOM checks.
--   **Semantic Locators:** Prioritize user-facing attributes (roles, labels, text) over brittle CSS or XPath selectors to ensure tests are resilient to UI changes and accessible.
--   **Test Isolation:** Ensure each test runs independently without sharing state (unless explicitly managed via `storageState`) to prevent cross-test pollution.
--   **Deterministic Execution:** Use network mocking and HAR replay to eliminate external dependencies and ensure consistent test results.
--   **Comprehensive Diagnostics:** Always leverage Trace Viewer and verbose logging when debugging complex issues or flaky tests.
-
-## Key References
-
--   **Playwright CLI:** `npx playwright test`, `npx playwright codegen`, `npx playwright show-trace`.
--   **Configuration:** `playwright.config.ts` for global, project, and test-level settings.
--   **Locators:** `page.getByRole()`, `page.getByLabel()`, `page.getByText()`, `page.getByTestId()`.
--   **Assertions:** `expect(locator).toBeVisible()`, `expect(locator).toHaveText()`, `expect(page).toHaveScreenshot()`.
--   **Network:** `page.route()`, `route.fulfill()`, `route.abort()`.
-
----
-
-## Adversarial Verification Panel
-
-For each significant test failures and flakiness findings produced by the parallel sub-agents:
-
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong test failures and flakiness findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Test Executor, Matrix Tester, Diagnostics Agent, Visual Reviewer) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Matrix Tester marks a test as passing on Chromium while Diagnostics Agent marks the same test as flaky due to a race condition on Chromium)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified test report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+### Synthesis Agent
+Actively resolve contradictions, re-order prerequisites, calibrate confidence, and note gap analysis.

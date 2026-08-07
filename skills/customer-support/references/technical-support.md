@@ -1,7 +1,7 @@
 # Technical Support
 
 ## Table of Contents
-1. Troubleshooting Methodology
+1. Troubleshooting Methodology (ITIL 4)
 2. Common Issue Categories
 3. Communication Templates
 4. Incident Management
@@ -9,9 +9,11 @@
 
 ---
 
-## 1. Troubleshooting Methodology
+## 1. Troubleshooting Methodology (ITIL 4)
 
-### Systematic Troubleshooting
+### ITIL 4 Service Value System
+
+The troubleshooting methodology is grounded in the ITIL 4 Service Value System, focusing on co-creation of value, holistic service management, and continuous improvement.
 
 | Step | Activity | Output |
 |---|---|---|

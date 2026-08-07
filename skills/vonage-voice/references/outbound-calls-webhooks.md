@@ -2,6 +2,11 @@
 
 This document details the mechanics of initiating outbound calls using the Vonage Voice API and handling the webhooks that drive the call flow.
 
+Verified against upstream: 2026-08-07
+Primary sources:
+- https://developer.vonage.com/en/voice/voice-api/webhook-reference
+- https://developer.vonage.com/en/api/voice
+
 ## 1. Authentication
 
 The Voice API uses JSON Web Tokens (JWT) for authentication. The JWT must be signed using the private key generated when creating the Vonage Application.
@@ -27,6 +32,12 @@ To start a voice call from your backend application, make an HTTP `POST` request
 | `from` | Object | An endpoint object representing the caller ID. This MUST be one of your linked Vonage virtual numbers. Example: `{"type": "phone", "number": "YOUR_VONAGE_NUMBER"}`. |
 | `answer_url` | Array | An array containing a single URL pointing to your server. Vonage will make a request to this URL when the call is answered to retrieve the NCCO instructions. |
 
+### Optional Payload Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `shaken` | Object | STIR/SHAKEN compliance information. Required for US destinations to ensure call delivery and display trust. |
+
 ### Example Request
 
 ```bash
@@ -36,7 +47,10 @@ curl -X POST https://api.nexmo.com/v1/calls \
   -d '{
     "to": [{"type": "phone", "number": "447700900001"}],
     "from": {"type": "phone", "number": "447700900000"},
-    "answer_url": ["https://api.example.com/answer"]
+    "answer_url": ["https://api.example.com/answer"],
+    "shaken": {
+      "attestation": "A"
+    }
   }'
 ```
 
@@ -47,9 +61,17 @@ Vonage uses webhooks to interact with your application. There are two primary we
 1. **Answer Webhook:** Sent when a call is answered. Your server must respond with an NCCO array.
 2. **Event Webhook:** Sent when there is a status change in the call (e.g., ringing, answered, completed, or user input received).
 
+### Signed Webhooks
+
+Vonage supports signed webhooks to ensure that requests to your webhook endpoints originate from Vonage and have not been tampered with. It is highly recommended to verify the signature of incoming webhooks using your Vonage Application's signature secret.
+
+### SIP Headers and User-to-User Headers
+
+When receiving webhooks for calls originating from or destined to SIP endpoints, the payload may include SIP headers and User-to-User (UUI) headers. These headers can provide additional context or routing information.
+
 ### Answer Webhook
 
-When the outbound call connects, Vonage sends an HTTP request to the `answer_url` provided in the `POST /v1/calls` request. 
+When the outbound call connects, Vonage sends an HTTP request to the `answer_url` provided in the `POST /v1/calls` request.
 
 - **Method:** `GET` (by default, can be overridden to `POST`).
 - **Response Required:** Your server MUST return a valid JSON array representing the NCCO.
@@ -89,7 +111,7 @@ curl -X PUT https://api.nexmo.com/v1/calls/$VOICE_CALL_ID \
   -d '{
     "action": "transfer",
     "destination": {
-      "type": "ncco", 
+      "type": "ncco",
       "url": ["https://api.example.com/new-ncco"]
     }
   }'

@@ -1,103 +1,89 @@
 ---
 name: security-engineering
-description: Comprehensive cybersecurity skill covering application security (AppSec), cloud security, penetration testing, security architecture, DevSecOps, compliance frameworks, threat modeling, incident response, and identity/access management. Use when performing security reviews, designing secure systems, implementing security controls, conducting threat modeling, or responding to security incidents.
+description: Comprehensive cybersecurity skill covering application security, cloud security, DevSecOps, security architecture, and compliance. Use when performing security reviews, designing secure systems, implementing security controls, conducting threat modeling, or responding to security incidents. Routes deep code review to security-review and incident communication to post-mortem-master.
 ---
 
 # Security Engineering
 
-Expert-level cybersecurity covering the full security spectrum: application security, cloud security, penetration testing, security architecture, DevSecOps, compliance, threat modeling, incident response, and identity management.
+Expert-level cybersecurity covering the full security spectrum: application security, cloud security, security architecture, DevSecOps, and compliance.
 
-## When to Use
+## Scope and Triggers
 
-- Security code review and vulnerability assessment
+**Use this skill for:**
 - Threat modeling and security architecture design
 - Cloud security posture management
-- Penetration testing and red team operations
 - DevSecOps pipeline implementation
 - Compliance frameworks (SOC 2, ISO 27001, PCI DSS, HIPAA)
-- Incident response and forensics
-- Identity and access management (IAM)
-- Cryptography and data protection
+- Application security principles and vulnerability assessment
+
+**Escalation Boundaries:**
+- For exhaustive, line-by-line code security audits, secret scanning, or IaC checks, route to `security-review`.
+- For writing customer-facing incident reports or communication slide decks, route to `post-mortem-master`.
+- For adopting a specific security persona (e.g., penetration-tester) for a broader workflow, route to `ai-teammates`.
+
+## Preconditions
+
+Before executing security tasks, detect the target environment, permissions, and user intent.
+- **Read-only vs. Mutation:** Identify if the task requires read-only discovery (scanning, auditing) or mutation (remediation, blocking, policy changes).
+- **Permissions:** Ensure sufficient permissions are available for the required actions.
+
+## Source Freshness
+
+Security standards and vulnerabilities evolve rapidly. Do not rely on hardcoded facts (e.g., specific OWASP Top 10 versions or crypto algorithms).
+- Always verify current standards and best practices from the canonical sources linked in the references.
+- Record the verification date during execution.
 
 ## Workflow
 
-1. **Understand the context** — What system, data classification, threat landscape?
-2. **Select reference** — Choose the appropriate security domain:
-   - Application security → `references/application-security.md`
-   - Cloud security → `references/cloud-security.md`
-   - Security architecture → `references/security-architecture.md`
-   - DevSecOps → `references/devsecops.md`
-   - Compliance and governance → `references/compliance.md`
-3. **Assess threats** — Identify threat actors, attack vectors, and risk
-4. **Design controls** — Implement defense-in-depth countermeasures
-5. **Validate** — Test controls through review, scanning, or penetration testing
-6. **Document** — Record findings, risks, and remediation guidance
+1. **Detect Domain:** Identify the specific security domain(s) required by the task (AppSec, Cloud, DevSecOps, Architecture, Compliance).
+2. **Load References:** Load the corresponding reference file(s) to understand the principles and required controls.
+3. **Verify Standards:** Verify current standards and best practices from the canonical sources linked in the references.
+4. **Discovery:** Perform read-only discovery or assessment based on the verified standards.
+5. **Plan & Confirm:** If remediation or mutation is required, generate a plan and request explicit user confirmation before executing any destructive or production-impacting actions.
+6. **Execute:** Apply changes using dry-runs where possible (e.g., `terraform plan`), stopping if errors occur.
+7. **Synthesize:** Synthesize findings into a structured output contract detailing risks, evidence, and actionable recommendations.
 
-## Core Principles (All Security Work)
+## Safety
 
-- Defense in depth: Never rely on a single security control
-- Least privilege: Minimum permissions for every entity
-- Zero trust: Never trust, always verify (even internal traffic)
-- Secure by default: Systems should be secure out of the box
-- Fail securely: Failures should not expose data or bypass controls
-- Assume breach: Design systems assuming attackers are already inside
-- Shift left: Find and fix security issues as early as possible
-- Measure and monitor: Continuous security posture assessment
+- **Separate Discovery from Mutation:** Always perform read-only discovery before attempting any mutation.
+- **User Confirmation:** Require explicit user confirmation before executing any destructive, external, privileged, or production-impacting actions (e.g., isolating instances, changing IAM policies).
 
-## Role Capabilities
+## Validation
 
-| Role | Expertise | Reference |
-|---|---|---|
-| Security Engineer | AppSec, code review, SAST/DAST | `references/application-security.md` |
-| Cloud Security Engineer | Cloud posture, IAM, network security | `references/cloud-security.md` |
-| Security Architect | Threat modeling, security design | `references/security-architecture.md` |
-| DevSecOps Engineer | Pipeline security, automation | `references/devsecops.md` |
-| Penetration Tester | Offensive security, red team | `references/application-security.md` |
-| Compliance Analyst | Frameworks, audits, governance | `references/compliance.md` |
+- Validate all IaC/policy changes with dry-runs before applying.
+- Ensure all scripts or commands fail securely and return non-zero exit codes on error.
 
-## Key References
+## Failure Handling
 
-- **Application security**: See `references/application-security.md` for OWASP, code review, and vulnerability classes.
-- **Cloud security**: See `references/cloud-security.md` for cloud-native security controls and posture management.
-- **Security architecture**: See `references/security-architecture.md` for threat modeling, zero trust, and cryptography.
-- **DevSecOps**: See `references/devsecops.md` for security automation and pipeline integration.
-- **Compliance**: See `references/compliance.md` for frameworks, audits, and governance.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+- If an action fails, diagnose the error, choose an alternative approach, or roll back changes.
+- Do not repeat a failed action unchanged.
 
----
+## Output Contract
 
-## Multi-Specialist Protocol
+The final output must be a structured synthesis detailing:
+- Identified risks and vulnerabilities
+- Evidence supporting the findings
+- Severity and confidence levels
+- Actionable remediation recommendations
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+## Resources
 
-### Domain Detection Table
+- `references/application-security.md`: Application security principles, secure coding, and API security.
+- `references/cloud-security.md`: Cloud security posture, IAM, and network security.
+- `references/security-architecture.md`: Threat modeling, zero trust, and cryptography.
+- `references/devsecops.md`: Security automation, pipeline integration, and supply chain security.
+- `references/compliance.md`: Compliance frameworks, audits, and governance.
 
-Scan the task for signals that indicate which domains apply:
+## Orchestration
 
-| Task Signal (examples) | Domain | Specialist Agent | Reference |
-|---|---|---|---|
-| `application`, ... | **Application Security** | AppSec Specialist | `references/application-security.md` |
-| `cloud`, ... | **Cloud Security** | CloudSec Specialist | `references/cloud-security.md` |
-| `DevSecOps`, ... | **DevSecOps** | DevSecOps Specialist | `references/devsecops.md` |
-| `compliance`, ... | **Compliance** | Compliance Specialist | `references/compliance.md` |
-| `architecture`, ... | **Security Architecture** | Architecture Specialist | `references/security-architecture.md` |
+When multiple domains are involved, process them logically. If parallel processing is used for independent dimensions, ensure a synthesis step maps compliance requirements to architectural gaps to DevSecOps pipeline holes, constructing the full kill chain across domains.
 
-### Spawning Logic
+## Source freshness
 
-**Single domain detected** → Fall back to original single-reference behavior (no change).
+Package guidance was **verified against upstream on 2026-08-07**. Re-check linked official sources at runtime before relying on volatile versions, flags, limits, prices, lifecycle dates, or hosted-service behavior.
 
-**Multiple domains detected** → Launch all relevant specialists simultaneously:
-- Each specialist receives: **full task context** + its dedicated reference file only
-- No specialist waits for another — all start at the same time
-- Maximum concurrent specialists: 5
+## Package resource index
 
-### Cross-Domain Synthesizer
-
-After all specialists complete, run one **Kill Chain Mapper** with all specialist outputs that:
-
-1. **Identifies contradictions** between specialist recommendations for the same component
-2. **Identifies gaps** — requirements addressed by no specialist
-3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
-4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
-
-> Synthesis focus for this skill: Maps compliance requirements to architectural gaps to DevSecOps pipeline holes — constructing the full kill chain across domains. Surfaces where a compliance requirement is architecturally unenforceable.
+| Resource | Purpose |
+|---|---|
+| [scripts/verify-owasp.sh](scripts/verify-owasp.sh) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

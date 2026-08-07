@@ -1,94 +1,65 @@
 ---
 name: rabbitmq
-description: Advanced RabbitMQ operations, troubleshooting, and architecture design for tech support specialists and SREs.
+description: Advanced RabbitMQ 4.x operations, troubleshooting, and architecture design focusing on Quorum Queues and Streams.
 ---
 
-# RabbitMQ Tech Support Operations Specialist
+# RabbitMQ Operations Specialist
 
-This skill provides comprehensive expertise in managing, troubleshooting, and optimizing RabbitMQ in high-stakes production environments. It covers advanced operations, cluster management, high availability patterns, and worst-case scenario mitigation.
+This skill provides comprehensive expertise in managing, troubleshooting, and optimizing RabbitMQ 4.x in production environments. It focuses exclusively on modern High Availability paradigms, specifically Quorum Queues and Streams, and provides deterministic workflows for cluster management and incident response.
 
-## When to Use
+## Scope and Triggers
 
-Use this skill when you need to:
-- Diagnose and resolve RabbitMQ production incidents (memory/disk alarms, network partitions).
-- Troubleshoot massive message backlogs and consumer starvation.
-- Design or audit RabbitMQ topologies (exchanges, queues, bindings, DLX).
-- Configure and tune RabbitMQ for high throughput or low latency.
-- Perform security audits on RabbitMQ clusters (TLS, RBAC, LDAP).
-- Migrate from Classic Mirrored Queues to Quorum Queues.
-- Analyze Erlang VM (BEAM) performance and memory fragmentation.
+**Use this skill when you need to:**
+- Diagnose and resolve RabbitMQ production incidents (memory/disk alarms, network partitions, Raft consensus issues).
+- Troubleshoot message backlogs, consumer starvation, or WAL exhaustion.
+- Design or audit RabbitMQ topologies using Quorum Queues, Streams, and Dead Letter Exchanges (DLX).
+- Configure and tune RabbitMQ 4.x for high throughput or low latency.
+- Perform security audits on RabbitMQ clusters (TLS, RBAC).
 
-## Sub-Agent Spawning
+**Do NOT use this skill for:**
+- Building new event-driven applications or background workers (route to `automation-and-scheduling`).
+- Deploying a new RabbitMQ instance via Docker or systemd (route to `persistent-computing`).
+- Managing legacy Classic Mirrored Queues or Classic Queue version 1 (CQv1).
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions and Source Freshness
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple clusters to audit | Security Auditor | Parallel security review of each RabbitMQ cluster |
-| Multiple vhosts to validate | Topology Validator | Parallel validation of exchanges, queues, and bindings |
-| Multiple nodes to check | Health Checker | Parallel diagnostics and log analysis of cluster nodes |
-| Bulk queue troubleshooting | Diagnostics Agent | Parallel investigation of queues with massive backlogs |
-
-### Spawning Rules
-- Spawn when 3+ independent items (clusters, vhosts, nodes, queues) need the same operation.
-- Each sub-agent receives: context, specific target (e.g., node IP, vhost name), success criteria.
-- Results are aggregated and cross-referenced for cluster-wide insights.
-- Maximum concurrent sub-agents: 10.
+Before executing any commands, you MUST:
+1. Verify the cluster state and version using `rabbitmq-diagnostics status` and `rabbitmq-diagnostics cluster_status`.
+2. Ensure the cluster is running RabbitMQ 4.x.
+3. Consult the official RabbitMQ 4.x documentation for any volatile facts, commands, or configurations.
 
 ## Workflow
 
-1. **Information Gathering:** Assess the current state using `rabbitmq-diagnostics` and `rabbitmqctl`. Check alarms, cluster status, memory breakdown, and top queues.
-2. **Emergency Mitigation:** Take immediate action to restore service (e.g., unblock publishers, kill rogue clients, resolve partitions) based on business SLAs.
-3. **Deep Dive Diagnostics:** Analyze Erlang VM stats, RabbitMQ logs, and consumer application behavior to identify the root cause.
-4. **Topology & Configuration Review:** Audit `rabbitmq.conf`, `advanced.config`, and `definitions.json` for optimal settings and security compliance.
-5. **Remediation & Optimization:** Implement long-term fixes such as migrating to Quorum Queues, applying policies (e.g., max-length, DLX), and tuning prefetch counts.
-6. **Documentation & Guidance:** Provide actionable feedback to engineering teams on connection management, publisher confirms, and consumer acknowledgements.
+1. **Discovery:** Run `rabbitmq-diagnostics status` and `rabbitmq-diagnostics cluster_status` to understand the current state.
+2. **Validation:** Run `scripts/validate-topology.sh` against the cluster's `definitions.json` to identify legacy configurations (e.g., `ha-mode`, transient non-exclusive queues).
+3. **Migration Planning:** If legacy configurations are found, halt and require user confirmation to plan a migration to Quorum Queues or Streams.
+4. **Execution:** Execute operational or troubleshooting tasks using `references/operations-playbook.md` and `references/architecture-patterns.md`.
+5. **Verification:** Run `rabbitmq-diagnostics` to ensure cluster health, Raft consensus stability, and expected post-conditions.
 
-## Core Principles
+## Safety and Validation
 
-- **Visibility First:** Rely on metrics (Prometheus/Grafana) and CLI diagnostics before making changes.
-- **Protect the Broker:** Respect memory and disk alarms; they are self-preservation mechanisms. Do not blindly restart nodes under load.
-- **Quorum Queues Default:** Advocate for Quorum Queues over Classic Mirrored Queues for data safety and predictable performance.
-- **Declarative Management:** Use `definitions.json` and policies for reproducible and dynamic configuration.
-- **Consumer Responsibility:** 95% of issues are caused by misbehaving applications (connection leaks, slow consumers, lack of ACKs). Hold consumers accountable.
+- **Read-Only Discovery:** Always use `rabbitmq-diagnostics` for read-only discovery before any mutation.
+- **Confirmation Required:** Explicit user confirmation is REQUIRED before executing destructive commands like `rabbitmqctl reset`, `rabbitmqctl force_reset`, or `rabbitmqadmin purge queue`.
+- **Validation:** Validate `definitions.json` changes with `scripts/validate-topology.sh` before applying them.
+- **Focus:** Ensure Quorum Queue WAL exhaustion and Raft consensus issues are the primary focus of HA troubleshooting.
 
-## Key References
+## Failure Handling
 
-- [Complete Reference](./references/complete-reference.md): Exhaustive guide on RabbitMQ internals, CLI tools, configuration, security, and troubleshooting.
-- [Reading List](./references/reading-list.md): Curated list of books and articles for continuous learning in distributed systems and RabbitMQ operations.
+- If a command fails, do not repeat it unchanged.
+- Diagnose the error using `rabbitmq-diagnostics` and log files.
+- Consult `references/operations-playbook.md` for alternative approaches or rollback procedures.
+- If Raft consensus is lost, prioritize restoring quorum before attempting other operations.
 
----
+## Output Contract
 
-## Adversarial Verification Panel
+The result must include:
+- A summary of the actions taken and their outcomes.
+- Evidence of cluster health (e.g., `rabbitmq-diagnostics status` output).
+- Any identified legacy configurations or architectural risks.
+- Actionable next steps for remediation or optimization.
 
-For each significant production incident and optimization finding produced by the parallel sub-agents:
+## Resources
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong production incidents and optimization findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Security Auditor, Topology Validator, Health Checker, Diagnostics Agent) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Security Auditor recommending disabling a vhost while Topology Validator marks its bindings as healthy and required)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified remediation and optimization plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+- `references/operations-playbook.md`: Focused guide on CLI commands, diagnostics, and Sev-1 incident response for RabbitMQ 4.x.
+- `references/architecture-patterns.md`: Focused guide on Quorum Queues, Streams, DLX, and cross-cluster communication.
+- `scripts/validate-topology.sh`: Deterministic script to check `definitions.json` for legacy `ha-mode` policies, transient non-exclusive queues, and other 4.0-incompatible configurations.

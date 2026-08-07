@@ -1,0 +1,18 @@
+{
+  "pipeline_name": "example-v2-pipeline",
+  "version": "2.0",
+  "stages": [
+    {
+      "stage_id": "stage-1",
+      "action": "detect_environment",
+      "parameters": {}
+    },
+    {
+      "stage_id": "stage-2",
+      "action": "execute_workflow",
+      "parameters": {
+        "use_webmcp": true
+      }
+    }
+  ]
+}

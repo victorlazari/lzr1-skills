@@ -18,6 +18,10 @@ services:
     volumes:
       # Must mount the Docker socket so Ofelia can trigger commands
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      # Optional: Configure remote Docker host connection
+      # - DOCKER_HOST=tcp://remote-docker-host:2376
+      # - DOCKER_TLS_VERIFY=1
     command: daemon --docker
     depends_on:
       - backend
@@ -53,7 +57,26 @@ Ofelia supports different execution models:
 3. **`job-local`**: Runs the command inside the Ofelia container itself.
 4. **`job-service-run`**: Runs the command inside a Docker Swarm service.
 
+## Docker Host Configuration
+
+Ofelia can connect to a remote Docker host by setting the following environment variables:
+- `DOCKER_HOST`: The URL of the Docker host (e.g., `tcp://remote-docker-host:2376`).
+- `DOCKER_TLS_VERIFY`: Set to `1` to enable TLS verification.
+- `DOCKER_CERT_PATH`: Path to the directory containing the TLS certificates.
+
+## Logging Drivers
+
+Ofelia supports multiple logging drivers to capture job output:
+- `mail`: Sends job output via email.
+- `save`: Saves job output to a file.
+- `slack`: Sends job output to a Slack channel.
+
+Configure these drivers in the Ofelia configuration file (`/etc/ofelia/config.ini`) or via environment variables.
+
 ## Why this is 100% Correct for Complex Setups:
 - **Centralized Scheduling:** You manage all schedules via labels in your `docker-compose.yml`, making it highly visible.
 - **Zero Image Modification:** You don't need to install `cron` or `supercronic` in your application images.
 - **True Isolation:** Using `job-run` ensures heavy cron jobs don't steal resources from your running web servers.
+
+*Verified against upstream: 2026-08-07*
+[Ofelia GitHub Repository](https://github.com/mcuadros/ofelia)

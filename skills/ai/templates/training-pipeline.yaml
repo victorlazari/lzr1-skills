@@ -1,0 +1,12 @@
+# Training Pipeline Definition
+pipeline:
+  name: example-training
+  stages:
+    - name: data-prep
+      type: preprocessing
+    - name: train
+      type: distributed-training
+      nodes: 4
+      gpus_per_node: 8
+    - name: evaluate
+      type: evaluation

@@ -1,20 +1,40 @@
 # Technology Evaluation
 
+**Verified against upstream: 2026-08-07** (Technology Readiness Assessment Guidebook, Feb 2025)
+
 ## Table of Contents
-1. Technology Scouting
-2. Evaluation Framework
-3. Proof of Concept
-4. Technology Adoption
-5. Emerging Technology Landscape
+1. Problem Definition
+2. Technology Scouting
+3. Evaluation Framework
+4. Proof of Concept
+5. Technology Adoption
+6. Emerging Technology Landscape
 
 ---
 
-## 1. Technology Scouting
+## 1. Problem Definition
+
+**Mandatory Step:** Before evaluating any technology, a specific problem statement must be defined and documented.
+
+| Element | Description |
+|---|---|
+| Context | What is the current situation? |
+| Problem | What is the specific issue or opportunity? |
+| Impact | Why does this matter? |
+| Constraints | What are the limitations (budget, time, resources)? |
+| Success Criteria | How will we know the problem is solved? |
+
+---
+
+## 2. Technology Scouting
+
+**Mandatory Step:** AI-powered technology scouting must be conducted before finalizing vendor shortlists.
 
 ### Scouting Sources
 
 | Source | Type | Value |
 |---|---|---|
+| AI Scouting Tools | AI | Rapid landscape mapping, hidden gems |
 | Academic papers | Research | Breakthrough discoveries |
 | Patent filings | IP | Competitor intentions |
 | Startup ecosystem | Market | New approaches |
@@ -44,7 +64,7 @@
 
 ---
 
-## 2. Evaluation Framework
+## 3. Evaluation Framework
 
 ### Technology Assessment Criteria
 
@@ -59,23 +79,23 @@
 | Team readiness | 10% | Skills gap, learning curve |
 | Vendor viability | 5% | Company health, roadmap |
 
-### Technology Readiness Levels (TRL)
+### Technology Readiness Levels (TRL) - 2025 DoD TRA Guidebook Aligned
 
 | Level | Description | Evidence |
 |---|---|---|
-| TRL 1 | Basic principles observed | Research papers |
-| TRL 2 | Technology concept formulated | Theoretical framework |
-| TRL 3 | Experimental proof of concept | Lab demonstration |
-| TRL 4 | Technology validated in lab | Prototype works |
-| TRL 5 | Technology validated in relevant environment | Pilot deployment |
-| TRL 6 | Technology demonstrated in relevant environment | Beta testing |
-| TRL 7 | System prototype in operational environment | Pre-production |
-| TRL 8 | System complete and qualified | Production ready |
-| TRL 9 | System proven in operational environment | Production proven |
+| TRL 1 | Basic principles observed and reported | Published research |
+| TRL 2 | Technology concept and/or application formulated | Analytical studies |
+| TRL 3 | Analytical and experimental critical function and/or characteristic proof of concept | Lab-based validation |
+| TRL 4 | Component and/or breadboard validation in a laboratory environment | Standalone prototype |
+| TRL 5 | Component and/or breadboard validation in a relevant environment | Integrated prototype |
+| TRL 6 | System/subsystem model or prototype demonstration in a relevant environment | High-fidelity prototype |
+| TRL 7 | System prototype demonstration in an operational environment | Pre-production system |
+| TRL 8 | Actual system completed and qualified through test and demonstration | Production-ready system |
+| TRL 9 | Actual system proven through successful mission operations | Field-proven system |
 
 ---
 
-## 3. Proof of Concept
+## 4. Proof of Concept
 
 ### PoC Planning
 
@@ -103,7 +123,7 @@
 
 ---
 
-## 4. Technology Adoption
+## 5. Technology Adoption
 
 ### Adoption Lifecycle
 
@@ -127,7 +147,7 @@
 
 ---
 
-## 5. Emerging Technology Landscape (2024-2026)
+## 6. Emerging Technology Landscape (2024-2026)
 
 ### Key Technology Trends
 

@@ -1,12 +1,15 @@
 # Systems Architecture
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Architecture Decision Framework
 2. Scalability Patterns
 3. Data Architecture
 4. Integration Patterns
 5. Reliability Engineering
-6. Architecture Documentation
+6. AI Agent Orchestration
+7. Architecture Documentation
 
 ---
 
@@ -195,7 +198,36 @@ Tools: Istio, Linkerd, Consul Connect
 
 ---
 
-## 6. Architecture Documentation
+## 6. AI Agent Orchestration
+
+### AI Agent Patterns
+
+| Pattern | Description | Use Case |
+|---|---|---|
+| Single Agent | One LLM with tools | Simple tasks, focused domains |
+| Multi-Agent (Sequential) | Agents pass work in a chain | Pipelines, data processing |
+| Multi-Agent (Hierarchical) | Manager agent delegates to workers | Complex tasks, planning |
+| Multi-Agent (Collaborative) | Agents work together, debate | Brainstorming, review |
+| RAG (Retrieval-Augmented Generation) | Fetch context before generation | Knowledge-intensive tasks |
+
+### Orchestration Frameworks
+
+- **LangChain**: General-purpose LLM application framework
+- **LlamaIndex**: Data framework for LLM applications
+- **AutoGen**: Framework for building LLM applications
+- **CrewAI**: Multi-agent conversation framework
+
+### Best Practices for AI Integration
+
+- **Tool use**: Provide clear, focused tools with strict schemas
+- **Context management**: Keep context windows clean, use summarization
+- **Error handling**: Implement retry logic for LLM failures or hallucinations
+- **Evaluation**: Use LLM-as-a-judge or deterministic metrics to evaluate outputs
+- **Security**: Sandbox agent execution, validate all outputs before execution
+
+---
+
+## 7. Architecture Documentation
 
 ### C4 Model
 

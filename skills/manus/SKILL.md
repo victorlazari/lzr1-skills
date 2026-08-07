@@ -1,97 +1,68 @@
 ---
 name: manus
-description: Mastering Manus Autonomous Agent Platform, Sandbox Environments, Browser Automation, Web Development Scaffolds, MCP Integration, File Management, and Scheduling
+description: Orchestrate Manus v2 agent pipelines, configure sandboxes, manage WebMCP browser automation, and integrate with the Manus Control Plane.
 ---
 
 # Manus Specialist Skill
 
-## When to Use
+## Scope and Triggers
 
 Use this skill when you need to architect, scale, secure, or troubleshoot complex solutions using the Manus autonomous agent platform. This includes:
-- Orchestrating complex agent pipelines and parallel clusters.
-- Configuring and troubleshooting sandboxed execution environments.
-- Managing robust browser automation at scale.
-- Building and extending web development scaffolds (frontend and backend).
+- Orchestrating complex agent pipelines and parallel clusters using the v2 API.
+- Configuring and troubleshooting sandboxed execution environments with network policies.
+- Managing robust browser automation with WebMCP support.
 - Integrating with the Manus Control Plane (MCP) for scheduling and state management.
-- Handling complex file management and synchronization patterns.
-- Diagnosing and resolving agent execution, connectivity, and automation failures.
+- Handling complex file management, including S3 multipart uploads with CRC-64/NVME checksums.
 
-## Sub-Agent Spawning
+**Cross-Skill Routing:**
+- Route to `automation-and-scheduling` when the task involves automated execution, recurring execution, or background execution.
+- Route to `persistent-computing` when the task requires persistent services, Docker, fixed IP, or heavy compute.
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple agents in a pipeline | Pipeline Orchestrator | Parallel execution of independent pipeline stages |
-| High-throughput browser automation | Browser Automation Agent | Parallel scraping or interaction across multiple URLs |
-| Bulk file processing/transfer | File Management Agent | Parallel chunk uploads or delta synchronization |
-| Distributed health checks | Diagnostics Agent | Parallel monitoring of MCP components and sandboxes |
+Before acting, detect the target environment, required permissions, and user intent. Verify current upstream documentation for Manus v2 API and dependencies.
 
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation (e.g., scraping multiple sites, processing multiple files).
-- Each sub-agent receives: context, specific target (e.g., URL, file chunk), success criteria.
-- Results are aggregated and cross-referenced for conflicts or errors.
-- Maximum concurrent sub-agents: 10.
+## Source Freshness
+
+Volatile facts like API endpoints and supported versions are documented with a verification date (2026-08-07) in the reference file. Verify current upstream documentation before applying production-impacting actions.
 
 ## Workflow
 
-1. **Architecture & Orchestration**: Define the agent workflow (chained pipelines, event-driven, or parallel clusters).
-2. **Sandbox Configuration**: Set up isolation mechanisms (namespaces, cgroups) and fine-grained permissions (filesystem whitelisting, network policies).
-3. **Browser Automation Setup**: Implement browser pooling, session isolation, and robust waiting strategies for dynamic content.
-4. **Web Scaffold Integration**: Extend frontend dashboards and backend APIs, integrating with MCP for event handling.
-5. **MCP & Scheduling**: Configure cron-like schedules, dependency scheduling, and retry policies. Ensure MCP components are scaled horizontally.
-6. **File Management**: Set up volume mounts, object storage integration, and secure file transfer mechanisms.
-7. **Troubleshooting**: Monitor logs, metrics, and traces to diagnose execution failures, connectivity issues, or automation errors.
+1. Detect the target environment, required permissions, and user intent.
+2. Verify current upstream documentation for Manus v2 API and dependencies.
+3. Define the agent workflow (chained pipelines, event-driven, or parallel clusters) using the v2 API structure.
+4. Configure the sandbox environment with appropriate isolation and network policies.
+5. Set up browser automation with WebMCP support and robust waiting strategies.
+6. Integrate with the Manus Control Plane (MCP) for scheduling and state management.
+7. Execute the workflow, applying safety checks and requiring confirmation for destructive actions.
+8. Validate the output against the expected contract and handle failures with retry logic or rollback.
+9. Stop when the workflow completes successfully or a terminal error occurs.
 
-## Core Principles
+## Safety
 
-- **Security First**: Enforce strict sandbox isolation, capability dropping, and secure credential injection.
-- **Scalability**: Utilize horizontal scaling for MCP components and parallel agent clusters for high throughput.
-- **Resilience**: Implement retry logic, dead letter queues, and high availability configurations to handle transient failures.
-- **Efficiency**: Optimize resource utilization through browser pooling, lazy initialization, and incremental file synchronization.
-- **Observability**: Maintain comprehensive logging, metrics collection, and tracing for rapid troubleshooting.
+- Separate read-only discovery from mutations.
+- Require confirmation for destructive, external, privileged, financial, legal, or production-impacting actions.
+- Dry-run Kubernetes network policies.
 
-## Key References
+## Validation
 
-- [Manus Platform Official Documentation](https://docs.manus-platform.io)
-- [Manus GitHub Repository](https://github.com/manus-platform)
-- [Puppeteer Documentation](https://pptr.dev)
-- [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-- [PostgreSQL Clustering Best Practices](https://www.postgresql.org/docs/current/high-availability.html)
-- [AWS S3 Multipart Upload](https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html)
+- Verify v2 API endpoint structures before execution.
+- Validate Puppeteer scripts against version 25.5.0 compatibility.
+- Ensure S3 multipart uploads specify CRC-64/NVME checksums.
 
----
+## Failure Handling
 
-## Adversarial Verification Panel
+Explain how to diagnose errors, choose alternatives, roll back, and avoid repeating a failed action unchanged.
 
-For each significant agent execution diagnosis and remediation recommendation produced by the parallel sub-agents:
+## Output Contract
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+Specify the structure, evidence, severity/confidence, and actionable next steps expected in the result.
 
-> This prevents plausible-but-wrong agent execution diagnoses and remediation recommendations from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+## Resources
 
-## Cross-System Consistency Validator
+- [Complete Reference](references/complete-reference.md): Detailed technical material, v2 API endpoints, WebMCP integration, and modern K8s/PostgreSQL practices.
+- [Agent Pipeline Template](templates/agent-pipeline.json): Reusable, valid JSON template for chained agent pipelines using the v2 API structure.
 
-After all parallel agents (Pipeline Orchestrator, Browser Automation Agent, File Management Agent, Diagnostics Agent) complete, but **before** synthesis:
+## Orchestration
 
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Pipeline Orchestrator recommends increasing max concurrent sub-agents beyond 10 for throughput, while the Diagnostics Agent flags resource exhaustion on the sandbox nodes and recommends reducing concurrency)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified agent pipeline execution report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+Use parallel work only for independent dimensions; define inputs, schemas, conflict handling, synthesis, and termination conditions.

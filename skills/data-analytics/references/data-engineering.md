@@ -189,6 +189,20 @@ Producers → Topics (partitioned) → Consumer Groups → Consumers
 | Cost | Low storage | High compute + storage | Low storage, pay-per-query |
 | Use case | Raw data, ML | BI, reporting | Unified analytics |
 
+### Medallion Architecture (Lakehouse Pattern)
+
+The Medallion architecture is a data design pattern used to logically organize data in a Lakehouse, with the goal of incrementally and progressively improving the structure and quality of data as it flows through each layer of the architecture.
+
+| Layer | Name | Purpose | Characteristics |
+|---|---|---|---|
+| Bronze | Raw | Landing zone for raw data | Append-only, immutable, original format/schema, full history |
+| Silver | Cleansed | Filtered, cleaned, augmented | Conformed schema, deduplicated, standardized types, joined |
+| Gold | Curated | Business-level aggregates | Star schema, metrics, ready for BI/ML, highly optimized |
+
+```
+Sources → [ Bronze (Raw) ] → [ Silver (Cleansed) ] → [ Gold (Curated) ] → BI / ML
+```
+
 ### File Formats
 
 | Format | Type | Best For |
@@ -256,3 +270,8 @@ quality:
   completeness: 99.5%
   uniqueness: order_id
 ```
+
+---
+*Verified against upstream: 2026-08-07*
+*Sources:*
+* - Data Engineering Design Patterns You Must Learn in 2026: https://aws.plainenglish.io/data-engineering-design-patterns-you-must-learn-in-2026-c25b7bd0b9a7

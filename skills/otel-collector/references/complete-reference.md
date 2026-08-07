@@ -2,6 +2,8 @@
 
 The OpenTelemetry (OTel) Collector is a vendor-agnostic proxy that receives, processes, and exports telemetry data (traces, metrics, logs). It removes the need to run, operate, and maintain multiple agents/collectors. This comprehensive reference consolidates advanced patterns, configuration schemas, CLI usage, and deep-dive architecture for production environments.
 
+Verified against upstream: 2026-08-07
+
 ## 1. Architecture Internals
 
 The OpenTelemetry Collector is written in Go and operates as a pipeline for telemetry data.
@@ -52,6 +54,14 @@ OTTL is a domain-specific language for transforming telemetry data within the Co
 -   **Evaluation**: `IsMatch(target, regex)`, `Int(target)`, `String(target)`.
 -   **String**: `Concat(values[], separator)`, `Split(target, separator)`, `Substring(target, start, length)`.
 -   **Parsing**: `ParseJSON(target)`, `ExtractPatterns(target, regex)`.
+
+### 2.3 Feature Gates and Advanced OTTL
+
+-   **`ottl.set.allowNil`**: This feature gate changes the behavior of the `set` function when a `nil` value is evaluated. Ensure you account for this if you rely on the old guaranteed no-op behavior.
+-   **Advanced Examples**:
+    -   Using `filter` processor to drop spans: `span.attributes["http.status_code"] == 200`
+    -   Using `transform` processor to redact PII: `replace_pattern(attributes["user.email"], ".*@(.*)", "***@$1")`
+-   **Debugging OTTL**: Use the collector's debug logging feature to debug OTTL statements. Set the telemetry level to debug to see detailed logs of OTTL execution.
 
 ## 3. Scaling Patterns
 
@@ -164,8 +174,3 @@ Deploy using the official Helm charts or the OpenTelemetry Operator.
 
 -   **Operator CRD**: Manages `OpenTelemetryCollector` and `Instrumentation` (auto-instrumentation) resources.
 -   **Sidecar Injection**: Use annotation `sidecar.opentelemetry.io/inject: "true"` on Pods.
-
----
-*Author: Manus AI*
-AI*
-Date: June 2026*

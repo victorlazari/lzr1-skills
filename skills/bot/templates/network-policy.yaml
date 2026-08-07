@@ -1,0 +1,31 @@
+# Reusable template for OpenShell network policies with safe defaults
+# Default policy: Deny all outbound traffic except explicitly allowed
+
+network:
+  default_action: deny
+  outbound:
+    # Allow DNS resolution
+    - host: 8.8.8.8
+      port: 53
+      protocol: udp
+      methods: ["*"]
+      paths: ["*"]
+    - host: 8.8.4.4
+      port: 53
+      protocol: udp
+      methods: ["*"]
+      paths: ["*"]
+
+    # Allow specific API endpoints (example)
+    # - host: api.github.com
+    #   port: 443
+    #   protocol: tcp
+    #   methods: [GET]
+    #   paths: ["/**"]
+
+    # Allow specific internal services (example)
+    # - host: internal-service.local
+    #   port: 8080
+    #   protocol: tcp
+    #   methods: [GET, POST]
+    #   paths: ["/api/v1/**"]

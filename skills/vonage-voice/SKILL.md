@@ -11,8 +11,8 @@ This skill provides comprehensive mastery of the Vonage Voice API, focusing on c
 ## Capabilities
 - **Outbound Calls:** Making outbound calls via the REST API to connect to PSTN, SIP, or WebSockets.
 - **Call Flow Control:** Designing and serving JSON-based NCCO arrays to direct call execution.
-- **User Input:** Prompting users and capturing DTMF keypad presses or Automatic Speech Recognition (ASR).
-- **Webhooks:** Handling Answer Webhooks to serve NCCOs and Event Webhooks to monitor call status and user inputs.
+- **User Input:** Prompting users and capturing DTMF keypad presses and ASR (Automatic Speech Recognition).
+- **Webhooks:** Handling Answer Webhooks to serve NCCOs and Event Webhooks to monitor call status and user inputs, including signed webhooks.
 - **Advanced Actions:** Utilizing `talk`, `stream`, `record`, `connect`, `notify`, `wait`, and `transfer` actions.
 
 ## Prerequisites & Setup
@@ -25,112 +25,49 @@ Before implementing a Vonage Voice flow, ensure the following setup:
    - Generate a private key for JWT authentication.
 4. **Link Number:** Link the purchased virtual number to the Application.
 
+## Source Freshness
+Verified against upstream: 2026-08-07
+- Vonage Voice API Overview: https://developer.vonage.com/en/voice/voice-api/overview
+- Vonage Voice API NCCO Reference: https://developer.vonage.com/en/voice/voice-api/ncco-reference
+- Vonage Voice API Webhooks Reference: https://developer.vonage.com/en/voice/voice-api/webhook-reference
+- Vonage Voice API Reference: https://developer.vonage.com/en/api/voice
+- Vonage Voice API DTMF Concepts: https://developer.vonage.com/en/voice/voice-api/concepts/dtmf
+- Vonage Voice API ASR Concepts: https://developer.vonage.com/en/voice/voice-api/concepts/asr
+
 ## Reference Materials
 For detailed implementation instructions, refer to the specialized guides in the `references` directory:
 
-- [Outbound Calls and Webhooks](references/outbound-calls-webhooks.md): Master the REST API for initiating calls, JWT authentication, and webhook handling.
+- [Outbound Calls and Webhooks](references/outbound-calls-webhooks.md): Master the REST API for initiating calls, JWT authentication, and webhook handling (including signed webhooks and SIP headers).
 - [NCCO Actions Reference](references/ncco-actions.md): Complete guide to all NCCO actions, including `talk`, `connect`, `record`, and `transfer`.
-- [Handling User Input (DTMF & ASR)](references/user-input.md): Detailed patterns for building Interactive Voice Response (IVR) systems.
+- [Handling User Input (DTMF & ASR)](references/user-input.md): Detailed patterns for building Interactive Voice Response (IVR) systems, including Google ASR configuration.
 
-## Core Implementation Pattern: Outbound IVR Flow
+## Workflow
+1. **Discover findings:** Identify current Vonage branding, API capabilities, and security practices.
+2. **Classify findings:** Categorize findings into NCCO actions, outbound calls and webhooks, and user input.
+3. **Fix one bounded set:** Update the corresponding reference file with the classified findings.
+4. **Run targeted checks:** Verify that the updated reference file is accurate and complete.
+5. **Run the reviewer again:** Review the updated reference file for consistency and clarity.
+6. **Compare remaining findings:** Identify any remaining findings that need to be addressed.
+7. **Stop** when no actionable findings remain, the iteration cap is reached, or progress stalls.
 
-To build an outbound call that provides options and executes actions based on user input, follow this architecture:
+## Safety
+- **Read-only discovery:** Always verify current API documentation and installed versions before making changes.
+- **Mutations:** Require confirmation for destructive, external, privileged, financial, legal, or production-impacting actions.
+- **Signed Webhooks:** Ensure webhook handlers can process signed webhooks for enhanced security.
 
-1. **Initiate Call:** The backend server uses the Vonage REST API (`POST /v1/calls`) to dial the destination number. The request includes an `answer_url` pointing to your server.
-2. **Serve Initial NCCO:** When the call connects, Vonage sends a GET/POST request to the `answer_url`. Your server responds with an NCCO containing a `talk` action (the prompt) and an `input` action (to capture the response).
-3. **Capture Input:** The user hears the prompt and presses a keypad digit (DTMF) or speaks (ASR).
-4. **Handle Event Webhook:** Vonage sends the captured input to the `eventUrl` defined in the `input` action.
-5. **Execute Application Logic:** Your server receives the input, executes internal logic (e.g., updating a database, routing a ticket), and returns a *new* NCCO to replace the current one.
-6. **Continue or End:** The new NCCO might `connect` the call to an agent, `talk` a confirmation message, or `transfer` the call.
+## Validation
+- Verify that all API endpoints use the correct base URL (`api.nexmo.com` for v1).
+- Ensure that ASR configurations include the `provider` and `providerOptions` fields.
+- Validate that webhook handlers can process signed webhooks.
+- Check that outbound call requests include the `shaken` parameter when required for US destinations.
 
-### Example: Outbound Call to Webhook
-```bash
-# Initiating the call
-curl -X POST https://api.nexmo.com/v1/calls \
-  -H "Authorization: Bearer $JWT" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "to": [{"type": "phone", "number": "14155550100"}],
-    "from": {"type": "phone", "number": "14155550200"},
-    "answer_url": ["https://api.example.com/answer"]
-  }'
-```
+## Failure Handling
+- If an API request fails, check the HTTP status code and response body for error details.
+- Ensure JWT tokens are correctly signed and not expired.
+- Verify that the `from` number is linked to the Vonage Application.
+- Do not repeat a failed action unchanged; diagnose the issue and apply a fix.
 
-### Example: Answer Webhook (Serving the IVR Menu)
-When Vonage hits `https://api.example.com/answer`, return this NCCO:
-```json
-[
-  {
-    "action": "talk",
-    "text": "Hello. Press 1 to speak with sales, or 2 for support.",
-    "bargeIn": true
-  },
-  {
-    "action": "input",
-    "type": ["dtmf"],
-    "dtmf": {
-      "maxDigits": 1,
-      "timeOut": 5
-    },
-    "eventUrl": ["https://api.example.com/ivr-input"]
-  }
-]
-```
-
-### Example: Handling the Input
-When the user presses "1", Vonage sends a webhook to `https://api.example.com/ivr-input`.
-Your server processes the JSON payload, checks `req.body.dtmf.digits === "1"`, executes internal logic, and returns a new NCCO to connect to sales:
-```json
-[
-  {
-    "action": "talk",
-    "text": "Connecting you to sales."
-  },
-  {
-    "action": "connect",
-    "from": "14155550200",
-    "endpoint": [
-      {
-        "type": "phone",
-        "number": "14155550300"
-      }
-    ]
-  }
-]
-```
-
----
-
-## Adversarial Verification Panel
-
-For each significant NCCO configuration issue and integration recommendation produced by the parallel sub-agents:
-
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong NCCO configuration issues and integration recommendations from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Outbound Calls & Webhooks Agent, NCCO Actions Agent, User Input & IVR Agent) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the NCCO Actions Agent recommends setting `bargeIn: true` on all `talk` actions for a smoother IVR experience, while the User Input & IVR Agent recommends disabling `bargeIn` during compliance recording prompts to ensure the full legal disclosure is heard before input is accepted)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified implementation plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+## Output Contract
+- **Structure:** Provide a clear, actionable summary of the implemented Voice API flow.
+- **Evidence:** Include code snippets, NCCO JSON arrays, and API request/response examples.
+- **Actionable Next Steps:** Specify any required configuration changes in the Vonage Dashboard or application code.

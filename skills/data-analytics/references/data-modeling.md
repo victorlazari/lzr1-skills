@@ -4,7 +4,7 @@
 1. Dimensional Modeling
 2. Data Vault
 3. dbt (Data Build Tool)
-4. Metrics Layer
+4. Metrics Layer & dbt Semantic Layer
 5. Schema Design Patterns
 
 ---
@@ -177,7 +177,7 @@ models:
 
 ---
 
-## 4. Metrics Layer
+## 4. Metrics Layer & dbt Semantic Layer
 
 ### Metrics Definition
 
@@ -188,7 +188,15 @@ models:
 | Time grain | Temporal granularity | Day, week, month |
 | Filter | Subset condition | Active customers only |
 
-### dbt Semantic Layer (MetricFlow)
+### dbt Semantic Layer (MetricFlow) - 2026 Capabilities
+
+The dbt Semantic Layer, powered by MetricFlow, centralizes metric definitions to ensure consistency across all downstream consumers (BI tools, notebooks, APIs).
+
+**Key 2026 Features:**
+- **Universal API Integrations**: Seamlessly query metrics via GraphQL, JDBC, and REST APIs from any application, not just BI tools.
+- **Advanced Caching Strategies**: Intelligent, query-aware caching that pre-computes frequently accessed metrics and dimensions, drastically reducing warehouse compute costs and latency.
+- **Dynamic Joins**: MetricFlow automatically generates the most efficient SQL joins based on the requested metrics and dimensions, eliminating the need for pre-joined "One Big Tables" (OBTs).
+- **Export capabilities**: Native support for exporting semantic models to various BI platforms' native semantic layers.
 
 ```yaml
 semantic_models:
@@ -262,3 +270,8 @@ CREATE TABLE activity_stream (
 | Query | Simple SELECT | Requires pivot/filter |
 | Flexibility | Fixed metrics | Easy to add new metrics |
 | Best for | BI dashboards | Metrics stores, time series |
+
+---
+*Verified against upstream: 2026-08-07*
+*Sources:*
+* - dbt Semantic Layer Documentation: https://docs.getdbt.com/docs/use-dbt-semantic-layer/dbt-sl

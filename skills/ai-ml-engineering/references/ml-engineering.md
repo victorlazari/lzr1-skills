@@ -189,7 +189,7 @@ The Transformer (Vaswani et al., 2017) underpins modern AI:
 - Use consistent naming conventions for experiments
 - Tag experiments by hypothesis, dataset, architecture
 - Document failed experiments (what didn't work and why)
-- Maintain a leaderboard of best configurations per task
+- Maintain a central dashboard for key metrics
 - Automate experiment comparison reports
 
 ---

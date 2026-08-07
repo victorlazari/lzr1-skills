@@ -7,8 +7,9 @@ description: Comprehensive IT administration skill covering endpoint management,
 
 Expert-level IT administration covering endpoint management, identity and access management, IT security, SaaS administration, and IT operations for technology companies.
 
-## When to Use
+## Scope and Triggers
 
+**Use this skill when:**
 - Managing endpoints (laptops, devices, MDM)
 - Configuring identity and access management (SSO, SCIM)
 - Administering SaaS tools and licenses
@@ -18,77 +19,67 @@ Expert-level IT administration covering endpoint management, identity and access
 - IT policy development and enforcement
 - Helpdesk and IT support operations
 
+**Escalation Boundaries:**
+- For deep application or code-level security analysis, route to `security-review`.
+- For building complex automated IT workflows or background processes, route to `automation-and-scheduling`.
+
+## Preconditions
+
+Before acting, detect the target environment, permissions, and user intent:
+1. Identify the specific IT domain (endpoint, identity, security) based on the task context.
+2. Verify current state and identify gaps against the latest frameworks (NIST CSF 2.0, CIS v8.1, CISA ZTMM V2.0).
+3. Check required permissions and access levels for the target systems.
+
+## Source Freshness
+
+Volatile facts must be verified against current official documentation. Key authoritative sources include:
+- NIST Cybersecurity Framework 2.0: https://www.nist.gov/cyberframework
+- CISA Zero Trust Maturity Model V2.0: https://www.cisa.gov/zero-trust-maturity-model
+- CIS Critical Security Controls v8.1: https://www.cisecurity.org/controls/v8-1
+
 ## Workflow
 
-1. **Understand the context** — What IT challenge, environment, and scale?
-2. **Select reference** — Choose the appropriate domain:
+1. **Detect Domain:** Identify the specific IT domain (endpoint, identity, security) based on the task context.
+2. **Load Reference:** Load the corresponding updated reference file:
    - Endpoint and device management → `references/endpoint-management.md`
    - Identity and access management → `references/identity-access.md`
    - IT security and compliance → `references/it-security.md`
-3. **Assess** — Current state, gaps, risks
-4. **Plan** — Solution design, migration path
-5. **Implement** — Configure, test, deploy
-6. **Operate** — Monitor, maintain, optimize
+3. **Assess:** Verify the current state and identify gaps against the latest frameworks (NIST CSF 2.0, CIS v8.1, CISA ZTMM V2.0).
+4. **Plan:** Formulate a plan with explicit safety checks and confirmation boundaries for any destructive actions.
+5. **Execute:** Execute the plan, validating configurations against official documentation.
+6. **Stop:** Stop when the IT administration task is complete and verified, outputting a structured report of changes made.
 
-## Core Principles (All IT Work)
+## Safety
 
-- Security-first: Every decision considers security impact
-- Zero trust: Never trust, always verify
-- Automated: Automate provisioning, deprovisioning, compliance
-- Documented: Runbooks for every process
-- Least privilege: Minimum access needed for the job
-- Scalable: Solutions that work at 10x headcount
-- User experience: Security shouldn't impede productivity
-- Compliant: Meet regulatory and audit requirements
+- **Read-only discovery precedes mutation:** Always assess the current state before making changes.
+- **Require confirmation:** Require confirmation before executing any destructive or production-impacting actions (e.g., wiping devices, revoking access, changing firewall rules).
+- **Dry-run capabilities:** Ensure dry-run capabilities for automated provisioning/deprovisioning scripts.
 
-## Role Capabilities
+## Validation
 
-| Role | Expertise | Reference |
-|---|---|---|
-| IT Administrator | Endpoints, SaaS, helpdesk | `references/endpoint-management.md` |
-| IT Security Admin | Hardening, compliance, monitoring | `references/it-security.md` |
-| Identity Admin | SSO, SCIM, access management | `references/identity-access.md` |
+- Validate all configuration changes against current official documentation.
+- Define syntax checks, dry runs, tests, evidence capture, and postcondition verification.
 
-## Key References
+## Failure Handling
 
-- **Endpoint management**: See `references/endpoint-management.md` for devices and MDM.
-- **Identity and access**: See `references/identity-access.md` for SSO and provisioning.
-- **IT security**: See `references/it-security.md` for hardening and compliance.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+- If an action fails, diagnose the error using logs and documentation.
+- Choose alternative methods or tools if the primary approach fails.
+- Roll back changes if a critical failure occurs.
+- Do not repeat a failed action unchanged.
 
----
+## Output Contract
 
-## Multi-Specialist Protocol
+The result must include:
+- A structured report of changes made.
+- Evidence of validation and testing.
+- Actionable next steps or recommendations.
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+## Resources
 
-### Domain Detection Table
+- `references/endpoint-management.md`: Endpoint and device management.
+- `references/identity-access.md`: Identity and access management.
+- `references/it-security.md`: IT security and compliance.
 
-Scan the task for signals that indicate which domains apply:
+## Orchestration
 
-| Task Signal (examples) | Domain | Specialist Agent | Reference |
-|---|---|---|---|
-| `identity`, ... | **Identity & Access** | Identity Specialist | `references/complete-reference.md` |
-| `network`, ... | **Network Administration** | Network Specialist | `references/complete-reference.md` |
-| `endpoint`, ... | **Endpoint Management** | Endpoint Specialist | `references/complete-reference.md` |
-| `compliance`, ... | **IT Compliance** | Compliance Specialist | `references/complete-reference.md` |
-
-### Spawning Logic
-
-**Single domain detected** → Fall back to original single-reference behavior (no change).
-
-**Multiple domains detected** → Launch all relevant specialists simultaneously:
-- Each specialist receives: **full task context** + its dedicated reference file only
-- No specialist waits for another — all start at the same time
-- Maximum concurrent specialists: 4
-
-### Cross-Domain Synthesizer
-
-After all specialists complete, run one **IT Change Risk Synthesizer** with all specialist outputs that:
-
-1. **Identifies contradictions** between specialist recommendations for the same component
-2. **Identifies gaps** — requirements addressed by no specialist
-3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
-4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
-
-> Synthesis focus for this skill: Ensures a firewall change does not break an identity policy or trigger a compliance audit flag. Maps endpoint management policies to network access control implications.
+Use parallel work only for independent dimensions. Define inputs, schemas, conflict handling, synthesis, and termination conditions.

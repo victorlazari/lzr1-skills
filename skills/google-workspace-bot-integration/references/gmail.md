@@ -17,3 +17,5 @@ The bot can compose and send emails directly or as replies to existing threads. 
 ## Official Documentation
 
 * [Gmail API Reference](https://developers.google.com/workspace/gmail/api/reference/rest)
+
+> Verified against upstream: 2026-08-07

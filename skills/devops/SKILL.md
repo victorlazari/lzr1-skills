@@ -1,93 +1,94 @@
 ---
 name: devops
-description: Advanced DevOps specialist skill covering AWS, Kubernetes, EKS, Helm, Git, VPC, Networking, and CI/CD pipelines.
+description: Advanced DevOps specialist skill covering AWS, Kubernetes, EKS, Helm, GitOps, VPC, Networking, and CI/CD pipelines. Triggers on infrastructure provisioning, deployment, or troubleshooting tasks.
 ---
 
 # DevOps Specialist
 
-## When to Use
+## Scope and Triggers
 Use this skill when you need to:
 - Architect, deploy, and maintain scalable and resilient cloud-native systems.
 - Manage infrastructure using Infrastructure as Code (IaC) tools like Terraform and CloudFormation.
 - Orchestrate containerized applications using Kubernetes and Amazon EKS.
-- Automate software delivery through CI/CD pipelines (e.g., GitHub Actions, GitLab CI, AWS CodePipeline).
-- Design secure and scalable Virtual Private Cloud (VPC) networks.
-- Implement GitOps workflows and advanced deployment strategies (Blue/Green, Canary).
+- Automate software delivery through CI/CD pipelines with ephemeral testing environments.
+- Implement modern GitOps workflows (trunk-based development, directory-based environment separation, pull-based deployments).
 - Troubleshoot complex networking, deployment, or infrastructure issues.
 
-## Sub-Agent Spawning
+**Non-goals:** Do not use this skill for application code development or deep security vulnerability scanning (route to `security-review` or `trivy-scanner`).
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
+Before executing any action, verify:
+1. **Target Environment:** Identify the target cloud provider, cluster, or repository.
+2. **Permissions:** Ensure necessary IAM roles, Kubernetes RBAC, or Git credentials are available.
+3. **Tool Versions:** Check installed versions of `terraform`, `kubectl`, `helm`, `kustomize`, etc.
+4. **User Intent:** Confirm whether the task is a read-only audit or a mutating deployment.
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple microservices to deploy | Deployment Agent | Parallel deployment of independent services |
-| Multiple environments to provision | Infrastructure Provisioner | Parallel IaC execution across environments |
-| Multiple repositories to configure | CI/CD Configurator | Parallel setup of CI/CD pipelines |
-| Bulk infrastructure auditing | Security/Compliance Auditor | Parallel security review of cloud resources |
-| Multi-cluster health checks | Cluster Diagnostics Agent | Parallel Kubernetes cluster investigation |
-
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation (e.g., deploying 3+ microservices).
-- Each sub-agent receives: context, specific target (e.g., service name, environment), and success criteria.
-- Results are aggregated and cross-referenced for conflicts or shared dependencies.
-- Maximum concurrent sub-agents: 10.
+## Source Freshness
+Volatile facts (e.g., supported Kubernetes versions, Helm chart syntax, AWS service limits) must be verified against authoritative sources before executing actions. Record the verification date in the output.
+- See `references/source-map.md` for canonical URLs.
 
 ## Workflow
-1. **Requirement Analysis:** Understand the deployment, infrastructure, or troubleshooting requirements. Identify the target environment and constraints.
-2. **Architecture & Design:** Design the solution using appropriate AWS services, Kubernetes resources, and networking configurations.
-3. **Infrastructure Provisioning:** Use IaC (Terraform/CloudFormation) to provision or update the required infrastructure.
-4. **Pipeline Configuration:** Set up or modify CI/CD pipelines to automate the build, test, and deployment processes.
-5. **Deployment & Orchestration:** Deploy applications using Helm, Kubernetes manifests, or GitOps tools (Argo CD/Flux). Implement advanced deployment strategies if needed.
-6. **Validation & Monitoring:** Verify the deployment success, monitor system health, and ensure observability (metrics, logs, traces).
-7. **Documentation:** Document the architecture, deployment steps, and any rollback procedures.
+1. **Requirement Analysis:** Identify target environment, constraints, and required resources.
+2. **Precondition Check:** Verify access, permissions, and tool versions against authoritative sources.
+3. **Architecture Design:** Design solution using IaC and modern GitOps practices (trunk-based, directory separation).
+4. **Infrastructure Provisioning:** Run `scripts/validate-iac.sh`, request confirmation, then apply.
+5. **Pipeline Configuration:** Set up CI/CD with ephemeral testing environments and pull-based deployments.
+6. **Deployment:** Run `scripts/dry-run-deploy.sh`, request confirmation, then deploy using Helm/Kustomize.
+7. **Validation:** Verify deployment success, monitor health, and run Cross-System Consistency Validator if sub-agents were used.
+8. **Output Generation:** Produce structured output with evidence, confidence levels, and rollback procedures. Stop when all requirements are met and validated.
 
-## Core Principles
-- **Infrastructure as Code (IaC):** All infrastructure must be defined declaratively and version-controlled.
-- **Automation First:** Automate repetitive tasks, including testing, deployment, and scaling.
-- **Security by Design (DevSecOps):** Implement least privilege IAM, secure secrets management, and continuous security scanning.
-- **Immutability:** Prefer replacing infrastructure and containers over modifying them in place.
-- **Observability:** Ensure comprehensive monitoring, logging, and tracing for all components.
-- **Resilience & High Availability:** Design for failure across multiple Availability Zones and implement autoscaling.
-- **GitOps:** Use Git as the single source of truth for infrastructure and application state.
+## Safety
+- **Read-only Discovery:** Always perform read-only discovery (e.g., `terraform plan`, `kubectl get`) before any mutation.
+- **Confirmation Required:** Explicit user confirmation is REQUIRED for any infrastructure provisioning, modification, or deletion, and for any production-impacting actions.
 
-## Key References
-For detailed technical guidance, refer to the following resources:
-- [Complete Reference](references/complete-reference.md): In-depth guide on AWS, Kubernetes, EKS, Helm, Git, VPC, CI/CD, and configuration schemas.
-- [Reading List](references/reading-list.md): Curated list of recent books and articles on advanced DevOps practices.
+## Validation
+- Validate IaC templates (Terraform/CloudFormation) before execution using `scripts/validate-iac.sh`.
+- Verify Kubernetes manifests using `kubeval` or similar tools.
+- Implement dry-run capabilities for all deployment scripts (`scripts/dry-run-deploy.sh`).
+- Ensure rollback procedures are documented and tested.
 
----
+## Failure Handling
+- Fail fast on script errors with clear diagnostic output.
+- If a deployment fails, do not repeat the same action unchanged. Diagnose the error using logs and events.
+- Execute documented rollback procedures if a deployment leaves the system in an unstable state.
 
-## Adversarial Verification Panel
+## Output Contract
+The final output must include:
+- **Action Summary:** What was deployed or modified.
+- **Evidence:** Links to PRs, deployment logs, or infrastructure state.
+- **Confidence Level:** HIGH/MEDIUM/LOW based on validation results.
+- **Rollback Procedures:** Clear steps to revert the changes if necessary.
+- **Next Steps:** Actionable recommendations for the user.
 
-For each significant infrastructure and deployment finding produced by the parallel sub-agents:
+## Resources
+- [Source Map](references/source-map.md): Mapping of authoritative sources to specific DevOps domains.
+- [Complete Reference](references/complete-reference.md): In-depth guide on AWS, Kubernetes, GitOps, and CI/CD.
+- [Validate IaC Script](scripts/validate-iac.sh): Syntax and smoke tests for Terraform/CloudFormation.
+- [Dry-Run Deploy Script](scripts/dry-run-deploy.sh): Dry-run execution for Helm/Kubernetes deployments.
+- [GitOps Repo Structure Template](templates/gitops-repo-structure.md): Template for directory-based environment separation.
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+## Orchestration (Parallel and Loop Protocol)
 
-> This prevents plausible-but-wrong infrastructure and deployment findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
+This skill supports spawning sub-agents for parallel execution when tasks can be decomposed (e.g., deploying multiple microservices, provisioning multiple environments).
 
-## Cross-System Consistency Validator
+### Spawning Rules
+- Spawn when 3+ independent items need the same operation.
+- Maximum concurrent sub-agents: 10.
 
-After all parallel agents (Deployment Agent, Infrastructure Provisioner, CI/CD Configurator, Security/Compliance Auditor, Cluster Diagnostics Agent) complete, but **before** synthesis:
+### Adversarial Verification Panel
+For each significant infrastructure and deployment finding produced by parallel sub-agents:
+1. Spawn **3 independent Refuter Agents** per finding.
+2. A finding is **confirmed** only if ≥2 refuters fail to refute it.
+3. A finding is **discarded** if ≥2 refuters succeed.
+4. Include dissenting arguments in the output with a `CONTESTED` label.
 
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Security/Compliance Auditor recommends locking down all outbound egress rules in the VPC, while the Cluster Diagnostics Agent recommends opening additional ports to external registries to resolve image pull failures)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
+### Cross-System Consistency Validator
+After all parallel agents complete, run one **Consistency Validator Agent** to:
+- Flag logical contradictions between recommendations (`MUST_RESOLVE`).
+- Note missing prerequisites (`SEQUENCING_REQUIRED`).
 
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified infrastructure remediation plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+### Synthesis Agent
+- Resolve `MUST_RESOLVE` contradictions.
+- Re-order plan based on `SEQUENCING_REQUIRED` items.
+- Calibrate confidence (HIGH/MEDIUM/LOW).
+- Note any analysis blind spots.

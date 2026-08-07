@@ -97,6 +97,10 @@ For complex problems requiring exploration:
 | Recursive decomposition | Divide and conquer | Complex nested problems |
 | Least-to-most | Solve simpler version first | Progressive complexity |
 
+### Programmatic Prompt Optimization
+
+- **DSPy**: A framework for algorithmically optimizing LM prompts and weights. Use DSPy to compile declarative language model programs into optimized prompts.
+
 ---
 
 ## 3. Structured Output
@@ -220,7 +224,7 @@ Test prompts against adversarial inputs:
 # prompt_config.yaml
 name: "customer_support_classifier"
 version: "2.3.1"
-model: "claude-sonnet-4-20250514"
+model: "claude-3-5-sonnet-20240620"
 temperature: 0.0
 max_tokens: 500
 system_prompt_file: "prompts/support_classifier_system.txt"
@@ -250,7 +254,7 @@ minimum_accuracy: 0.95
 - Leverage extended thinking for complex analysis
 - System prompts are strongly followed; use for persona and constraints
 
-### GPT-4 / GPT-4o (OpenAI)
+### GPT-4o (OpenAI)
 
 - System message is powerful for setting behavior
 - JSON mode available for structured output
@@ -258,7 +262,7 @@ minimum_accuracy: 0.95
 - Seed parameter for reproducibility
 - Structured Outputs for guaranteed schema compliance
 
-### Open-Source Models (Llama, Mistral)
+### Open-Source Models (Llama 3.1, Mistral)
 
 - Follow model-specific chat templates exactly
 - Shorter, more direct prompts often work better

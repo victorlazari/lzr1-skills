@@ -2,6 +2,8 @@
 
 This reference provides the JavaScript and CSS implementations for the complex animations used in premium landing pages, specifically focusing on GSAP (GreenSock Animation Platform) integrations.
 
+Verified against upstream: 2026-08-07
+
 ---
 
 ## 1. The "Pixel Dissolve" Preloader (ChainGPT Style)
@@ -67,7 +69,7 @@ function initPreloader() {
   const preloader = document.getElementById('preloader');
   const counterEl = document.getElementById('counter');
   const gridEl = document.getElementById('pixel-grid');
-  
+
   // 1. Generate the pixel grid (400 pixels for a 20x20 grid)
   for (let i = 0; i < 400; i++) {
     const pixel = document.createElement('div');
@@ -91,7 +93,7 @@ function initPreloader() {
   function triggerDissolve() {
     // Hide counter
     gsap.to(counterEl.parentElement, { opacity: 0, duration: 0.3 });
-    
+
     // Animate pixels out with random stagger
     gsap.to('.pixel', {
       opacity: 0,
@@ -113,9 +115,9 @@ document.addEventListener('DOMContentLoaded', initPreloader);
 
 ---
 
-## 2. Scramble Text Reveal
+## 2. Scramble Text Reveal (Free Alternative)
 
-This effect makes text appear to decode or decrypt as it scrolls into view. It requires the GSAP `ScrambleTextPlugin` (which is a premium plugin, but this is the conceptual implementation).
+This effect makes text appear to decode or decrypt as it scrolls into view. Since GSAP's ScrambleTextPlugin is a premium plugin, this is a free alternative implementation using vanilla JavaScript.
 
 ### HTML Usage
 
@@ -126,33 +128,45 @@ This effect makes text appear to decode or decrypt as it scrolls into view. It r
 ### JavaScript Implementation
 
 ```javascript
-// Requires GSAP ScrollTrigger and ScrambleTextPlugin
 function initScrambleText() {
   const elements = document.querySelectorAll('.scramble-reveal');
-  
+  const chars = "01010101XYZ!@#$%";
+
   elements.forEach(el => {
     const originalText = el.innerText;
-    // Clear text initially
     el.innerText = "";
-    
-    ScrollTrigger.create({
-      trigger: el,
-      start: "top 80%", // Trigger when element is 80% down the viewport
-      onEnter: () => {
-        gsap.to(el, {
-          duration: 1.5,
-          scrambleText: {
-            text: originalText,
-            chars: "01010101XYZ!@#$%", // Characters to cycle through
-            revealDelay: 0.5,
-            speed: 0.3
-          }
-        });
-      },
-      once: true // Only animate once
-    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          let iteration = 0;
+          const interval = setInterval(() => {
+            el.innerText = originalText
+              .split("")
+              .map((letter, index) => {
+                if (index < iteration) {
+                  return originalText[index];
+                }
+                return chars[Math.floor(Math.random() * chars.length)];
+              })
+              .join("");
+
+            if (iteration >= originalText.length) {
+              clearInterval(interval);
+            }
+
+            iteration += 1 / 3;
+          }, 30);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.8 });
+
+    observer.observe(el);
   });
 }
+
+document.addEventListener('DOMContentLoaded', initScrambleText);
 ```
 
 ---

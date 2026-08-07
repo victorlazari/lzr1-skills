@@ -1,11 +1,14 @@
 # Compensation & Benefits
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Compensation Philosophy
 2. Salary Bands
 3. Equity Compensation
 4. Benefits Design
 5. Compensation Reviews
+6. 2026 Compliance and Salary Transparency
 
 ---
 
@@ -166,3 +169,24 @@ Position in band:
 | Compa-ratio distribution | Position in band by group | Annual |
 | New hire vs tenure | Fair treatment of existing employees | Semi-annual |
 | Promotion equity | Equal access to advancement | Annual |
+
+---
+
+## 6. 2026 Compliance and Salary Transparency
+
+### Multi-State Salary Transparency Compliance
+
+| Requirement | Description | Action |
+|---|---|---|
+| Job Postings | Must include good faith salary range | Update all job descriptions |
+| Internal Transfers | Must provide range upon request or promotion | Document ranges for all roles |
+| Record Keeping | Must keep history of compensation and job descriptions | Maintain records for required duration |
+| Reporting | Pay data reporting by demographic | File required state reports |
+
+### Guidelines
+
+- Always include a realistic, good-faith salary range in job postings.
+- Do not ask candidates for their salary history.
+- Ensure ranges are based on objective criteria (e.g., market data, internal equity).
+- Regularly review and update ranges to reflect current market conditions.
+- Train managers on how to discuss compensation and transparency with their teams.

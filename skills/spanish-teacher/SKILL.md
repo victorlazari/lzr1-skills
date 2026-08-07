@@ -8,81 +8,56 @@ description: A comprehensive Spanish language teaching and learning skill coveri
 ## When to Use
 Use this skill when you need to:
 - Teach or learn Spanish from absolute beginner (A1) to mastery (C2) levels.
-- Generate Spanish language exercises, quizzes, and conversation templates.
-- Explain complex Spanish grammar concepts (e.g., Subjunctive, Ser vs. Estar, Por vs. Para).
-- Understand regional variations (e.g., Voseo, Caribbean aspiration, Castilian distinction).
-- Audit Spanish text for cultural sensitivity and appropriateness.
-- Troubleshoot common learner errors and provide pedagogical fixes.
+- Generate Spanish language exercises, quizzes, and assessments.
+- Understand and explain complex Spanish grammar rules.
+- Explore dialectal variations and cultural nuances across the Spanish-speaking world.
+- Design comprehensive Spanish language curricula.
 
-## Sub-Agent Spawning
+## Scope and Triggers
+- **Trigger:** User requests Spanish language instruction, exercises, grammar explanations, or curriculum design.
+- **Scope:** Spanish language learning from A1 to C2 (CEFR) and Novice to Distinguished (ACTFL 2024).
+- **Out of Scope:** Tutoring in languages other than Spanish (route to `language-tutor`), general curriculum design not specific to Spanish (route to `curriculum-designer`).
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+## Preconditions
+- Determine the learner's current proficiency level (CEFR or ACTFL).
+- Identify the specific learning goal (e.g., grammar, vocabulary, conversation, culture).
 
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Multiple grammar topics to explain | Grammar Tutor | Parallel generation of explanations and exercises for different grammar nodes |
-| Multiple regional dialects to analyze | Dialect Specialist | Parallel analysis of text for regional variations and slang |
-| Bulk vocabulary list generation | Vocabulary Builder | Parallel creation of thematic vocabulary lists with Anki flashcard syntax |
-| Multiple conversation scenarios | Scenario Generator | Parallel creation of role-play dialogues for different situations |
-| Comprehensive curriculum design | Curriculum Planner | Parallel development of lesson plans for different CEFR levels |
-
-### Spawning Rules
-- Spawn when 3+ independent items need the same operation (e.g., 3 different grammar rules, 3 different regional dialects).
-- Each sub-agent receives: context (learner's CEFR level), specific target (e.g., Subjunctive mood), success criteria (e.g., 5 exercises with answers).
-- Results are aggregated and cross-referenced for conflicts (e.g., ensuring vocabulary matches the target CEFR level).
-- Maximum concurrent sub-agents: 10
+## Source Freshness
+- Grammar rules align with the Real Academia Española (RAE) "Nueva gramática de la lengua española" (2025 edition).
+- Dialectal variations align with the Asociación de Academias de la Lengua Española (ASALE) classifications.
+- Proficiency levels align with CEFR and ACTFL 2024 guidelines.
+- **Verified against upstream:** 2026-08-07
 
 ## Workflow
-1. **Assess Learner Level:** Determine the target CEFR level (A1-C2) to tailor vocabulary and grammar complexity.
-2. **Identify the Goal:** Is the goal conversation practice, grammar drilling, reading comprehension, or cultural understanding?
-3. **Select Pedagogical Strategy:** Apply appropriate strategies like Comprehensible Input (i+1), Spaced Repetition Systems (SRS), or Shadowing.
-4. **Generate Content:** Create explanations, examples, and exercises using the comprehensive reference guide.
-5. **Review and Correct:** Analyze learner output, identify common errors (e.g., Ser vs. Estar confusion), and provide gentle, constructive feedback.
-6. **Cultural Audit:** Ensure the content is culturally appropriate for the target region (e.g., avoiding "coger" in Latin America).
+1. **Assess:** Determine the learner's proficiency using CEFR or ACTFL standards.
+2. **Identify Goal:** Clarify the learning objective (grammar, vocabulary, conversation, culture).
+3. **Parallel Execution (Optional):** If the task is complex (e.g., comprehensive curriculum design, multiple grammar topics), spawn parallel sub-agents (Grammar Tutor, Dialect Specialist, etc.).
+4. **Validation:** Run the Cross-System Consistency Validator on parallel outputs to flag contradictions (`MUST_RESOLVE`) and missing prerequisites (`SEQUENCING_REQUIRED`).
+5. **Synthesis:** Synthesize the final output, resolving contradictions, reordering based on prerequisites, and applying cultural sensitivity audits.
+6. **Stop Condition:** The generated content meets the learner's level and goal without unresolved contradictions.
 
-## Core Principles
-- **Comprehensible Input:** Provide input slightly above the learner's current level (i+1).
-- **Contextual Learning:** Teach vocabulary and grammar in context (full sentences) rather than in isolation.
-- **The Subjunctive State of Mind:** Teach the subjunctive not just as conjugations, but as a psychological state representing emotions, doubts, and desires (WEIRDO framework).
-- **Cultural Competence:** Language and culture are inseparable. Teach regional variations, formality rules (tú vs. usted), and cultural norms.
-- **Constructive Troubleshooting:** Diagnose the root cause of learner errors (e.g., direct translation from English) and provide specific fixes.
+## Safety and Validation
+- **Confirmation:** Require confirmation before generating large, multi-level curriculum plans.
+- **Validation:** Validate generated vocabulary lists against target CEFR/ACTFL levels. Ensure cultural sensitivity audits flag potentially offensive regional slang.
+- **Fallback:** Provide fallback explanations if a specific dialectal variation is unknown.
 
-## Key References
-- **Complete Reference:** `references/complete-reference.md` (Contains the full A1-C2 curriculum, grammar rules, vocabulary, and conversation templates).
-- **Reading List:** `references/reading-list.md` (Recommended books and articles for Spanish learners and teachers).
+## Output Contract
+- **Structure:** Clear, structured explanations or exercises tailored to the learner's level.
+- **Evidence:** Cite RAE/ASALE rules where applicable.
+- **Next Steps:** Provide actionable next steps or practice exercises.
 
----
+## Resources
+- `references/grammar-and-pedagogy.md`: Comprehensive grammar rules (aligned with RAE 2025), pedagogical strategies (Comprehensible Input, SRS), and inclusive language guidelines.
+- `references/dialectal-variations.md`: Systematic coverage of regional variations aligned with ASALE classifications, including cultural sensitivity audits.
+- `references/curriculum-schemas.md`: Curriculum progression schemas mapped to both CEFR (A1-C2) and ACTFL 2024 proficiency levels.
+- `scripts/validate-curriculum.py`: Deterministic script to validate that a generated curriculum plan covers required grammar nodes and vocabulary targets for a given CEFR/ACTFL level.
 
-## Adversarial Verification Panel
+## Authoritative sources
 
-For each significant language assessment finding and pedagogical recommendation produced by the parallel sub-agents:
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+## Package resource index
 
-> This prevents plausible-but-wrong language assessment findings and pedagogical recommendations from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Grammar Tutor, Dialect Specialist, Vocabulary Builder, Scenario Generator, Curriculum Planner) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Grammar Tutor recommending a formal Castilian construction while Dialect Specialist recommends a regional voseo form for the same learner context)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified lesson plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

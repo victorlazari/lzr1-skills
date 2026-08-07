@@ -17,7 +17,7 @@ Cron uses a 5-field time scheduling syntax followed by the command to execute.
 ## Operators
 
 - `*` (Asterisk): Matches all values for that field. (e.g., `*` in the hour field means every hour).
-- `,` (Comma): Separates items in a list. (e.g., `1,15` in the day of month field means the 1st and 15th of the month).
+- `,` (Comma): Separates items in a list. (e.g., `1,15` in the day of month field means the 1st and 15th).
 - `-` (Hyphen): Defines a range. (e.g., `1-5` in the day of week field means Monday through Friday).
 - `/` (Slash): Defines a step value. (e.g., `*/5` in the minute field means every 5 minutes).
 
@@ -43,3 +43,6 @@ Some cron implementations support special strings instead of the 5-field syntax:
 - `@weekly`: Run once a week, `0 0 * * 0`.
 - `@daily` or `@midnight`: Run once a day, `0 0 * * *`.
 - `@hourly`: Run once an hour, `0 * * * *`.
+
+*Verified against upstream: 2026-08-07*
+[Linux cron(8) Manual Page](https://man7.org/linux/man-pages/man8/cron.8.html)

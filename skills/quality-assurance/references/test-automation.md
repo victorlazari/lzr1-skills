@@ -1,5 +1,8 @@
 # Test Automation
 
+**Verified against upstream: 2026-08-07**
+**Normative Guidance**: ISTQB CTAL-TAE v2.0
+
 ## Table of Contents
 1. Automation Strategy
 2. Framework Design
@@ -18,7 +21,6 @@
 | Regression tests | Exploratory testing |
 | Smoke tests | One-time tests |
 | Data-driven tests | Tests requiring human judgment |
-| API contract tests | Usability testing |
 | Performance benchmarks | Tests for unstable features |
 | Security scans | Ad-hoc investigation |
 

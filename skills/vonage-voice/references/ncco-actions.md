@@ -2,6 +2,9 @@
 
 A Nexmo Call Control Object (NCCO) is a JSON array containing instructions that control the flow of a Voice API call. Vonage executes the actions in the array sequentially.
 
+Verified against upstream: 2026-08-07
+Primary source: https://developer.vonage.com/en/voice/voice-api/ncco-reference
+
 ## Execution Flow
 
 - **Synchronous Actions:** The current action must complete before the next action in the array is executed. Examples: `talk` (unless bargeIn is true), `connect`, `input`, `wait`.

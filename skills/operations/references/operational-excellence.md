@@ -1,5 +1,10 @@
 # Operational Excellence
 
+**Verified against upstream:** 2026-08-07
+**Primary Sources:**
+- Shingo Model (https://shingo.org/shingo-model/)
+- Shingo Institute (https://shingo.org/about-the-shingo-institute/)
+
 ## Table of Contents
 1. Operational Metrics
 2. Capacity Planning
@@ -9,7 +14,9 @@
 
 ---
 
-## 1. Operational Metrics
+## 1. Operational Metrics (Shingo Model Integration)
+
+Focus on Cultural Enablers, Continuous Improvement, and Enterprise Alignment.
 
 ### Key Operational KPIs
 
@@ -25,6 +32,8 @@
 | Customer | Response time | Time to first response |
 | Customer | Resolution time | Time to full resolution |
 | People | Productivity | Output per person |
+| Culture | Employee Engagement | eNPS, turnover rate |
+| Culture | Safety Incidents | Number of safety incidents |
 
 ### Dashboard Design
 
@@ -160,3 +169,32 @@ Scoring:
 | Aligned | Connected to company strategy |
 | Transparent | Visible across the organization |
 | Limited | 3-5 objectives, 3-5 KRs each |
+
+## Recommended Reading (Source Map)
+- **The Goal** — Eliyahu Goldratt (1984), North River Press. Theory of constraints.
+- **The Phoenix Project** — Gene Kim et al. (2013), IT Revolution. IT operations novel.
+- **The Unicorn Project** — Gene Kim (2019), IT Revolution. Developer productivity.
+- **Operations Management** — Nigel Slack et al. (9th ed, 2022), Pearson.
+- **Good Strategy Bad Strategy** — Richard Rumelt (2011), Crown. Strategy fundamentals.
+- **The Hard Thing About Hard Things** — Ben Horowitz (2014), Harper Business. Operational challenges.
+- **Scaling Up** — Verne Harnish (2014), Gazelles. Growth operations.
+- **Blitzscaling** — Reid Hoffman & Chris Yeh (2018), Currency. Rapid scaling.
+- **High Output Management** — Andy Grove (1983), Vintage. Management operations.
+- **The Great CEO Within** — Matt Mochary (2019). Operational excellence for leaders.
+- **Measure What Matters** — John Doerr (2018), Portfolio. OKRs.
+- **Radical Focus** — Christina Wodtke (2nd ed, 2021). OKR implementation.
+- **Business Continuity Management** — Michael Blyth (2009), Wiley.
+- **The Resilient Enterprise** — Yossi Sheffi (2005), MIT Press. Supply chain resilience.
+- **First Round Review** — review.firstround.com. Startup operations insights.
+- **a16z Operations** — a16z.com. Scaling operations.
+- **Stripe Atlas Guides** — stripe.com/atlas/guides. Startup operations.
+- **The Mochary Method** — mocharymethod.com. CEO operations.
+- **What Matters** — whatmatters.com. OKR resources (John Doerr).
+- **Lattice OKR Guide** — lattice.com/library. OKR implementation.
+- **GitLab OKR Handbook** — handbook.gitlab.com. OKR in practice.
+- **SaaStr Operations** — saastr.com. SaaS scaling.
+- **Y Combinator Library** — ycombinator.com/library. Startup scaling.
+- **Sequoia Arc** — sequoiacap.com. Company building.
+- **BCI (Business Continuity Institute)** — thebci.org. BC resources.
+- **FEMA Continuity** — fema.gov. Business continuity planning.
+- **AWS Well-Architected** — aws.amazon.com/architecture. Operational excellence pillar.

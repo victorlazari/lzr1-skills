@@ -1,127 +1,322 @@
-# .github/workflows/trivy-security-scan.yaml
-# GitHub Actions workflow for comprehensive Trivy security scanning.
-# Copy this file to your repository's .github/workflows/ directory.
+# Copy to .github/workflows/trivy-security-scan.yaml only after review.
+# Verified against upstream action definitions: 2026-08-07.
+# All actions are pinned to immutable 40-character commit SHAs.
+#
+# REQUIRED BEFORE ENABLEMENT:
+# 1. Replace TRIVY_BINARY_SHA256 with the SHA-256 of the extracted Linux x86-64
+#    Trivy v0.73.0 executable from a separately verified official release.
+# 2. Re-resolve every action pin and inspect its action definition/dependencies.
+# 3. Review artifact visibility/retention. Raw results can expose secrets, paths,
+#    package inventory, repository structure, and infrastructure identifiers.
+# 4. Review the policy severities/scanners. A gate is policy, not universal truth.
+# 5. If runner mutability is out of scope, use a controlled/pinned runner image.
 
-name: Trivy Security Scan
+name: Trivy security evidence
 
 on:
-  push:
-    branches: [main, master, develop]
   pull_request:
-    branches: [main, master, develop]
+    branches: [main]
+  push:
+    branches: [main]
   schedule:
-    # Run weekly on Monday at 06:00 UTC
-    - cron: '0 6 * * 1'
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
 
+# Untrusted scan code gets read-only repository access. The privileged SARIF upload
+# is isolated in a job that never checks out or executes repository content.
 permissions:
   contents: read
-  security-events: write
+
+concurrency:
+  group: trivy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TRIVY_VERSION: v0.73.0
+  # Fail-closed placeholder. Do not source this value dynamically from the same
+  # release channel during this workflow; approve it out of band.
+  TRIVY_BINARY_SHA256: REPLACE_WITH_REVIEWED_LINUX_X86_64_EXECUTABLE_SHA256
 
 jobs:
-  trivy-scan:
-    name: Trivy Vulnerability & Misconfiguration Scan
-    runs-on: ubuntu-latest
+  scan:
+    name: Generate and validate local evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    outputs:
+      sarif_valid: ${{ steps.validate.outputs.sarif_valid }}
+      gate_status: ${{ steps.scan.outputs.gate_status }}
+    env:
+      TRIVY_DISABLE_TELEMETRY: "true"
+      TRIVY_NO_PROGRESS: "true"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scanner (SARIF)
-        uses: aquasecurity/trivy-action@master
+      - name: Check out the exact event revision without persisted credentials
+        # actions/checkout v7.0.1; resolved 2026-08-07
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'vuln,misconfig,secret'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          severity: 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+          fetch-depth: 1
+          persist-credentials: false
 
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Install the exact Trivy release
+        # aquasecurity/setup-trivy v0.2.6; resolved 2026-08-07
+        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: ${{ env.TRIVY_VERSION }}
+          cache: false
+          token: ${{ github.token }}
+
+      - name: Verify scanner identity before execution
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          expected="${TRIVY_BINARY_SHA256,,}"
+          if [[ ! "$expected" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "TRIVY_BINARY_SHA256 is not a reviewed 64-character digest" >&2
+            exit 1
+          fi
+          trivy_bin="$(readlink -f "$(command -v trivy)")"
+          actual="$(sha256sum "$trivy_bin" | awk '{print $1}')"
+          if [[ "$actual" != "$expected" ]]; then
+            echo "Trivy executable hash mismatch" >&2
+            exit 1
+          fi
+          version_output="$("$trivy_bin" --version)"
+          grep -Eq 'Version:[[:space:]]*0\.73\.0([[:space:]]|$)' <<<"$version_output"
+          install -d -m 700 evidence
+          printf '%s\n' "$version_output" > evidence/trivy-version-before-scan.txt
+          printf '%s  %s\n' "$actual" "$trivy_bin" > evidence/trivy-executable.sha256
+          printf '%s\n' "${GITHUB_SHA}" > evidence/target-commit.txt
+          git status --porcelain=v1 --untracked-files=normal > evidence/target-status.txt
+
+      - name: Run discovery, exchange-format, SBOM, and policy passes
+        id: scan
+        shell: bash
+        run: |
+          set -uo pipefail
+          umask 077
+          failures=()
+
+          run_scan() {
+            local label=$1
+            shift
+            set +e
+            "$@" >"evidence/${label}.stdout.log" 2>"evidence/${label}.stderr.log"
+            local rc=$?
+            set -e
+            printf '%s\n' "$rc" >"evidence/${label}.exit-code"
+            return "$rc"
+          }
+
+          set -e
+          if ! run_scan canonical trivy repo \
+              --scanners vuln,misconfig,secret,license \
+              --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
+              --exit-code 0 --format json --output evidence/trivy.json .; then
+            failures+=("canonical scan failed")
+          fi
+
+          # Freeze the data obtained by the first pass for consistent derived runs.
+          data_args=(--skip-db-update --skip-java-db-update --skip-check-update)
+
+          if ! run_scan sarif trivy repo \
+              --scanners vuln,misconfig,secret \
+              --severity UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL \
+              --exit-code 0 "${data_args[@]}" \
+              --format sarif --output evidence/trivy.sarif .; then
+            failures+=("SARIF generation failed")
+          fi
+
+          if ! run_scan cyclonedx trivy repo "${data_args[@]}" \
+              --format cyclonedx --output evidence/sbom.cdx.json .; then
+            failures+=("CycloneDX generation failed")
+          fi
+
+          if ! run_scan spdx trivy repo "${data_args[@]}" \
+              --format spdx-json --output evidence/sbom.spdx.json .; then
+            failures+=("SPDX generation failed")
+          fi
+
+          set +e
+          run_scan gate trivy repo \
+              --scanners vuln,misconfig,secret,license \
+              --severity HIGH,CRITICAL --exit-code 10 "${data_args[@]}" \
+              --format json --output evidence/gate.json .
+          gate_rc=$?
+          set -e
+          case "$gate_rc" in
+            0) gate_status=pass ;;
+            10) gate_status=fail ;;
+            *) gate_status=incomplete; failures+=("gate execution failed with exit $gate_rc") ;;
+          esac
+          printf 'gate_status=%s\n' "$gate_status" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "$gate_status" > evidence/gate-status.txt
+          printf '%s\n' "${failures[@]:-}" | sed '/^$/d' > evidence/failures.txt
+          trivy --version > evidence/trivy-version-after-scan.txt 2>evidence/trivy-version-after-scan.stderr.log || true
+
+          # Preserve the scan state for validation and artifact upload. Do not fail
+          # this step for policy findings; the final gate step handles them.
+          if [[ ${#failures[@]} -gt 0 ]]; then
+            printf 'scan_complete=false\n' >> "$GITHUB_OUTPUT"
+          else
+            printf 'scan_complete=true\n' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate evidence and create an integrity manifest
+        id: validate
         if: always()
-        with:
-          sarif_file: 'trivy-results.sarif'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          echo 'sarif_valid=false' >> "$GITHUB_OUTPUT"
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
 
-      - name: Run Trivy scanner (JSON for artifacts)
-        uses: aquasecurity/trivy-action@master
+          root = Path("evidence")
+          required = [
+              "trivy.json",
+              "trivy.sarif",
+              "sbom.cdx.json",
+              "sbom.spdx.json",
+              "gate.json",
+              "trivy-executable.sha256",
+              "target-commit.txt",
+              "gate-status.txt",
+          ]
+          missing = [name for name in required if not (root / name).is_file() or (root / name).stat().st_size == 0]
+          if missing:
+              raise SystemExit(f"missing or empty evidence: {missing}")
+
+          parsed = {}
+          for name in ["trivy.json", "trivy.sarif", "sbom.cdx.json", "sbom.spdx.json", "gate.json"]:
+              with (root / name).open("r", encoding="utf-8") as handle:
+                  parsed[name] = json.load(handle)
+              if not isinstance(parsed[name], dict):
+                  raise SystemExit(f"{name} root is not an object")
+          if not isinstance(parsed["trivy.sarif"].get("runs"), list):
+              raise SystemExit("SARIF does not contain a runs array")
+
+          def digest(path: Path) -> str:
+              value = hashlib.sha256()
+              with path.open("rb") as handle:
+                  for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                      value.update(chunk)
+              return value.hexdigest()
+
+          artifacts = []
+          for path in sorted(root.iterdir(), key=lambda item: item.name):
+              if path.is_file() and path.name not in {"manifest.json", "SHA256SUMS"}:
+                  artifacts.append({"path": path.name, "bytes": path.stat().st_size, "sha256": digest(path)})
+
+          findings = {}
+          for name in ("trivy.json", "gate.json"):
+              total = 0
+              by_class = {}
+              for result in parsed[name].get("Results") or []:
+                  if not isinstance(result, dict):
+                      continue
+                  for field in ("Vulnerabilities", "Misconfigurations", "Secrets", "Licenses"):
+                      count = len(result.get(field) or [])
+                      by_class[field] = by_class.get(field, 0) + count
+                      total += count
+              findings[name] = {"total": total, "by_class": by_class}
+
+          manifest = {
+              "schema_version": 1,
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "repository": os.environ.get("GITHUB_REPOSITORY"),
+              "event": os.environ.get("GITHUB_EVENT_NAME"),
+              "ref": os.environ.get("GITHUB_REF"),
+              "commit": os.environ.get("GITHUB_SHA"),
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "trivy_version_expected": os.environ.get("TRIVY_VERSION"),
+              "gate_status": (root / "gate-status.txt").read_text(encoding="utf-8").strip(),
+              "failures": (root / "failures.txt").read_text(encoding="utf-8").splitlines(),
+              "finding_counts": findings,
+              "artifacts": artifacts,
+          }
+          (root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+          PY
+          (
+            cd evidence
+            find . -maxdepth 1 -type f ! -name SHA256SUMS -print0 \
+              | LC_ALL=C sort -z | xargs -0 sha256sum > SHA256SUMS
+          )
+          echo 'sarif_valid=true' >> "$GITHUB_OUTPUT"
+
+      - name: Upload evidence for authorized reviewers
         if: always()
+        # actions/upload-artifact v7.0.1; resolved 2026-08-07
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'vuln,misconfig,secret'
-          format: 'json'
-          output: 'trivy-results.json'
+          name: trivy-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
 
-      - name: Upload scan results as artifact
-        uses: actions/upload-artifact@v4
+      - name: Enforce evidence completeness and policy gate
         if: always()
-        with:
-          name: trivy-scan-results
-          path: |
-            trivy-results.sarif
-            trivy-results.json
-          retention-days: 30
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if [[ "${{ steps.validate.outputs.sarif_valid }}" != "true" ]]; then
+            echo "Trivy evidence is incomplete or invalid" >&2
+            exit 2
+          fi
+          case "${{ steps.scan.outputs.gate_status }}" in
+            pass) exit 0 ;;
+            fail) echo "Trivy policy gate found HIGH/CRITICAL findings" >&2; exit 1 ;;
+            *) echo "Trivy policy gate is incomplete" >&2; exit 2 ;;
+          esac
 
-  trivy-license:
-    name: Trivy License Compliance Check
-    runs-on: ubuntu-latest
+  publish-sarif:
+    name: Publish SARIF from a non-executing privileged job
+    needs: scan
+    if: >-
+      ${{ always() && needs.scan.outputs.sarif_valid == 'true' &&
+          (github.event_name == 'push' || github.event_name == 'schedule' ||
+           github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run Trivy license scanner
-        uses: aquasecurity/trivy-action@master
+      - name: Download only the evidence artifact
+        # actions/download-artifact v8.0.1; resolved 2026-08-07
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'license'
-          format: 'json'
-          output: 'trivy-license.json'
-          severity: 'HIGH,CRITICAL'
-          exit-code: '1'
+          name: trivy-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence
 
-      - name: Upload license results
-        uses: actions/upload-artifact@v4
-        if: always()
+      - name: Revalidate SARIF before publication
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("evidence/trivy.sarif")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          if not isinstance(data, dict) or not isinstance(data.get("runs"), list):
+              raise SystemExit("invalid SARIF")
+          PY
+
+      - name: Upload SARIF to this repository and commit
+        # github/codeql-action v4; resolved 2026-08-07
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3
         with:
-          name: trivy-license-results
-          path: trivy-license.json
-          retention-days: 30
-
-  trivy-sbom:
-    name: Generate SBOM
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Generate CycloneDX SBOM
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'cyclonedx'
-          output: 'sbom.cdx.json'
-
-      - name: Upload SBOM
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-cyclonedx
-          path: sbom.cdx.json
-          retention-days: 90
-
-  trivy-gate:
-    name: Security Gate (Fail on Critical)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Security gate - fail on CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'vuln,secret'
-          severity: 'CRITICAL'
-          exit-code: '1'
-          ignore-unfixed: true
+          sarif_file: evidence/trivy.sarif
+          category: trivy-repository
+          ref: ${{ github.ref }}
+          sha: ${{ github.sha }}
+          wait-for-processing: true

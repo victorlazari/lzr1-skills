@@ -7,6 +7,7 @@
 4. Email Marketing
 5. Social Media
 6. Demand Generation
+7. AI-Driven Personalization and Automation
 
 ---
 
@@ -214,3 +215,21 @@ Awareness → Interest → Consideration → Intent → Evaluation → Purchase
 | SAL | Sales accepted, agrees to work | Sales |
 | SQL | Qualified by sales, real opportunity | Sales |
 | Opportunity | In pipeline, active deal | Sales |
+
+---
+
+## 7. AI-Driven Personalization and Automation
+
+### AI-Driven Personalization
+
+- **Dynamic Content**: Use AI to deliver personalized content recommendations based on user behavior and preferences.
+- **Predictive Targeting**: Leverage machine learning models to identify high-value segments and predict future actions.
+- **Insight-Based Content**: Generate content ideas and outlines using AI-driven insights from search trends and social listening.
+
+### Automation Orchestration
+
+- **Cross-Channel Workflows**: Orchestrate complex, multi-channel campaigns using AI to determine the optimal channel and timing for each user.
+- **Automated Optimization**: Use AI to continuously test and optimize ad creatives, targeting, and bidding strategies.
+- **Conversational AI**: Implement AI chatbots and virtual assistants to handle initial inquiries, qualify leads, and provide 24/7 support.
+
+Verified against upstream: 2026-08-07

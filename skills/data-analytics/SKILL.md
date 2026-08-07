@@ -21,16 +21,16 @@ Expert-level data engineering, analytics, and business intelligence covering the
 ## Workflow
 
 1. **Understand the question** — What business question needs answering?
-2. **Select reference** — Choose the appropriate domain:
-   - Data pipelines and infrastructure → `references/data-engineering.md`
-   - Analysis and statistics → `references/data-analysis.md`
-   - Visualization and dashboards → `references/visualization.md`
-   - Data modeling and warehousing → `references/data-modeling.md`
-   - Data governance and quality → `references/data-governance.md`
-3. **Explore the data** — Understand structure, quality, and relationships
-4. **Transform and model** — Clean, transform, and model for the use case
-5. **Analyze and visualize** — Extract insights and present clearly
-6. **Document and validate** — Ensure reproducibility and accuracy
+2. **Detect the target domain(s)** — Based on task signals (e.g., pipeline, analysis, visualization, dbt, governance).
+3. **Select reference / Spawn specialists** —
+   - If a single domain is detected, fall back to the single-reference behavior.
+   - If multiple domains are detected, launch all relevant specialists simultaneously, providing each with the full task context and its dedicated reference file.
+4. **Explore the data** — Understand structure, quality, and relationships
+5. **Transform and model** — Clean, transform, and model for the use case
+6. **Analyze and visualize** — Extract insights and present clearly
+7. **Synthesize** — Run the Analytics Synthesizer with all specialist outputs to identify contradictions, gaps, and dependencies.
+8. **Document and validate** — Ensure reproducibility and accuracy. Produce a unified recommendation with explicit trade-off annotations for any resolved contradictions.
+9. **Stop** — Stop when the unified recommendation is complete and actionable.
 
 ## Core Principles (All Data Work)
 
@@ -66,7 +66,7 @@ Expert-level data engineering, analytics, and business intelligence covering the
 
 ## Multi-Specialist Protocol
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them. This explicitly accounts for AI-ready data systems and streaming architectures.
 
 ### Domain Detection Table
 
@@ -74,11 +74,11 @@ Scan the task for signals that indicate which domains apply:
 
 | Task Signal (examples) | Domain | Specialist Agent | Reference |
 |---|---|---|---|
-| `pipeline`, ... | **Data Engineering** | Pipeline Specialist | `references/data-engineering.md` |
-| `analysis`, ... | **Data Analysis** | Analysis Specialist | `references/data-analysis.md` |
-| `visualization`, ... | **Visualization** | Viz Specialist | `references/visualization.md` |
-| `dbt`, ... | **Data Modeling** | Modeling Specialist | `references/data-modeling.md` |
-| `governance`, ... | **Data Governance** | Governance Specialist | `references/data-governance.md` |
+| `pipeline`, `streaming`, `lakehouse` | **Data Engineering** | Pipeline Specialist | `references/data-engineering.md` |
+| `analysis`, `statistics` | **Data Analysis** | Analysis Specialist | `references/data-analysis.md` |
+| `visualization`, `dashboard` | **Visualization** | Viz Specialist | `references/visualization.md` |
+| `dbt`, `metricflow`, `semantic layer` | **Data Modeling** | Modeling Specialist | `references/data-modeling.md` |
+| `governance`, `ai compliance` | **Data Governance** | Governance Specialist | `references/data-governance.md` |
 
 ### Spawning Logic
 
@@ -99,3 +99,13 @@ After all specialists complete, run one **Analytics Synthesizer** with all speci
 4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
 
 > Synthesis focus for this skill: Ensures modeling assumptions are consistent with governance policies. Maps pipeline design decisions to their downstream impact on analysis accuracy.
+
+## Safety and Validation
+
+- **Safety**: Separate read-only discovery from mutations. Require confirmation for destructive, external, privileged, financial, legal, or production-impacting actions.
+- **Validation**: Verify that the Multi-Specialist Protocol correctly spawns specialists for AI compliance when governance is detected; ensure dbt Semantic Layer examples use valid 2026 MetricFlow syntax; validate that Medallion architecture concepts are clearly defined in data engineering references.
+- **Failure Handling**: If an action fails, diagnose the error, choose alternatives, and do not repeat the failed action unchanged.
+
+## Output Contract
+
+The final output must include a unified recommendation with explicit trade-off annotations for any resolved contradictions, actionable next steps, and evidence of validation.

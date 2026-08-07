@@ -7,139 +7,74 @@ description: Master of cron and cron scheduling across local and Docker environm
 
 This skill provides comprehensive guidance on configuring, executing, and troubleshooting cron jobs in both local machine environments and Docker containerized environments. It guarantees 100% correct execution by following strict best practices and avoiding common pitfalls.
 
-## Core Concepts & Syntax
+## Scope and Triggers
 
-Cron uses a 5-field time scheduling syntax followed by the command to execute:
+- **Handles:** Creating, troubleshooting, configuring, and executing scheduled tasks using cron syntax, system crontab, Docker cron solutions (Supercronic, Ofelia), and host-to-container execution patterns.
+- **Activates:** When the user requests to schedule a task, troubleshoot a failing cron job, or configure cron in a Docker environment.
+- **Non-goals:** Does not cover complex workflow orchestration (e.g., Airflow, Temporal) or application-level scheduling libraries (e.g., Celery, Quartz).
+- **Escalation boundaries:** For complex automation, background execution, or event-triggered execution beyond simple time-based scheduling, consult the `automation-and-scheduling` skill. For long-running background jobs on persistent VMs, consult the `persistent-computing` skill.
 
-```
-*    *    *    *    *   /path/to/command
-|    |    |    |    |
-|    |    |    |    +-- Day of week (0-7, Sunday is 0 or 7)
-|    |    |    +------- Month (1-12)
-|    |    +------------ Day of month (1-31)
-|    +----------------- Hour (0-23)
-+---------------------- Minute (0-59)
-```
+## Preconditions
 
-**Syntax Operators:**
-- `*`: Any value (e.g., `*` in hour means every hour)
-- `,`: Value list separator (e.g., `1,15` in day means 1st and 15th)
-- `-`: Range of values (e.g., `1-5` in day of week means Monday to Friday)
-- `/`: Step values (e.g., `*/5` in minute means every 5 minutes)
+Before modifying any cron configuration, you must:
+1. Identify the target environment (local machine, existing container, or complex Docker Compose setup).
+2. Verify the current user's permissions (can they edit the crontab or deploy containers?).
+3. Check for existing cron jobs to avoid conflicts.
+4. Confirm the availability of required tools (e.g., `crontab`, `docker`, `supercronic`).
 
-For detailed syntax examples, see `references/syntax.md`.
+## Source Freshness
 
-## Environment 1: Local Machine (Host OS)
+Cron syntax and basic local machine patterns are stable. However, Docker-based solutions (Supercronic, Ofelia) may evolve.
+- Always verify the installed versions of Supercronic and Ofelia.
+- Consult the official documentation for the most up-to-date configuration options.
+- See the `Verified against upstream: 2026-08-07` markers in the reference files for the latest verified features.
 
-When running on a standard Linux host, cron jobs are managed via the system cron daemon (`crond`).
+## Workflow
 
-### Execution Workflow (100% Correct Pattern)
+1. **Identify Environment:** Determine if the target is a local machine, a single Docker container, or a multi-container setup.
+2. **Select Pattern:**
+   - Local Machine: Use standard `crontab`. See `references/local_machine.md`.
+   - Single Container (Production): Use Supercronic. See `references/docker_supercronic.md`.
+   - Existing Container (Host-to-Container): Use Host Cron with Docker Exec. See `scripts/docker-cron-wrapper.sh`.
+   - Multi-Container (Docker Compose): Use Ofelia. See `references/docker_ofelia.md`.
+3. **Read Reference:** Consult the appropriate reference file for syntax and configuration details. See `references/syntax.md` for standard cron syntax.
+4. **Validate Syntax:** Validate the cron syntax and script permissions locally before applying.
+5. **Apply Configuration:** Apply the configuration. **Require user confirmation before modifying system crontabs or deploying new scheduler containers.**
+6. **Verify Execution:** Verify execution by checking logs or using a dry-run/simulated environment. See `references/troubleshooting.md` if issues arise.
+7. **Stop:** Stop when the cron job is successfully scheduled and verified.
 
-1. **Verify Environment Variables:** Cron runs with a minimal environment. ALWAYS use absolute paths for executables (e.g., `/usr/bin/node` instead of `node`).
-2. **Handle Output:** NEVER discard output blindly. Always redirect `stdout` and `stderr` to a log file or to `syslog`.
-3. **Use Dedicated Users:** Apply the principle of least privilege. Run jobs as a specific user, not root, unless necessary.
-4. **Prevent Overlaps:** Use a lock mechanism (like `flock`) for long-running jobs to prevent multiple instances.
+## Safety
 
-### Standard Local Crontab Pattern
+- **Discovery vs. Mutation:** Always read existing crontabs (`crontab -l`) and container configurations before making changes.
+- **Confirmation:** Require explicit user confirmation before applying any destructive, external, privileged, or production-impacting actions (e.g., `crontab -e`, `docker-compose up -d`).
+- **Least Privilege:** Run jobs as a dedicated user, not root, unless absolutely necessary.
 
-```bash
-# Set essential environment variables at the top
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-MAILTO=admin@example.com
+## Validation
 
-# Use absolute paths and redirect output correctly
-*/5 * * * * /usr/bin/flock -n /tmp/myjob.lock /opt/myapp/script.sh >> /var/log/myapp/cron.log 2>&1
-```
+- **Syntax Checks:** Use `bash -n` to check shell scripts.
+- **Dry Runs:** If possible, run the script manually in a simulated environment (`env -i /bin/bash -c '/path/to/script.sh'`) before scheduling it.
+- **Postcondition Verification:** Check the designated log files or syslog to confirm the job executed successfully at the scheduled time.
 
-For complete local machine best practices, see `references/local_machine.md`.
+## Failure Handling
 
-## Environment 2: Docker Containers
+- If a cron job fails, consult `references/troubleshooting.md`.
+- Diagnose errors by checking paths, permissions, environment variables, and logs.
+- Do not repeat a failed action unchanged. Adjust the configuration based on the error logs and try again.
+- If a new configuration fails, roll back to the previous working state.
 
-Running cron inside Docker requires special handling because traditional cron violates container principles (single process per container) and loses environment variables.
+## Output Contract
 
-### The OpenClaw / Production Pattern
+When completing a cron-related task, the output must include:
+- **Structure:** A clear summary of the applied configuration (e.g., the crontab entry or Docker Compose snippet).
+- **Evidence:** Log output or command results confirming the configuration was applied successfully.
+- **Severity/Confidence:** High confidence if the job was verified to run; Medium if only the syntax was validated.
+- **Actionable Next Steps:** Instructions for the user on how to monitor the job or modify it in the future.
 
-When running systems like OpenClaw inside Docker, you MUST choose one of the three robust patterns depending on your architecture.
+## Resources
 
-### Pattern A: Supercronic (Recommended for Production)
-
-Supercronic is a cron replacement designed specifically for containers. It solves environment variable loss, logs to stdout/stderr naturally, and handles graceful shutdowns.
-
-**Execution Workflow:**
-1. Use an image that installs `supercronic`.
-2. Write a standard crontab file.
-3. Set `supercronic /etc/crontab` as the container's CMD.
-
-See `references/docker_supercronic.md` for the exact Dockerfile and implementation details.
-
-### Pattern B: Host Cron with Docker Exec (The OpenClaw Example)
-
-If you have a running container (e.g., OpenClaw) and want to trigger tasks inside it without modifying its image, use the host machine's cron to trigger `docker exec`.
-
-**Execution Workflow:**
-1. Ensure the target container is running with a stable name (e.g., `openclaw_app`).
-2. On the **host machine**, create a cron job that executes the command inside the container.
-3. Always check if the container is running before executing to avoid errors.
-
-**Example Implementation for OpenClaw:**
-
-```bash
-# On the HOST machine's crontab:
-# Run data sync inside the OpenClaw container every hour
-0 * * * * /usr/bin/docker exec openclaw_app /usr/local/bin/python /app/sync_data.py >> /var/log/openclaw_cron.log 2>&1
-```
-
-For a robust wrapper script that checks container state first, see `scripts/docker-cron-wrapper.sh`.
-
-### Pattern C: Dedicated Job Launcher (Ofelia)
-
-For complex multi-container setups (like Docker Compose), use a dedicated scheduler container like Ofelia that mounts the Docker socket and triggers jobs via labels.
-
-See `references/docker_ofelia.md` for Docker Compose configuration.
-
-## Troubleshooting
-
-If a cron job fails:
-1. **Check paths:** Are you using absolute paths?
-2. **Check permissions:** Does the script have `+x` execution rights?
-3. **Check environment:** Did you rely on an env var that cron doesn't have?
-4. **Check logs:** Look at `/var/log/syslog` or the specific redirected log file.
-5. **Check newline:** Does the crontab file end with an empty newline (LF)?
-
-For a complete troubleshooting checklist, see `references/troubleshooting.md`.
-
----
-
-## Adversarial Verification Panel
-
-For each significant scheduling issues and configuration errors produced by the parallel sub-agents:
-
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong scheduling issues and configuration errors from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Supercronic Agent, Host Cron with Docker Exec Agent, Ofelia Agent) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Supercronic Agent recommends making cron the container's sole CMD process, while the Host Cron with Docker Exec Agent recommends keeping the existing container image unchanged and triggering jobs from the host — these conflict when the container already runs a primary service)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified cron configuration plan so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+- [Local Machine Best Practices](references/local_machine.md): Guidance for standard Linux host cron.
+- [Docker Pattern A: Supercronic](references/docker_supercronic.md): Best practice for running cron inside a container.
+- [Docker Pattern C: Ofelia](references/docker_ofelia.md): Best practice for complex Docker Compose setups.
+- [Cron Syntax Reference](references/syntax.md): Standard 5-field cron syntax and examples.
+- [Troubleshooting Checklist](references/troubleshooting.md): Steps to diagnose and fix failing cron jobs.
+- [Docker Cron Wrapper Script](scripts/docker-cron-wrapper.sh): Safe wrapper for executing commands in containers from the host.

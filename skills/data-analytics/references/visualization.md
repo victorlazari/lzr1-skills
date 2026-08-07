@@ -56,8 +56,7 @@
 |---|---|---|
 | Pie chart (>5 slices) | Hard to compare angles | Horizontal bar chart |
 | 3D charts | Distorts perception | 2D equivalent |
-| Dual-axis | Misleading correlations | Separate charts or indexed |
-| Stacked area (many) | Hard to read middle layers | Small multiples |
+| Dual-axis | Misleading correlation | Two separate charts |
 | Radar/spider | Hard to compare | Grouped bar chart |
 
 ---

@@ -21,15 +21,11 @@ Expert-level marketing covering digital strategy, content, SEO, growth, brand, a
 ## Workflow
 
 1. **Understand the context** — What product, audience, stage, and goals?
-2. **Select reference** — Choose the appropriate domain:
-   - Digital and content strategy → `references/digital-marketing.md`
-   - SEO and organic growth → `references/seo.md`
-   - Brand and positioning → `references/brand-strategy.md`
-   - Analytics and measurement → `references/marketing-analytics.md`
-3. **Research** — Audience, competitors, channels, and benchmarks
-4. **Strategize** — Define objectives, channels, messaging, and budget
-5. **Execute** — Create content, launch campaigns, optimize
-6. **Measure** — Track KPIs, attribute results, iterate
+2. **Detect domains** — Scan the task for signals that indicate which domains apply.
+3. **Spawn specialists** — Launch all relevant specialists simultaneously (Brand, Demand Gen, SEO, Analytics).
+4. **Research and strategize** — Each specialist researches and strategizes using their updated, AI-focused reference file.
+5. **Synthesize** — Run the Campaign Synthesizer to identify gaps, dependencies, and produce a unified recommendation.
+6. **Execute and measure** — Execute the synthesized plan and measure based on the defined metrics.
 
 ## Core Principles (All Marketing Work)
 
@@ -60,13 +56,12 @@ Expert-level marketing covering digital strategy, content, SEO, growth, brand, a
 - **SEO**: See `references/seo.md` for search optimization strategy and tactics.
 - **Brand strategy**: See `references/brand-strategy.md` for positioning and messaging.
 - **Marketing analytics**: See `references/marketing-analytics.md` for measurement and attribution.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
 
 ---
 
 ## Multi-Specialist Protocol
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
 
 ### Domain Detection Table
 
@@ -98,3 +93,31 @@ After all specialists complete, run one **Campaign Synthesizer** with all specia
 4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
 
 > Synthesis focus for this skill: Ensures messaging aligns with funnel metrics targets. Catches where a brand positioning change requires a demand gen strategy adjustment.
+
+## Safety and Validation
+
+- **Read-only discovery**: Separate read-only discovery from mutations.
+- **Confirmation**: Require confirmation for destructive, external, privileged, financial, legal, or production-impacting actions.
+- **Validation**: Verify that the Multi-Specialist Protocol correctly synthesizes AI-driven recommendations.
+- **Dry run**: Dry run the skill with a complex marketing task to ensure the new AI-focused strategies are applied correctly.
+
+## Output Contract
+
+- **Structure**: Unified recommendation with explicit trade-off annotations for any resolved contradictions.
+- **Evidence**: Source-backed functional, safety, validation, and documentation improvements made.
+- **Severity/Confidence**: High confidence based on authoritative sources.
+- **Actionable Next Steps**: Execute the synthesized plan and measure based on the defined metrics.
+
+## Source Verification
+
+Verified against upstream: 2026-08-07
+
+## Authoritative sources
+
+- [Authoritative source map](references/source-map.md) — consult this before relying on volatile upstream behavior.
+
+## Package resource index
+
+| Resource | Purpose |
+|---|---|
+| [references/source-map.md](references/source-map.md) | Supporting package resource; inspect before use and apply the workflow’s safety and validation gates. |

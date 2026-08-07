@@ -1,0 +1,13 @@
+[server]
+host = "0.0.0.0"
+port = 8080
+workers = 4
+
+[batching]
+dynamic_batching = true
+max_batch_size = 32
+max_latency_ms = 100
+
+[hardware]
+accelerator = "gpu"
+memory_fraction = 0.9

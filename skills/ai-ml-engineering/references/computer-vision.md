@@ -140,9 +140,9 @@ Meta's SAM 2 (2024) provides:
 
 | Model | Capabilities | Use Case |
 |---|---|---|
-| GPT-4V/4o | Image understanding, OCR, reasoning | General vision tasks |
-| Claude 3.5 Vision | Document analysis, charts, diagrams | Document processing |
-| Gemini Pro Vision | Multimodal reasoning | Complex visual QA |
+| GPT-4o | Image understanding, OCR, reasoning | General vision tasks |
+| Claude 3.5 Sonnet | Document analysis, charts, diagrams | Document processing |
+| Gemini 1.5 Pro | Multimodal reasoning | Complex visual QA |
 | LLaVA | Open-source VLM | Self-hosted vision |
 | CLIP | Image-text alignment | Zero-shot classification, search |
 | Florence-2 | Multiple vision tasks | Unified vision model |
@@ -163,6 +163,7 @@ Extend RAG to handle images, diagrams, and mixed content:
 - Store image embeddings (CLIP) alongside text embeddings
 - Implement multi-modal retrieval (text query → image + text results)
 - Use vision-language models for generation with image context
+- **ColPali**: Use vision-language models for document retrieval directly from images.
 
 ---
 

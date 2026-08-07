@@ -6,6 +6,9 @@
 3. Landing Page Copy
 4. Email Copy
 5. Brand Voice
+6. SEO Copywriting
+7. A/B Testing
+8. Human-Centric Narratives
 
 ---
 
@@ -171,3 +174,29 @@ PS: [Optional reinforcement]
 | Numbers | Spell out 1-9, numerals for 10+ |
 | Dates | Month Day, Year (January 15, 2024) |
 | Acronyms | Spell out first use, then abbreviate |
+
+---
+
+## 6. SEO Copywriting
+
+- **Keyword Integration**: Naturally incorporate primary and secondary keywords into headlines, subheadings, and body copy without keyword stuffing.
+- **Search Intent**: Align content with the user's search intent (informational, navigational, transactional).
+- **Meta Data**: Write compelling meta titles and descriptions that include target keywords and encourage click-throughs.
+- **Readability**: Use short paragraphs, bullet points, and clear headings to improve readability and dwell time.
+
+---
+
+## 7. A/B Testing
+
+- **Variables to Test**: Headlines, CTAs, button colors, email subject lines, hero images, and copy length.
+- **Methodology**: Test one variable at a time to isolate its impact.
+- **Metrics**: Track conversion rates, click-through rates, and bounce rates to determine the winning variation.
+- **Continuous Optimization**: Use test results to iteratively improve copy performance.
+
+---
+
+## 8. Human-Centric Narratives
+
+- **Empathy**: Focus on the user's emotional journey and pain points.
+- **Storytelling**: Use real-world examples, customer success stories, and relatable scenarios to build connection.
+- **Authenticity**: Avoid overly corporate or robotic language; write as a human speaking to another human.

@@ -4,7 +4,7 @@ The Google Sheets API allows the bot to read, write, and format data within spre
 
 ## Core Capabilities
 
-The bot retrieves values from specific cells, ranges, or entire sheets for analysis. It can write or update data by appending new rows or modifying specific cells using batch update requests. Formatting capabilities include applying text styles, colors, borders, and conditional formatting rules to highlight key metrics. The bot also manages the structure of the spreadsheet by adding, deleting, renaming, or copying individual sheets (tabs). Furthermore, it can interact with embedded charts and apply data filters or sorting rules to organize information.
+The bot retrieves values from specific cells, ranges, or entire sheets for analysis. It can write or update data by appending new rows or modifying specific cells using batch update requests. Formatting capabilities include applying text styles, colors, borders, and conditional formatting rules to highlight important data. The bot also manages the structure of the spreadsheet by adding, deleting, or renaming individual sheets (tabs) within a file.
 
 ## Action Categories and Examples
 
@@ -17,3 +17,5 @@ The bot retrieves values from specific cells, ranges, or entire sheets for analy
 ## Official Documentation
 
 * [Google Sheets API Reference](https://developers.google.com/workspace/sheets/api/reference/rest)
+
+> Verified against upstream: 2026-08-07

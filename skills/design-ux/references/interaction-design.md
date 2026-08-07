@@ -1,5 +1,7 @@
 # Interaction Design
 
+*Verified against upstream: 2026-08-07*
+
 ## Table of Contents
 1. Interaction Patterns
 2. Motion Design
@@ -82,6 +84,23 @@
 | Expand/Collapse | Accordions, details | height: 0 → auto (or max-height) |
 | Stagger | Lists, grids | Delay each item by 50-100ms |
 | Morph | State change | Shared element transition |
+
+### Motion Accessibility
+
+Always respect the user's system preferences for reduced motion.
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
 
 ---
 

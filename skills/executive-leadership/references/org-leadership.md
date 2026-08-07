@@ -1,3 +1,4 @@
+
 # Organizational Leadership
 
 ## Table of Contents
@@ -10,6 +11,11 @@
 ---
 
 ## 1. Organizational Design
+
+### 2026 Trends
+- **Cross-Functional Alignment**: Breaking down silos to enable rapid, coordinated responses to market changes.
+- **Rapid Response to External Risks**: Building resilient structures capable of adapting to geopolitical and economic shifts.
+
 
 ### Org Design Principles
 

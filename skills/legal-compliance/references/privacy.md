@@ -1,11 +1,15 @@
 # Data Privacy & Protection
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. GDPR
-2. CCPA/CPRA
-3. Data Processing Agreements
-4. Privacy by Design
-5. International Data Transfers
+2. CCPA/CPRA (2026 Updates)
+3. UK Data (Use and Access) Act 2025
+4. Data Processing Agreements
+5. Privacy by Design
+6. International Data Transfers
+7. Source Map
 
 ---
 
@@ -48,7 +52,7 @@
 
 ---
 
-## 2. CCPA/CPRA (California)
+## 2. CCPA/CPRA (2026 Updates)
 
 ### CCPA vs GDPR Comparison
 
@@ -73,9 +77,32 @@
 | Right to correct | Correct inaccurate information |
 | Right to limit | Limit use of sensitive personal information |
 
+### 2026 CCPA Regulations
+
+Effective January 1, 2026, new regulations apply to:
+
+| Requirement | Description |
+|---|---|
+| Risk Assessments | Required for processing that presents a significant risk to consumers' privacy or security. |
+| Cybersecurity Audits | Annual independent audits required for businesses whose processing presents significant risk. |
+| Automated Decision-Making | Consumers have the right to opt-out of and access information about automated decision-making technologies. |
+
 ---
 
-## 3. Data Processing Agreements
+## 3. UK Data (Use and Access) Act 2025
+
+Effective February 2026, the UK Data (Use and Access) Act amends the UK GDPR and PECR:
+
+| Change | Description |
+|---|---|
+| Cookie Consent | Relaxed rules for certain non-intrusive cookies (e.g., analytics, website improvements) without explicit consent. |
+| Recognised Legitimate Interests | New list of processing activities deemed to be in the legitimate interest, reducing the need for balancing tests. |
+| PECR Fines | Increased fines for nuisance calls and texts, aligning with UK GDPR levels (up to £17.5m or 4% of global turnover). |
+| Automated Decision-Making | Clarifications and potential relaxations on restrictions regarding solely automated decision-making. |
+
+---
+
+## 4. Data Processing Agreements
 
 ### DPA Required Contents (GDPR Art. 28)
 
@@ -94,7 +121,7 @@
 
 ---
 
-## 4. Privacy by Design
+## 5. Privacy by Design
 
 ### Seven Principles
 
@@ -127,11 +154,11 @@ DPIA contents:
 
 ---
 
-## 5. International Data Transfers
+## 6. International Data Transfers
 
 ### Transfer Mechanisms
 
-| Mechanism | Description | Status (2024-2025) |
+| Mechanism | Description | Status (2024-2026) |
 |---|---|---|
 | Adequacy decision | Country deemed adequate by EU | US (DPF), UK, Canada, Japan, etc. |
 | Standard Contractual Clauses (SCCs) | EU-approved contract terms | Valid, requires TIA |
@@ -149,3 +176,15 @@ DPIA contents:
 | 4 | Identify supplementary measures needed |
 | 5 | Implement measures (technical, organizational) |
 | 6 | Document assessment and re-evaluate periodically |
+
+---
+
+## 7. Source Map
+
+- **CCPA 2026 Regulations**: [Paul Hastings Insights](https://www.paulhastings.com/insights/ph-privacy/plan-ahead-updated-ccpa-regulations-go-into-effect-jan-1)
+- **UK Data (Use and Access) Act**: [Clifford Chance Insights](https://www.cliffordchance.com/insights/resources/blogs/talking-tech/en/articles/2026/02/key-aspects-of-the-data--use-and-access--act-take-effect.html)
+- **IAPP (International Association of Privacy Professionals)**: iapp.org
+- **GDPR.eu**: gdpr.eu
+- **ICO Guidance**: ico.org.uk
+- **CNIL Guidance**: cnil.fr
+- **EDPB Guidelines**: edpb.europa.eu

@@ -1,5 +1,7 @@
 # Design & UX Recommended Reading (2024-2026)
 
+*Verified against upstream: 2026-08-07*
+
 ## Essential Books (33)
 
 ### UX Design Fundamentals
@@ -68,8 +70,8 @@
 10. **UX Research Cheat Sheet** — nngroup.com (2024). Method selection guide.
 
 ### Accessibility
-11. **WCAG 2.2 Specification** — w3.org/WAI (2023). Official guidelines.
-12. **WAI-ARIA Authoring Practices** — w3.org (2024). ARIA pattern implementations.
+11. **WCAG 2.2 Specification** — w3.org/TR/WCAG22/ (2023). Official guidelines.
+12. **WAI-ARIA Authoring Practices** — w3.org/WAI/ARIA/apg/ (2024). ARIA pattern implementations.
 13. **The A11Y Project** — a11yproject.com. Community accessibility resource.
 14. **Inclusive Design Principles** — inclusivedesignprinciples.org. Design for all.
 15. **axe-core Rules** — dequeuniversity.com. Automated testing rules.

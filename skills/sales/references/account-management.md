@@ -1,5 +1,7 @@
 # Account Management
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Account Planning
 2. Customer Success
@@ -74,14 +76,12 @@
 
 ### Expansion Playbook
 
-```
 1. Identify signal (usage spike, new stakeholder, feature request)
 2. Validate need (discovery conversation)
 3. Quantify value (ROI of expansion)
 4. Propose solution (tailored to their growth)
 5. Negotiate (leverage existing relationship)
 6. Close and implement (fast time-to-value)
-```
 
 ---
 
@@ -115,7 +115,6 @@
 
 ### Executive Business Review (EBR)
 
-```
 Agenda (60 minutes):
 1. Business context (10 min)
    - Their strategic priorities this quarter
@@ -137,7 +136,6 @@ Agenda (60 minutes):
    - Joint success plan for next quarter
    - Expansion opportunities
    - Mutual commitments
-```
 
 ### Relationship Mapping
 
@@ -147,3 +145,10 @@ Agenda (60 minutes):
 | Management | AM / Director | Director / Manager | Operational success |
 | Practitioner | CSM / SE | Users / Admins | Daily adoption |
 | Technical | Support / SE | IT / Engineering | Technical health |
+
+## Source Map
+
+- **The Expansion Sale** (Peterson & Riesterer): Consult for growing accounts and expansion strategies.
+- **Customer Success** (Mehta et al.): Consult for CS fundamentals and health scoring.
+- **Farm Don't Hunt** (Nirpaz): Consult for customer success strategy and lifecycle management.
+- **The Seven Keys to Managing Strategic Accounts** (Sherman, Sperry & Reese): Consult for strategic account planning.

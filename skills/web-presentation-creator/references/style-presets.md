@@ -2,6 +2,8 @@
 
 This reference documents five distinct aesthetic presets inspired by industry leaders. Use these presets to establish the color palette, typography, and core visual identity of the landing page.
 
+Verified against upstream: 2026-08-07
+
 ---
 
 ## 1. Cinematic Dark (Inspired by Apple / DJI)

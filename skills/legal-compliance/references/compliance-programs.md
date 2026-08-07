@@ -1,11 +1,14 @@
 # Compliance Programs
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. SOC 2
 2. ISO 27001
 3. HIPAA
 4. PCI DSS
 5. Building a Compliance Program
+6. Source Map
 
 ---
 
@@ -116,7 +119,9 @@ Must include:
 
 ## 4. PCI DSS
 
-### PCI DSS Requirements (v4.0)
+### PCI DSS Requirements (v4.0.1)
+
+*Note: PCI DSS v4.0 retired on December 31, 2024. v4.0.1 is the active standard.*
 
 | Requirement | Description |
 |---|---|
@@ -170,3 +175,14 @@ Must include:
 | Audit | Auditor interviews, evidence review | 2-4 weeks |
 | Remediation | Address findings | 30-90 days after |
 | Certification | Report issued | After remediation |
+
+---
+
+## 6. Source Map
+
+- **PCI DSS v4.0.1**: [PCI Security Standards Council](https://blog.pcisecuritystandards.org/just-published-pci-dss-v4-0-1)
+- **HIPAA Security Rule**: [HHS](https://www.hipaajournal.com/hipaa-security-rule/)
+- **AICPA SOC Resources**: aicpa.org
+- **ISO 27001 Resources**: iso.org
+- **NIST Cybersecurity Framework**: nist.gov
+- **CIS Controls**: cisecurity.org

@@ -1,5 +1,7 @@
 # Procurement & Sourcing
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Procurement Process
 2. Vendor Selection
@@ -133,6 +135,7 @@
 | Concentration | Over-reliance on single vendor | Multi-vendor strategy |
 | Geopolitical | Sanctions, trade restrictions | Geographic diversification |
 | Contractual | Lock-in, unfavorable terms | Exit clauses, data portability |
+| Compliance | SOC 2, ESG | Audits, certifications |
 
 ### Vendor Risk Assessment
 
@@ -143,3 +146,9 @@
 | Criticality | Nice-to-have | Important | Mission-critical |
 | Alternatives | Many options | Few options | No alternatives |
 | Vendor size | Large, stable | Mid-market | Startup |
+
+## Authoritative Sources
+
+- 2 CFR Part 200 Subpart D - Procurement Standards: https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200/subpart-D/subject-group-ECFR45ddd4419ad436d
+- World Bank Procurement Framework: https://www.worldbank.org/ext/en/what-we-do/project-procurement/framework
+- Master SOC 2 Vendor Management Requirements in 2026: https://soc2auditors.org/insights/soc-2-vendor-management-requirements/

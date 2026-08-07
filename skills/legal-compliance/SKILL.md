@@ -7,92 +7,68 @@ description: Comprehensive legal and compliance skill covering corporate law, co
 
 Expert-level legal and compliance covering corporate law, contracts, IP, data privacy, regulatory compliance, and risk management for technology companies.
 
-## When to Use
+## Scope and Triggers
 
-- Drafting or reviewing contracts and agreements
-- Building compliance programs (SOC2, GDPR, HIPAA)
-- Managing intellectual property and patents
-- Data privacy and protection requirements
-- Corporate governance and entity management
-- Risk assessment and mitigation
-- Regulatory navigation and licensing
-- Employment law and HR legal matters
+- **Scope**: Drafting or reviewing contracts, building compliance programs (SOC2, GDPR, HIPAA, PCI DSS), managing intellectual property, data privacy, corporate governance, risk assessment, and employment law.
+- **Triggers**: Activates when tasks involve legal agreements, compliance audits, privacy regulations, or corporate structuring.
+- **Non-goals**: Does not provide formal legal counsel or represent clients in litigation. All outputs must include a disclaimer.
+
+## Preconditions
+
+- Detect the jurisdiction, business model, and specific legal/compliance domain involved.
+- Identify the target regulatory framework (e.g., GDPR, CCPA, PCI DSS) and verify its current version.
+
+## Source Freshness
+
+- Verify the current status of regulations via their canonical URLs before providing definitive compliance advice.
+- See domain references for specific canonical URLs and verification dates.
 
 ## Workflow
 
-1. **Understand the context** — What jurisdiction, business model, and legal question?
-2. **Select reference** — Choose the appropriate domain:
-   - Contracts and commercial law → `references/contracts.md`
-   - Data privacy and protection → `references/privacy.md`
-   - Compliance programs → `references/compliance-programs.md`
-   - IP and corporate law → `references/corporate-ip.md`
-3. **Research** — Applicable laws, regulations, precedents
-4. **Analyze** — Risk assessment, gap analysis
-5. **Advise** — Recommendations with risk/benefit tradeoffs
-6. **Document** — Policies, contracts, or compliance artifacts
+1. **Detect Domain**: Identify the legal/compliance domain(s) involved in the task.
+2. **Spawn Specialists**: If multiple domains are detected, spawn specialists concurrently with their respective reference files (max 4).
+   - Contract Law → `references/contracts.md`
+   - Regulatory Compliance → `references/compliance-programs.md`
+   - Intellectual Property → `references/corporate-ip.md`
+   - Data Privacy → `references/privacy.md`
+3. **Verify Freshness**: Verify the freshness of the relevant regulations using the embedded canonical URLs.
+4. **Generate Artifact**: Generate the required legal or compliance artifact.
+5. **Synthesize**: If multiple specialists were spawned, run the Legal Risk Synthesizer to resolve contradictions and identify gaps.
+6. **Validate**: Run `scripts/validate-compliance-checklist.py` to ensure the artifact meets structural requirements.
+7. **Present**: Present the final artifact to the user with appropriate legal disclaimers.
 
-## Core Principles (All Legal Work)
+## Safety
 
-- Risk-based: Prioritize by likelihood and impact
-- Jurisdiction-aware: Laws vary by location; always specify
-- Practical: Balance legal perfection with business needs
-- Preventive: Proactive compliance beats reactive firefighting
-- Documented: If it's not written down, it doesn't exist
-- Proportionate: Controls should match the risk level
-- Current: Laws change; stay updated on regulatory shifts
-- Disclaimer: AI cannot replace qualified legal counsel for specific matters
+- **Read-only**: Discovery of legal requirements and gap analysis.
+- **Confirmation Required**: Require explicit user confirmation before generating final legal documents or compliance reports.
+- **Disclaimer**: Ensure all generated advice includes a disclaimer that it does not constitute formal legal counsel.
 
-## Role Capabilities
+## Validation
 
-| Role | Expertise | Reference |
-|---|---|---|
-| General Counsel | Corporate, governance, strategy | `references/corporate-ip.md` |
-| Contracts Attorney | Commercial agreements, negotiation | `references/contracts.md` |
-| Privacy Counsel | GDPR, CCPA, data protection | `references/privacy.md` |
-| Compliance Officer | Programs, audits, certifications | `references/compliance-programs.md` |
-| IP Counsel | Patents, trademarks, trade secrets | `references/corporate-ip.md` |
+- Use `scripts/validate-compliance-checklist.py` to validate that generated compliance artifacts meet minimum structural requirements based on the selected framework.
+- Implement dry-run mode for the validation script.
+- Validate that all referenced regulatory frameworks are explicitly versioned in the output.
 
-## Key References
+## Failure Handling
 
-- **Contracts**: See `references/contracts.md` for agreements and commercial law.
-- **Privacy**: See `references/privacy.md` for data protection and privacy.
-- **Compliance programs**: See `references/compliance-programs.md` for certifications and audits.
-- **Corporate and IP**: See `references/corporate-ip.md` for governance and intellectual property.
-- **Recommended reading**: See `references/reading-list.md` for curated books and articles.
+- If a regulatory source is unreachable, fall back to the bundled verified references and note the inability to verify freshness.
+- If the validation script fails, review the output against the specific framework requirements and adjust the artifact.
 
----
+## Output Contract
 
-## Multi-Specialist Protocol
+- **Structure**: Clear, structured legal or compliance documents with explicit versioning of referenced frameworks.
+- **Evidence**: Citations to canonical regulatory sources.
+- **Actionable Steps**: Clear recommendations with risk/benefit tradeoffs.
 
-> **Replaces the single "Select reference" step.** When multiple domains are detected, spawn all relevant specialists simultaneously — do not serialize them.
+## Resources
 
-### Domain Detection Table
+- `references/contracts.md`: Contracts and commercial law.
+- `references/compliance-programs.md`: Compliance programs (SOC 2, ISO 27001, HIPAA, PCI DSS).
+- `references/corporate-ip.md`: Corporate governance and intellectual property.
+- `references/privacy.md`: Data privacy and protection (GDPR, CCPA).
+- `scripts/validate-compliance-checklist.py`: Deterministic script to validate compliance artifacts.
 
-Scan the task for signals that indicate which domains apply:
+## Orchestration
 
-| Task Signal (examples) | Domain | Specialist Agent | Reference |
-|---|---|---|---|
-| `contract`, ... | **Contract Law** | Contract Specialist | `references/complete-reference.md` |
-| `regulatory`, ... | **Regulatory Compliance** | Regulatory Specialist | `references/complete-reference.md` |
-| `IP`, ... | **Intellectual Property** | IP Specialist | `references/complete-reference.md` |
-| `data privacy`, ... | **Data Privacy** | Privacy Specialist | `references/complete-reference.md` |
-
-### Spawning Logic
-
-**Single domain detected** → Fall back to original single-reference behavior (no change).
-
-**Multiple domains detected** → Launch all relevant specialists simultaneously:
-- Each specialist receives: **full task context** + its dedicated reference file only
-- No specialist waits for another — all start at the same time
-- Maximum concurrent specialists: 4
-
-### Cross-Domain Synthesizer
-
-After all specialists complete, run one **Legal Risk Synthesizer** with all specialist outputs that:
-
-1. **Identifies contradictions** between specialist recommendations for the same component
-2. **Identifies gaps** — requirements addressed by no specialist
-3. **Identifies dependencies** — where Domain A's output is a prerequisite for Domain B's recommendation
-4. **Produces** a unified recommendation with explicit trade-off annotations for any resolved contradictions
-
-> Synthesis focus for this skill: Flags where a data handling practice violates multiple regulatory frameworks simultaneously. Maps IP risks to contract clause gaps.
+- **Multi-Specialist Protocol**: When multiple domains are detected, spawn all relevant specialists simultaneously.
+- **Legal Risk Synthesizer**: After all specialists complete, run one synthesizer to identify contradictions, gaps, and dependencies, producing a unified recommendation with explicit trade-off annotations.

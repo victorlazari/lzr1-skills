@@ -1,5 +1,7 @@
 # Organizational Development
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Org Design
 2. Career Frameworks
@@ -132,7 +134,7 @@ Objective: Become the go-to platform for mid-market companies
 
 | Module | Content | Duration |
 |---|---|---|
-| New manager foundations | Role transition, expectations | 2 days |
+| New manager foundations | Role transition, expectations, HR basics | 1 day |
 | Feedback and coaching | Giving feedback, coaching conversations | 1 day |
 | Performance management | Reviews, PIPs, difficult conversations | 1 day |
 | Hiring and team building | Interviewing, onboarding, team dynamics | 1 day |

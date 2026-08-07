@@ -1,58 +1,38 @@
-# .trivyignore.yaml - Structured Ignore File Template
-# Place this file as .trivyignore.yaml in the root of your repository.
-# Documentation: https://trivy.dev/docs/latest/configuration/filtering/
+# Review-only .trivyignore.yaml starting point.
+# Upstream filtering documentation verified: 2026-08-07.
+# https://trivy.dev/docs/latest/configuration/filtering/
 #
-# This format provides richer metadata than the plain .trivyignore format,
-# including justification, expiration dates, and path-scoped suppression.
+# IMPORTANT:
+# - YAML ignore support was documented as EXPERIMENTAL and potentially
+#   backward-incompatible at the verification date.
+# - Select this file explicitly with `--ignorefile` where required by the
+#   installed release.
+# - Test parsing and positive/negative suppression behavior before merge.
+# - Keep owner, evidence, approval, and audit state in a separate protected
+#   governance ledger; those are not Trivy schema fields.
+# - A suppression does not remove the underlying condition.
+#
+# Supported entry fields at the verification date:
+#   id          required string
+#   paths       optional string array
+#   purls       optional string array; vulnerabilities only
+#   expired_at  optional YYYY-MM-DD date
+#   statement   optional rationale; not used by Trivy's filter decision
+#
+# Example (leave commented until reviewed):
+# vulnerabilities:
+#   - id: "CVE-2025-12345"
+#     paths:
+#       - "package-lock.json"
+#     purls:
+#       - "pkg:npm/example@1.2.3"
+#     expired_at: 2026-12-31
+#     statement: "SEC-1234: bounded exception while the upgrade is validated"
+#
+# Do NOT add unsupported keys such as `reason`, `owner`, `evidence`, `ticket`,
+# `approved_by`, `expires`, or `scope` to this file.
 
-vulnerabilities:
-  # Example: Suppress a CVE with justification and expiration
-  # - id: CVE-2023-12345
-  #   paths:
-  #     - "go.sum"
-  #     - "go.mod"
-  #   reason: "Not exploitable: vulnerable function is not called in our code path"
-  #   expires: 2025-12-31
-
-  # Example: Suppress a vulnerability globally
-  # - id: CVE-2024-67890
-  #   reason: "Mitigated by WAF rules and network segmentation"
-
-  # Example: Suppress GitHub Security Advisory
-  # - id: GHSA-xxxx-yyyy-zzzz
-  #   reason: "False positive: package version is patched via backport"
-
-misconfigurations:
-  # Example: Suppress Dockerfile check for dev images
-  # - id: AVD-DS-0002
-  #   paths:
-  #     - "Dockerfile.dev"
-  #     - "docker/Dockerfile.test"
-  #   reason: "Development-only images, not deployed to production"
-
-  # Example: Suppress Terraform check
-  # - id: AVD-AWS-0107
-  #   paths:
-  #     - "terraform/modules/dev/**"
-  #   reason: "Dev environment does not require encryption at rest"
-
-secrets:
-  # Example: Suppress false positive secret detection
-  # - id: generic-api-key
-  #   paths:
-  #     - "tests/fixtures/**"
-  #     - "docs/examples/**"
-  #   reason: "Test fixtures with dummy/example keys, not real credentials"
-
-  # Example: Suppress private key detection in test certs
-  # - id: private-key
-  #   paths:
-  #     - "tests/certs/**"
-  #   reason: "Self-signed test certificates, not used in production"
-
-licenses:
-  # Example: Suppress license findings
-  # - id: GPL-3.0
-  #   paths:
-  #     - "tools/**"
-  #   reason: "Build-time tool only, not linked into distributed binary"
+vulnerabilities: []
+misconfigurations: []
+secrets: []
+licenses: []

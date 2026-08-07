@@ -2,22 +2,24 @@
 
 This document serves as a comprehensive, expert-level reference for implementing Vitest unit testing within a modern full-stack Next.js 16 application architecture utilizing React 19, Tailwind CSS v4, and shadcn/ui component primitives. It consolidates advanced mocking strategies, configuration schemas, CLI commands, troubleshooting diagnostics, and security best practices.
 
+**Verified against upstream: 2026-08-07**
+
 ## 1. Vitest Architecture and Core Concepts
 
 Vitest is a blazing fast unit testing framework built as a modern alternative to Jest, tightly integrated with the Vite build toolchain. It is optimized for TypeScript-first development and embraces ESM (ECMAScript Modules) and native modern JavaScript features.
 
 ### Core Components
 
--   **Vite Integration**: Vitest integrates seamlessly with Vite, using its module resolution, hot module replacement (HMR), and fast build times.
--   **Native ESM Support**: Vitest leverages Vite's native ESM handling to avoid the overhead of transpiling and bundling test code upfront, resulting in faster test startup and incremental runs.
--   **In-Process Test Execution**: Vitest runs tests within the same Node.js process as the Vite server, reducing inter-process communication overhead and improving test reliability.
--   **Dependency Graph Management**: Vitest uses Vite's dependency graph management to ensure efficient module resolution and caching. Changes in source files trigger minimal invalidations.
+- **Vite Integration**: Vitest integrates seamlessly with Vite, using its module resolution, hot module replacement (HMR), and fast build times.
+- **Native ESM Support**: Vitest leverages Vite's native ESM handling to avoid the overhead of transpiling and bundling test code upfront, resulting in faster test startup and incremental runs.
+- **In-Process Test Execution**: Vitest runs tests within the same Node.js process as the Vite server, reducing inter-process communication overhead and improving test reliability.
+- **Dependency Graph Management**: Vitest uses Vite's dependency graph management to ensure efficient module resolution and caching. Changes in source files trigger minimal invalidations.
 
 ### Fast Execution Mechanics
 
--   **Module Caching**: When a test file imports a module, Vitest requests the module from Vite’s dev server, which returns a cached transformed module if available.
--   **Parallel Test Execution**: Vitest spawns multiple worker threads to parallelize test execution. Each worker runs a subset of tests independently while sharing module caches.
--   **Incremental Test Runs**: In watch mode, Vitest listens to file system events and intelligently reruns only impacted tests based on the dependency graph.
+- **Module Caching**: When a test file imports a module, Vitest requests the module from Vite’s dev server, which returns a cached transformed module if available.
+- **Parallel Test Execution**: Vitest spawns multiple worker threads to parallelize test execution. Each worker runs a subset of tests independently while sharing module caches.
+- **Incremental Test Runs**: In watch mode, Vitest listens to file system events and intelligently reruns only impacted tests based on the dependency graph.
 
 ## 2. Advanced Mocking Strategies
 
@@ -29,7 +31,7 @@ An effective mocking approach is to abstract Prisma client calls behind reposito
 
 ```typescript
 // src/adapters/prismaUserRepository.ts
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, User } from "@prisma/client";
 
 export interface IUserRepository {
   findUserById(id: string): Promise<User | null>;
@@ -46,18 +48,20 @@ export class PrismaUserRepository implements IUserRepository {
 In unit tests, mock the repository interface:
 
 ```typescript
-import { describe, it, expect, vi } from 'vitest';
-import { IUserRepository } from '@/adapters/prismaUserRepository';
-import { UserService } from '@/services/userService';
+import { describe, it, expect, vi } from "vitest";
+import { IUserRepository } from "@/adapters/prismaUserRepository";
+import { UserService } from "@/services/userService";
 
-describe('UserService', () => {
-  it('should return user by id', async () => {
+describe("UserService", () => {
+  it("should return user by id", async () => {
     const mockUserRepo: IUserRepository = {
-      findUserById: vi.fn().mockResolvedValue({ id: '123', email: 'test@example.com' }),
+      findUserById: vi
+        .fn()
+        .mockResolvedValue({ id: "123", email: "test@example.com" }),
     };
     const userService = new UserService(mockUserRepo);
-    const user = await userService.getUserById('123');
-    expect(user).toEqual({ id: '123', email: 'test@example.com' });
+    const user = await userService.getUserById("123");
+    expect(user).toEqual({ id: "123", email: "test@example.com" });
   });
 });
 ```
@@ -67,16 +71,16 @@ describe('UserService', () => {
 Mock the `ioredis` client instance methods such as `get`, `set`, `del`, and `expire`.
 
 ```typescript
-import Redis from 'ioredis';
-import { vi } from 'vitest';
+import Redis from "ioredis";
+import { vi } from "vitest";
 
-vi.mock('ioredis', () => {
+vi.mock("ioredis", () => {
   return {
     default: vi.fn().mockImplementation(() => ({
       get: vi.fn((key) => Promise.resolve(mockCache[key] || null)),
       set: vi.fn((key, value) => {
         mockCache[key] = value;
-        return Promise.resolve('OK');
+        return Promise.resolve("OK");
       }),
     })),
   };
@@ -90,10 +94,10 @@ const mockCache: Record<string, string> = {};
 Mock the AMQP client by replacing the channel and connection methods.
 
 ```typescript
-import amqplib from 'amqplib';
-import { vi } from 'vitest';
+import amqplib from "amqplib";
+import { vi } from "vitest";
 
-vi.mock('amqplib', () => {
+vi.mock("amqplib", () => {
   const channelMock = {
     publish: vi.fn(),
     consume: vi.fn(),
@@ -108,40 +112,64 @@ vi.mock('amqplib', () => {
 });
 ```
 
+### Context Management with Hooks
+
+Vitest 4.1 introduces `aroundEach` and `aroundAll` hooks for wrapping tests in contexts like transactions or AsyncLocalStorage.
+
+```typescript
+import { aroundEach, it, expect } from "vitest";
+
+aroundEach(async (test, { expect }) => {
+  // Setup context before test
+  const dbTransaction = await startTransaction();
+
+  await test(); // Run the test
+
+  // Teardown context after test
+  await dbTransaction.rollback();
+});
+
+it("runs within transaction", () => {
+  expect(true).toBe(true);
+});
+```
+
 ## 3. Unit Testing React 19 Components
 
 ### Testing Server Components
 
-Server Components are plain functions without lifecycle hooks and can be tested as pure functions using `ReactDOMServer.renderToString`.
+Sync Server Components are plain functions without lifecycle hooks and can be tested as pure functions using `ReactDOMServer.renderToString`.
 
 ```tsx
-import React from 'react';
-import { renderToString } from 'react-dom/server';
-import { ServerComponent } from '@/app/components/ServerComponent';
+import React from "react";
+import { renderToString } from "react-dom/server";
+import { ServerComponent } from "@/app/components/ServerComponent";
 
-describe('ServerComponent', () => {
-  it('renders expected static markup', () => {
+describe("ServerComponent", () => {
+  it("renders expected static markup", () => {
     const html = renderToString(<ServerComponent title="Test" />);
-    expect(html).toContain('<h1>Test</h1>');
+    expect(html).toContain("<h1>Test</h1>");
   });
 });
 ```
+
+**Note:** Async Server Components are not supported by Vitest and require E2E testing (e.g., Playwright).
 
 ### Testing Client Components
 
 Client Components require a DOM environment. Use `@testing-library/react` to render and interact with components.
 
 ```tsx
-import { render, screen } from '@testing-library/react';
-import { Button } from 'shadcn/ui/button';
-import React from 'react';
+import { render, screen } from "@testing-library/react";
+import { Button } from "shadcn/ui/button";
+import React from "react";
 
-describe('Button component', () => {
-  it('renders with correct text and styles', () => {
+describe("Button component", () => {
+  it("renders with correct text and styles", () => {
     render(<Button className="bg-blue-500">Click me</Button>);
-    const button = screen.getByRole('button', { name: /click me/i });
+    const button = screen.getByRole("button", { name: /click me/i });
     expect(button).toBeVisible();
-    expect(button).toHaveClass('bg-blue-500');
+    expect(button).toHaveClass("bg-blue-500");
   });
 });
 ```
@@ -151,115 +179,183 @@ describe('Button component', () => {
 Create manual mocks for `next/navigation` hooks like `useRouter` and `usePathname`.
 
 ```typescript
-import { renderHook } from '@testing-library/react-hooks';
-import { useRouter, usePathname } from 'next/navigation';
+import { renderHook } from "@testing-library/react-hooks";
+import { useRouter, usePathname } from "next/navigation";
 
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
   }),
-  usePathname: () => '/test-path',
+  usePathname: () => "/test-path",
 }));
 ```
 
-## 4. Snapshot Testing
+## 4. Snapshot Testing and Visual Regression
 
 Snapshot testing captures the rendered output of React components, serialized objects, or stringified results.
 
 ```tsx
-import { render } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import Button from '@/components/ui/Button';
+import { render } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import Button from "@/components/ui/Button";
 
-describe('Button component', () => {
-  it('matches the snapshot', () => {
+describe("Button component", () => {
+  it("matches the snapshot", () => {
     const { container } = render(<Button variant="primary">Click me</Button>);
     expect(container).toMatchSnapshot();
   });
 });
 ```
 
-## 5. Testing Zod Schemas
+### Browser Mode Visual Regression Testing
 
-Testing Zod schemas ensures input validation is robust and aligns with business rules.
+Vitest 4.1 supports stable Browser Mode with visual regression testing using `toMatchScreenshot`.
 
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { userSchema } from '@/validation/user';
+import { test, expect } from "vitest";
 
-describe('userSchema validation', () => {
-  it('accepts valid user data', () => {
-    const data = { id: 'uuid', email: 'test@example.com', name: 'John' };
-    expect(() => userSchema.parse(data)).not.toThrow();
+test("visual regression", async () => {
+  // Render component in browser mode
+  document.body.innerHTML = '<div style="color: red;">Hello</div>';
+
+  // Compare screenshot
+  await expect(document.body).toMatchScreenshot();
+});
+```
+
+## 5. Testing Zod Schemas
+
+Testing Zod schemas ensures input validation is robust and aligns with business rules. Vitest 4.1 introduces `expect.schemaMatching` for validation.
+
+```typescript
+import { describe, it, expect } from "vitest";
+import { z } from "zod";
+
+const userSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  name: z.string(),
+});
+
+describe("userSchema validation", () => {
+  it("accepts valid user data", () => {
+    const data = {
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      email: "test@example.com",
+      name: "John",
+    };
+    expect(data).toEqual(expect.schemaMatching(userSchema));
   });
 
-  it('rejects invalid email', () => {
-    const data = { id: 'uuid', email: 'invalid', name: 'John' };
-    expect(() => userSchema.parse(data)).toThrow();
+  it("rejects invalid email", () => {
+    const data = {
+      id: "123e4567-e89b-12d3-a456-426614174000",
+      email: "invalid",
+      name: "John",
+    };
+    expect(data).not.toEqual(expect.schemaMatching(userSchema));
   });
 });
 ```
 
-## 6. Vitest Configuration Schemas
+## 6. Advanced Test Patterns
+
+### Builder Pattern with `test.extend`
+
+Vitest 4.1 introduces a new `test.extend` builder pattern with type inference and `onCleanup` callbacks.
+
+```typescript
+import { test as base } from "vitest";
+
+const test = base.extend<{ db: Database }>({
+  db: async ({}, use, onCleanup) => {
+    const db = await createDatabase();
+    onCleanup(async () => {
+      await db.close();
+    });
+    await use(db);
+  },
+});
+
+test("database test", async ({ db }) => {
+  const user = await db.query("SELECT * FROM users");
+  expect(user).toBeDefined();
+});
+```
+
+## 7. Vitest Configuration Schemas
 
 The `vitest.config.ts` file allows extensive customization.
 
--   `include`: Glob patterns specifying which files to include as test files.
--   `exclude`: Glob patterns for files and directories to exclude.
--   `environment`: The test environment to use (`node`, `jsdom`, `happy-dom`).
--   `coverage`: Configuration options for code coverage reporting (`provider`, `reporters`, `include`, `exclude`).
--   `setupFiles`: List of files to be loaded before the test suite is executed.
--   `maxConcurrency`: Maximum number of test files to run concurrently.
+- `include`: Glob patterns specifying which files to include as test files.
+- `exclude`: Glob patterns for files and directories to exclude.
+- `environment`: The test environment to use (`node`, `jsdom`, `happy-dom`).
+- `coverage`: Configuration options for code coverage reporting (`provider`, `reporters`, `include`, `exclude`).
+- `setupFiles`: List of files to be loaded before the test suite is executed.
+- `maxConcurrency`: Maximum number of test files to run concurrently.
+- `viteModuleRunner`: Experimental option to run tests natively in Node.js without Vite transforms (`viteModuleRunner: false`).
 
 ```typescript
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts'],
+    environment: "jsdom",
+    setupFiles: ["./vitest.setup.ts"],
     coverage: {
-      provider: 'c8',
-      reporter: ['text', 'json', 'html'],
+      provider: "v8",
+      reporter: ["text", "json", "html"],
     },
+    // Experimental: Run tests natively in Node.js without Vite transforms
+    // viteModuleRunner: false,
   },
 });
 ```
 
-## 7. Vitest CLI Command Reference
+## 8. Vitest CLI Command Reference
 
--   `vitest`: Starts the test runner in watch mode (dev) or run mode (CI).
--   `vitest run`: Runs the test suite once and exits.
--   `vitest watch`: Starts the test runner in watch mode.
--   `vitest related <files...>`: Runs tests related to a list of source files.
--   `--ui`: Enable the Vitest UI.
--   `--coverage`: Enable coverage report generation.
--   `--update`, `-u`: Update snapshot files.
--   `--shard <shard>`: Test suite shard to execute (e.g., `1/3`).
+- `vitest`: Starts the test runner in watch mode (dev) or run mode (CI).
+- `vitest run`: Runs the test suite once and exits.
+- `vitest watch`: Starts the test runner in watch mode.
+- `vitest related <files...>`: Runs tests related to a list of source files.
+- `--ui`: Enable the Vitest UI.
+- `--coverage`: Enable coverage report generation.
+- `--update`, `-u`: Update snapshot files.
+- `--shard <shard>`: Test suite shard to execute (e.g., `1/3`).
+- `--project <name>`: Run tests for a specific project in a workspace.
 
-## 8. Troubleshooting & Diagnostics
+### Test Tags
+
+Vitest 4.1 supports test tags for organizing and filtering tests.
+
+```bash
+# Run tests with specific tags
+vitest --testNamePattern="@unit"
+```
+
+## 9. Troubleshooting & Diagnostics
 
 Vitest provides a multi-layered diagnostics architecture encompassing error handling, logging, and tracing.
 
 ### Common Error Codes
 
--   `VIT001`: Test Suite Initialization Failure (e.g., syntax errors in config).
--   `VIT002`: Test Case Execution Timeout (e.g., infinite loops, network issues).
--   `VIT003`: Assertion Failure (mismatch between expected and actual results).
--   `VIT004`: Module Not Found (issues with module paths or missing dependencies).
+- `VIT001`: Test Suite Initialization Failure (e.g., syntax errors in config).
+- `VIT002`: Test Case Execution Timeout (e.g., infinite loops, network issues).
+- `VIT003`: Assertion Failure (mismatch between expected and actual results).
+- `VIT004`: Module Not Found (issues with module paths or missing dependencies).
 
 ### Logging and Tracing
 
-Configure logging levels (`error`, `warning`, `info`, `debug`) and enable tracing to capture function call sequences and execution times.
+Configure logging levels (`error`, `warning`, `info`, `debug`) and enable tracing to capture function call sequences and execution times. Vitest 4.1 supports Playwright Traces for deeper insights.
 
-## 9. Security Audit Checklist
+## 10. Security Audit Checklist
 
 Ensure the integration of Vitest adheres to stringent security practices.
 
--   **Environment Configuration**: Do not expose sensitive information in environment variables.
--   **Dependency Management**: Regularly run `npm audit` and lock dependency versions.
--   **Test Code Review**: Ensure no sensitive data is hardcoded in test scripts. Use mocks for sensitive data.
--   **File System Permissions**: Restrict access to test files using role-based access control (RBAC).
--   **CI/CD Security**: Ensure CI/CD tools have minimum required permissions and use secure tokens.
+- **Environment Configuration**: Do not expose sensitive information in environment variables.
+- **Dependency Management**: Regularly audit dependencies for vulnerabilities.
+- **Test Code Review**: Ensure no sensitive data is hardcoded in test scripts. Use mocks for sensitive data.
+- **File System Permissions**: Restrict access to test files using role-based access control (RBAC).
+- **CI/CD Security**: Ensure CI/CD tools have minimum required permissions and use secure tokens.

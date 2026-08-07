@@ -90,8 +90,8 @@
 27. **Pitchbook** — pitchbook.com. VC and startup data.
 
 ### Standards & Frameworks
-28. **NIST** — nist.gov. Standards and frameworks.
-29. **W3C** — w3.org. Web standards.
-30. **IETF** — ietf.org. Internet standards.
-31. **ISO** — iso.org. International standards.
+28. **ISO 56000:2025** — iso.org/standard/84436.html. Innovation management fundamentals.
+29. **DoD TRA Guidebook (Feb 2025)** — cto.mil. Technology Readiness Assessment.
+30. **NIST** — nist.gov. Standards and frameworks.
+31. **W3C** — w3.org. Web standards.
 32. **OpenAI Research** — openai.com/research. AI safety and capabilities.

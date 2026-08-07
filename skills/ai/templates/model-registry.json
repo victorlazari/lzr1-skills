@@ -1,0 +1,12 @@
+{
+  "registry_version": "1.0",
+  "models": [
+    {
+      "id": "model-001",
+      "name": "example-llm",
+      "version": "v1.0.0",
+      "status": "production",
+      "framework": "pytorch"
+    }
+  ]
+}

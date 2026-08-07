@@ -1,3 +1,5 @@
+Verified against upstream: 2026-08-07
+
 # Orchestration, Scheduling, and Operations
 
 This reference covers the operational backbone of the meeting assistant fleet: calendar-driven scheduling, task dispatch, persistence, deduplication, notifications, and containerized deployment.

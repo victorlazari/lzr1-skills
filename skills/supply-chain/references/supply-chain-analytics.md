@@ -1,5 +1,7 @@
 # Supply Chain Analytics
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Spend Analysis
 2. Demand Planning
@@ -56,12 +58,13 @@
 | Regression | Correlate with drivers | Causal relationships |
 | Machine learning | Pattern recognition | Complex, multi-factor |
 | Collaborative | Input from stakeholders | New products, events |
+| Predictive Analytics | AI-driven forecasting | High variability |
 
 ### Demand Planning Process
 
 | Phase | Activities | Frequency |
 |---|---|---|
-| Data collection | Gather historical data, market signals | Ongoing |
+| Data collection | Gather historical data, market signals | Weekly |
 | Statistical forecast | Generate baseline forecast | Monthly |
 | Demand sensing | Incorporate real-time signals | Weekly |
 | Consensus planning | Cross-functional alignment | Monthly |
@@ -145,3 +148,8 @@
 | Cost | Price competitiveness, TCO | 25% |
 | Responsiveness | Communication, issue resolution | 15% |
 | Innovation | New ideas, continuous improvement | 10% |
+
+## Authoritative Sources
+
+- ASCM Top 10 Supply Chain Trends in 2026: https://www.ascm.org/making-an-impact/research/top-10-supply-chain-trends-in-2026/
+- 2026's supply chain challenge: Confronting complexity and disruption in global trade: https://tax.thomsonreuters.com/blog/2026s-supply-chain-challenge-confronting-complexity-and-disruption-in-global-trade-tri/

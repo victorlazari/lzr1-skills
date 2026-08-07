@@ -1,5 +1,7 @@
 # Design Systems
 
+*Verified against upstream: 2026-08-07*
+
 ## Table of Contents
 1. Design System Architecture
 2. Design Tokens
@@ -15,7 +17,7 @@
 
 | Layer | Contents | Consumers |
 |---|---|---|
-| Foundation | Tokens (color, spacing, typography) | All layers above |
+| Foundation | Tokens (color, spacing, typography, accessibility) | All layers above |
 | Core components | Buttons, inputs, cards, modals | Product teams |
 | Patterns | Forms, navigation, data display | Product teams |
 | Templates | Page layouts, common screens | Product teams |
@@ -58,8 +60,9 @@ Example:
 | Motion | Duration, easing | ms, cubic-bezier |
 | Breakpoints | Screen sizes | px |
 | Z-index | Stacking order | Integer scale |
+| Accessibility | Contrast pairs, target sizes | Hex pairs, px |
 
-### Token Implementation
+### Token Implementation (Including Accessibility Tokens)
 
 ```json
 {
@@ -84,6 +87,16 @@ Example:
     "md": { "value": "16px", "type": "spacing" },
     "lg": { "value": "24px", "type": "spacing" },
     "xl": { "value": "32px", "type": "spacing" }
+  },
+  "accessibility": {
+    "contrast-pairs": {
+      "primary-on-surface": { "value": ["{color.primary.700}", "{color.semantic.surface}"], "type": "color-pair" },
+      "text-on-primary": { "value": ["{color.neutral.0}", "{color.primary.500}"], "type": "color-pair" }
+    },
+    "target-size": {
+      "minimum": { "value": "24px", "type": "dimension" },
+      "recommended": { "value": "44px", "type": "dimension" }
+    }
   }
 }
 ```
@@ -119,7 +132,6 @@ Example:
 
 - Consistent prop naming across components (size, variant, disabled)
 - Composition over configuration (slots/children over complex props)
-- Sensible defaults (work out of the box)
 - Accessible by default (ARIA, keyboard, focus management)
 - Controlled and uncontrolled modes
 - Forward refs and spread props for flexibility

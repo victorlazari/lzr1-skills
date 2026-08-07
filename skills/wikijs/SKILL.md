@@ -1,96 +1,59 @@
 ---
 name: wikijs
-description: Advanced administration, API automation, and content management for Wiki.js enterprise deployments.
+description: Advanced administration, API automation, and content management for Wiki.js enterprise deployments. Triggers on requests to configure Git sync, manage content via GraphQL, or verify Wiki.js versions.
 ---
 
 # Wiki.js Specialist Skill
 
-This skill provides comprehensive capabilities for managing, automating, and optimizing Wiki.js instances. It covers advanced configuration, GraphQL API interactions, Git synchronization, rendering pipeline customization, and performance tuning.
+This skill provides operational procedures for managing Wiki.js enterprise deployments, focusing on Git synchronization, GraphQL API automation, and rendering pipeline configuration.
 
-## When to Use
+## Scope and Triggers
+- **Triggers:** User requests to configure Wiki.js Git storage, execute GraphQL mutations/queries, customize rendering (KaTeX, Mermaid), or verify instance versions.
+- **Scope:** Wiki.js 2.x (specifically 2.5.314) administration and automation.
+- **Non-goals:** General server administration, database tuning, or network routing outside of Wiki.js configuration.
 
-Use this skill when you need to:
-- Automate page creation, updates, or migrations via the Wiki.js GraphQL API.
-- Configure bidirectional Git storage synchronization for docs-as-code workflows.
-- Manage user access, roles, and private namespaces.
-- Customize the rendering pipeline (e.g., KaTeX, MathJax, Mermaid, PlantUML).
-- Optimize Wiki.js performance (connection pooling, caching, CDN integration).
-- Troubleshoot deployment issues, Git sync conflicts, or asset management problems.
-- Perform bulk operations on the page tree or tag system.
+## Preconditions
+- Verify the target Wiki.js instance URL and authentication credentials (API token or admin login).
+- Ensure the instance is running a supported version (2.5.314 is the current stable release).
 
-## Sub-Agent Spawning
-
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
-
-| Trigger Condition | Sub-Agent Type | Purpose |
-|---|---|---|
-| Bulk page migrations across locales | Migration Agent | Parallel migration of page batches |
-| Large-scale content updates | Content Updater | Parallel updates via GraphQL API |
-| Multi-namespace permission audits | Security Auditor | Parallel review of namespace access controls |
-| Comprehensive broken link checks | Link Checker | Parallel scanning of the page tree |
-
-### Spawning Rules
-- Spawn when 3+ independent items (pages, namespaces, locales) need the same operation.
-- Each sub-agent receives: API credentials, specific target paths/IDs, and success criteria.
-- Results are aggregated and cross-referenced for conflicts (e.g., Git sync collisions).
-- Maximum concurrent sub-agents: 10.
+## Source Freshness
+- **Verified against upstream:** 2026-08-07
+- **Primary Source:** Official Wiki.js documentation (docs.requarks.io).
+- **Volatile Facts:** Current stable version is 2.5.314. Always verify the installed version before applying changes.
 
 ## Workflow
+1. **Discover:** Query the Wiki.js GraphQL API or use `scripts/check-version.sh` to determine the current version and configuration.
+2. **Validate:** Check the discovered version against the known stable release (2.5.314) and verify Git sync connectivity using `scripts/validate-git-sync.sh`.
+3. **Plan:** Formulate the required GraphQL mutations or configuration changes based on the user's request. Consult `references/graphql-api.md` or `references/git-sync.md`.
+4. **Confirm:** Present the planned changes to the user for approval, especially for destructive or bulk operations.
+5. **Execute:** Apply the changes via the API or configuration files.
+6. **Verify:** Query the API again to confirm the changes were applied successfully and check for any Git sync conflicts.
+7. **Stop:** Terminate the workflow when the desired state is achieved and verified.
 
-1. **Authentication & Setup**: Ensure valid API Bearer tokens are available for GraphQL interactions. Verify the target Wiki.js instance URL.
-2. **Assessment**: Determine the scope of the operation (e.g., single page update, bulk migration, configuration change).
-3. **Execution**:
-   - For API tasks: Construct and execute the appropriate GraphQL mutations or queries.
-   - For configuration tasks: Modify `config.yml` or use the administration panel.
-   - For content tasks: Utilize the correct editor format (Markdown, WYSIWYG, etc.) and handle asset uploads if necessary.
-4. **Validation**: Verify the changes via API queries or by checking the web interface. Ensure no Git sync conflicts were introduced.
-5. **Optimization**: Apply performance tuning (caching, minification) if applicable to the task.
+## Safety
+- **Read-only first:** Always perform read-only discovery (e.g., querying versions or current config) before attempting mutations.
+- **Confirmation required:** Explicit user confirmation is required before executing any GraphQL mutations that modify or delete pages, or before changing storage backend configurations.
 
-## Core Principles
+## Validation
+- Use `scripts/validate-git-sync.sh` to verify Git connectivity.
+- Use `scripts/check-version.sh` to verify the instance version.
 
-- **Docs-as-Code**: Treat documentation like software. Leverage Git synchronization for version control and collaborative editing.
-- **API-First**: Utilize the GraphQL API for automation and bulk operations to ensure consistency and efficiency.
-- **Security by Design**: Implement granular access controls using private pages and namespaces. Secure API tokens and use SSH for Git sync.
-- **Performance Optimization**: Configure connection pooling, caching, and CDNs to maintain high availability and fast response times.
-- **Structured Content**: Adhere to strict page path rules and utilize the tag system for effective content organization.
+## Failure Handling
+- If Git sync fails, check SSH keys and repository permissions.
+- If GraphQL mutations fail, verify the API token permissions and query syntax.
+- Do not repeat failed actions without modifying the approach based on error messages.
 
-## Key References
+## Output Contract
+- Provide a summary of actions taken, including the verified version, applied configurations, and any validation results.
+- Include actionable next steps if errors occurred.
 
-- [Complete Reference Guide](./references/complete-reference.md): In-depth documentation on advanced patterns, CLI, and API usage.
-- [Reading List](./references/reading-list.md): Curated books and articles on Wiki.js, knowledge management, and related technologies.
+## Resources
+- [Git Sync Reference](references/git-sync.md): Operational guide for Git storage synchronization.
+- [GraphQL API Reference](references/graphql-api.md): Guide for authenticating and executing GraphQL operations.
+- [Rendering Pipeline Reference](references/rendering-pipeline.md): Guide for customizing KaTeX, MathJax, Mermaid, etc.
+- [Validate Git Sync Script](scripts/validate-git-sync.sh): Script to verify Git connectivity.
+- [Check Version Script](scripts/check-version.sh): Script to verify the Wiki.js version.
 
----
-
-## Adversarial Verification Panel
-
-For each significant content and configuration audit finding produced by the parallel sub-agents:
-
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
-
-> This prevents plausible-but-wrong content and configuration audit findings from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Migration Agent, Content Updater, Security Auditor, Link Checker) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: the Security Auditor recommends restricting a namespace to private access while the Migration Agent recommends bulk-migrating public pages into that same namespace without access control changes)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified aggregated cross-referenced report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+## Cross-Skill Routing
+- Route to `automation-and-scheduling` when the user requests recurring backups, scheduled syncs, or event-triggered Wiki.js updates.
+- Route to `security-review` when the user requests a comprehensive security audit of the Wiki.js deployment infrastructure.

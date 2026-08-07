@@ -4,6 +4,11 @@ The `input` NCCO action allows you to collect digits pressed on a keypad (DTMF) 
 
 When the input is captured, Vonage sends an HTTP request to the specified `eventUrl`. Your server MUST process this request and return a **new NCCO array** to replace the current one and continue the call flow.
 
+Verified against upstream: 2026-08-07
+Primary sources:
+- https://developer.vonage.com/en/voice/voice-api/concepts/dtmf
+- https://developer.vonage.com/en/voice/voice-api/concepts/asr
+
 ## 1. The `input` Action Structure
 
 ```json
@@ -19,7 +24,11 @@ When the input is captured, Vonage sends an HTTP request to the specified `event
   "speech": {
     "language": "en-US",
     "endOnSilence": 2.0,
-    "context": ["sales", "support", "billing"]
+    "context": ["sales", "support", "billing"],
+    "provider": "google",
+    "providerOptions": {
+      "model": "default"
+    }
   }
 }
 ```
@@ -39,6 +48,8 @@ Configured inside the `speech` object:
 - `language`: BCP-47 language code (e.g., `en-US`).
 - `context`: Array of expected words or phrases to improve recognition accuracy (e.g., `["yes", "no", "operator"]`).
 - `endOnSilence`: Seconds of silence to wait after the user stops speaking before submitting (default: 2.0).
+- `provider`: The ASR provider to use. Currently, `google` is supported.
+- `providerOptions`: Additional options specific to the ASR provider (e.g., `model`).
 
 ---
 

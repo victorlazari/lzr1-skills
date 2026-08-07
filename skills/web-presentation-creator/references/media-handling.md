@@ -2,6 +2,8 @@
 
 This reference outlines how to handle user-provided images, local videos, and YouTube embeds within a premium landing page architecture, focusing on scroll-driven transitions.
 
+Verified against upstream: 2026-08-07
+
 ---
 
 ## 1. Handling User-Provided Media

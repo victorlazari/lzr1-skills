@@ -1,5 +1,7 @@
 # Product Discovery
 
+**Verified against upstream: 2026-08-07**
+
 ## Table of Contents
 1. Discovery Process
 2. Problem Validation
@@ -11,38 +13,17 @@
 
 ## 1. Discovery Process
 
-### Dual-Track Agile
+### Dual-Track Agile Workflow
 
-```
-Discovery Track (what to build):
-  Research → Ideate → Prototype → Test → Validate
+1. **Discovery Track (what to build):** Research → Ideate → Prototype → Test → Validate
+2. **Delivery Track (how to build):** Spec → Design → Develop → Test → Ship
+3. Ensure Discovery feeds validated ideas into Delivery.
 
-Delivery Track (how to build):
-  Spec → Design → Develop → Test → Ship
+### Assumption Mapping Procedure
 
-Discovery feeds validated ideas into Delivery.
-```
-
-### Discovery Activities
-
-| Activity | Purpose | Output |
-|---|---|---|
-| Customer interviews | Understand needs and context | Insights, patterns |
-| Data analysis | Quantify behavior and trends | Metrics, segments |
-| Competitive research | Understand alternatives | Opportunity gaps |
-| Prototyping | Test solutions cheaply | Validated concepts |
-| Assumption mapping | Identify risks | Prioritized assumptions |
-| Opportunity assessment | Size the opportunity | Business case |
-
-### Assumption Mapping
-
-| Category | Question | Risk Level |
-|---|---|---|
-| Desirability | Do customers want this? | High (test first) |
-| Viability | Can we make money? | High |
-| Feasibility | Can we build this? | Medium |
-| Usability | Can users figure it out? | Medium |
-| Ethical | Should we build this? | Variable |
+1. Identify assumptions across Desirability, Viability, Feasibility, Usability, and Ethical categories.
+2. Rank assumptions by risk level (High, Medium, Low).
+3. Prioritize testing High-risk assumptions first.
 
 ---
 
@@ -50,14 +31,12 @@ Discovery feeds validated ideas into Delivery.
 
 ### Problem Interview Structure
 
-```
-1. Context: Tell me about your role and how you handle [topic]
-2. Problem: What's the hardest part about [activity]?
-3. Current solution: How do you solve this today?
-4. Pain: What frustrates you about current solutions?
-5. Impact: How does this problem affect your work/life?
-6. Willingness: What would you pay/do to solve this?
-```
+1. **Context:** Tell me about your role and how you handle [topic]
+2. **Problem:** What's the hardest part about [activity]?
+3. **Current solution:** How do you solve this today?
+4. **Pain:** What frustrates you about current solutions?
+5. **Impact:** How does this problem affect your work/life?
+6. **Willingness:** What would you pay/do to solve this?
 
 ### Problem Validation Signals
 
@@ -74,16 +53,6 @@ Discovery feeds validated ideas into Delivery.
 
 ## 3. Solution Validation
 
-### Prototype Fidelity Levels
-
-| Level | Fidelity | Time to Create | Tests |
-|---|---|---|---|
-| Concept | Verbal/written description | Minutes | Desirability |
-| Wireframe | Low-fi sketches/mockups | Hours | Information architecture |
-| Clickable | Interactive prototype | Days | Usability, flow |
-| Wizard of Oz | Manual backend, real frontend | Days-weeks | Full experience |
-| MVP | Minimal working product | Weeks | Market viability |
-
 ### Validation Methods
 
 | Method | What It Tests | Sample Size |
@@ -98,15 +67,6 @@ Discovery feeds validated ideas into Delivery.
 ---
 
 ## 4. Customer Development
-
-### Customer Development Process (Steve Blank)
-
-| Phase | Goal | Activity |
-|---|---|---|
-| Customer Discovery | Find problem-solution fit | Interviews, observation |
-| Customer Validation | Find product-market fit | Sell before building |
-| Customer Creation | Scale demand | Marketing, channels |
-| Company Building | Scale organization | Process, hiring |
 
 ### Product-Market Fit Indicators
 
@@ -131,19 +91,6 @@ I want to [motivation/job],
 So I can [expected outcome].
 ```
 
-### Job Map
-
-| Step | Description | Example (Hiring a Contractor) |
-|---|---|---|
-| Define | Determine what to accomplish | Decide to renovate kitchen |
-| Locate | Find inputs needed | Search for contractors |
-| Prepare | Set up for the job | Get quotes, check references |
-| Confirm | Verify readiness | Review contract, timeline |
-| Execute | Perform the job | Renovation work |
-| Monitor | Track progress | Check quality, timeline |
-| Modify | Make adjustments | Change requests |
-| Conclude | Finish the job | Final inspection, payment |
-
 ### Outcome-Driven Innovation
 
 ```
@@ -154,12 +101,3 @@ Example outcomes:
 - "Minimize the likelihood of missing an important notification"
 - "Increase the accuracy of budget forecasts"
 ```
-
-### Switching Forces
-
-| Force | Direction | Example |
-|---|---|---|
-| Push (current pain) | Toward switch | "Current tool is too slow" |
-| Pull (new attraction) | Toward switch | "New tool has AI features" |
-| Anxiety (uncertainty) | Against switch | "What if data migration fails?" |
-| Habit (inertia) | Against switch | "I know how to use the old tool" |

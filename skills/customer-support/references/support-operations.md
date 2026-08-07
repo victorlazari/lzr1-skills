@@ -30,6 +30,7 @@
 | Data loss/security | Emergency escalation | Engineering on-call + Security |
 | Multiple customers affected | Incident declaration | Incident commander |
 | Customer threatens churn | Retention escalation | CS Manager + Account team |
+| Predictive AI escalation | AI-driven escalation | Proactive Support Team |
 
 ### Escalation Process
 
@@ -80,20 +81,20 @@ Created → Triaged → Assigned → In Progress → Pending Customer → Resolv
 
 ## 3. Support Metrics
 
-### Key Performance Indicators
+### 2026 Four-Pillar Framework
 
-| Metric | Definition | Benchmark |
-|---|---|---|
-| First Response Time (FRT) | Time to first human response | <1 hour (business hours) |
-| Average Resolution Time | Time from creation to resolution | <24 hours |
-| First Contact Resolution (FCR) | % resolved in first interaction | >70% |
-| Customer Satisfaction (CSAT) | Post-interaction survey score | >90% |
-| Net Promoter Score (NPS) | Likelihood to recommend | >50 |
-| Ticket volume | Tickets per period | Trending down relative to users |
-| Backlog | Open unresolved tickets | <2 days of volume |
-| Escalation rate | % escalated to higher tier | <15% |
-| Reopen rate | % tickets reopened after resolution | <5% |
-| Self-service rate | % resolved without human | >40% |
+| Pillar | Metric | Definition | Benchmark |
+|---|---|---|---|
+| Speed | First Response Time (FRT) | Time to first human response | <1 hour (business hours) |
+| Speed | Average Resolution Time | Time from creation to resolution | <24 hours |
+| Quality | First Contact Resolution (FCR) | % resolved in first interaction | >70% |
+| Quality | Automation Resolution Rate | % resolved by AI/automation | >30% |
+| Cost | Cost per Ticket | Total support cost / ticket volume | Trending down |
+| Cost | Self-service rate | % resolved without human | >40% |
+| Loyalty | Customer Satisfaction (CSAT) | Post-interaction survey score | >90% |
+| Loyalty | Net Promoter Score (NPS) | Likelihood to recommend | >50 |
+
+*Note: Isolated metrics like Average Handle Time (AHT) are deprecated as they can incentivize poor service quality.*
 
 ### Reporting Cadence
 
@@ -160,3 +161,4 @@ Example:
 | Sentiment analysis | Detect frustrated customers | Proactive escalation |
 | Knowledge suggestions | Surface relevant articles | Better self-service |
 | Summarization | Summarize long ticket threads | Faster context |
+| Predictive Analytics | Identify issues before they occur | Proactive support |

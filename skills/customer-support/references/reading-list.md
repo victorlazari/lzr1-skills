@@ -1,6 +1,6 @@
 # Customer Support Recommended Reading (2024-2026)
 
-## Essential Books (32)
+## Essential Books
 
 ### Customer Service Fundamentals
 1. **The Effortless Experience** — Dixon, Toman & DeLisi (2013), Portfolio. Reducing customer effort.
@@ -21,7 +21,7 @@
 12. **The Art of Support** — Francoise Tourniaire (2016). Support operations.
 13. **Technical Support Essentials** — Andrew Sanchez (2010), Apress.
 14. **Building a World-Class Support Organization** — various (2023). Modern support.
-15. **IT Service Management** — ITIL Foundation (2019). ITSM framework.
+15. **ITIL 4 Foundation** — AXELOS (2019). ITSM framework and service value system.
 
 ### Knowledge Management
 16. **Every Page is Page One** — Mark Baker (2013). Topic-based documentation.
@@ -50,7 +50,7 @@
 
 ---
 
-## Essential Articles & Resources (32)
+## Essential Articles & Resources
 
 ### Support Strategy
 1. **Intercom Blog** — intercom.com/blog. Support strategy and tools.
@@ -101,3 +101,9 @@
 30. **Intercom Customer Service Trends** — intercom.com/blog. Trends report.
 31. **Gartner Customer Service** — gartner.com. Research and analysis.
 32. **Forrester CX** — forrester.com. Customer experience research.
+
+### 2026 Authoritative Sources
+33. **Transforming Customer Support: Best Practices for 2026** — https://www.bluetweak.com/blog/customer-support-best-practices-2025
+34. **Customer Operations Ultimate Guide [2026]** — https://front.com/guides/customer-operations-guide
+35. **Customer Support KPIs That Matter in 2026** — https://zahoree.com/customer-support-kpis-that-matter-in-2026/
+36. **ITIL 4 Explained: Framework, Practices, and Key Changes** — https://itsm.tools/itil-4-explained/

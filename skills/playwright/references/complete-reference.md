@@ -1,5 +1,7 @@
 # Comprehensive Playwright End-to-End Testing Reference
 
+**Verified against upstream:** 2026-08-07
+
 This document serves as an expert-level reference for leveraging Playwright as the primary end-to-end (E2E) testing framework, specifically tailored for modern web applications utilizing Next.js (App Router), React, Tailwind CSS, and shadcn/ui. It consolidates advanced architectural concepts, configuration strategies, locator paradigms, and troubleshooting techniques into a single, authoritative guide.
 
 ## 1. Playwright Architecture and Core Concepts
@@ -71,30 +73,7 @@ Integrating Playwright into a modern stack requires specific configuration consi
 
 ### 4.1 The `playwright.config.ts` File
 
-The `playwright.config.ts` file centralizes Playwright configurations, defining global settings, test runners, projects, and web server options.
-
-```typescript
-import { defineConfig, devices } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './e2e',
-  timeout: 30000,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
-  reporter: [['html', { outputFolder: 'playwright-report' }]],
-  use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    storageState: 'e2e/storageState.json',
-  },
-  projects: [
-    { name: 'chromium', use: devices['Desktop Chrome'] },
-    { name: 'firefox', use: devices['Desktop Firefox'] },
-    { name: 'webkit', use: devices['Desktop Safari'] },
-  ],
-});
-```
+The `playwright.config.ts` file centralizes Playwright configurations, defining global settings, test runners, projects, and web server options. See `templates/playwright.config.ts` for a complete example.
 
 ### 4.2 Session Persistence
 
@@ -126,10 +105,10 @@ This is essential for simulating edge cases like server failures or latency with
 
 ### 5.2 Visual Regression Testing
 
-Visual regression testing ensures UI changes do not unintentionally break the design. Playwright's `toHaveScreenshot()` assertion performs pixel-level diffing against stored reference snapshots.
+Visual regression testing ensures UI changes do not unintentionally break the design. Playwright's `toHaveScreenshot()` assertion performs pixel-level diffing against stored reference snapshots. Playwright now supports WebP screenshots.
 
 ```typescript
-await expect(page.locator('main')).toHaveScreenshot('dashboard-main.png', {
+await expect(page.locator('main')).toHaveScreenshot('dashboard-main.webp', {
   maxDiffPixels: 100,
 });
 ```
@@ -145,6 +124,34 @@ const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
 expect(accessibilityScanResults.violations).toEqual([]);
 ```
 
+### 5.4 Component Testing (Stories and Galleries)
+
+Playwright v1.62 introduced a new component testing model based on stories and galleries. This allows testing individual components in isolation, similar to Storybook, but with the full power of Playwright's browser automation.
+
+### 5.5 Cancelling Operations with AbortSignal
+
+Playwright now supports cancelling operations using `AbortSignal`. This is useful for aborting long-running actions or network requests when they are no longer needed.
+
+```typescript
+const controller = new AbortController();
+const signal = controller.signal;
+
+// Cancel the operation after 5 seconds
+setTimeout(() => controller.abort(), 5000);
+
+try {
+  await page.goto('https://example.com', { signal });
+} catch (e) {
+  if (e.name === 'AbortError') {
+    console.log('Navigation aborted');
+  }
+}
+```
+
+### 5.6 WebAuthn Passkeys and WebStorage API
+
+Playwright v1.61 introduced support for WebAuthn passkeys, allowing you to test authentication flows that rely on biometric or hardware security keys. The new WebStorage API provides a more robust way to interact with `localStorage` and `sessionStorage`.
+
 ## 6. Troubleshooting and Diagnostics
 
 Robust troubleshooting strategies are necessary to maintain a healthy test suite and resolve execution errors efficiently.
@@ -159,7 +166,7 @@ The Playwright Trace Viewer is the most powerful diagnostic tool, capturing a fu
 
 ### 6.3 Handling Flaky Tests
 
-Flaky tests undermine confidence in the test suite. Common causes include race conditions, network instability, and shared state pollution. Mitigation techniques involve using strict, semantic locators, waiting for specific application states (e.g., `networkidle`), isolating test data, and configuring retries for transient failures.
+Flaky tests undermine confidence in the test suite. Common causes include race conditions, network instability, and shared state pollution. Mitigation techniques involve using strict, semantic locators, waiting for specific application states (e.g., `networkidle`), isolating test data, and configuring retries for transient failures. The new `retryStrategy: 'isolated'` option in `playwright.config.ts` helps mitigate flakiness by running retries in a completely isolated worker process.
 
 ## 7. Security and Enterprise Patterns
 
@@ -176,7 +183,5 @@ Enterprise implementations benefit from a modular design, utilizing the Page Obj
 ## References
 
 [1] Playwright Official Documentation: https://playwright.dev/docs/intro
-[2] Playwright Locator API: https://playwright.dev/docs/locators
-[3] Playwright Auto-Waiting and Assertions: https://playwright.dev/docs/assertions
-[4] axe-core Playwright Integration: https://github.com/dequelabs/axe-playwright
-[5] Playwright Visual Regression Testing: https://playwright.dev/docs/test-snapshots
+[2] Playwright Release Notes: https://playwright.dev/docs/release-notes
+[3] Playwright GitHub Releases: https://github.com/microsoft/playwright/releases

@@ -17,3 +17,5 @@ The bot can generate entirely new, blank presentations or manage slides within a
 ## Official Documentation
 
 * [Google Slides API Reference](https://developers.google.com/workspace/slides/api/reference/rest)
+
+> Verified against upstream: 2026-08-07

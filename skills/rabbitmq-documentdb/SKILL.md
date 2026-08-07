@@ -5,19 +5,72 @@ description: Specialist skill for integrating, managing, and troubleshooting Rab
 
 # RabbitMQ & DocumentDB Specialist
 
-## When to Use
+## Scope and Triggers
 
-Use this skill when the task involves designing, implementing, securing, or troubleshooting systems that integrate RabbitMQ with Amazon DocumentDB. This includes scenarios such as:
-- Architecting event-driven microservices using RabbitMQ as the communication backbone and DocumentDB as the state store.
-- Configuring RabbitMQ exchanges, queues, bindings, and clustering for high availability and reliable message delivery.
-- Designing DocumentDB schemas, partitioning strategies, and indexing policies for optimal query performance.
-- Implementing data synchronization patterns like Change Data Capture (CDC) or dual writes between RabbitMQ and DocumentDB.
-- Performing security audits, configuring TLS/SSL, and setting up IAM or RBAC for both systems.
-- Troubleshooting message loss, duplication, high CPU utilization, or connection issues in integrated environments.
+Use this skill when the task involves designing, implementing, securing, or troubleshooting systems that integrate RabbitMQ with Amazon DocumentDB.
+- **In Scope:** Architecting event-driven microservices, configuring RabbitMQ exchanges/queues/bindings, designing DocumentDB schemas/indexes, implementing data synchronization (CDC), security audits, and troubleshooting integration issues.
+- **Out of Scope:** General application development not related to RabbitMQ/DocumentDB integration, or managing other message brokers (e.g., Kafka) or databases (e.g., DynamoDB).
+- **Escalation Boundaries:** Route to `trivy-scanner` when scanning RabbitMQ or DocumentDB container images for vulnerabilities. Route to `security-review` when performing a comprehensive security audit of the application code interacting with these services.
 
-## Sub-Agent Spawning
+## Preconditions
 
-This skill supports spawning sub-agents for parallel execution when tasks can be decomposed:
+Before executing any operations, the agent must:
+1. Detect the target environment (e.g., AWS VPC, Kubernetes cluster).
+2. Verify RabbitMQ version (target 4.3+ for Khepri metadata store, 32 priority levels, and delayed retries).
+3. Verify DocumentDB engine version (target 8.0+ for improved latency, compression, and new aggregation operators).
+4. Ensure necessary permissions (IAM roles, RabbitMQ RBAC) are available.
+5. Confirm user intent for any destructive or production-impacting actions.
+
+## Source Freshness
+
+Volatile facts, such as supported versions or specific command flags, require runtime verification against official sources.
+- See `references/source-map.md` for authoritative sources.
+- Verify installed versions and current upstream documentation before applying destructive or production-impacting actions.
+
+## Workflow
+
+1. **Discover current environment state (read-only):** Identify RabbitMQ and DocumentDB clusters, versions, and configurations.
+2. **Validate prerequisites and configuration syntax:** Use `scripts/validate-config.sh` to perform syntax and smoke tests on configurations.
+3. **Present proposed changes:** Require explicit user confirmation for any mutating actions (e.g., dropping databases/collections, deleting users, modifying queues).
+4. **Execute configuration or integration steps:** Apply changes using safe, deterministic methods.
+5. **Run post-execution validation and health checks:** Ensure the system is stable and performing as expected.
+6. **Stop and provide rollback instructions:** If any step fails, halt execution and guide the user through rollback procedures.
+
+## Safety
+
+- **Read-only discovery:** Always separate read-only discovery from mutation steps.
+- **Explicit confirmation:** Require explicit user confirmation for destructive actions (e.g., dropping databases/collections, deleting users).
+- **Dry-run support:** Implement dry-run support in validation scripts where feasible.
+- **Rollback guidance:** Provide rollback guidance for failed migrations or configuration changes.
+
+## Validation
+
+- **Syntax checks:** Use `scripts/validate-config.sh` to validate RabbitMQ and DocumentDB configuration files.
+- **Postcondition verification:** Verify that queues are created, indexes are built, and connections are established successfully.
+
+## Failure Handling
+
+- If a configuration fails validation, diagnose the error using the output of `validate-config.sh` and suggest corrections.
+- If a mutation fails, provide rollback instructions and avoid repeating the failed action unchanged.
+
+## Output Contract
+
+The result must include:
+- A structured summary of actions taken.
+- Evidence of successful validation (e.g., output of `validate-config.sh`).
+- Severity/confidence levels for any identified issues.
+- Actionable next steps for the user.
+
+## Resources
+
+- [Complete Reference Guide](references/complete-reference.md): Actionable, normative requirements with primary source links.
+- [Source Map](references/source-map.md): Maps specific tasks to authoritative sources.
+- [Validation Script](scripts/validate-config.sh): Validates configuration files.
+- [Connection Settings Template](templates/connection-settings.json.template): Reusable template for DocumentDB connection settings.
+
+## Orchestration
+
+This skill supports spawning sub-agents for parallel execution when 3+ independent items need the same operation.
 
 | Trigger Condition | Sub-Agent Type | Purpose |
 |---|---|---|
@@ -33,63 +86,14 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - Results are aggregated and cross-referenced for conflicts or inconsistencies.
 - Maximum concurrent sub-agents: 10.
 
-## Workflow
-
-1. **Requirement Analysis**: Understand the specific use case, whether it's a new architecture design, performance tuning, security audit, or troubleshooting an existing issue.
-2. **Architecture Design**: Determine the appropriate RabbitMQ exchange types (Direct, Topic, Fanout, Headers) and DocumentDB consistency models based on the application's needs.
-3. **Configuration & Implementation**:
-   - Set up RabbitMQ queues with appropriate durability, TTL, and Dead Letter Exchanges (DLX).
-   - Configure DocumentDB collections, partition keys, and indexes.
-   - Implement consumers with idempotent logic and manual acknowledgments to ensure data consistency.
-4. **Security Hardening**: Apply network isolation (VPC), enable TLS for data in transit, configure encryption at rest, and enforce strict access controls (RBAC/IAM).
-5. **Performance Tuning**: Optimize RabbitMQ prefetch counts and connection pooling. Tune DocumentDB queries using the profiler and appropriate indexing.
-6. **Monitoring & Diagnostics**: Set up metrics collection and alerting. Use distributed tracing and log analysis to troubleshoot issues like message loss or high latency.
-
-## Core Principles
-
-- **Idempotency**: Consumers must be designed to handle duplicate messages gracefully, typically using DocumentDB's `upsert` operations with unique identifiers.
-- **Reliability**: Utilize RabbitMQ publisher confirms, durable queues, persistent messages, and manual consumer acknowledgments to prevent message loss.
-- **Security First**: Always encrypt data in transit (TLS) and at rest (KMS). Apply the principle of least privilege using RBAC in RabbitMQ and IAM in DocumentDB.
-- **Scalability**: Leverage RabbitMQ clustering and DocumentDB replica sets to handle high throughput and ensure high availability.
-- **Observability**: Implement comprehensive logging, monitoring, and distributed tracing to quickly identify and resolve bottlenecks or failures.
-
-## Key References
-
-- [Complete Reference Guide](./references/complete-reference.md)
-- [Reading List](./references/reading-list.md)
-
----
-
-## Adversarial Verification Panel
-
+### Adversarial Verification Panel
 For each significant integration issue, security vulnerability, or performance bottleneck produced by the parallel sub-agents:
+1. Spawn 3 independent Refuter Agents per finding.
+2. A finding is confirmed only if ≥2 refuters fail to refute it.
+3. A finding is discarded if ≥2 refuters succeed.
 
-1. Spawn **3 independent Refuter Agents** per finding, each with:
-   - The finding in full
-   - Instruction: *"Assume this finding is wrong. Find the strongest argument against it."*
-   - Default stance: `refuted=true` if evidence is insufficient or ambiguous
-2. A finding is **confirmed** only if ≥2 refuters fail to refute it
-3. A finding is **discarded** if ≥2 refuters succeed
-4. When a confirmed finding had 1 successful refuter, include the dissenting argument in the output with a `CONTESTED` label
+### Cross-System Consistency Validator
+Run one Consistency Validator Agent with all parallel outputs to flag contradictions and missing prerequisites.
 
-> This prevents plausible-but-wrong integration issues, security vulnerabilities, or performance bottlenecks from reaching the final output. The 3-vote panel eliminates single-point hallucination without requiring unanimity.
-
-## Cross-System Consistency Validator
-
-After all parallel agents (Infrastructure Provisioner, Database Optimizer, Integration Developer, Diagnostics Agent, Security Auditor) complete, but **before** synthesis:
-
-Run one **Consistency Validator Agent** with all parallel outputs that:
-- Flags any pair of recommendations that logically contradict each other
-  *(example: Security Auditor recommends disabling a RabbitMQ plugin to reduce attack surface while the Integration Developer depends on that same plugin for message routing)*
-- Notes where one agent's output is a prerequisite for another agent's recommendation
-- Passes contradictions to the Synthesis Agent as `MUST_RESOLVE` items
-- Passes missing prerequisites as `SEQUENCING_REQUIRED` items
-
-## Synthesis Agent (Upgraded)
-
-The synthesis step actively resolves rather than aggregates:
-
-1. **`MUST_RESOLVE` contradictions**: Pick the better recommendation, annotate the reasoning, preserve the dissenting view as a footnote
-2. **`SEQUENCING_REQUIRED` items**: Re-order the unified integration report so prerequisites appear before the steps that depend on them
-3. **Confidence calibration**: Label each finding `HIGH` / `MEDIUM` / `LOW` confidence based on refuter panel outcomes
-4. **Gap analysis**: Note any analysis dimension not covered by any of the parallel agents — these are blind spots, not confirmed negatives
+### Synthesis Agent
+The synthesis step actively resolves contradictions, re-orders items based on prerequisites, calibrates confidence, and notes blind spots.

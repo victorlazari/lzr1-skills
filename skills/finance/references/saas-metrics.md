@@ -1,5 +1,7 @@
 # SaaS Metrics
 
+Verified against upstream: 2026-08-07
+
 ## Table of Contents
 1. Core SaaS Metrics
 2. Unit Economics
@@ -87,7 +89,7 @@ Where:
 | MoM growth | (This month - Last month) / Last month | Monthly momentum |
 | YoY growth | (This year - Last year) / Last year | Annual trajectory |
 | CAGR | (End value / Start value)^(1/years) - 1 | Multi-year growth |
-| T2D3 | Triple, triple, double, double, double | VC growth expectation |
+| T2D3 | Triple, triple, double, double, double | VC growth expectation (historical) |
 
 ### Net Revenue Retention (NRR)
 
@@ -148,13 +150,13 @@ Target: Always maintain 12+ months runway
 
 ---
 
-## 5. Benchmarks by Stage
+## 5. Benchmarks by Stage (Updated 2024/2025)
 
 ### SaaS Benchmarks by ARR
 
 | Metric | $1-5M ARR | $5-20M ARR | $20-50M ARR | $50M+ ARR |
 |---|---|---|---|---|
-| YoY Growth | 100-200% | 80-120% | 50-80% | 30-50% |
+| YoY Growth | 60-100% | 40-80% | 30-50% | 20-40% |
 | Gross Margin | 60-70% | 70-80% | 75-85% | 80-85% |
 | Net Retention | 100-110% | 110-120% | 115-130% | 120-140% |
 | CAC Payback | 12-18 months | 12-15 months | 10-14 months | 8-12 months |
@@ -163,8 +165,12 @@ Target: Always maintain 12+ months runway
 
 ### Median SaaS Metrics (2024-2025)
 
+*Note: Growth rates have stabilized and valuations have adjusted to prioritize profitability and efficient growth.*
+
 | Metric | Median | Top Quartile |
 |---|---|---|
+| YoY Growth Rate | ~30% | 50%+ |
+| Valuation Multiple (EV/ARR) | 6.0-7.0x | 10.0x+ |
 | Gross margin | 75% | 82%+ |
 | Net revenue retention | 110% | 125%+ |
 | CAC payback | 15 months | 10 months |
