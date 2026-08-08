@@ -5,7 +5,6 @@
 set -Eeuo pipefail
 umask 077
 
-PROGRAM=${0##*/}
 DRY_RUN=0
 TARGET=""
 OUTPUT_DIR=""

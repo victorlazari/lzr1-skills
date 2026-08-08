@@ -18,5 +18,5 @@ This reference provides a structured troubleshooting guide for networking, stora
 - Inspect container logs for errors or warnings: `docker logs <container>`
 
 ## Authoritative Source
-- Docker Troubleshooting Documentation: https://docs.docker.com/config/daemon/troubleshoot/
+- Docker Troubleshooting Documentation: https://docs.docker.com/engine/daemon/troubleshoot/
 Verified against upstream: 2026-08-07.

@@ -1,64 +1,93 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
-# Deterministic script to execute Playwright tests with safe defaults and error handling.
+# Deterministic wrapper for Playwright tests with argument-safe command construction.
 
 show_help() {
-    echo "Usage: $0 [OPTIONS]"
-    echo "Run Playwright tests safely."
-    echo ""
-    echo "Options:"
-    echo "  --project <name>   Run tests for a specific project (e.g., chromium, firefox)"
-    echo "  --grep <pattern>   Run tests matching the pattern"
-    echo "  --dry-run          Preview the command without executing"
-    echo "  --help             Show this help message"
+    cat <<'EOF'
+Usage: run-tests.sh [OPTIONS]
+Run Playwright tests safely.
+
+Options:
+  --project <name>   Run tests for a specific project (for example, chromium)
+  --grep <pattern>   Run tests matching the pattern
+  --dry-run          Preview the exact argv without executing it
+  -h, --help         Show this help message
+EOF
+}
+
+fail() {
+    printf 'Error: %s\n' "$1" >&2
+    exit 2
+}
+
+require_value() {
+    local option_name=$1
+    local remaining=$2
+    if [[ $remaining -lt 2 ]]; then
+        fail "$option_name requires a value"
+    fi
+}
+
+print_command() {
+    local arg
+    printf '  '
+    for arg in "$@"; do
+        printf '%q ' "$arg"
+    done
+    printf '\n'
 }
 
 PROJECT=""
-GREP=""
+GREP_PATTERN=""
 DRY_RUN=0
 
 while [[ $# -gt 0 ]]; do
     case $1 in
         --project)
-            PROJECT="$2"
+            require_value "$1" "$#"
+            PROJECT=$2
             shift 2
             ;;
         --grep)
-            GREP="$2"
+            require_value "$1" "$#"
+            GREP_PATTERN=$2
             shift 2
             ;;
         --dry-run)
             DRY_RUN=1
             shift
             ;;
-        --help)
+        -h|--help)
             show_help
             exit 0
             ;;
+        --)
+            shift
+            [[ $# -eq 0 ]] || fail "positional arguments are not supported"
+            ;;
         *)
-            echo "Unknown option: $1"
-            show_help
-            exit 1
+            fail "unknown option: $1"
             ;;
     esac
 done
 
-CMD="npx playwright test"
+command_argv=(npx playwright test)
 
-if [[ -n "$PROJECT" ]]; then
-    CMD="$CMD --project=\"$PROJECT\""
+if [[ -n $PROJECT ]]; then
+    command_argv+=(--project "$PROJECT")
 fi
 
-if [[ -n "$GREP" ]]; then
-    CMD="$CMD --grep=\"$GREP\""
+if [[ -n $GREP_PATTERN ]]; then
+    command_argv+=(--grep "$GREP_PATTERN")
 fi
 
 if [[ $DRY_RUN -eq 1 ]]; then
-    echo "Dry run mode. Would execute:"
-    echo "$CMD"
+    printf '%s\n' 'Dry run mode. Would execute:'
+    print_command "${command_argv[@]}"
     exit 0
 fi
 
-echo "Executing: $CMD"
-eval "$CMD"
+printf '%s\n' 'Executing:'
+print_command "${command_argv[@]}"
+exec "${command_argv[@]}"

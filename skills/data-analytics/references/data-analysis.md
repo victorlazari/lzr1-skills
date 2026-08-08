@@ -15,7 +15,7 @@
 
 ```sql
 -- Window functions for running totals and rankings
-SELECT 
+SELECT
     date,
     revenue,
     SUM(revenue) OVER (ORDER BY date) AS cumulative_revenue,
@@ -26,13 +26,13 @@ FROM daily_metrics;
 
 -- Cohort analysis
 WITH cohorts AS (
-    SELECT 
+    SELECT
         user_id,
         DATE_TRUNC('month', first_purchase_date) AS cohort_month,
         DATE_TRUNC('month', purchase_date) AS activity_month
     FROM purchases
 )
-SELECT 
+SELECT
     cohort_month,
     activity_month,
     EXTRACT(MONTH FROM AGE(activity_month, cohort_month)) AS months_since_first,
@@ -42,7 +42,7 @@ GROUP BY 1, 2, 3;
 
 -- Funnel analysis
 WITH funnel AS (
-    SELECT 
+    SELECT
         user_id,
         MAX(CASE WHEN event = 'page_view' THEN 1 END) AS viewed,
         MAX(CASE WHEN event = 'add_to_cart' THEN 1 END) AS added,
@@ -52,7 +52,7 @@ WITH funnel AS (
     WHERE event_date = CURRENT_DATE
     GROUP BY user_id
 )
-SELECT 
+SELECT
     COUNT(*) AS total_users,
     SUM(viewed) AS viewers,
     SUM(added) AS adders,

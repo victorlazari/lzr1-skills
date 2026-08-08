@@ -16,12 +16,12 @@ If the user provides a short MP4/WebM video, it is best used as a silent, autopl
 **Implementation:**
 ```html
 <div class="video-wrapper">
-  <video 
-    src="assets/user-video.mp4" 
-    autoplay 
-    loop 
-    muted 
-    playsinline 
+  <video
+    src="assets/user-video.mp4"
+    autoplay
+    loop
+    muted
+    playsinline
     class="bg-video">
   </video>
 </div>
@@ -34,10 +34,10 @@ If the user provides a YouTube link, use an iframe, but wrap it in an aspect-rat
 **Implementation:**
 ```html
 <div class="youtube-wrapper">
-  <iframe 
-    src="https://www.youtube.com/embed/VIDEO_ID?autoplay=0&controls=1&rel=0" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+  <iframe
+    src="https://www.youtube.com/embed/VIDEO_ID?autoplay=0&controls=1&rel=0"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen>
   </iframe>
 </div>
@@ -70,10 +70,10 @@ This is the core mechanic for Apple/DJI style product reveals. A tall track allo
 ```html
 <!-- The Track: Determines how long the scroll lasts -->
 <div class="scroll-track" style="height: 400vh;">
-  
+
   <!-- The Viewport: Sticks to the screen -->
   <div class="sticky-viewport">
-    
+
     <!-- Background Media -->
     <div class="media-layer" data-fade-in="0" data-fade-out="0.9">
       <img src="assets/product-bg.jpg" alt="Product">
@@ -147,7 +147,7 @@ class ScrollytellingFader {
     this.tracks.forEach(track => {
       const rect = track.getBoundingClientRect();
       const trackH = track.offsetHeight;
-      
+
       // Calculate progress from 0 to 1
       // 0 = top of track hits bottom of viewport
       // 1 = bottom of track hits top of viewport
@@ -155,13 +155,13 @@ class ScrollytellingFader {
       progress = Math.max(0, Math.min(1, progress));
 
       const layers = track.querySelectorAll('[data-fade-in]');
-      
+
       layers.forEach(layer => {
         const fadeInStart = parseFloat(layer.dataset.fadeIn);
         const fadeOutEnd = parseFloat(layer.dataset.fadeOut);
-        
+
         // Define transition zones (e.g., 10% of the total duration to fade in)
-        const transitionDuration = 0.1; 
+        const transitionDuration = 0.1;
         const fadeInEnd = fadeInStart + transitionDuration;
         const fadeOutStart = fadeOutEnd - transitionDuration;
 

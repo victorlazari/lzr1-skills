@@ -1,0 +1,175 @@
+# yaml-language-server: $schema=./values.schema.json
+
+# -- replicaCount controls the desired workload replicas.
+# @type integer
+# @required false
+# @accepted integer from 1 through 20
+# @default 2
+# @example 3
+# @security Bound the value to prevent accidental resource exhaustion.
+replicaCount: 2
+
+# -- image configures the application container image.
+# @type object
+# @required true
+# @accepted documented keys only
+# @default repository and pullPolicy below
+# @example repository: registry.example.invalid/example/app
+# @security Pin an immutable digest in production through the deployment workflow.
+image:
+  # -- image.repository identifies the image registry and repository without credentials.
+  # @type string
+  # @required true
+  # @accepted registry/repository reference
+  # @default registry.example.invalid/example/app
+  # @example registry.example.invalid/example/app
+  # @security Do not embed registry credentials in this value.
+  repository: registry.example.invalid/example/app
+
+  # -- image.tag selects a documented release tag for non-production examples.
+  # @type string
+  # @required false
+  # @accepted non-empty tag; production policy may require a digest instead
+  # @default 1.0.0
+  # @example 1.0.0
+  # @security Treat mutable tags as insufficient provenance for production.
+  tag: "1.0.0"
+
+  # -- image.pullPolicy controls kubelet image retrieval behavior.
+  # @type string
+  # @required false
+  # @accepted IfNotPresent, Always, or Never
+  # @default IfNotPresent
+  # @example IfNotPresent
+  # @security Align pull behavior with the image-integrity policy.
+  pullPolicy: IfNotPresent
+
+# -- service configures the namespaced Service rendered by the chart.
+# @type object
+# @required true
+# @accepted documented keys only
+# @default ClusterIP on port 8080
+# @example type: ClusterIP
+# @security Expose only the ports required by the workload.
+service:
+  # -- service.type selects the Kubernetes Service type.
+  # @type string
+  # @required false
+  # @accepted ClusterIP, NodePort, or LoadBalancer
+  # @default ClusterIP
+  # @example ClusterIP
+  # @security NodePort and LoadBalancer require an explicit exposure review.
+  type: ClusterIP
+
+  # -- service.port is the Service port exposed to in-cluster clients.
+  # @type integer
+  # @required false
+  # @accepted integer from 1 through 65535
+  # @default 8080
+  # @example 8080
+  # @security Keep the exposed surface minimal.
+  port: 8080
+
+# -- podSecurityContext configures pod-level security defaults.
+# @type object
+# @required true
+# @accepted documented keys only
+# @default runAsNonRoot and RuntimeDefault seccomp
+# @example runAsNonRoot: true
+# @security Preserve the Restricted Pod Security posture unless compatibility evidence requires change.
+podSecurityContext:
+  # -- podSecurityContext.runAsNonRoot prevents UID 0 execution.
+  # @type boolean
+  # @required true
+  # @accepted true
+  # @default true
+  # @example true
+  # @security Must remain true for the bundled restricted-profile example.
+  runAsNonRoot: true
+
+  # -- podSecurityContext.seccompProfile selects the pod seccomp profile.
+  # @type object
+  # @required true
+  # @accepted documented keys only
+  # @default RuntimeDefault
+  # @example type: RuntimeDefault
+  # @security RuntimeDefault provides a baseline syscall filter.
+  seccompProfile:
+    # -- podSecurityContext.seccompProfile.type selects the seccomp profile source.
+    # @type string
+    # @required true
+    # @accepted RuntimeDefault or Localhost
+    # @default RuntimeDefault
+    # @example RuntimeDefault
+    # @security Unconfined is not accepted by this contract.
+    type: RuntimeDefault
+
+# -- containerSecurityContext configures container-level security controls.
+# @type object
+# @required true
+# @accepted documented keys only
+# @default privilege escalation disabled and all capabilities dropped
+# @example allowPrivilegeEscalation: false
+# @security Preserve the Restricted Pod Security posture.
+containerSecurityContext:
+  # -- containerSecurityContext.allowPrivilegeEscalation controls no-new-privileges behavior.
+  # @type boolean
+  # @required true
+  # @accepted false
+  # @default false
+  # @example false
+  # @security Must remain false unless an approved exception exists.
+  allowPrivilegeEscalation: false
+
+  # -- containerSecurityContext.capabilities configures Linux capability changes.
+  # @type object
+  # @required true
+  # @accepted documented keys only
+  # @default drop ALL
+  # @example drop: [ALL]
+  # @security Drop every capability and add back only reviewed requirements.
+  capabilities:
+    # -- containerSecurityContext.capabilities.drop lists capabilities removed from the container.
+    # @type array
+    # @required true
+    # @accepted array containing ALL
+    # @default [ALL]
+    # @example [ALL]
+    # @security Restricted policy requires ALL to be dropped.
+    drop:
+      - ALL
+
+# -- existingSecret references a separately managed Secret.
+# @type object
+# @required false
+# @accepted documented keys only
+# @default empty name and key
+# @example name: app-credentials
+# @security Reference metadata only; never place secret material in values files.
+existingSecret:
+  # -- existingSecret.name is the Secret resource name.
+  # @type string
+  # @required false
+  # @accepted empty or a valid Kubernetes name
+  # @default empty
+  # @example app-credentials
+  # @security The referenced Secret must be provisioned through an approved secret-management path.
+  name: ""
+
+  # -- existingSecret.key is the key selected from the referenced Secret.
+  # @type string
+  # @required false
+  # @accepted empty or a key present in the referenced Secret
+  # @default empty
+  # @example api-token
+  # @security Key names are metadata; secret values remain external.
+  key: ""
+
+# -- extraLabels adds non-sensitive metadata to rendered objects.
+# @type object
+# @required false
+# @accepted open map with string keys and string values
+# @default empty object
+# @example owner: platform
+# @security Do not place secrets or regulated data in labels.
+extraLabels: {}

@@ -1,15 +1,15 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=lzr1-skills&fontSize=42&fontColor=fff&animation=twinkling&fontAlignY=32&desc=84%20AI%20Skills%20%C2%B7%20Parallel%20Agent%20Edition&descAlignY=55&descSize=18" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=lzr1-skills&fontSize=42&fontColor=fff&animation=twinkling&fontAlignY=32&desc=86%20AI%20Skills%20%C2%B7%20Parallel%20Agent%20Edition&descAlignY=55&descSize=18" width="100%"/>
 
 <div align="center">
 
-[![Stars](https://img.shields.io/github/stars/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills/stargazers)
+[![Stars](https://img.shields.io/github/stars/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills)
 [![License](https://img.shields.io/badge/license-MIT-06b6d4?style=flat-square&labelColor=1a1a2e)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-84-ec4899?style=flat-square&labelColor=1a1a2e)](skills/)
+[![Skills](https://img.shields.io/badge/skills-86-ec4899?style=flat-square&labelColor=1a1a2e)](skills/)
 [![macOS](https://img.shields.io/badge/macOS-✓-a855f7?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Linux](https://img.shields.io/badge/Linux-✓-06b6d4?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Made with Bash](https://img.shields.io/badge/made%20with-bash-ec4899?style=flat-square&labelColor=1a1a2e&logo=gnubash&logoColor=white)](install.sh)
 
-**84 curated AI skills. One installer. Nine tools. Now with parallel execution.**
+**86 curated AI skills. One installer. Nine tools. Complete packages, not entrypoints alone.**
 
 *Stop configuring. Start shipping — in formation.*
 
@@ -24,8 +24,8 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 ## Table of Contents
 
 - [What are Skills?](#what-are-skills)
-- [Parallel Agent Architecture](#parallel-agent-architecture) — the June 2026 upgrade across all 84 skills
-- [The Arsenal](#the-arsenal) — 84 skills, organized by domain
+- [Parallel Agent Architecture](#parallel-agent-architecture) — the June 2026 upgrade across the original 84-skill baseline
+- [The Arsenal](#the-arsenal) — 86 skills, organized by domain
 - [The Armory](#the-armory) — 9 supported tools
 - [Equip Up](#equip-up) — 3 ways to install
 - [Command Reference](#command-reference)
@@ -53,9 +53,9 @@ Each skill in this arsenal is battle-tested and includes:
 
 ## Parallel Agent Architecture
 
-Every skill in this arsenal ships with a **parallel execution protocol** added in June 2026. Instead of sequential analysis, skills now fan out into specialized agents that work simultaneously, then synthesize findings that no single agent could surface alone.
+The original 84-skill baseline received a **parallel execution protocol** in June 2026. Instead of sequential analysis, those skills can fan out into specialized agents that work simultaneously, then synthesize findings that no single agent could surface alone.
 
-Three upgrade patterns cover all 84 skills:
+Three upgrade patterns cover that original 84-skill baseline. The newer `coderabbit-reviewer` and `yaml-specialist` skills deliberately use bounded, evidence-first local workflows: CodeRabbit findings are triaged before remediation, while YAML, Helm, schema, and Kubernetes evidence remains separated by validation layer. Neither skill manufactures parallelism where ordered verification is safer.
 
 ---
 
@@ -129,6 +129,8 @@ Skills that already spawned parallel agents received three additive upgrades:
 | `hermes-agent` | Hermes agent patterns — message routing, async communication, event-driven architecture, agent-to-agent protocols | Building reliable agent communication layers |
 | `meeting-engineering` | Live virtual meeting assistants with voice — Playwright automation, audio pipelines, STT/LLM/TTS, Docker | Building real-time meeting bots |
 | `software-engineering` | Backend, frontend, fullstack, APIs, systems architecture, performance, Go/Rust and more | Any production code decision |
+| `coderabbit-reviewer` | Local CodeRabbit CLI reviews with deterministic NDJSON evidence, independent finding triage, and bounded remediation loops | Reviewing uncommitted or branch changes without silently publishing them |
+| `yaml-specialist` | YAML 1.2, JSON Schema, Helm, and Kubernetes configuration engineering with secret-safe analysis, explicit compatibility matrices, isolated rendering, and layered validation evidence | Authoring, auditing, validating, or safely refactoring YAML and Helm/Kubernetes configuration |
 | `quality-assurance` | Test strategy, automation frameworks, performance testing, API testing, QA processes | Shipping with confidence |
 | `research-development` | Innovation strategy, tech scouting, R&D management, emerging tech evaluation | Staying ahead of the curve |
 
@@ -286,21 +288,32 @@ The installer detects these tools automatically and installs skills to their con
 
 ## Equip Up
 
-### Option 1 — curl (recommended)
+### Option 1 — one-line curl installer
 
-No cloning required. The installer downloads directly from GitHub.
+The required one-line command remains available and launches an interactive target menu. Like every `curl | bash` pattern, it executes the fetched script immediately; use the inspect-first alternative below when your trust policy requires review before execution.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash
 ```
 
-This launches an interactive menu — pick your tools, choose your action, done.
+In piped mode, the script downloads **one repository archive**, validates that `skills-list.txt` exactly matches 86 package directories, and then installs complete packages. It does not fall back to a stale embedded list or continue after a partial catalog download.
 
-**Silent install to all detected tools:**
+**Inspect first, then run the exact saved file:**
 
 ```bash
-LZRI_AUTO=1 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh -o install.sh
+less install.sh
+bash install.sh --detected --dry-run
+bash install.sh --detected --yes
 ```
+
+**Non-interactive install to detected tools:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- --detected --yes
+```
+
+`LZR1_AUTO=1` remains an automation shorthand for detected targets. `LZRI_AUTO=1` is retained as a backward-compatible alias.
 
 ### Option 2 — Clone and run
 
@@ -315,14 +328,14 @@ bash install.sh
 **Or go straight to a specific loadout:**
 
 ```bash
-bash install.sh --claude-code --cursor       # just these two
-bash install.sh --all                         # arm everything
-bash install.sh --all --dry-run              # preview without touching anything
+bash install.sh --claude-code --cursor --yes  # just these two
+bash install.sh --all --yes                    # all nine targets, even if undetected
+bash install.sh --all --dry-run                # validate and preview without writing
 ```
 
 ### Option 3 — Update existing install
 
-Re-downloads the latest skills and reinstalls to whichever tools you previously selected.
+Revalidates the latest source snapshot and reinstalls complete packages to whichever tools are recorded in the managed state file.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- update
@@ -348,21 +361,23 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 | `--claude-code` | `~/.claude/skills/` |
 | `--claude-desktop` | Platform-specific Claude Desktop path |
 | `--codex` | `~/.codex/skills/` |
-| `--opencode` | `~/.config/opencode/skills/` |
+| `--opencode` | `~/.config/opencode/skill/` |
 | `--factory` | `~/.factory/skills/` |
 | `--cursor` | `~/.cursor/rules/` |
 | `--vscode` | `~/.vscode/lzr1-skills/` |
-| `--antigravity` | `~/.antigravity/skills/` |
-| `--agy` | `~/.agy/skills/` |
-| `--all` | All nine tools |
+| `--antigravity` | `~/.antigravity-ide/rules/` |
+| `--agy` | `~/.gemini/antigravity-cli/skills/` |
+| `--detected` | Every tool whose config directory already exists |
+| `--all` | All nine targets, including undetected tools |
 
 ### Behavior Flags
 
 | Flag | What it does |
 |:-----|:-------------|
-| `--dry-run`, `-n` | Preview what would be installed without writing anything |
-| `--verbose`, `-v` | Show per-file output |
-| `--yes`, `-y` | Skip confirmation prompts |
+| `--dry-run`, `-n` | Validate the source and preview destination changes without writing |
+| `--verbose`, `-v` | Show per-skill activity |
+| `--yes`, `-y` | Disable interactive selection; a target flag is still required |
+| `--force` | Back up and replace an unowned same-name collision |
 | `--version` | Show installer version |
 | `--help`, `-h` | Full help text |
 
@@ -370,13 +385,14 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 
 | Variable | Effect |
 |:---------|:-------|
-| `LZRI_AUTO=1` | Skip the interactive menu, install to all detected tools automatically |
+| `LZR1_AUTO=1` | Skip the interactive menu and select detected tools |
+| `LZRI_AUTO=1` | Backward-compatible alias for `LZR1_AUTO=1` |
 
 ---
 
 ## Update & Remove
 
-**Update** re-downloads the latest version of all skills and reinstalls them to whatever tools you picked last time. Your previous selection is saved to `~/.lzr1-skills-state`.
+**Update** validates a fresh source snapshot and reinstalls all 86 complete packages to the targets recorded in `~/.lzr1-skills-state`. Explicit target flags update only those targets while preserving the other recorded selections.
 
 ```bash
 # Via curl (no clone needed)
@@ -386,12 +402,14 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 bash install.sh update
 ```
 
-**Remove** deletes skill files from the target tool directories.
+**Remove** deletes only packages that carry this repository’s ownership markers. Same-name files or directories without those markers are left untouched.
 
 ```bash
-bash install.sh remove --claude-code    # remove from one tool
-bash install.sh remove --all            # clean everything
+bash install.sh remove --claude-code --yes  # remove one managed target
+bash install.sh remove --all --yes           # remove managed content from all targets
 ```
+
+If installation finds an unowned same-name path, it fails before writing that target. `--force` is explicit opt-in: the existing content is moved under that target’s `.lzr1-backups/<run-id>/` directory before replacement.
 
 **Health check:**
 
@@ -403,15 +421,19 @@ bash install.sh doctor
 
 ## How It Works
 
-The installer has two modes, chosen automatically:
+The installer chooses its source mode automatically and then applies the same fail-closed catalog validation in both modes.
 
-**Local mode** (when you clone the repo) — skills are read directly from `./skills/*/SKILL.md` and copied to target directories. No network required after cloning.
+**Local mode** — a clone is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 86 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. No network is required after cloning.
 
-**Curl mode** (when piped from the internet) — the installer detects that no local `skills/` directory exists, fetches the skill manifest from `skills-list.txt`, then downloads each `SKILL.md` individually from GitHub raw URLs. Falls back to a hardcoded list if the manifest is unreachable.
+**Curl mode** — the one-line script downloads a single GitHub repository archive over HTTPS, rejects unsafe archive paths and symbolic links, validates the same exact 86-skill manifest-to-directory contract, and installs from that coherent snapshot. There is no hardcoded-list fallback and no per-file partial-download mode. The downloaded archive’s SHA-256 is printed for evidence; because `main` is mutable, pin or independently verify a trusted revision when your policy requires immutable provenance.
 
-**State file** — after each install, the selected tools are written to `~/.lzr1-skills-state`. The `update` and `remove` subcommands read this file so you don't have to re-specify your tools every time.
+**Destination layouts** — package-native tools receive `skills/<name>/` directories. Flat-rule tools receive `<name>.md` plus a hidden `.lzr1-skill-resources/<name>/` package mirror; entrypoint links are rewritten to that mirror so referenced materials continue to resolve.
 
-**Tool detection** — the installer checks for each tool's config directory at startup. Detected tools show `✓` in the interactive menu; undetected ones show `○` but can still be installed (the directory will be created).
+**Ownership and replacement** — each installed package has a repository ownership marker, and each target has a managed index. Updates stage a complete replacement before swapping it into place. Unowned collisions fail closed unless `--force` is explicit, in which case the prior content is backed up rather than deleted.
+
+**State and locking** — successful target selections are merged into `~/.lzr1-skills-state`; subset removals delete only those records. A per-user lock prevents overlapping write operations. `--dry-run` performs source validation and target preflight without writing installer state or target content.
+
+**Tool detection** — the installer checks each tool’s current config directory at startup. Detected tools are labeled in the interactive menu; undetected targets can still be selected explicitly and their directories will be created safely.
 
 ---
 
@@ -430,7 +452,7 @@ cd lzr1-skills
 
 **Skill format** — frontmatter with `name` and `description`, followed by markdown. Reference files go in `references/`, scripts in `scripts/`, templates in `templates/`.
 
-**Parallel protocols** — new skills should include a `## Parallel Execution Protocol`, `## Multi-Specialist Protocol`, or `## Adversarial Verification Panel` section depending on the skill's workflow shape. See any existing skill for the pattern that fits.
+**Execution protocols** — use parallel specialists only when work branches are genuinely independent. Ordered, stateful workflows such as `coderabbit-reviewer` and `yaml-specialist` should instead use bounded loops, explicit approval gates, deterministic evidence, and stop conditions. Choose the protocol that fits the risk and dependency structure rather than adding concurrency mechanically.
 
 ---
 

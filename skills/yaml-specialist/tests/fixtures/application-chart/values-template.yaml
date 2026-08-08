@@ -1,0 +1,32 @@
+# @mode active-overlay
+# This file is an active Helm values overlay. It contains every canonical path so
+# contract drift is detectable; customize only reviewed non-secret values.
+
+replicaCount: 3
+
+image:
+  repository: registry.example.invalid/example/app
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# Reference an externally managed Secret; never add secret material here.
+existingSecret:
+  name: ""
+  key: ""
+
+extraLabels: {}

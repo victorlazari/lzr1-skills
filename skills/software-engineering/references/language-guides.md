@@ -37,7 +37,7 @@
 func processItems(ctx context.Context, items []Item, workers int) error {
     g, ctx := errgroup.WithContext(ctx)
     ch := make(chan Item, workers)
-    
+
     // Producer
     g.Go(func() error {
         defer close(ch)
@@ -50,7 +50,7 @@ func processItems(ctx context.Context, items []Item, workers int) error {
         }
         return nil
     })
-    
+
     // Workers
     for i := 0; i < workers; i++ {
         g.Go(func() error {
@@ -62,7 +62,7 @@ func processItems(ctx context.Context, items []Item, workers int) error {
             return nil
         })
     }
-    
+
     return g.Wait()
 }
 ```

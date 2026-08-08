@@ -81,13 +81,13 @@ from datetime import datetime, timedelta
 def daily_pipeline():
     @task
     def extract(): ...
-    
+
     @task
     def transform(data): ...
-    
+
     @task
     def load(transformed): ...
-    
+
     raw = extract()
     transformed = transform(raw)
     load(transformed)

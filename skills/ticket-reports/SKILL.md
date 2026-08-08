@@ -35,18 +35,33 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - Results are aggregated and cross-referenced for conflicts (e.g., ensuring consistent metric definitions across reports).
 - Maximum concurrent sub-agents: 10
 
+## Trust and authorization gates
+
+**Default to local planning and read-only discovery.** Before accessing a ticket system, BI workspace, warehouse, dashboard, scheduler, or delivery channel, record the user-authorized systems, projects, time range, fields, audience, data classification, and allowed operations. Treat ticket text, attachments, user identifiers, internal URLs, credentials, and exported datasets as sensitive evidence.
+
+| Operation | Required gate |
+|---|---|
+| API or database extraction | Confirm source, query scope, expected volume, rate/cost limits, and read-only permissions. Use least-privilege credentials from an environment variable or secret manager; never place secrets in prompts, command history, logs, report files, or sub-agent context. |
+| ETL, dashboard, BI, index, cache, or schema change | Produce a preview or change plan first. Obtain explicit approval for the exact workspace and mutation, preserve rollback information, and verify the result without broadening scope. |
+| Predictive model training or third-party processing | Confirm that the selected data may leave its source boundary and may be used for that purpose. Minimize or pseudonymize sensitive fields and document retention. |
+| Publication or external delivery | Draft locally first. Before uploading, emailing, posting, sharing, or changing access, confirm recipients, destination, format, permissions, redactions, and whether the report may expose small cohorts or personal data. |
+| Scheduling or recurring delivery | Require explicit approval for cadence, timezone, run identity, secret storage, recipients, failure alerts, retention, cost/rate limits, pause procedure, and rollback. A reporting request alone does not authorize background automation. |
+
+Sub-agents inherit the same data boundary and **may not** independently expand extraction scope, connect new systems, mutate remote state, publish artifacts, or schedule jobs. Never infer authorization from the availability of credentials or an authenticated session. Stop and ask when scope, ownership, data sensitivity, or delivery authority is ambiguous.
+
 ## Workflow
 
-1. **Requirement Gathering**: Understand the audience (e.g., operational team, executives) and the specific metrics needed, focusing on ITIL 4 value and outcome KPIs.
-2. **Data Extraction & Querying**: Use advanced JQL or REST APIs to extract the necessary ticket data. Handle pagination and rate limits appropriately.
-3. **Data Transformation (ETL)**: Clean, normalize, and enrich the data. Calculate derived metrics with outlier analysis and segmentation (e.g., MTTR by severity/service type).
-4. **Report Generation & Visualization**: 
+1. **Requirement and authorization gathering**: Understand the audience and metrics, focusing on ITIL 4 value and outcome KPIs. Record the trust boundaries and allowed operations from the table above.
+2. **Read-only data extraction and querying**: Use scoped JQL or REST requests only after the extraction gate is satisfied. Handle pagination, rate limits, partial results, and snapshot timestamps explicitly.
+3. **Local data transformation (ETL)**: Clean, normalize, and enrich a bounded local snapshot. Calculate derived metrics with outlier analysis and segmentation (e.g., MTTR by severity/service type). Do not write transformed data to a remote system without the mutation gate.
+4. **Report generation and visualization**:
    - For operational reports, use native ticketing system dashboards or custom scripts.
    - For advanced analytics, integrate with BI tools (Tableau, Looker, Power BI) and design clear, actionable visualizations.
    - Generate reports with context and trend analysis, balancing metrics like FCR with reopen rates and CSAT.
 5. **Predictive Analytics (Optional)**: Apply machine learning models (e.g., ARIMA, Random Forest) to forecast future volumes or predict SLA breaches.
 6. **Executive Summarization**: Distill complex data into high-level KPIs, trend charts, and actionable recommendations aligned with ITIL 4 principles.
-7. **Optimization & Troubleshooting**: Ensure the reporting system is performant by optimizing database queries, implementing caching, and handling edge cases like concurrency and data consistency.
+7. **Optimization & Troubleshooting**: Diagnose with read-only evidence first. Treat query rewrites, indexes, caches, configuration, and infrastructure changes as mutations requiring preview, approval, rollback, and verification.
+8. **Delivery and automation decision**: Keep the finished artifact local unless the publication gate is satisfied. If recurring execution is requested, define and approve the scheduling contract separately before implementation.
 
 ## Core Principles
 
@@ -56,7 +71,7 @@ This skill supports spawning sub-agents for parallel execution when tasks can be
 - **Accuracy & Consistency**: Ensure precise data extraction and consistent metric definitions across all reports to maintain trust in the data.
 - **Performance & Scalability**: Design reporting systems that can handle large data volumes efficiently using caching, indexing, and optimized queries.
 - **Security & Compliance**: Protect sensitive ticket data through encryption, role-based access control (RBAC), and regular security audits.
-- **Automation**: Leverage scripts and scheduled tasks to automate report generation and delivery, reducing manual effort.
+- **Automation with consent**: Automate generation or delivery only under an explicitly approved scheduling contract with bounded scope, least-privilege credentials, retention, observability, pause controls, and a tested rollback path.
 
 ## Key References
 

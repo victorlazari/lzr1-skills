@@ -91,7 +91,7 @@ Effective January 1, 2026, new regulations apply to:
 
 ## 3. UK Data (Use and Access) Act 2025
 
-Effective February 2026, the UK Data (Use and Access) Act amends the UK GDPR and PECR:
+The majority of the Act’s Part 5 data-protection and privacy changes took effect on **5 February 2026**; the controller complaint-handling provisions in section 103 and Schedule 10 took effect on **19 June 2026**. The changes amend the UK GDPR, Data Protection Act 2018, and PECR:
 
 | Change | Description |
 |---|---|
@@ -182,7 +182,7 @@ DPIA contents:
 ## 7. Source Map
 
 - **CCPA 2026 Regulations**: [Paul Hastings Insights](https://www.paulhastings.com/insights/ph-privacy/plan-ahead-updated-ccpa-regulations-go-into-effect-jan-1)
-- **UK Data (Use and Access) Act**: [Clifford Chance Insights](https://www.cliffordchance.com/insights/resources/blogs/talking-tech/en/articles/2026/02/key-aspects-of-the-data--use-and-access--act-take-effect.html)
+- **UK Data (Use and Access) Act commencement**: [GOV.UK commencement plan](https://www.gov.uk/guidance/data-use-and-access-act-2025-plans-for-commencement) and [Commencement No. 6 Regulations 2026](https://www.legislation.gov.uk/uksi/2026/82/made)
 - **IAPP (International Association of Privacy Professionals)**: iapp.org
 - **GDPR.eu**: gdpr.eu
 - **ICO Guidance**: ico.org.uk

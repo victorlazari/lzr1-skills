@@ -1,5 +1,7 @@
 # docker-compose.meet.yml — Template stack for the Google Meet assistant fleet.
-# Run with:  docker compose -f docker-compose.meet.yml --profile meet up -d
+# Required before use: set URL-safe MEET_POSTGRES_PASSWORD,
+# MEET_RABBITMQ_USER, and MEET_RABBITMQ_PASSWORD values outside this file.
+# Run with: docker compose -f docker-compose.meet.yml --profile meet up -d
 version: "3.9"
 
 services:
@@ -20,14 +22,15 @@ services:
       MEET_ADMIT_TIMEOUT_S: "300"
       MEET_DEDUP_TTL: "7200"
       MEET_SLACK_CHANNEL: "#meeting-bot"
-      # Provider keys
+      # Provider keys. Supply these through the runtime environment or a secret manager.
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       GROQ_API_KEY: ${GROQ_API_KEY}
-      # Infra
-      DATABASE_URL: "postgresql://meet:meet@postgres:5432/meet"
+      # Infrastructure credentials are required and must be URL-safe because
+      # they are interpolated into connection URIs.
+      DATABASE_URL: "postgresql://meet:${MEET_POSTGRES_PASSWORD:?set a URL-safe MEET_POSTGRES_PASSWORD}@postgres:5432/meet"
       VALKEY_URL: "redis://valkey:6379/0"
-      AMQP_URL: "amqp://guest:guest@rabbitmq:5672/"
+      AMQP_URL: "amqp://${MEET_RABBITMQ_USER:?set MEET_RABBITMQ_USER}:${MEET_RABBITMQ_PASSWORD:?set a URL-safe MEET_RABBITMQ_PASSWORD}@rabbitmq:5672/"
       AMQP_EXCHANGE: "sindarian.tasks"
       AMQP_QUEUE: "tasks.meet"
     volumes:
@@ -53,9 +56,9 @@ services:
     environment:
       MEET_AUTH_STATE: "/app/workspace/config/meet-auth-state.json"
       MEET_DEDUP_TTL: "7200"
-      DATABASE_URL: "postgresql://meet:meet@postgres:5432/meet"
+      DATABASE_URL: "postgresql://meet:${MEET_POSTGRES_PASSWORD:?set a URL-safe MEET_POSTGRES_PASSWORD}@postgres:5432/meet"
       VALKEY_URL: "redis://valkey:6379/0"
-      AMQP_URL: "amqp://guest:guest@rabbitmq:5672/"
+      AMQP_URL: "amqp://${MEET_RABBITMQ_USER:?set MEET_RABBITMQ_USER}:${MEET_RABBITMQ_PASSWORD:?set a URL-safe MEET_RABBITMQ_PASSWORD}@rabbitmq:5672/"
       AMQP_EXCHANGE: "sindarian.tasks"
     volumes:
       - ./workspace:/app/workspace
@@ -69,7 +72,7 @@ services:
     profiles: ["meet"]
     environment:
       POSTGRES_USER: meet
-      POSTGRES_PASSWORD: meet
+      POSTGRES_PASSWORD: ${MEET_POSTGRES_PASSWORD:?set a URL-safe MEET_POSTGRES_PASSWORD}
       POSTGRES_DB: meet
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -83,8 +86,11 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     profiles: ["meet"]
+    environment:
+      RABBITMQ_DEFAULT_USER: ${MEET_RABBITMQ_USER:?set MEET_RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${MEET_RABBITMQ_PASSWORD:?set a URL-safe MEET_RABBITMQ_PASSWORD}
     ports:
-      - "15672:15672"   # management UI
+      - "127.0.0.1:15672:15672"   # management UI; local host only
     restart: unless-stopped
 
 volumes:

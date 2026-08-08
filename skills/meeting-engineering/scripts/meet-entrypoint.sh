@@ -18,7 +18,7 @@ trap cleanup EXIT
 # --- 1. Virtual display -------------------------------------------------
 Xvfb "${DISPLAY}" -screen 0 "${SCREEN_GEOMETRY}" -nolisten tcp -ac &
 XVFB_PID=$!
-for i in $(seq 1 30); do
+for _ in {1..30}; do
   if xdpyinfo -display "${DISPLAY}" >/dev/null 2>&1; then break; fi
   sleep 0.5
 done
@@ -30,7 +30,7 @@ pulseaudio --daemonize=no --exit-idle-time=-1 \
   --load="module-native-protocol-unix socket=/tmp/pulse-socket auth-anonymous=1" \
   --disallow-exit --log-target=stderr &
 PULSE_PID=$!
-for i in $(seq 1 30); do
+for _ in {1..30}; do
   if pactl info >/dev/null 2>&1; then break; fi
   sleep 0.5
 done

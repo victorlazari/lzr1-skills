@@ -1,0 +1,6 @@
+{"type":"review_context","repository":"example/repository","scope":"uncommitted"}
+{"type":"status","status":"reviewing"}
+{"type":"heartbeat"}
+{"type":"finding","severity":"major","fileName":"src/app.py","codegenInstructions":"Validate the parsed value before use.","suggestions":["Add a guard before the state transition."]}
+{"type":"finding","severity":"minor","fileName":"src/lib.py","codegenInstructions":"","comment":"Handle this error explicitly rather than discarding it.","suggestions":[]}
+{"type":"complete","status":"completed","findings":2}

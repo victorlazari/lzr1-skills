@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/victorlazari/lzr1-skills/security-review/finding.schema.json",
+  "$id": "https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/skills/security-review/templates/finding.schema.json",
   "title": "Security review report",
   "description": "Canonical machine-readable contract for an evidence-backed security review. Schema validity does not prove that a finding is correct.",
   "type": "object",

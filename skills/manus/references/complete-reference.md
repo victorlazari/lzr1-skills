@@ -12,7 +12,7 @@
 
 The official Manus v2 API documentation is available at `https://open.manus.ai/docs/v2/introduction`.
 
-- Base URL: `https://api.manus.ai/v2`
+- Base URL: `https://api.manus.ai` (API v2 is the current contract; verify endpoint paths in the linked v2 reference).
 - Authentication: Bearer token in the `Authorization` header.
 
 ## WebMCP Integration

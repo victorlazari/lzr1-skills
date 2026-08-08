@@ -1,6 +1,6 @@
 # Handling User Input (DTMF & ASR)
 
-The `input` NCCO action allows you to collect digits pressed on a keypad (DTMF) or capture spoken words (Automatic Speech Recognition - ASR). 
+The `input` NCCO action allows you to collect digits pressed on a keypad (DTMF) or capture spoken words (Automatic Speech Recognition - ASR).
 
 When the input is captured, Vonage sends an HTTP request to the specified `eventUrl`. Your server MUST process this request and return a **new NCCO array** to replace the current one and continue the call flow.
 
@@ -139,11 +139,11 @@ app.post('/handle-input', (req, res) => {
   if (dtmfInput === "1" || speechInput === "sales") {
     // Execute server-side logic: Log metric, look up available agent, etc.
     console.log("Routing to sales...");
-    
+
     ncco = [
       { "action": "talk", "text": "Connecting to sales." },
-      { 
-        "action": "connect", 
+      {
+        "action": "connect",
         "from": "YOUR_VONAGE_NUMBER",
         "endpoint": [{ "type": "phone", "number": "SALES_TEAM_NUMBER" }]
       }

@@ -84,7 +84,7 @@ Both Anthropic and OpenAI support prompt caching, which dramatically reduces cos
 
 ### Rules for Cache Optimization:
 * **Keep the Prefix Static:** Any change to the cached prefix invalidates the entire cache. Ensure all dynamic data (dates, user IDs, current query) is placed at the very end of the prompt.
-* **Minimum Token Thresholds:** 
+* **Minimum Token Thresholds:**
   * **Anthropic:** Cache triggers at 1024 tokens.
   * **OpenAI:** Cache triggers automatically in 1024-token blocks.
 * **Structure:** Always structure prompts as: `[System Instructions] -> [Tools] -> [Examples] -> [Cache Boundary] -> [Dynamic Context/History]`.

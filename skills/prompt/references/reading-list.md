@@ -19,7 +19,7 @@ This reading list serves as a source map for the prompt engineering skill. It id
    - **When to consult**: When optimizing prompts for Claude models, especially for tasks involving large documents or complex formatting requirements.
    - **Verified against upstream**: 2026-08-07
 
-4. **[Braintrust: The Data-Driven Prompt Engineering Guide](https://www.braintrust.dev/docs/guides/prompt-engineering)**
+4. **[Braintrust: The Data-Driven Prompt Engineering Guide](https://www.braintrust.dev/docs/evaluate/write-prompts)**
    - **Governs**: Automated evaluation, LLM-as-a-judge methodologies, dataset management, and iterative prompt optimization.
    - **When to consult**: When setting up evaluation pipelines, defining scoring metrics, or transitioning from manual testing to automated, data-driven prompt optimization.
    - **Verified against upstream**: 2026-08-07

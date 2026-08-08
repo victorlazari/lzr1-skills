@@ -42,7 +42,7 @@ Embeddings transform text into dense vector representations.
 ### 3.2 Vector Databases
 Specialized data stores optimized for high-dimensional embeddings.
 - **Popular Solutions**: FAISS, Pinecone, Weaviate, Milvus.
-- **Indexing Algorithms**: 
+- **Indexing Algorithms**:
   - **Flat**: Exact search, brute force.
   - **IVF (Inverted File)**: Clusters vectors for faster approximate search.
   - **HNSW (Hierarchical Navigable Small World)**: Graph-based ANN search for low latency.

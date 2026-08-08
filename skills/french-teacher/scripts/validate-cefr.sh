@@ -14,7 +14,6 @@ show_help() {
 }
 
 LEVEL=""
-DRY_RUN=1
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -27,7 +26,6 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -d|--dry-run)
-            DRY_RUN=1
             shift
             ;;
         *)

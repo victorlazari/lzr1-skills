@@ -219,11 +219,11 @@ supply_chain_evidence:
 ## Sources
 
 - [Trivy SBOM generation and discovery](https://trivy.dev/docs/latest/supply-chain/sbom/)
-- [Trivy SBOM attestations](https://trivy.dev/docs/latest/supply-chain/attestation/sbom/)
+- [Trivy SBOM attestations](https://trivy.dev/docs/latest/guide/supply-chain/attestation/sbom/)
 - [Trivy VEX overview](https://trivy.dev/docs/latest/supply-chain/vex/)
-- [Trivy SBOM target](https://trivy.dev/docs/latest/target/sbom/)
-- [Trivy built-in compliance](https://trivy.dev/docs/latest/compliance/)
-- [Trivy custom compliance](https://trivy.dev/docs/latest/compliance/custom/)
+- [Trivy SBOM target](https://trivy.dev/docs/latest/guide/target/sbom/)
+- [Trivy built-in compliance](https://trivy.dev/docs/latest/compliance/compliance/)
+- [Trivy custom compliance](https://trivy.dev/docs/latest/compliance/contrib-compliance/)
 - [CycloneDX specifications](https://cyclonedx.org/specification/overview/)
 - [SPDX specifications](https://spdx.dev/specifications/)
 - [Sigstore Cosign verification](https://docs.sigstore.dev/cosign/verifying/verify/)

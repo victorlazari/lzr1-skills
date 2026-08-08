@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=./values.schema.json
+
+# -- library configures the exported helper’s caller-provided text.
+# @type object
+# @required true
+# @accepted documented keys only
+# @default message below
+# @example message: portable
+# @security Treat caller-provided text as untrusted output and quote it in YAML contexts.
+library:
+  # -- library.message is the non-sensitive text emitted by the fixture helper.
+  # @type string
+  # @required true
+  # @accepted non-empty text up to 64 characters
+  # @default portable
+  # @example portable
+  # @security Do not place credentials or regulated data in this value.
+  message: portable

@@ -28,7 +28,7 @@ RAG has transitioned from simple vector-search chunk retrieval (Naive RAG) to hi
 ## 2. Advanced Retrieval & Indexing Strategies
 
 ### A. Hybrid Search (Dense + Sparse)
-Dense vector embeddings capture semantic meaning, but often fail on exact keyword matches (part numbers, product IDs, names). 
+Dense vector embeddings capture semantic meaning, but often fail on exact keyword matches (part numbers, product IDs, names).
 * **Sparse Search (BM25):** Performs exact keyword matching.
 * **Dense Search:** Performs semantic concept matching.
 * **Reciprocal Rank Fusion (RRF):** Combines the ranks of dense and sparse retrieval to produce a unified, optimal set of retrieved documents.

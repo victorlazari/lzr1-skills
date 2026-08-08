@@ -1,0 +1,68 @@
+# This planning file is evidence input, not an executable configuration.
+contract:
+  yaml:
+    specification: "1.2.2"
+    schema: core
+    duplicateKeys: reject
+  helm:
+    testedVersions:
+      - "4.2.3"
+  kubernetes:
+    testedMinors:
+      - "1.34"
+      - "1.35"
+      - "1.36"
+  jsonSchema:
+    dialect: "https://json-schema.org/draft/2020-12/schema"
+  podSecurityProfile: restricted
+
+schemaSources:
+  # Replace with reviewed immutable local or HTTPS sources. Do not use plaintext HTTP.
+  - kind: local
+    location: "./schemas"
+    trustEvidence: "TODO: digest, repository revision, and owner"
+
+executionPolicy:
+  allowNetwork: false
+  allowedNetworkHosts: []
+  allowCluster: false
+  kubectlContext: ""
+  serverDryRun: false
+  publicationAuthorized: false
+
+scenarios:
+  - name: canonical-defaults
+    valuesFiles: []
+    expectedCoverage:
+      - values-contract
+      - helm-lint
+      - render
+      - internal-references
+      - kubernetes-schema
+
+  - name: operator-template
+    valuesFiles:
+      - values-template.yaml
+    expectedCoverage:
+      - values-contract
+      - helm-lint
+      - render
+      - internal-references
+      - kubernetes-schema
+
+  - name: compatibility-fixture
+    valuesFiles:
+      - tests/fixtures/compatibility.yaml
+    expectedCoverage:
+      - helm-lint
+      - render
+      - internal-references
+      - kubernetes-schema
+
+completionPolicy:
+  toolErrorIsFailure: true
+  missingSchemaIsIncomplete: true
+  skippedGateIsIncomplete: true
+  unresolvedDynamicExpressionIsIncomplete: true
+  ignoredMissingSchemasAllowed: false
+  requireEveryScenarioAndTarget: true

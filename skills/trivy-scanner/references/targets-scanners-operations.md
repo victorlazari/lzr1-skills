@@ -207,16 +207,16 @@ An empty result without these answers is inconclusive.
 
 ## Sources
 
-- [Targets overview](https://trivy.dev/docs/latest/target/)
-- [Scanner overview](https://trivy.dev/docs/latest/scanner/)
+- [Targets overview](https://trivy.dev/docs/latest/guide/)
+- [Scanner overview](https://trivy.dev/docs/latest/scanner/vulnerability/)
 - [Coverage overview](https://trivy.dev/docs/latest/coverage/)
 - [Configuration overview](https://trivy.dev/docs/latest/configuration/)
 - [Configuration-file reference](https://trivy.dev/docs/latest/references/configuration/config-file/)
-- [CLI command reference](https://trivy.dev/docs/latest/references/configuration/cli/)
-- [Standalone and client/server modes](https://trivy.dev/docs/latest/references/modes/)
+- [CLI command reference](https://trivy.dev/docs/latest/references/configuration/cli/trivy/)
+- [Standalone and client/server modes](https://trivy.dev/docs/latest/references/modes/client-server/)
 - [Databases](https://trivy.dev/docs/latest/configuration/db/)
 - [Cache](https://trivy.dev/docs/latest/configuration/cache/)
-- [Connectivity and network considerations](https://trivy.dev/docs/latest/advanced/connectivity/)
+- [Connectivity and network considerations](https://trivy.dev/docs/latest/guide/advanced/air-gap/)
 - [Self-hosting databases](https://trivy.dev/docs/latest/advanced/self-hosting/)
 - [Modules](https://trivy.dev/docs/latest/advanced/modules/)
 - [Plugins](https://trivy.dev/docs/latest/plugin/)

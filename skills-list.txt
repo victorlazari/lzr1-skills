@@ -4,6 +4,7 @@ ai-ml-engineering
 bash
 bot
 claude
+coderabbit-reviewer
 content-communications
 cron-master
 customer-support
@@ -77,8 +78,9 @@ tomate-pos80
 trivy-scanner
 valkey-redis
 vitest
-vonage-voice
 voip-oncall
+vonage-voice
 web-presentation-creator
 web-tester-supreme
 wikijs
+yaml-specialist

@@ -70,7 +70,7 @@ Example:
   Average handle time: 30 minutes
   Available hours per agent: 140 hours/month (accounting for meetings, breaks)
   Required agents: 5,000 × 0.5 / 140 = 17.9 → 18 agents
-  
+
   Add buffer (20%): 18 × 1.2 = 22 agents
 ```
 

@@ -13,7 +13,7 @@ PULSE_SERVER="${PULSE_SERVER:-unix:/tmp/pulse-socket}"
 export PULSE_SERVER
 
 wait_for_pulse() {
-  for i in $(seq 1 30); do
+  for _ in {1..30}; do
     if pactl info >/dev/null 2>&1; then return 0; fi
     sleep 0.5
   done

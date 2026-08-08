@@ -1,0 +1,3 @@
+{"type":"review_context","repository":"example/repository","scope":"tracked"}
+{"type":"status","status":"preparing"}
+{"type":"error","message":"The selected review scope contains too many files.","candidates":[{"command":"cr review --uncommitted","estimatedFileCount":12,"fits":true},{"command":"cr review --dir src","estimatedFileCount":20,"fits":true}],"candidatesNote":"Choose one narrower scope and rerun it manually."}

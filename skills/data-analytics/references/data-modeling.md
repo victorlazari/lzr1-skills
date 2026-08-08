@@ -140,7 +140,7 @@ final AS (
         orders.customer_id,
         orders.order_date,
         payments.amount_usd,
-        CASE 
+        CASE
             WHEN payments.amount_usd > 100 THEN 'high_value'
             ELSE 'standard'
         END AS order_tier
@@ -228,7 +228,7 @@ metrics:
       measure: order_total
     filter: |
       {{ Dimension('status') }} = 'completed'
-      
+
   - name: average_order_value
     type: derived
     type_params:

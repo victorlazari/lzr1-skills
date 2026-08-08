@@ -241,10 +241,10 @@ def get_user(user_id):
     cached = redis.get(f"user:{user_id}")
     if cached:
         return json.loads(cached)
-    
+
     # Cache miss: query database
     user = db.query("SELECT * FROM users WHERE id = %s", user_id)
-    
+
     # Store in cache with TTL
     redis.setex(f"user:{user_id}", 3600, json.dumps(user))
     return user

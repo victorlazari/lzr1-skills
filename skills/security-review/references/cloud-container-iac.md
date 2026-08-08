@@ -138,7 +138,7 @@ The complete source-to-check and freshness matrix is `sources.md`. CIS Controls 
 [1] CIS Critical Security Controls. Center for Internet Security. https://www.cisecurity.org/controls
 [2] NIST SP 800-207 Zero Trust Architecture. National Institute of Standards and Technology. https://csrc.nist.gov/pubs/sp/800/207/final
 [3] Cloud Security Alliance Cloud Controls Matrix. Cloud Security Alliance. https://cloudsecurityalliance.org/research/cloud-controls-matrix
-[4] NIST SP 800-190 Application Container Security Guide. National Institute of Standards and Technology. https://csrc.nist.gov/pubs/sp/800/190/final
+[4] NIST SP 800-190 Application Container Security Guide. National Institute of Standards and Technology. https://www.nist.gov/publications/application-container-security-guide
 [5] Kubernetes Pod Security Standards. Kubernetes. https://kubernetes.io/docs/concepts/security/pod-security-standards/
 [6] Kubernetes Hardening Guide. NSA and CISA. https://media.defense.gov/2022/Aug/29/2003066362/-1/-1/0/CTR_KUBERNETES_HARDENING_GUIDANCE_1.2_20220829.PDF
 [7] NIST SP 800-204 Security Strategies for Microservices-based Application Systems. National Institute of Standards and Technology. https://csrc.nist.gov/pubs/sp/800/204/final

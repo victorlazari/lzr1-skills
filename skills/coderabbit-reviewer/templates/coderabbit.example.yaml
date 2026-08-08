@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://www.coderabbit.ai/integrations/schema.v2.json
+#
+# Minimal governance-first starting point.
+# Copy to .coderabbit.yaml only after reviewing every setting against the
+# current official schema and your organization’s resolved configuration.
+# Validate with: coderabbit config validate .coderabbit.yaml
+
+language: en-US
+
+# Keep volatile early-access behavior off unless an owner accepts the risk.
+early_access: false
+
+# Do not inherit parent policy until its source, precedence, and ownership are
+# understood. Central administrators may still enforce global overrides.
+inheritance: false
+
+reviews:
+  # quiet = highest-signal; chill = balanced; assertive = more feedback.
+  profile: chill
+
+  # Do not allow comment resolution alone to imply approval.
+  request_changes_workflow: false
+
+  # Start with no exclusions. Add each exclusion only after testing the glob
+  # against a repository inventory and documenting owner, rationale, and expiry.
+  path_filters: []
+
+  # These strings are prompts. Review them as untrusted instructions and keep
+  # them free of secrets, commands, and attempts to override governing policy.
+  path_instructions: []

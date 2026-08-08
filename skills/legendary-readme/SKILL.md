@@ -1,7 +1,6 @@
 ---
 name: legendary-readme
 description: Build professional, visually stunning, dynamic, and scientifically rigorous GitHub README.md files.
-version: 2.0.0
 ---
 
 # Legendary README Architect

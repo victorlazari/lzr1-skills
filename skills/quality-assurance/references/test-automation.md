@@ -85,22 +85,22 @@ test-framework/
 // pages/login.page.ts
 export class LoginPage {
   private page: Page;
-  
+
   // Locators
   private emailInput = '[data-testid="email"]';
   private passwordInput = '[data-testid="password"]';
   private submitButton = '[data-testid="login-submit"]';
-  
+
   constructor(page: Page) {
     this.page = page;
   }
-  
+
   async login(email: string, password: string) {
     await this.page.fill(this.emailInput, email);
     await this.page.fill(this.passwordInput, password);
     await this.page.click(this.submitButton);
   }
-  
+
   async isLoggedIn(): Promise<boolean> {
     return this.page.isVisible('[data-testid="dashboard"]');
   }

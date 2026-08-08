@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Landing Page</title>
-    
+
     <!-- Preload critical assets -->
     <!-- <link rel="preload" href="assets/hero-bg.jpg" as="image"> -->
 
@@ -21,7 +21,7 @@
             --text-secondary: #86868b;
             --accent-color: #30d158;
             --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            
+
             /* Fluid Typography */
             --text-hero: clamp(2.5rem, 5vw + 1rem, 5rem);
             --text-h2: clamp(2rem, 4vw + 0.5rem, 3.5rem);
@@ -51,7 +51,7 @@
         }
 
         .text-center { text-align: center; }
-        
+
         .gradient-text {
             background: linear-gradient(135deg, #ffffff, #86868b);
             -webkit-background-clip: text;
@@ -132,7 +132,7 @@
                 grid-template-columns: 1fr;
             }
         }
-        
+
         @media (prefers-reduced-motion: reduce) {
             * {
                 animation-duration: 0.01ms !important;
@@ -145,7 +145,7 @@
 <body>
 
     <!-- Preloader (Optional, requires JS) -->
-    <!-- 
+    <!--
     <div id="preloader" style="position:fixed; inset:0; background:#000; z-index:9999; display:flex; align-items:center; justify-content:center;">
         <div style="font-family:monospace; font-size:3rem; color:#fff;"><span id="counter">0</span>%</div>
     </div>
@@ -170,7 +170,7 @@
     <!-- Scrollytelling Section -->
     <section class="scroll-track">
         <div class="sticky-viewport">
-            
+
             <!-- Background Image Layer -->
             <div class="layer" data-fade-in="0" data-fade-out="0.9">
                 <!-- Replace with actual image -->
@@ -193,14 +193,14 @@
     <!-- Feature Grid Section -->
     <section class="container" style="padding: 100px 24px;">
         <h2 class="text-center" style="font-size: var(--text-h2); margin-bottom: 40px;">Everything you need.</h2>
-        
+
         <div class="bento-grid">
             <div class="bento-card">
                 <h3 style="font-size: 1.5rem;">Battery Life</h3>
                 <p style="color: var(--accent-color); font-size: 3rem; font-weight: 800;">24hrs</p>
                 <p style="color: var(--text-secondary);">All day power.</p>
             </div>
-            
+
             <div class="bento-card">
                 <h3 style="font-size: 1.5rem;">Display</h3>
                 <div class="media-wrapper" style="aspect-ratio: 4/3; margin-top: 16px;">
@@ -233,24 +233,24 @@
         // 2. Simple Scrollytelling Controller
         function initScrollytelling() {
             const tracks = document.querySelectorAll('.scroll-track');
-            
+
             window.addEventListener('scroll', () => {
                 const viewH = window.innerHeight;
-                
+
                 tracks.forEach(track => {
                     const rect = track.getBoundingClientRect();
                     const trackH = track.offsetHeight;
-                    
+
                     let progress = (-rect.top) / (trackH - viewH);
                     progress = Math.max(0, Math.min(1, progress));
 
                     const layers = track.querySelectorAll('[data-fade-in]');
-                    
+
                     layers.forEach(layer => {
                         const start = parseFloat(layer.dataset.fadeIn);
                         const end = parseFloat(layer.dataset.fadeOut);
                         const duration = 0.1; // 10% fade duration
-                        
+
                         let opacity = 0;
                         let translateY = 20;
 
@@ -271,7 +271,7 @@
                                 translateY = 0;
                             }
                         }
-                        
+
                         layer.style.opacity = opacity;
                         layer.style.transform = `translateY(${translateY}px)`;
                     });

@@ -23,4 +23,4 @@ ChatOps integrates incident management workflows directly into collaboration pla
 ## References
 
 -   [PagerDuty Slack Integration](https://support.pagerduty.com/docs/slack-integration-guide)
--   [incident.io Slack Integration](https://help.incident.io/en/articles/5400000-slack-integration)
+-   [incident.io Slack Integration](https://docs.incident.io/getting-started/installing)

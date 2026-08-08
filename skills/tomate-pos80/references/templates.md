@@ -32,32 +32,32 @@ Below is a Python generator that outputs raw ESC/POS bytes for a beautiful, stan
 def generate_retail_receipt(items, subtotal, discount, total, payment_method):
     # Initialize list of bytes
     b = []
-    
+
     # 1. Initialize & Select Code Page WPC1252
     b.append(b'\x1b\x40')      # ESC @ (Initialize)
     b.append(b'\x1b\x74\x10')  # ESC t 16 (WPC1252)
-    
+
     # 2. Header (Centered, Bold, Double-Height)
     b.append(b'\x1b\x61\x01')  # Center
     b.append(b'\x1b\x21\x18')  # Bold + Double-Height
     b.append("LOJAS TOMATE LTDA\n".encode('cp1252'))
-    
+
     # Subheader (Normal size)
     b.append(b'\x1b\x21\x00')  # Reset format
     b.append("Av. Paulista, 1000 - São Paulo, SP\n".encode('cp1252'))
     b.append("CNPJ: 12.345.678/0001-90\n".encode('cp1252'))
     b.append("------------------------------------------------\n".encode('cp1252'))
-    
+
     # 3. Transaction Meta (Left-aligned)
     b.append(b'\x1b\x61\x00')  # Left
     b.append("Cupom Fiscal Eletrônico - NFC-e\n".encode('cp1252'))
     b.append("Data: 31/05/2026 14:30:15   Série: 001\n".encode('cp1252'))
     b.append("================================================\n".encode('cp1252'))
-    
+
     # Table Header
     b.append(f"{'Qtd':<5}{'Item':<31}{'Valor (R$)':>12}\n".encode('cp1252'))
     b.append("------------------------------------------------\n".encode('cp1252'))
-    
+
     # 4. Items List
     for qty, name, price in items:
         # Format price as string
@@ -67,31 +67,31 @@ def generate_retail_receipt(items, subtotal, discount, total, payment_method):
             name = name[:27] + ".."
         line = f"{qty:<5}{name:<31}{price_str:>12}\n"
         b.append(line.encode('cp1252'))
-        
+
     b.append("------------------------------------------------\n".encode('cp1252'))
-    
+
     # 5. Totals Section
     sub_str = f"{subtotal:.2f}".replace('.', ',')
     disc_str = f"{discount:.2f}".replace('.', ',')
     tot_str = f"{total:.2f}".replace('.', ',')
-    
+
     b.append(f"{'Subtotal:':<30}{'R$ ' + sub_str:>18}\n".encode('cp1252'))
     b.append(f"{'Desconto:':<30}{'R$ ' + disc_str:>18}\n".encode('cp1252'))
-    
+
     # Total (Bold + Double-Width)
     b.append(b'\x1b\x21\x28')  # Bold + Double-Width
     b.append(f"{'TOTAL:':<15}{'R$ ' + tot_str:>9}\n".encode('cp1252'))
     b.append(b'\x1b\x21\x00')  # Reset
-    
+
     b.append("------------------------------------------------\n".encode('cp1252'))
     b.append(f"{'Forma de Pagamento:':<30}{payment_method:>18}\n".encode('cp1252'))
     b.append("================================================\n".encode('cp1252'))
-    
+
     # 6. Footer & QR Code Placeholder
     b.append(b'\x1b\x61\x01')  # Center
     b.append("Obrigado pela preferência!\n".encode('cp1252'))
     b.append("Consulte sua NFC-e pelo QR Code abaixo:\n\n".encode('cp1252'))
-    
+
     # Native QR Code command (ESC Z)
     # Encodes a dummy URL for the NFC-e invoice portal
     qr_data = "https://www.fazenda.sp.gov.br/nfce/qrcode?p=123456"
@@ -101,11 +101,11 @@ def generate_retail_receipt(items, subtotal, discount, total, payment_method):
     dH = (length >> 8) & 0xFF
     # \x1b\x5a\x00\x4d\x04 = ESC Z \x00 M(Error Correction) \x04(Size 4)
     b.append(b'\x1b\x5a\x00\x4d\x04' + bytes([dL, dH]) + qr_bytes + b'\n')
-    
+
     # 7. Feed and Cut (GS V 66 0)
     b.append(b'\x1b\x64\x04')  # Feed 4 lines
     b.append(b'\x1d\x56\x42\x00') # Cut partially
-    
+
     return b''.join(b)
 ```
 
@@ -118,46 +118,46 @@ Restaurant orders require larger text for item quantities and modifiers to preve
 ```python
 def generate_kitchen_ticket(order_id, table, items):
     b = []
-    
+
     # Initialize & Select Code Page WPC1252
     b.append(b'\x1b\x40')
     b.append(b'\x1b\x74\x10')
-    
+
     # Header (Centered, Bold, Double-Height, Double-Width)
     b.append(b'\x1b\x61\x01')  # Center
     b.append(b'\x1b\x21\x38')  # Bold + Double-Height + Double-Width
     b.append(f"PEDIDO #{order_id}\n".encode('cp1252'))
-    
+
     # Table Info
     b.append(b'\x1b\x21\x30')  # Double-Height + Double-Width
     b.append(f"MESA: {table}\n".encode('cp1252'))
     b.append(b'\x1b\x21\x00')  # Reset
     b.append("------------------------------------------------\n".encode('cp1252'))
-    
+
     # Time
     b.append(b'\x1b\x61\x00')  # Left
     b.append("Hora do Pedido: 31/05/2026 21:15:00\n".encode('cp1252'))
     b.append("================================================\n".encode('cp1252'))
-    
+
     # Items
     for qty, item_name, modifiers in items:
         # Quantity & Name (Bold + Double-Height)
         b.append(b'\x1b\x21\x18')  # Bold + Double-Height
         b.append(f"{qty}x {item_name}\n".encode('cp1252'))
-        
+
         # Modifiers (Normal size, indented, italicized/underlined if needed)
         if modifiers:
             b.append(b'\x1b\x21\x00')  # Reset to normal
             for mod in modifiers:
                 b.append(f"  * OBS: {mod}\n".encode('cp1252'))
-        
+
         b.append(b'\x1b\x21\x00')  # Reset
         b.append("------------------------------------------------\n".encode('cp1252'))
-        
+
     # Feed & Cut
     b.append(b'\x1b\x64\x04')
     b.append(b'\x1d\x56\x42\x00')
-    
+
     return b''.join(b)
 ```
 

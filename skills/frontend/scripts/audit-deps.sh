@@ -16,7 +16,8 @@ fi
 # Function to check dependency version
 check_dep() {
   local dep=$1
-  local version=$(npm list "$dep" --depth=0 2>/dev/null | grep "$dep@" | awk -F@ '{print $2}')
+  local version
+  version=$(npm list "$dep" --depth=0 2>/dev/null | grep "$dep@" | awk -F@ '{print $2}')
 
   if [ -z "$version" ]; then
     echo "Warning: $dep is not installed."

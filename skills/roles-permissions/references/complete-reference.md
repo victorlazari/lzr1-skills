@@ -90,6 +90,6 @@ Casbin can encode relationships in role definitions or policies, enabling dynami
 - **Apache Casbin Documentation:** https://casbin.org/docs/overview/ (Use for Casbin model/policy syntax and API usage)
 - **Casdoor Documentation:** https://casdoor.github.io/docs/overview/ (Use for IAM configuration and SSO integration)
 - **OWASP Authorization Cheat Sheet:** https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html (Use for general authorization best practices)
-- **NIST SP 800-162 (ABAC):** https://nvlpubs.nist.gov/nistpubs/specialpublications/nist.sp.800-162.pdf (Use for ABAC definitions and considerations)
+- **NIST SP 800-162 (ABAC):** https://csrc.nist.gov/pubs/sp/800/162/upd2/final (Use for ABAC definitions and considerations)
 - **OWASP Top 10: Broken Access Control (2025):** https://owasp.org/Top10/2021/A01_2021-Broken_Access_Control/ (Use for mitigating BAC and IDOR)
 - **Google Zanzibar Paper:** https://research.google/pubs/zanzibar-googles-consistent-global-authorization-system/ (Use for ReBAC architecture and relationship traversal)

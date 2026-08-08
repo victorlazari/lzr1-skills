@@ -1,7 +1,7 @@
 # Redis Lua Scripting
 
 **Verified against upstream:** 2026-08-07
-**Primary Source:** [Redis Programmability - Lua API](https://redis.io/docs/manual/programmability/lua-api/)
+**Primary Source:** [Redis Programmability - Lua API](https://redis.io/docs/latest/develop/programmability/lua-api/)
 
 ## Overview
 This reference covers Redis Lua scripting, focusing on performance, security, and constraints.

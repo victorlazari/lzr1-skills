@@ -1,6 +1,8 @@
 # Prompt Engineering Specialist: Complete Reference
 
-This document consolidates and enhances all knowledge related to advanced prompt engineering, prompt architecture, configuration schemas, and system troubleshooting.
+This document consolidates conceptual guidance related to prompt engineering, prompt architecture, configuration schemas, and system troubleshooting.
+
+> **Scope and freshness — reviewed 2026-08-07:** This is an implementation-neutral conceptual reference, not versioned documentation for any named model, provider, product, or `prompt` executable. Product names are examples only. The error codes and CLI commands below are illustrative interface patterns, not claims about a specific upstream tool. Before implementation, select the actual provider or executable, inspect its current first-party documentation and local `--help` output, record versions and dates, and test every parameter and side effect. Do not invent compatibility from this reference.
 
 ## 1. Advanced Prompt Architecture
 
@@ -30,7 +32,7 @@ As models become more capable, the nature of prompt engineering is shifting from
 - **DSPy (Declarative Self-improving Python)**: A framework for algorithmically optimizing LM prompts and weights by defining task signatures and compiling optimized prompts.
 - **OPRO (Optimization by PROmpting)**: Uses the LLM itself to optimize prompts based on a history of prompt-score pairs.
 - **Meta-Prompting**: Uses the model to generate or improve prompts in a feedback loop.
-- **LLM-as-a-Judge**: Using a strong LLM (like GPT-4) to evaluate the outputs of other models or prompts based on specific criteria (e.g., relevance, accuracy, tone). This is crucial for scalable, automated evaluation.
+- **LLM-as-a-Judge**: Using a separately selected and evaluated model to assess outputs against explicit criteria (e.g., relevance, accuracy, tone). Control evaluator bias, leakage, conflicts of interest, nondeterminism, and model-version drift rather than treating a model score as ground truth.
 - **Braintrust/LangSmith**: Platforms for managing prompt versions, running evaluations against datasets, and tracking performance over time.
 
 ## 4. Context Window Management
@@ -72,9 +74,9 @@ Effective recovery strategies are essential to minimize downtime. **Automatic Re
 
 Several common issues can arise in prompt systems. For **Delayed Responses**, optimize prompts, analyze server load, and improve network infrastructure. For **Incorrect Output**, refine prompt design, understand model limitations, and review parsing logic. For a **High Error Rate**, validate API configuration, implement input validation, and monitor request rates.
 
-## 9. `prompt` CLI Tool Command Reference
+## 9. Illustrative `prompt` CLI interface pattern
 
-The `prompt` CLI tool is a powerful command-line utility designed to facilitate interaction with various systems and services through prompts and responses.
+The following table is a **design example for a hypothetical or locally selected `prompt` command**. Do not execute it until the actual binary, publisher, version, command surface, trust boundary, and side effects have been verified from first-party documentation and local help output.
 
 | Command | Description |
 |---|---|

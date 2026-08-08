@@ -99,20 +99,20 @@ Decimal: 27 90 m n k dL dH d1...dn
 def print_ean13_barcode(socket_conn, code: str):
     if len(code) not in [12, 13]:
         raise ValueError("EAN13 barcode must be 12 or 13 digits long")
-        
+
     # 1. Initialize printer
     socket_conn.sendall(b'\x1b\x40')
-    
+
     # 2. Configure height (100 dots) and width (module size 3)
     socket_conn.sendall(b'\x1d\x68\x64') # GS h 100
     socket_conn.sendall(b'\x1d\x77\x03') # GS w 3
-    
+
     # 3. Print text below barcode
     socket_conn.sendall(b'\x1d\x48\x02') # GS H 2
-    
+
     # 4. Center align
     socket_conn.sendall(b'\x1b\x61\x01') # ESC a 1
-    
+
     # 5. Send print barcode command (m=67 for EAN13)
     data_bytes = code.encode('ascii')
     header = b'\x1d\x6b\x43' + bytes([len(data_bytes)])
@@ -124,23 +124,23 @@ def print_ean13_barcode(socket_conn, code: str):
 def print_qr_code(socket_conn, data: str, size=4, ec_level=b'M'):
     # 1. Initialize printer
     socket_conn.sendall(b'\x1b\x40')
-    
+
     # 2. Center align
     socket_conn.sendall(b'\x1b\x61\x01') # ESC a 1
-    
+
     # 3. Prepare data length
     data_bytes = data.encode('utf-8')
     length = len(data_bytes)
     dL = length & 0xFF
     dH = (length >> 8) & 0xFF
-    
+
     # 4. Build ESC Z command
     # \x1b\x5a = ESC Z
     # \x00 = persist b
     # ec_level = L, M, Q, or H
     # size = module size multiple
     command = b'\x1b\x5a\x00' + ec_level + bytes([size]) + bytes([dL, dH]) + data_bytes
-    
+
     # 5. Send command and line feed
     socket_conn.sendall(command + b'\x0a')
 ```

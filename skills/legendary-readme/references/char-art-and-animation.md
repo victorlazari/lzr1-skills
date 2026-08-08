@@ -40,7 +40,7 @@ everywhere including `cat README.md` in a raw terminal.
 Generate block-letter project names with any of these, then paste the output straight into a
 fenced code block:
 
-- **[patorjk.com/software/taag](http://patorjk.com/software/taag/)** — the web figlet generator; hundreds of fonts, copy-paste output directly
+- **[patorjk.com/software/taag](https://patorjk.com/software/taag/)** — the web figlet generator; hundreds of fonts, copy-paste output directly
 - **`figlet`** (CLI, `brew install figlet` / `apt install figlet`) — `figlet -f slant "MyProject"`
 - **`toilet`** (`figlet`'s louder cousin) — adds color/filters for terminal use, but for README purposes just take the plain output
 - **`cfonts`** (npm) — good defaults for camelCase project names, run once and paste the output, don't ship it as a runtime dependency

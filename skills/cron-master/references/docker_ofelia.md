@@ -32,11 +32,11 @@ services:
     labels:
       # Enable Ofelia for this specific container
       ofelia.enabled: "true"
-      
+
       # Job 1: Execute a command inside this running container (job-exec)
       ofelia.job-exec.cleanup.schedule: "*/5 * * * *"
       ofelia.job-exec.cleanup.command: "python /app/jobs/cleanup.py"
-      
+
       # Job 2: Spawn a NEW container just for this job (job-run)
       ofelia.job-run.reports.schedule: "0 8 * * *"
       ofelia.job-run.reports.image: "myapp/backend:latest"

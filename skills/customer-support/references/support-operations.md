@@ -119,7 +119,7 @@ Example:
   Average handle time: 20 minutes
   Available hours per agent: 6 hours/day × 22 days = 132 hours
   Buffer: 20% (meetings, training, breaks)
-  
+
   Required: 3,000 × 0.33 / 132 × 1.2 = 9 agents
 ```
 

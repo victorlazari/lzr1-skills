@@ -1,7 +1,7 @@
 # Rendering Pipeline Configuration
 
 **Verified against upstream:** 2026-08-07
-**Primary Source:** https://docs.requarks.io/render
+**Primary Source:** https://docs.requarks.io/rendering
 
 This guide covers customizing the rendering pipeline in Wiki.js, including KaTeX, MathJax, Mermaid, and PlantUML.
 
