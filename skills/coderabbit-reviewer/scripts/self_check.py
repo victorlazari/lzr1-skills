@@ -51,6 +51,12 @@ EXPECTED_FILES = {
     "tests/test_validate_findings.py",
     "tests/test_wrappers.sh",
 }
+INSTALLER_MARKER = ".lzr1-managed"
+INSTALLER_MARKER_TEXT = (
+    "schema=1\n"
+    "source=victorlazari/lzr1-skills\n"
+    "skill=coderabbit-reviewer\n"
+)
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 HTTPS_URL = re.compile(r"https://[^\s)>\]}\"']+")
 PRIVATE_KEY = re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |PGP )?PRIVATE KEY-----")
@@ -108,6 +114,27 @@ def all_files(root: Path) -> set[str]:
         if stat.S_ISLNK(mode) or path.is_file():
             found.add(relative)
     return found
+
+
+def check_installer_marker(audit: Audit, root: Path) -> None:
+    marker = root / INSTALLER_MARKER
+    if not marker.exists() and not marker.is_symlink():
+        return
+    try:
+        mode = marker.lstat().st_mode
+    except OSError as exc:
+        audit.error(f"{INSTALLER_MARKER}: cannot inspect installer ownership marker: {exc}")
+        return
+    if stat.S_ISLNK(mode) or not stat.S_ISREG(mode):
+        audit.error(f"{INSTALLER_MARKER}: installer ownership marker must be a regular, non-symlink file")
+        return
+    try:
+        content = marker.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        audit.error(f"{INSTALLER_MARKER}: cannot read installer ownership marker: {exc}")
+        return
+    if content != INSTALLER_MARKER_TEXT:
+        audit.error(f"{INSTALLER_MARKER}: invalid installer ownership marker content")
 
 
 def parse_frontmatter(audit: Audit, text: str) -> None:
@@ -433,8 +460,9 @@ def run(root: Path, repo_input: str | None) -> tuple[Audit, Discovery]:
     found = all_files(root)
     for item in sorted(EXPECTED_FILES - found):
         audit.error(f"missing required file: {item}")
-    for item in sorted(found - EXPECTED_FILES):
+    for item in sorted(found - EXPECTED_FILES - {INSTALLER_MARKER}):
         audit.error(f"unexpected package file: {item}")
+    check_installer_marker(audit, root)
     if EXPECTED_FILES - found:
         return audit, discovery
 

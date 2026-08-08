@@ -73,6 +73,20 @@ if grep -F -- '](references/' "$cursor/yaml-specialist.md" >/dev/null; then
   fail 'flat yaml-specialist entrypoint retained a broken references/ link'
 fi
 
+PYTHONDONTWRITEBYTECODE=1 python3 "$codex/coderabbit-reviewer/scripts/self_check.py" >"$WORK/coderabbit-installed-self-check.out"
+assert_contains "$WORK/coderabbit-installed-self-check.out" 'PASS: 0 error(s), 0 warning(s)'
+PYTHONDONTWRITEBYTECODE=1 python3 "$codex/yaml-specialist/scripts/self_check.py" >"$WORK/yaml-installed-self-check.out"
+assert_contains "$WORK/yaml-installed-self-check.out" 'yaml-specialist self-check: passed'
+PYTHONDONTWRITEBYTECODE=1 python3 "$codex/security-review/scripts/self_check.py" >"$WORK/security-installed-self-check.out"
+assert_contains "$WORK/security-installed-self-check.out" 'PASS: 0 error(s), 0 warning(s)'
+
+printf 'schema=1\nsource=untrusted/example\nskill=coderabbit-reviewer\n' >"$codex/coderabbit-reviewer/.lzr1-managed"
+if PYTHONDONTWRITEBYTECODE=1 python3 "$codex/coderabbit-reviewer/scripts/self_check.py" >"$WORK/tampered-marker.out" 2>&1; then
+  fail 'CodeRabbit self-check accepted a tampered installer ownership marker'
+fi
+assert_contains "$WORK/tampered-marker.out" '.lzr1-managed: invalid installer ownership marker content'
+printf 'schema=1\nsource=victorlazari/lzr1-skills\nskill=coderabbit-reviewer\n' >"$codex/coderabbit-reviewer/.lzr1-managed"
+
 assert_file "$WORK/home/.lzr1-skills-state"
 printf 'codex\ncursor\n' >"$WORK/expected-state"
 cmp -s "$WORK/expected-state" "$WORK/home/.lzr1-skills-state" || fail 'initial state does not list both installed targets'

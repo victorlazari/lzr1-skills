@@ -43,6 +43,12 @@ EXPECTED_FILES = {
     "tests/fixtures/README.md",
     "tests/fixtures/vulnerable_sample.py",
 }
+INSTALLER_MARKER = ".lzr1-managed"
+INSTALLER_MARKER_TEXT = (
+    "schema=1\n"
+    "source=victorlazari/lzr1-skills\n"
+    "skill=security-review\n"
+)
 ALLOWED_FRONTMATTER = {"name", "description", "license"}
 VERIFIED_DATE = "2026-08-07"
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
@@ -86,6 +92,27 @@ def all_files(root: Path) -> set[str]:
         elif path.is_file():
             found.add(relative)
     return found
+
+
+def check_installer_marker(audit: Audit, root: Path) -> None:
+    marker = root / INSTALLER_MARKER
+    if not marker.exists() and not marker.is_symlink():
+        return
+    try:
+        mode = marker.lstat().st_mode
+    except OSError as exc:
+        audit.error(f"{INSTALLER_MARKER}: cannot inspect installer ownership marker: {exc}")
+        return
+    if stat.S_ISLNK(mode) or not stat.S_ISREG(mode):
+        audit.error(f"{INSTALLER_MARKER}: installer ownership marker must be a regular, non-symlink file")
+        return
+    try:
+        content = marker.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        audit.error(f"{INSTALLER_MARKER}: cannot read installer ownership marker: {exc}")
+        return
+    if content != INSTALLER_MARKER_TEXT:
+        audit.error(f"{INSTALLER_MARKER}: invalid installer ownership marker content")
 
 
 def parse_frontmatter(audit: Audit, text: str) -> dict[str, str]:
@@ -264,11 +291,12 @@ def run(root: Path) -> Audit:
     audit = Audit()
     found = all_files(root)
     missing = sorted(EXPECTED_FILES - found)
-    unexpected = sorted(found - EXPECTED_FILES)
+    unexpected = sorted(found - EXPECTED_FILES - {INSTALLER_MARKER})
     for item in missing:
         audit.error(f"missing required file: {item}")
     for item in unexpected:
         audit.error(f"unexpected package file: {item}")
+    check_installer_marker(audit, root)
     if missing:
         return audit
 
