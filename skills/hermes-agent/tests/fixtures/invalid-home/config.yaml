@@ -1,0 +1,8 @@
+terminal:
+  backend: docker
+
+terminal:
+  backend: local
+
+approvals:
+  mode: manual

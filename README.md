@@ -126,7 +126,7 @@ Skills that already spawned parallel agents received three additive upgrades:
 | `nemoclaw` | NemoClaw distributed engine — LSM-tree storage, Raft consensus, stream processing, active-active CRDT replication | Operating NemoClaw clusters at scale |
 | `manus` | Manus AI agent framework — task automation, multi-step workflows, tool orchestration, autonomous agents | Building Manus-powered automation |
 | `manus-workflows` | Manus workflow design patterns — parallel execution, state management, agent coordination, error recovery | Designing complex Manus workflow graphs |
-| `hermes-agent` | Hermes agent patterns — message routing, async communication, event-driven architecture, agent-to-agent protocols | Building reliable agent communication layers |
+| `hermes-agent` | NousResearch Hermes Agent operations — discovery-first setup, providers, tools, memory, skills, automation, gateways, integrations, extensions, production hardening, offline preflight, and 98-page official-source provenance | Installing, configuring, auditing, troubleshooting, extending, or safely operating Hermes Agent |
 | `meeting-engineering` | Live virtual meeting assistants with voice — Playwright automation, audio pipelines, STT/LLM/TTS, Docker | Building real-time meeting bots |
 | `software-engineering` | Backend, frontend, fullstack, APIs, systems architecture, performance, Go/Rust and more | Any production code decision |
 | `coderabbit-reviewer` | Local CodeRabbit CLI reviews with deterministic NDJSON evidence, independent finding triage, and bounded remediation loops | Reviewing uncommitted or branch changes without silently publishing them |

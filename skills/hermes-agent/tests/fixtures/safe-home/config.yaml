@@ -1,0 +1,32 @@
+model: openrouter/example-model
+
+terminal:
+  backend: docker
+  home_mode: profile
+  timeout: 180
+  env_passthrough: []
+  docker_forward_env: []
+  docker_env: {}
+  docker_volumes: []
+  docker_extra_args: []
+  docker_network: false
+  docker_run_as_host_user: false
+  container_cpu: 1
+  container_memory: 2048
+  container_disk: 10240
+  container_persistent: false
+  docker_persist_across_processes: false
+  docker_orphan_reaper: true
+
+approvals:
+  mode: manual
+  denial_breaker_threshold: 3
+
+checkpoints:
+  enabled: true
+  max_snapshots: 20
+
+updates:
+  pre_update_backup: full
+  backup_keep: 5
+  non_interactive_local_changes: stash

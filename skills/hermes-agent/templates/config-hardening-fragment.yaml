@@ -1,0 +1,91 @@
+# Hermes Agent hardening fragment
+# Verified against upstream configuration documentation on 2026-08-08.
+# This is not a complete production configuration. Review every key against the
+# installed Hermes version, merge only required settings, and validate with the
+# target runtime before use. Unsupported keys may be rejected or ignored; fail the
+# rollout if runtime validation cannot prove the intended control is effective.
+# Values here do not replace whole-process isolation. This fragment contains no
+# secret fields: inject credentials only through approved secret-management paths.
+
+approvals:
+  # Use "manual" for higher-consequence environments or "smart" only after
+  # separately approving the guardian model/provider data flow and limitations.
+  # Never set this to "off" for shared, production, or untrusted-input use.
+  mode: manual
+
+  # Stop repeated command variations after consecutive denials. This is anti-loop
+  # ergonomics only; it does not authorize, confine, or make a command safe.
+  denial_breaker_threshold: 3
+
+  # These are defense-in-depth examples, not a security boundary or complete
+  # policy. Review application-specific commands and canonicalized arguments.
+  deny:
+    - "git push --force*"
+    - "*curl*|*sh*"
+
+checkpoints:
+  # Checkpoints cover supported file operations only; maintain independent
+  # backups for configuration, dependencies, state, and external systems.
+  enabled: true
+  max_snapshots: 20
+
+updates:
+  # Preserve a full Hermes-home backup before an approved update. Confirm disk
+  # capacity, permissions, retention, restore, and sensitive-data handling.
+  pre_update_backup: full
+  backup_keep: 5
+
+  # Preserve local source changes during non-interactive updates. Managed
+  # deployments may choose another reviewed policy after proving reproducibility.
+  non_interactive_local_changes: stash
+
+terminal:
+  # "local" executes with the host user's authority and is not suitable for
+  # adversarial input. A Docker backend isolates terminal/file/code handlers,
+  # but does not automatically contain all host-side Hermes code paths.
+  backend: docker
+
+  # Keep subprocess tool configuration inside the selected Hermes profile where
+  # supported. Initialize only the exact CLI identities required by the task.
+  home_mode: profile
+
+  # Apply a bounded per-command runtime. Also enforce outer job and provider
+  # limits because this setting does not bound every Hermes operation.
+  timeout: 180
+
+  # Forward no ambient host variables by default. Add reviewed names only; never
+  # forward a whole environment or general cloud/SSH/VCS credentials.
+  env_passthrough: []
+  docker_forward_env: []
+  docker_env: {}
+
+  # Replace with an approved, immutable image digest or organization-controlled
+  # reference. Do not execute this placeholder unchanged.
+  docker_image: "REPLACE_WITH_VERIFIED_IMAGE_REFERENCE"
+
+  # Do not mount the launch directory automatically. Add only explicit,
+  # canonical, least-privilege volumes and prefer read-only mounts for inputs.
+  docker_mount_cwd_to_workspace: false
+  docker_volumes: []
+  docker_extra_args: []
+
+  # Disable sandbox egress unless the approved task requires named destinations.
+  docker_network: false
+
+  # Run without host-user identity mapping unless a reviewed workflow requires
+  # it and the resulting filesystem authority is understood.
+  docker_run_as_host_user: false
+
+  # Bound container resources; tune for the workload and host capacity.
+  container_cpu: 1
+  container_memory: 2048
+  container_disk: 10240
+
+  # Persistent containers retain files and background processes across calls.
+  # Disable by default for high-risk workloads and verify cleanup explicitly.
+  container_persistent: false
+  docker_persist_across_processes: false
+
+  # Reap orphaned containers as lifecycle hygiene. This is not an isolation or
+  # privilege control; review Docker-daemon authority and verify cleanup behavior.
+  docker_orphan_reaper: true

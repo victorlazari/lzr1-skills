@@ -73,12 +73,35 @@ if grep -F -- '](references/' "$cursor/yaml-specialist.md" >/dev/null; then
   fail 'flat yaml-specialist entrypoint retained a broken references/ link'
 fi
 
+assert_file "$codex/hermes-agent/SKILL.md"
+assert_file "$codex/hermes-agent/references/security-production.md"
+assert_file "$codex/hermes-agent/references/sources.md"
+assert_file "$codex/hermes-agent/scripts/hermes_preflight.py"
+assert_file "$codex/hermes-agent/scripts/self_check.py"
+assert_file "$codex/hermes-agent/templates/production-readiness.md"
+assert_file "$codex/hermes-agent/tests/fixtures/safe-home/config.yaml"
+[[ -x $codex/hermes-agent/scripts/hermes_preflight.py ]] || fail 'native hermes-agent preflight lost executable mode'
+[[ -x $codex/hermes-agent/scripts/self_check.py ]] || fail 'native hermes-agent self-check lost executable mode'
+assert_file "$cursor/hermes-agent.md"
+assert_file "$cursor/.lzr1-skill-resources/hermes-agent/SKILL.md"
+assert_file "$cursor/.lzr1-skill-resources/hermes-agent/references/security-production.md"
+assert_file "$cursor/.lzr1-skill-resources/hermes-agent/scripts/hermes_preflight.py"
+assert_file "$cursor/.lzr1-skill-resources/hermes-agent/templates/production-readiness.md"
+assert_contains "$cursor/hermes-agent.md" '](.lzr1-skill-resources/hermes-agent/references/'
+if grep -F -- '](references/' "$cursor/hermes-agent.md" >/dev/null; then
+  fail 'flat hermes-agent entrypoint retained a broken references/ link'
+fi
+
 PYTHONDONTWRITEBYTECODE=1 python3 "$codex/coderabbit-reviewer/scripts/self_check.py" >"$WORK/coderabbit-installed-self-check.out"
 assert_contains "$WORK/coderabbit-installed-self-check.out" 'PASS: 0 error(s), 0 warning(s)'
 PYTHONDONTWRITEBYTECODE=1 python3 "$codex/yaml-specialist/scripts/self_check.py" >"$WORK/yaml-installed-self-check.out"
 assert_contains "$WORK/yaml-installed-self-check.out" 'yaml-specialist self-check: passed'
 PYTHONDONTWRITEBYTECODE=1 python3 "$codex/security-review/scripts/self_check.py" >"$WORK/security-installed-self-check.out"
 assert_contains "$WORK/security-installed-self-check.out" 'PASS: 0 error(s), 0 warning(s)'
+PYTHONDONTWRITEBYTECODE=1 python3 "$codex/hermes-agent/scripts/self_check.py" --require-installer-marker >"$WORK/hermes-installed-self-check.out"
+assert_contains "$WORK/hermes-installed-self-check.out" 'PASS: 0 error(s), 0 warning(s)'
+assert_contains "$WORK/hermes-installed-self-check.out" 'METRIC: official_sources=98'
+assert_contains "$WORK/hermes-installed-self-check.out" 'METRIC: official_guidance_source_urls=65'
 
 printf 'schema=1\nsource=untrusted/example\nskill=coderabbit-reviewer\n' >"$codex/coderabbit-reviewer/.lzr1-managed"
 if PYTHONDONTWRITEBYTECODE=1 python3 "$codex/coderabbit-reviewer/scripts/self_check.py" >"$WORK/tampered-marker.out" 2>&1; then
@@ -101,6 +124,7 @@ cmp -s "$WORK/expected-state" "$WORK/home/.lzr1-skills-state" || fail 'subset up
 run_installer "$WORK/home" remove --codex --yes >"$WORK/remove-codex.out"
 assert_absent "$codex/coderabbit-reviewer"
 assert_absent "$codex/yaml-specialist"
+assert_absent "$codex/hermes-agent"
 printf 'cursor\n' >"$WORK/expected-state"
 cmp -s "$WORK/expected-state" "$WORK/home/.lzr1-skills-state" || fail 'subset removal did not preserve Cursor state'
 
@@ -109,6 +133,8 @@ assert_absent "$cursor/coderabbit-reviewer.md"
 assert_absent "$cursor/.lzr1-skill-resources/coderabbit-reviewer"
 assert_absent "$cursor/yaml-specialist.md"
 assert_absent "$cursor/.lzr1-skill-resources/yaml-specialist"
+assert_absent "$cursor/hermes-agent.md"
+assert_absent "$cursor/.lzr1-skill-resources/hermes-agent"
 assert_absent "$WORK/home/.lzr1-skills-state"
 
 mkdir -p "$WORK/collision-home/.codex/skills/coderabbit-reviewer"

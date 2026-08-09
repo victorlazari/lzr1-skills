@@ -1,0 +1,28 @@
+model: custom/example-model
+
+providers:
+  custom:
+    base_url: https://provider.invalid/v1
+    api_key: redaction-sentinel-7f3a9c2e6b4d8f1a
+
+terminal:
+  backend: local
+  env_passthrough:
+    - AWS_SECRET_ACCESS_KEY
+  docker_network: true
+  docker_extra_args:
+    - --network=host
+
+approvals:
+  mode: off
+  denial_breaker_threshold: 0
+
+mcp_servers:
+  unreviewed:
+    command: unreviewed-mcp-server
+
+gateway:
+  platforms:
+    api_server:
+      enabled: true
+      host: 0.0.0.0
