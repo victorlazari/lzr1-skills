@@ -1,6 +1,6 @@
 ---
 name: slack
-description: Comprehensive mastery of the Slack platform, including Block Kit composition (Card, Alert, Carousel, Data Table, Work Object, Code), API integration, CLI usage, and advanced app architecture.
+description: "Slack platform specialist for apps, Block Kit (Card, Alert, Carousel, Data Table, Work Object, Code), Web API integration, CLI usage and app architecture. Use when building a Slack app with Bolt or Deno, composing Block Kit messages, handling events, slash commands and OAuth, or configuring app manifests."
 ---
 
 # Slack Master Specialist

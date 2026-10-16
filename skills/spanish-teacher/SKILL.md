@@ -1,6 +1,6 @@
 ---
 name: spanish-teacher
-description: A comprehensive Spanish language teaching and learning skill covering A1 to C2 levels, including grammar, vocabulary, cultural competence, and pedagogical strategies.
+description: "Spanish language teaching and learning from A1 to C2, covering grammar, vocabulary, cultural competence and pedagogy. Use when asked to teach or learn Spanish, generate Spanish exercises or quizzes, explain a grammar rule, compare dialects, or design a Spanish curriculum."
 ---
 
 # Spanish Teacher Skill

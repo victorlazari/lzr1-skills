@@ -1,6 +1,6 @@
 ---
 name: roles-permissions
-description: Advanced roles, permissions, and access control management using Casbin, Casdoor, ABAC, ReBAC, and OWASP best practices.
+description: "Advanced authorization design and review using Casbin, Casdoor, RBAC, ABAC and ReBAC with OWASP access-control practices. Use when designing roles and permission models, implementing Casbin or Casdoor policies, isolating multi-tenant domains, preventing IDOR or privilege escalation, or enforcing separation of duties."
 ---
 
 # Roles & Permissions Advanced Skill

@@ -1,6 +1,6 @@
 ---
 name: ticket-supreme
-description: Advanced architecture and implementation guide for enterprise-grade ticketing and issue-tracking systems, focusing on high availability, real-time communication, SLA management, security, omnichannel integration, and AI/ML capabilities.
+description: "Architecture and implementation guide for enterprise ticketing and issue-tracking systems covering high availability, real-time communication, SLA management, security, omnichannel integration and AI/ML. Use when designing or building a ticketing system, modeling SLAs and workflows, adding real-time updates or omnichannel intake, or reviewing ticketing architecture."
 ---
 
 # Ticket System Supreme Specialist

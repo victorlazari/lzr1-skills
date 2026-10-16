@@ -1,6 +1,6 @@
 ---
 name: seaweedfs
-description: Manage, configure, and troubleshoot SeaweedFS deployments, including Kubernetes operator and CSI driver setups.
+description: "Manage, configure, and troubleshoot SeaweedFS deployments, including the Kubernetes operator and CSI driver. Use when configuring Master, Volume or Filer servers, deploying SeaweedFS on Kubernetes, setting up erasure coding, tiered storage or S3 API features, tuning performance, or securing a cluster."
 ---
 
 # SeaweedFS Skill

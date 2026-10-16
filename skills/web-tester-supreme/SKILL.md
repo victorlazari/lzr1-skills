@@ -1,6 +1,6 @@
 ---
 name: web-tester-supreme
-description: Advanced web application testing specialist focusing on E2E automation, RBAC validation, Next.js App Router testing, state degradation, complex data visualization, and observability integration.
+description: "Web application testing specialist for E2E automation, RBAC validation, Next.js App Router testing, degraded-state behavior, data visualization and observability integration. Use when writing Playwright E2E suites for Next.js apps, testing permission gates, simulating network failures, or testing charts; for basic Playwright scripts use playwright."
 ---
 
 # Web Tester Supreme

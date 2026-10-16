@@ -1,6 +1,6 @@
 ---
 name: tech-support-ops
-description: Advanced Tech Support Operations specialist for handling critical incidents, AI-assisted triage, root cause analysis, blameless post-mortems, SLO/SLI tracking, error budgets, and deep troubleshooting.
+description: "Tech support operations specialist for critical incidents, AI-assisted triage, root cause analysis, blameless post-mortems, SLO/SLI tracking and error budgets. Use when triaging a Sev-1 or Sev-2 incident, running an RCA, defining SLOs, tracking MTTA or MTTR, or building incident runbooks; for customer-facing post-mortems use post-mortem-master."
 ---
 
 # Tech Support Operations Specialist

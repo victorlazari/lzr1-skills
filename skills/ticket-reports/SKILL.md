@@ -1,6 +1,6 @@
 ---
 name: ticket-reports
-description: Comprehensive skill for generating, analyzing, and managing advanced ticket system reports, including JQL queries, BI integration, predictive analytics, and executive reporting aligned with ITIL 4 measurement principles.
+description: "Generate, analyze and manage advanced ticket system reports, including JQL queries, BI integration, predictive analytics and executive reporting aligned with ITIL 4 measurement principles. Use when writing JQL reports, building SLA or team-performance dashboards, loading ticket data into a warehouse or BI tool, or preparing executive ticket summaries."
 ---
 
 # Ticket System Reports Skill
