@@ -339,6 +339,36 @@ chmod 755 "$m/skills/alpha/scripts/x.py"
 expect_only_rule "stale ref in .py, case-insensitive" stale-ref "$m"
 printf 'PASS: stale-ref\n'
 
+# --- stale-ref hardening fixtures ---
+stale_case() { # name expect(fail|pass) content
+  local d="$WORK/sh_$1"; make_fixture "$d"
+  printf '%s\n' "$3" > "$d/skills/beta/notes.md"
+  if [[ $2 == fail ]]; then expect_only_rule "stale-hard $1" stale-ref "$d"
+  else expect_clean "stale-hard $1" "$d"; fi
+}
+stale_case v1 pass 'Use claude-fable-5-1 here.'
+stale_case v2 pass 'Use claude-opus-5-5 here.'
+stale_case v3 pass 'Use claude-sonnet-5-5 here.'
+stale_case v4 pass 'Use claude-haiku-5-5 here.'
+stale_case r1 fail 'Use claude-opus-5 here.'
+stale_case r2 fail 'Use claude-mythos-5 here.'
+stale_case r3 pass 'Use claude-opus-5 here. (Historical)'
+stale_case g1 pass 'a claude3d scene and https://x.io/aclaude-3'
+stale_case c2 fail 'Use Claude 2 here.'
+stale_case c3 fail 'Use claude-2 here.'
+stale_case c4 fail 'Use claude-instant here.'
+stale_case n1 fail 'Built on Next.js 12.3 today.'
+stale_case n2 fail 'Built on Next.js 13 today.'
+stale_case n3 pass 'Built on Next.js 13.4 today.'
+stale_case n4 pass 'Built on Next.js 14 today.'
+d=$WORK/sh_ext; make_fixture "$d"
+printf 'const m = "gpt-4o";\n' > "$d/skills/beta/a.ts"
+expect_only_rule "stale-hard .ts scanned" stale-ref "$d"
+d=$WORK/sh_multi; make_fixture "$d"
+printf 'gpt-4o and claude-mythos-5\n' > "$d/skills/beta/notes.md"
+[[ $(python3 -I "$LINT" --root "$d" 2>&1 | grep -c '^ERROR .*stale-ref') -eq 2 ]] || fail "stale-hard: want 2 matches on one line"
+printf 'PASS: stale-ref hardening\n'
+
 # Real repo must be clean.
 rc=0
 out=$(python3 -I "$LINT" --root "$ROOT" 2>&1) || rc=$?

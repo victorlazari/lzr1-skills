@@ -23,13 +23,19 @@ SPAN_RE = re.compile(r"`([^`\n]+)`")
 BLOCK_RE = re.compile(r"^[>|][+-]?$")
 SKIP_CHARS = ("*", "<", "{", "$")
 TRIGGER_RE = re.compile(r"use when|use for|triggers", re.I)
+# Scope: files under skills/ only; README.md and root docs are deliberately not scanned.
+_G = r"(?<![A-Za-z0-9])"
 STALE_PATTERNS = [
-    r"claude[- ]?3", r"claude-(instant|2)", r"gpt-4o", r"gpt-4-turbo",
-    r"gpt-3\.5", r"text-davinci", r"gemini[- ]?1\.5", r"Next\.js 1[0-3]\b(?!\.\d)",
+    _G + r"claude[- ]?3(?![A-Za-z])", _G + r"claude[- ]2(?!\d)", _G + r"claude-instant",
+    _G + r"claude[- ]instant", _G + r"gpt-4o", _G + r"gpt-4-turbo", _G + r"gpt-3\.5",
+    _G + r"text-davinci", _G + r"gemini[- ]?1\.5",
+    _G + r"claude-mythos\S*", _G + r"claude-(?:fable|opus|sonnet|haiku)-5(?![-\d])",
+    r"Next\.js 1[0-2](?!\d)", r"Next\.js 13(?!\d)(?!\.[4-9](?!\d))",
 ]
 STALE_RE = re.compile("|".join("(?:%s)" % p for p in STALE_PATTERNS), re.I)
 STALE_EXEMPT = "(historical)"
-STALE_EXTS = (".md", ".yaml", ".yml", ".json", ".sh", ".py")
+STALE_EXTS = (".md", ".yaml", ".yml", ".json", ".sh", ".py", ".txt", ".toml", ".ts",
+              ".tsx", ".js", ".mjs", ".html", ".jinja", ".j2")
 
 
 def parse_frontmatter(text):
@@ -121,8 +127,9 @@ def main():
                 if not fn.lower().endswith(STALE_EXTS) or os.path.islink(p):
                     continue
                 for i, ln in enumerate(read(p).splitlines(), 1):
-                    m = STALE_RE.search(ln)
-                    if m and STALE_EXEMPT not in ln:
+                    if STALE_EXEMPT in ln.lower():
+                        continue
+                    for m in STALE_RE.finditer(ln):
                         add("ERROR", name, "stale-ref", "%s:%d %s"
                             % (os.path.relpath(p, root), i, m.group(0)))
         skill_md = os.path.join(base, "SKILL.md")
