@@ -46,6 +46,19 @@ expect_rule() {
   printf 'PASS: %s\n' "$rule"
 }
 
+# expect_only_rule NAME RULE ROOT: like expect_rule, and no OTHER ERROR rule id may appear.
+expect_only_rule() {
+  local name=$1 rule=$2 r=$3 out rc=0 others
+  out=$(python3 -I "$LINT" --root "$r" 2>&1) || rc=$?
+  [[ $rc -eq 1 ]] || fail "$name: expected exit 1, got $rc (mutation not detected)"
+  printf '%s\n' "$out" | grep -E "^ERROR .*: $rule( |\$)" >/dev/null \
+    || fail "$name: output lacks rule $rule: $out"
+  others=$(printf '%s\n' "$out" | grep -E '^ERROR ' \
+    | sed -E 's/^ERROR [^:]*: ([A-Za-z-]+).*/\1/' | grep -vx -- "$rule" || true)
+  [[ -z "$others" ]] || fail "$name: unexpected extra rule(s): $others: $out"
+  printf 'PASS: %s (only)\n' "$rule"
+}
+
 # Baseline: clean fixture passes.
 BASE="$WORK/base"
 make_fixture "$BASE"
@@ -56,27 +69,27 @@ printf 'PASS: clean fixture\n'
 
 m=$WORK/m1; make_fixture "$m"
 rm "$m/skills/beta/SKILL.md"
-expect_rule "missing SKILL.md" fm-missing "$m"
+expect_only_rule "missing SKILL.md" fm-missing "$m"
 
 m=$WORK/m2; make_fixture "$m"
 printf -- '---\nname: wrong\ndescription: Use when x.\n---\n' > "$m/skills/beta/SKILL.md"
-expect_rule "renamed frontmatter name" fm-name "$m"
+expect_only_rule "renamed frontmatter name" fm-name "$m"
 
 m=$WORK/m3; make_fixture "$m"
 printf -- '---\nname: beta\n---\n# Beta\n' > "$m/skills/beta/SKILL.md"
-expect_rule "missing description" fm-desc "$m"
+expect_only_rule "missing description" fm-desc "$m"
 
 m=$WORK/m4; make_fixture "$m"
 rm "$m/skills/alpha/references/guide.md"
-expect_rule "deleted referenced file" link-broken "$m"
+expect_only_rule "deleted referenced file" link-broken "$m"
 
 m=$WORK/m5; make_fixture "$m"
 printf 'x\n' > "$m/skills/alpha/references/unused.md"
-expect_rule "unreferenced reference file" ref-orphan "$m"
+expect_only_rule "unreferenced reference file" ref-orphan "$m"
 
 m=$WORK/m6; make_fixture "$m"
 chmod -x "$m/skills/alpha/scripts/run.sh"
-expect_rule "script not executable" exec-bit "$m"
+expect_only_rule "script not executable" exec-bit "$m"
 
 m=$WORK/m7; make_fixture "$m"
 mkdir "$m/skills/gamma"
@@ -85,11 +98,11 @@ expect_rule "skill absent from manifest" manifest-sync "$m"
 
 m=$WORK/m8; make_fixture "$m"
 printf 'EXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
-expect_rule "count constant changed" count-sync "$m"
+expect_only_rule "count constant changed" count-sync "$m"
 
 m=$WORK/m9; make_fixture "$m"
 ln -s ../beta/SKILL.md "$m/skills/alpha/link.md"
-expect_rule "symlink added" symlink "$m"
+expect_only_rule "symlink added" symlink "$m"
 
 # expect_clean NAME ROOT: linter must exit 0.
 expect_clean() {
@@ -114,7 +127,7 @@ done
 m=$WORK/m12; make_fixture "$m"
 printf -- '---\nname: beta\ndescription: Use when x.\n  continued line\n---\n# Beta\n' \
   > "$m/skills/beta/SKILL.md"
-expect_rule "indented continuation line" fm-syntax "$m"
+expect_only_rule "indented continuation line" fm-syntax "$m"
 
 m=$WORK/m13; make_fixture "$m"
 printf '\357\273\277---\nname: beta\ndescription: Use when testing beta.\n# a comment\n\n---\n# Beta\n' \
@@ -124,12 +137,12 @@ expect_clean "BOM and comment/blank frontmatter" "$m"
 m=$WORK/m14; make_fixture "$m"
 printf -- '---\nname: beta\ndescription: Use when testing beta.\n---\n# Beta\nSee [g](../alpha/references/gone.md).\n' \
   > "$m/skills/beta/SKILL.md"
-expect_rule "broken ../ link" link-broken "$m"
+expect_only_rule "broken ../ link" link-broken "$m"
 
 m=$WORK/m15; make_fixture "$m"
 printf -- '---\nname: beta\ndescription: Use when testing beta.\n---\n# Beta\nSee `skills/alpha/references/gone.md`.\n' \
   > "$m/skills/beta/SKILL.md"
-expect_rule "broken skills/ backtick path" link-broken "$m"
+expect_only_rule "broken skills/ backtick path" link-broken "$m"
 
 m=$WORK/m16; make_fixture "$m"
 printf -- '---\nname: beta\ndescription: Use when testing beta.\n---\n# Beta\nSee [g](../alpha/references/guide.md#top), `skills/alpha/references/guide.md`, `../alpha/scripts/run.sh`!\nSee [x](../alpha/references/guide.md#sec) and `../alpha/SKILL.md`. Prose mention of references/nope.md is ignored.\n' \
@@ -150,15 +163,83 @@ printf 'x\n' > "$m/skills/alpha/references/a.md"
 printf 'x\n' > "$m/skills/alpha/references/data.md"
 printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee `references/guide.md` and `references/data.md`.\n' \
   > "$m/skills/alpha/SKILL.md"
-expect_rule "a.md not satisfied by data.md" ref-orphan "$m"
+expect_only_rule "a.md not satisfied by data.md" ref-orphan "$m"
 
 m=$WORK/m19; make_fixture "$m"
 printf 'alpha\nbeta\nbeta\n' > "$m/skills-list.txt"
-expect_rule "duplicate manifest line" manifest-sync "$m"
+expect_only_rule "duplicate manifest line" manifest-sync "$m"
 
 m=$WORK/m20; make_fixture "$m"
 printf 'beta\nalpha\n' > "$m/skills-list.txt"
-expect_rule "unsorted manifest" manifest-sync "$m"
+expect_only_rule "unsorted manifest" manifest-sync "$m"
+
+# --- Phase 1 review coverage gaps ---
+
+# (a) CRLF frontmatter must not error.
+m=$WORK/g1; make_fixture "$m"
+printf -- '---\r\nname: beta\r\ndescription: Use when testing beta.\r\n---\r\n# Beta\r\n' \
+  > "$m/skills/beta/SKILL.md"
+expect_clean "CRLF frontmatter" "$m"
+
+# (b) description longer than 1024 chars.
+m=$WORK/g2; make_fixture "$m"
+long=$(python3 -I -c 'print("Use when " + "x" * 1030)')
+printf -- '---\nname: beta\ndescription: %s\n---\n# Beta\n' "$long" > "$m/skills/beta/SKILL.md"
+expect_only_rule "description over 1024 chars" fm-desc "$m"
+
+# (c) no trigger words: WARN only, exit 0.
+m=$WORK/g3; make_fixture "$m"
+printf -- '---\nname: beta\ndescription: A plain description.\n---\n# Beta\n' > "$m/skills/beta/SKILL.md"
+rc=0
+out=$(python3 -I "$LINT" --root "$m" 2>&1) || rc=$?
+[[ $rc -eq 0 ]] || fail "desc-trigger: expected exit 0, got $rc: $out"
+printf '%s\n' "$out" | grep -E '^WARN beta: desc-trigger' >/dev/null \
+  || fail "desc-trigger: WARN missing: $out"
+printf '%s\n' "$out" | grep -E '^ERROR ' >/dev/null && fail "desc-trigger: unexpected ERROR: $out"
+printf 'PASS: desc-trigger warn\n'
+
+# (d) README badge drift.
+m=$WORK/g4; make_fixture "$m"
+printf '![skills](https://img.shields.io/badge/skills-3-blue)\n2 curated AI skills\n' > "$m/README.md"
+expect_only_rule "README badge drift" count-sync "$m"
+
+# (e) README phrase missing entirely.
+m=$WORK/g5; make_fixture "$m"
+printf '![skills](https://img.shields.io/badge/skills-2-blue)\n' > "$m/README.md"
+expect_only_rule "README phrase missing" count-sync "$m"
+printf '%s\n' "$(python3 -I "$LINT" --root "$m" 2>&1 || true)" | grep -F 'pattern for' | grep -F 'not found' >/dev/null \
+  || fail "README phrase missing: no 'pattern ... not found' message"
+
+# (f) stale manifest entry (no directory).
+m=$WORK/g6; make_fixture "$m"
+printf 'alpha\nbeta\nzeta\n' > "$m/skills-list.txt"
+expect_only_rule "stale manifest entry" manifest-sync "$m"
+
+# (g) --skill mode checks only that skill, skips manifest-sync/count-sync.
+m=$WORK/g7; make_fixture "$m"
+printf 'alpha\nbeta\nzeta\n' > "$m/skills-list.txt"
+printf 'EXPECTED_SKILL_COUNT=9\n' > "$m/install.sh"
+printf -- '---\nname: wrong\ndescription: Use when x.\n---\n' > "$m/skills/beta/SKILL.md"
+rc=0
+out=$(python3 -I "$LINT" --root "$m" --skill alpha 2>&1) || rc=$?
+[[ $rc -eq 0 ]] || fail "--skill alpha: expected exit 0, got $rc: $out"
+printf '%s\n' "$out" | grep -E 'manifest-sync|count-sync|beta' >/dev/null \
+  && fail "--skill alpha: leaked other checks: $out"
+printf '%s\n' "$out" | grep -F 'Summary: 1 skill(s) checked, 0 error(s)' >/dev/null \
+  || fail "--skill alpha: unexpected summary: $out"
+rc=0
+out=$(python3 -I "$LINT" --root "$m" --skill beta 2>&1) || rc=$?
+[[ $rc -eq 1 ]] || fail "--skill beta: expected exit 1, got $rc: $out"
+printf '%s\n' "$out" | grep -E '^ERROR beta: fm-name' >/dev/null || fail "--skill beta: no fm-name: $out"
+printf '%s\n' "$out" | grep -E 'manifest-sync|count-sync' >/dev/null \
+  && fail "--skill beta: repo-level rule ran: $out"
+printf 'PASS: --skill mode\n'
+
+# (h) BOM-prefixed frontmatter must not yield fm-missing.
+m=$WORK/g8; make_fixture "$m"
+printf '\357\273\277---\nname: beta\ndescription: Use when testing beta.\n---\n# Beta\n' \
+  > "$m/skills/beta/SKILL.md"
+expect_clean "BOM frontmatter (no fm-missing)" "$m"
 
 # Real repo must be clean.
 rc=0
