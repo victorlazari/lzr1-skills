@@ -26,14 +26,18 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 ## Table of Contents
 
 - [What are Skills?](#what-are-skills)
-- [Parallel Agent Architecture](#parallel-agent-architecture) — the June 2026 upgrade across the original 84-skill baseline
+- [Parallel Agent Architecture](#parallel-agent-architecture) — three multi-agent patterns, counted from the skills
 - [The Arsenal](#the-arsenal) — 86 skills, organized by domain
+- [Choosing between overlapping skills](#choosing-between-overlapping-skills)
 - [The Armory](#the-armory) — 9 supported tools
 - [Equip Up](#equip-up) — 3 ways to install
 - [Command Reference](#command-reference)
 - [Update & Remove](#update--remove)
 - [How It Works](#how-it-works)
+- [Development](#development)
+- [Scope](#scope)
 - [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -55,16 +59,14 @@ Each skill in this arsenal is battle-tested and includes:
 
 ## Parallel Agent Architecture
 
-The original 84-skill baseline received a **parallel execution protocol** in June 2026. Instead of sequential analysis, those skills can fan out into specialized agents that work simultaneously, then synthesize findings that no single agent could surface alone.
-
-Three upgrade patterns cover that original 84-skill baseline. The newer `coderabbit-reviewer` and `yaml-specialist` skills deliberately use bounded, evidence-first local workflows: CodeRabbit findings are triaged before remediation, while YAML, Helm, schema, and Kubernetes evidence remains separated by validation layer. Neither skill manufactures parallelism where ordered verification is safer.
+Some skills describe an optional multi-agent execution protocol: independent work is split across sub-agents, then merged by a synthesis step. The numbers below are counted from the `SKILL.md` and `references/` files in this repository (a skill is listed when its text contains the named mechanism), not from a design document. The remaining skills are single-agent playbooks, and `coderabbit-reviewer`, `yaml-specialist` and `security-review` deliberately use bounded, evidence-first workflows where ordered verification is safer than concurrency.
 
 ---
 
-### Pattern B — Sequential → Parallel Fan-out
-*8 skills · highest analysis quality gain*
+### Pattern B — Parallel Execution Protocol
+*2 skills · all agents launch at once*
 
-Skills with multiple independent analysis phases now launch all of them simultaneously. A secrets scanner doesn't wait for a data-flow tracer. An audio/transport agent doesn't wait for a transcript pipeline agent. Each gets the full context window and a clean slate — no anchoring bias from prior phases.
+`devops-infrastructure` and `legendary-readme` define a **Parallel Execution Protocol**: when several independent domains are involved, every relevant agent launches at the same time, each with the full task context and its own reference file, and a synthesis step merges the results.
 
 ```
 BEFORE   Phase 1 ──▶ Phase 2 ──▶ Phase 3 ──▶ Phase N ──▶ Report
@@ -72,18 +74,19 @@ BEFORE   Phase 1 ──▶ Phase 2 ──▶ Phase 3 ──▶ Phase N ──▶
 AFTER    Phase 1 Agent ─┐
          Phase 2 Agent ─┤
          Phase 3 Agent ─┼──▶ Synthesis Agent ──▶ Unified Report
-         Phase N Agent ─┘    (cross-references all phases for
-                               interaction effects none could see alone)
+         Phase N Agent ─┘
 ```
 
-**Affected skills:** `security-review` · `trivy-scanner` · `meeting-engineering` · `legendary-readme` · `devops-infrastructure` · `web-tester-supreme` · `oncall-master-supreme` · `ticket-supreme`
+Other skills (for example `security-review`, `trivy-scanner`, `web-tester-supreme`, `ticket-supreme`, `oncall-master-supreme`) allow **conditional, bounded** parallel work only when branches are independent; they do not implement a launch-everything protocol.
+
+**Affected skills:** `devops-infrastructure` · `legendary-readme`
 
 ---
 
-### Pattern C — Reference-Selector → Multi-Specialist
-*22 skills · cross-domain insight*
+### Pattern C — Multi-Specialist Spawning
+*16 skills · cross-domain insight*
 
-Skills that used to pick *one* reference domain now detect *all* relevant domains and spawn a specialist per domain in parallel. A task touching Go + Postgres + REST gets a Backend Specialist, a DB Specialist, and an API Specialist running simultaneously — then a Cross-Domain Synthesizer resolves contradictions between them before you write a line of code.
+These skills detect every relevant domain and spawn a specialist per domain, then a **Cross-Domain Synthesizer** merges the specialists' outputs and flags contradictions between them. A task touching Go + Postgres + REST gets a Backend Specialist, a DB Specialist and an API Specialist instead of one reference.
 
 ```
 BEFORE   Detect domain ──▶ Pick ONE reference ──▶ Work within it
@@ -92,26 +95,27 @@ BEFORE   Detect domain ──▶ Pick ONE reference ──▶ Work within it
 AFTER    Detect all relevant domains
               ├──▶ Domain A Specialist ─┐
               ├──▶ Domain B Specialist ─┼──▶ Cross-Domain Synthesizer
-              └──▶ Domain C Specialist ─┘    (surfaces contradictions
-                                              before you ship them)
+              └──▶ Domain C Specialist ─┘    (surfaces contradictions)
 ```
 
-**Affected skills:** `software-engineering` · `data-analytics` · `quality-assurance` · `security-engineering` · `ai-ml-engineering` · `executive-leadership` · `finance` · `design-ux` · `product-management` · `operations` · `sales` · `marketing` · `hr-people` · `legal-compliance` · `content-communications` · `research-development` · `customer-support` · `supply-chain` · `accessibility-testing` · `it-administration` · `roles-permissions` · `ai`
+**Affected skills:** `ai` · `content-communications` · `customer-support` · `data-analytics` · `design-ux` · `executive-leadership` · `finance` · `legal-compliance` · `marketing` · `product-management` · `quality-assurance` · `research-development` · `roles-permissions` · `sales` · `software-engineering` · `supply-chain`
 
 ---
 
-### Pattern A — Adversarial Verification + Upgraded Synthesis
-*54 skills · already spawning, now hardened*
+### Pattern A — Adversarial Verification
+*18 skills with a refuter panel · 20 with a consistency validator · 15 with conflict-resolving synthesis*
 
-Skills that already spawned parallel agents received three additive upgrades:
+Skills that spawn parallel sub-agents add up to three verification steps. The counts differ because not every skill carries every step.
 
-| Addition | What it does |
-|:---------|:-------------|
-| **3× Refuter Panel** | For each significant finding, 3 independent agents are tasked to *refute* it. A finding is confirmed only if ≥2 refuters fail to disprove it. Eliminates plausible-but-wrong output before it reaches you. |
-| **Consistency Validator** | Before synthesis, one agent reviews all parallel outputs for contradictions and flags prerequisite sequencing — so you don't get two agents recommending incompatible approaches for the same component. |
-| **Upgraded Synthesis** | The synthesis step now actively resolves conflicts — picks a winner, annotates the reasoning, preserves the dissent as a footnote — instead of silently concatenating results. |
+| Mechanism | Skills | What it does |
+|:----------|:------:|:-------------|
+| **3× Refuter Panel** | 18 | For each significant finding, 3 independent agents try to *refute* it. A finding is confirmed only if at least 2 refuters fail to disprove it, and a contested finding keeps the dissent. |
+| **Consistency Validator** | 20 | Before synthesis, one agent reviews all parallel outputs for contradictions and missing prerequisites. |
+| **Conflict-resolving synthesis** | 15 | The synthesis step resolves contradictions, orders the plan by prerequisites and calibrates confidence instead of concatenating results. |
 
-**Affected skills:** all remaining 54 including `masterclaw` · `bash` · `nemoclaw` · `openclaw` · `prompt-master` · `rag` · `k8s-eks` · `otel-collector` · `manus` · and 45 more.
+**Affected skills:** `bot` · `claude` · `devops` · `frontend-menu-design` · `go` · `k8s-eks` · `mongodb` · `otel-collector` · `playwright` · `prompt` · `prompt-master` · `rabbitmq-documentdb` · `rag` · `redis-valkey` · `sql-partitioning` · `tech-support-ops` · `ticket-reports` · `vitest`
+
+The skills above carry the refuter panel. The consistency validator is additionally present in `seaweedfs` and `speedtest`.
 
 ---
 
