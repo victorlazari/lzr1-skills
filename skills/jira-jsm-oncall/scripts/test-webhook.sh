@@ -95,9 +95,17 @@ if (( ALLOW_PORT < 1 || ALLOW_PORT > 65535 )); then
     fail "--allow-port must be between 1 and 65535"
 fi
 
-for dependency in python3 jq sha256sum; do
+for dependency in python3 jq; do
     command -v "$dependency" >/dev/null 2>&1 || fail "$dependency is required"
 done
+
+if command -v sha256sum >/dev/null 2>&1; then
+    SHA256_CMD=(sha256sum)
+elif command -v shasum >/dev/null 2>&1; then
+    SHA256_CMD=(shasum -a 256)
+else
+    fail "sha256sum or shasum is required"
+fi
 
 [[ -f $PAYLOAD_FILE ]] || fail "payload file not found: $PAYLOAD_FILE"
 [[ ! -L $PAYLOAD_FILE ]] || fail "symbolic-link payloads are rejected"
@@ -109,7 +117,7 @@ fi
 if ! jq -e . "$PAYLOAD_FILE" >/dev/null 2>&1; then
     fail "payload is not valid JSON"
 fi
-PAYLOAD_SHA256=$(sha256sum "$PAYLOAD_FILE" | awk '{print $1}')
+PAYLOAD_SHA256=$("${SHA256_CMD[@]}" "$PAYLOAD_FILE" | awk '{print $1}')
 
 TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/test-webhook.XXXXXX") || fail "could not create a temporary directory"
 chmod 700 "$TEMP_DIR"

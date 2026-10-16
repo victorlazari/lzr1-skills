@@ -39,6 +39,38 @@ fail() {
   exit 64
 }
 
+# Portable replacements for GNU `sha256sum` and `realpath -e` (absent on macOS).
+sha256_file() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum -- "$1"
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 -- "$1"
+  else
+    fail 'sha256sum or shasum is required'
+  fi
+}
+
+canonical_existing() {
+  local p=$1 hops=0 target dir
+  [[ -e $p ]] || return 1
+  while [[ -L $p ]]; do
+    hops=$((hops + 1))
+    ((hops <= 40)) || return 1
+    target=$(readlink -- "$p") || return 1
+    case "$target" in
+      /*) p=$target ;;
+      *) p="$(dirname -- "$p")/$target" ;;
+    esac
+    [[ -e $p ]] || return 1
+  done
+  if [[ -d $p ]]; then
+    (cd -P -- "$p" && pwd -P)
+    return
+  fi
+  dir=$(cd -P -- "$(dirname -- "$p")" && pwd -P) || return 1
+  printf '%s/%s\n' "${dir%/}" "$(basename -- "$p")"
+}
+
 command_display() {
   local secret_index=$1
   shift
@@ -57,7 +89,7 @@ command_display() {
 canonical_existing_file() {
   local candidate=$1
   [[ -f "$candidate" && ! -L "$candidate" ]] || return 1
-  realpath -e -- "$candidate"
+  canonical_existing "$candidate"
 }
 
 repo_input=.
@@ -168,10 +200,9 @@ if [[ -n $timeout_seconds ]]; then
 fi
 
 command -v git >/dev/null 2>&1 || fail 'git is required'
-command -v realpath >/dev/null 2>&1 || fail 'realpath is required'
 
 repo_root=$(git -C "$repo_input" rev-parse --show-toplevel 2>/dev/null) || fail 'repository path is not inside a Git worktree'
-repo_root=$(realpath -e -- "$repo_root") || fail 'cannot canonicalize repository root'
+repo_root=$(canonical_existing "$repo_root") || fail 'cannot canonicalize repository root'
 [[ -d "$repo_root" && ! -L "$repo_root" ]] || fail 'canonical repository root must be a non-symlink directory'
 head_revision=$(git -C "$repo_root" rev-parse --verify HEAD 2>/dev/null) || fail 'repository has no resolvable HEAD'
 
@@ -201,7 +232,7 @@ elif command -v cr >/dev/null 2>&1; then
 else
   fail 'CodeRabbit CLI not found; inspect current official installation guidance before installing'
 fi
-coderabbit_bin=$(realpath -e -- "$coderabbit_bin") || fail 'cannot canonicalize CodeRabbit executable'
+coderabbit_bin=$(canonical_existing "$coderabbit_bin") || fail 'cannot canonicalize CodeRabbit executable'
 [[ -x "$coderabbit_bin" && ! -L "$coderabbit_bin" ]] || fail 'resolved CodeRabbit path must be an executable regular file'
 
 if [[ $use_api_key_env -eq 1 ]]; then
@@ -260,19 +291,19 @@ if [[ $execute -ne 1 ]]; then
   exit 0
 fi
 
-command -v sha256sum >/dev/null 2>&1 || fail 'sha256sum is required for evidence capture'
+command -v sha256sum >/dev/null 2>&1 || command -v shasum >/dev/null 2>&1 || fail 'sha256sum or shasum is required for evidence capture'
 
 if [[ -n $output_input ]]; then
   [[ ! -e $output_input && ! -L $output_input ]] || fail '--output-dir must not already exist'
   output_parent=$(dirname -- "$output_input")
-  output_parent=$(realpath -e -- "$output_parent") || fail 'cannot canonicalize output parent directory'
+  output_parent=$(canonical_existing "$output_parent") || fail 'cannot canonicalize output parent directory'
   output_dir="$output_parent/$(basename -- "$output_input")"
   mkdir -m 700 -- "$output_dir" || fail 'cannot create output directory'
 else
   output_dir=$(mktemp -d "${TMPDIR:-/tmp}/coderabbit-review.XXXXXXXX") || fail 'cannot create secure temporary output directory'
   chmod 700 "$output_dir" || fail 'cannot protect output directory'
 fi
-output_dir=$(realpath -e -- "$output_dir") || fail 'cannot canonicalize output directory'
+output_dir=$(canonical_existing "$output_dir") || fail 'cannot canonicalize output directory'
 case "$output_dir" in
   "$repo_root"|"$repo_root"/*) fail 'evidence directory must be outside the reviewed repository' ;;
 esac
@@ -316,7 +347,7 @@ if ((secret_index >= 0)); then
   review_cmd[$secret_index]='[REDACTED]'
 fi
 printf '%s\n' "$review_status" >"$exit_file"
-sha256sum "$stdout_file" "$stderr_file" "$command_file" "$metadata_file" >"$output_dir/sha256sums.txt"
+for hashed in "$stdout_file" "$stderr_file" "$command_file" "$metadata_file"; do sha256_file "$hashed"; done >"$output_dir/sha256sums.txt"
 
 validator_status=127
 if [[ -f "$VALIDATOR" ]] && command -v python3 >/dev/null 2>&1; then
