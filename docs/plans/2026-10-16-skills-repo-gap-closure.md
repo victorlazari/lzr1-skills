@@ -257,7 +257,7 @@ Edge cases reachable: a skill dir without SKILL.md (report `fm-missing`, skip ot
 ### Epic 2.3: Description triggers and enforcement
 
 **Goal:** Every `description:` carries a trigger and the linter enforces it.
-**Scope:** the 23 remaining skills from the 38 `desc-trigger` warnings that are not in Epic 2.2, plus `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `CONTRIBUTING.md`
+**Scope:** the 31 skills from the 38 `desc-trigger` warnings that are not in Epic 2.2, plus `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `CONTRIBUTING.md`
 **Dependencies:** Epics 2.1 and 2.2 (so the promotion lands on a clean tree)
 **Done when:** `desc-trigger` is an ERROR rule, `python3 -I scripts/lint_catalog.py` reports 0 errors and 0 warnings, CONTRIBUTING.md states the rule
 **Status:** Pending
