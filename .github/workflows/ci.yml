@@ -32,12 +32,13 @@ jobs:
       # Epic 3.1 of docs/plans/2026-10-16-skills-repo-gap-closure.md.
       # yaml-specialist never installs its pinned dependencies itself, so the
       # installed-skill self-check needs them in an isolated venv. shellcheck
-      # and jq are preinstalled on ubuntu runners.
+      # and jq are preinstalled on ubuntu runners. PyYAML is used by the
+      # compose check in tests/test-adversarial-remediations.sh.
       - name: Install reviewed yaml-specialist pins
         if: runner.os == 'Linux'
         run: |
           python3 -m venv "$RUNNER_TEMP/venv"
-          "$RUNNER_TEMP/venv/bin/pip" install --require-virtualenv -r skills/yaml-specialist/scripts/requirements.txt
+          "$RUNNER_TEMP/venv/bin/pip" install --require-virtualenv -r skills/yaml-specialist/scripts/requirements.txt PyYAML==6.0.2
           echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
       - name: Installer tests
         if: runner.os == 'Linux'
