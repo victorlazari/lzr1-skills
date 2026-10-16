@@ -21,7 +21,7 @@ description: Operational playbook for managing on-call systems, incidents, ChatO
 - Does not handle general system administration outside of on-call/incident context.
 - Does not perform arbitrary code execution or infrastructure provisioning without explicit runbook definitions.
 - Escalate to `automation-and-scheduling` when setting up recurring schedules or background processes.
-- Escalate to `post-mortem-master` when writing customer-facing incident post-mortems.
+- Hand off to `tech-support-ops` (post-mortem template) when writing customer-facing incident post-mortems.
 
 ## Preconditions
 

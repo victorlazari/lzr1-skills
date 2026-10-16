@@ -1,6 +1,6 @@
 ---
 name: tech-support-ops
-description: "Tech support operations specialist for critical incidents, AI-assisted triage, root cause analysis, blameless post-mortems, SLO/SLI tracking and error budgets. Use when triaging a Sev-1 or Sev-2 incident, running an RCA, defining SLOs, tracking MTTA or MTTR, or building incident runbooks; for customer-facing post-mortems use post-mortem-master."
+description: "Tech support operations specialist for critical incidents, AI-assisted triage, root cause analysis, blameless post-mortems, SLO/SLI tracking and error budgets. Use when triaging a Sev-1 or Sev-2 incident, running an RCA, defining SLOs, tracking MTTA or MTTR, or building incident runbooks. Also covers customer-facing post-mortems via its post-mortem template."
 ---
 
 # Tech Support Operations Specialist
@@ -17,7 +17,7 @@ Use this skill when you need to:
 - Create and implement automated runbooks for rapid incident remediation.
 
 **Escalation Boundaries:**
-- For writing customer-facing incident post-mortems or designing post-mortem slide decks, route to `post-mortem-master`.
+- For customer-facing incident post-mortems, use `templates/postmortem-template.md` and adapt the tone for the customer audience.
 - For incidents involving a potential security breach, vulnerability, or requiring exhaustive code security review, route to `security-review`.
 
 ## Preconditions

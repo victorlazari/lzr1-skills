@@ -8,7 +8,7 @@ description: "OpenAI API development: Responses API, Realtime API, function call
 ## When to Use
 
 Use this skill when you need to:
-- Interact with the OpenAI API for text generation, summarization, or chat completions using current models (e.g., `gpt-5.6`, `gpt-5.4`).
+- Interact with the OpenAI API for text generation, summarization, or chat completions using current models (current flagship / small-fast model: check the provider's model list).
 - Build intelligent conversational agents using the new Responses API with persistent state and custom personas.
 - Implement function calling (tool calling) to allow language models to interact dynamically with external systems and APIs.
 - Enforce structured outputs (e.g., JSON) for reliable and predictable model responses using `strict: true`.
@@ -19,7 +19,7 @@ Use this skill when you need to:
 ## Preconditions
 
 - **API Key**: Ensure a valid OpenAI API key is available in the environment (`OPENAI_API_KEY`).
-- **Model Version**: Verify the target model is current (e.g., `gpt-5.6`, `gpt-5.4`).
+- **Model Version**: Verify the target model is current (flagship vs small-fast tier: check the provider's model list).
 - **API Version**: Ensure the application uses the Responses API (`client.responses.create`) instead of the deprecated Assistants API (`client.beta.assistants`).
 
 ## Source Freshness
@@ -31,7 +31,7 @@ Use this skill when you need to:
 ## Workflow
 
 1. **Requirement Analysis**: Determine the specific OpenAI capability needed (e.g., Responses API, Realtime API, standard completions).
-2. **Model Selection**: Choose the appropriate current model (e.g., `gpt-5.6`, `gpt-5.4`) based on the task requirements.
+2. **Model Selection**: Choose the appropriate current model (flagship or small-fast tier; check the provider's model list) based on the task requirements.
 3. **Implementation**: Use the Responses API for stateful interactions and tool use, ensuring `strict: true` is used for Structured Outputs.
 4. **Validation**: Run syntax checks on any generated code and verify that no deprecated APIs (like Assistants API) are used.
 5. **Execution**: Execute the API calls, handling any rate limits or errors gracefully. Require confirmation before executing scripts that incur API costs.

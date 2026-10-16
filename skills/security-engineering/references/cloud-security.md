@@ -83,4 +83,4 @@ Cloud incident response requires specific strategies due to the dynamic nature o
 - **Containment:** Isolate compromised resources (e.g., changing security groups, revoking IAM roles) rather than shutting them down, to preserve evidence.
 - **Eradication:** Identify and remove the root cause of the incident.
 - **Recovery:** Restore services from known good backups or redeploy from infrastructure as code (IaC).
-- **Lessons Learned:** Conduct a post-mortem analysis to improve future response. For customer-facing incident reports, route to the `post-mortem-master` skill.
+- **Lessons Learned:** Conduct a post-mortem analysis to improve future response. For customer-facing incident reports, route to the `tech-support-ops` skill.
