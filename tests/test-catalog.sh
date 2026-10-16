@@ -94,6 +94,7 @@ expect_only_rule "script not executable" exec-bit "$m"
 m=$WORK/m7; make_fixture "$m"
 mkdir "$m/skills/gamma"
 printf -- '---\nname: gamma\ndescription: Use when testing gamma.\n---\n' > "$m/skills/gamma/SKILL.md"
+# expect_rule: the extra skill also desyncs README/install counts (count-sync).
 expect_rule "skill absent from manifest" manifest-sync "$m"
 
 m=$WORK/m8; make_fixture "$m"
@@ -115,19 +116,21 @@ expect_clean() {
 m=$WORK/m10; make_fixture "$m"
 ln -s beta "$m/skills/gamma"
 printf 'alpha\nbeta\ngamma\n' > "$m/skills-list.txt"
+# expect_rule: the symlinked entry also bumps the on-disk count (count-sync).
 expect_rule "skill dir is symlink" symlink "$m"
 
+m11n=0
 for bs in '>' '|' '>-' '|-' '>+' '|+'; do
-  m=$WORK/m11; make_fixture "$m"
+  m11n=$((m11n + 1)); m=$WORK/m11_$m11n; make_fixture "$m"
   printf -- '---\nname: beta\ndescription: %s\n  Use when testing beta.\n---\n# Beta\n' "$bs" \
     > "$m/skills/beta/SKILL.md"
-  expect_rule "block scalar description '$bs'" fm-desc "$m"
+  expect_only_rule "block scalar description '$bs'" fm-desc "$m"
 done
 
 m=$WORK/m12; make_fixture "$m"
 printf -- '---\nname: beta\ndescription: Use when x.\n  continued line\n---\n# Beta\n' \
   > "$m/skills/beta/SKILL.md"
-expect_only_rule "indented continuation line" fm-syntax "$m"
+expect_only_rule "indented continuation line" fm-desc "$m"
 
 m=$WORK/m13; make_fixture "$m"
 printf '\357\273\277---\nname: beta\ndescription: Use when testing beta.\n# a comment\n\n---\n# Beta\n' \
@@ -152,10 +155,11 @@ expect_clean "valid ../ skills/ anchor punctuation and prose" "$m"
 m=$WORK/m17; make_fixture "$m"
 printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee scripts/run.sh and `references/guide.md#top`, then references/gone.md#x.\n' \
   > "$m/skills/alpha/SKILL.md"
-expect_clean "prose-only path not scanned, anchored link ok" "$m"
+expect_clean "prose-only broken path is WARN not ERROR, anchored link ok" "$m"
 printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee [x](references/gone.md#x)\n' \
   > "$m/skills/alpha/SKILL.md"
 printf 'x\n' > "$m/skills/alpha/references/guide.md"
+# expect_rule: SKILL.md no longer mentions guide.md, so ref-orphan also fires.
 expect_rule "anchor stripped before existence check" link-broken "$m"
 
 m=$WORK/m18; make_fixture "$m"
@@ -240,6 +244,73 @@ m=$WORK/g8; make_fixture "$m"
 printf '\357\273\277---\nname: beta\ndescription: Use when testing beta.\n---\n# Beta\n' \
   > "$m/skills/beta/SKILL.md"
 expect_clean "BOM frontmatter (no fm-missing)" "$m"
+
+# --- Gap closure fixtures ---
+
+# expect_warn NAME RULE ROOT: exit 0, a WARN line with the rule, and no ERROR.
+expect_warn() {
+  local name=$1 rule=$2 r=$3 out rc=0
+  out=$(python3 -I "$LINT" --root "$r" 2>&1) || rc=$?
+  [[ $rc -eq 0 ]] || fail "$name: expected exit 0, got $rc: $out"
+  printf '%s\n' "$out" | grep -E "^WARN .*: $rule( |\$)" >/dev/null \
+    || fail "$name: WARN $rule missing: $out"
+  printf '%s\n' "$out" | grep -E '^ERROR ' >/dev/null && fail "$name: unexpected ERROR: $out"
+  printf 'PASS: %s (warn)\n' "$rule"
+}
+
+m=$WORK/n1; make_fixture "$m"
+printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee `references/guide.md` and [x](./references/missing.md).\n' \
+  > "$m/skills/alpha/SKILL.md"
+expect_only_rule "./ markdown link broken" link-broken "$m"
+
+m=$WORK/n2; make_fixture "$m"
+printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee `references/guide.md` and [x](./references/guide.md#a).\n' \
+  > "$m/skills/alpha/SKILL.md"
+expect_clean "valid ./ markdown link" "$m"
+
+m=$WORK/n3; make_fixture "$m"
+printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee `references/guide.md`. Also see references/gone.md, please.\n' \
+  > "$m/skills/alpha/SKILL.md"
+expect_warn "bare prose path broken" link-broken-prose "$m"
+
+m=$WORK/n4; make_fixture "$m"
+printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee `references/guide.md`.\n```\ncat scripts/gone.sh\n```\n' \
+  > "$m/skills/alpha/SKILL.md"
+expect_warn "fenced path broken" link-broken-prose "$m"
+
+m=$WORK/n5; make_fixture "$m"
+printf -- '---\nname: alpha\ndescription: Use when testing alpha.\n---\nSee `references/guide.md`, other/references/x.md, references/*.md, references/<n>.md and references/guide.md.\n```\ncp scripts/run.sh assets/${X}\n```\n' \
+  > "$m/skills/alpha/SKILL.md"
+rc=0
+out=$(python3 -I "$LINT" --root "$m" 2>&1) || rc=$?
+[[ $rc -eq 0 ]] || fail "prose false-positive guards: exit $rc: $out"
+printf '%s\n' "$out" | grep -E 'link-broken' >/dev/null && fail "prose false-positive guards: $out"
+printf 'PASS: prose word-boundary and skip chars\n'
+
+m=$WORK/n6; make_fixture "$m"
+ln -s nowhere "$m/skills/dangling"
+printf 'alpha\nbeta\ndangling\n' > "$m/skills-list.txt"
+printf 'EXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
+printf 'EXPECTED=3\n' > "$m/tests/test-installer.sh"
+printf '![skills](https://img.shields.io/badge/skills-3-blue)\n3 curated AI skills\n' > "$m/README.md"
+expect_only_rule "dangling symlink under skills/" symlink "$m"
+
+m=$WORK/n7; make_fixture "$m"
+ln -s beta/SKILL.md "$m/skills/file-link"
+printf 'alpha\nbeta\nfile-link\n' > "$m/skills-list.txt"
+printf 'EXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
+printf 'EXPECTED=3\n' > "$m/tests/test-installer.sh"
+printf '![skills](https://img.shields.io/badge/skills-3-blue)\n3 curated AI skills\n' > "$m/README.md"
+expect_only_rule "symlink-to-file under skills/" symlink "$m"
+
+m=$WORK/n8; make_fixture "$m"
+printf -- '---\nname: beta\ndescription: Use when x.\n  more text\n  and more\n---\n# Beta\n' \
+  > "$m/skills/beta/SKILL.md"
+out=$(python3 -I "$LINT" --root "$m" 2>&1 || true)
+printf '%s\n' "$out" | grep -F 'multi-line/block description not supported' >/dev/null \
+  || fail "multi-line description: message missing: $out"
+[[ $(printf '%s\n' "$out" | grep -c '^ERROR ') -eq 1 ]] || fail "multi-line description: want exactly 1 ERROR: $out"
+printf 'PASS: multi-line description single error\n'
 
 # Real repo must be clean.
 rc=0

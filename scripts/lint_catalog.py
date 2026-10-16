@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync symlink (ERROR); desc-trigger (WARN).
+       manifest-sync count-sync symlink (ERROR); desc-trigger, link-broken-prose (WARN).
 """
 import argparse
 import os
@@ -16,6 +16,9 @@ PATH_RE = re.compile(
     r"|(?:references|scripts|templates|assets)/" + _STOP + r"+"
 )
 MDLINK_RE = re.compile(r"\]\(\s*<?([^)\s>]+)")
+BARE_RE = re.compile(
+    r"(?<![A-Za-z0-9_./~-])(?:references|scripts|templates|assets)/" + _STOP + r"+"
+)
 SPAN_RE = re.compile(r"`([^`\n]+)`")
 BLOCK_RE = re.compile(r"^[>|][+-]?$")
 SKIP_CHARS = ("*", "<", "{", "$")
@@ -30,14 +33,23 @@ def parse_frontmatter(text):
         if lines[i].strip() == "---":
             fm = {}
             bad = []
+            last = None
             for ln in lines[1:i]:
                 if not ln.strip() or ln.lstrip().startswith("#"):
+                    continue
+                if ln[0] in " \t" and last == "description":
+                    fm["__multi_description"] = True
                     continue
                 m = re.match(r"^([A-Za-z0-9_-]+)\s*:\s*(.*)$", ln)
                 if not m:
                     bad.append(ln.strip()[:60])
+                    last = None
                     continue
+                last = m.group(1)
                 v = m.group(2).strip()
+                if BLOCK_RE.match(v) and last == "description":
+                    fm["__multi_description"] = True
+                    continue
                 if BLOCK_RE.match(v):
                     bad.append("%s: %s (block scalar)" % (m.group(1), v))
                     fm["__block_" + m.group(1)] = v
@@ -77,7 +89,8 @@ def main():
         out.append((level, skill, rule, detail))
 
     names = sorted(
-        d for d in os.listdir(sdir) if os.path.isdir(os.path.join(sdir, d))
+        d for d in os.listdir(sdir)
+        if os.path.islink(os.path.join(sdir, d)) or os.path.isdir(os.path.join(sdir, d))
     ) if os.path.isdir(sdir) else []
     targets = [args.skill] if args.skill else names
     if args.skill and args.skill not in names:
@@ -108,14 +121,12 @@ def main():
             add("ERROR", name, "fm-name",
                 "name %r != directory %r" % (fm.get("name"), name))
         for b in fm.get("__bad", []):
-            if b.startswith("description:"):
-                add("ERROR", name, "fm-desc", "block scalar not allowed: " + b)
-            else:
-                add("ERROR", name, "fm-syntax",
-                    "frontmatter must be single-line 'key: value': " + b)
+            add("ERROR", name, "fm-syntax",
+                "frontmatter must be single-line 'key: value': " + b)
         desc = fm.get("description", "")
-        if "__block_description" in fm:
-            pass
+        if fm.get("__multi_description"):
+            add("ERROR", name, "fm-desc",
+                "multi-line/block description not supported")
         elif not desc:
             add("ERROR", name, "fm-desc", "description absent or empty")
         elif len(desc) > 1024:
@@ -125,22 +136,39 @@ def main():
                 "description has no 'use when'/'use for'/'triggers'")
         # links
         seen = set()
-        cands = [m.group(1) for m in MDLINK_RE.finditer(text)]
+        fences = []
+        prose = []
+        in_fence = False
+        for ln in text.splitlines():
+            if ln.lstrip().startswith(("```", "~~~")):
+                in_fence = not in_fence
+                continue
+            (fences if in_fence else prose).append(ln)
+        strong = [(m.group(1), "link-broken") for m in MDLINK_RE.finditer(text)]
         for sm in SPAN_RE.finditer(text):
-            cands.extend(PATH_RE.findall(sm.group(1)))
-        for raw in cands:
+            strong.extend((c, "link-broken") for c in PATH_RE.findall(sm.group(1)))
+        weak = [(c, "link-broken-prose")
+                for c in BARE_RE.findall("\n".join(prose + fences))]
+        for raw, rule in strong + weak:
             if "://" in raw:
                 continue
+            if raw.startswith("./"):
+                raw = raw[2:]
             pm = PATH_RE.match(raw)
             if not pm:
                 continue
             tok = pm.group(0).split("#", 1)[0].rstrip("!?,.;:")
             if not tok or any(c in tok for c in SKIP_CHARS) or tok in seen:
                 continue
-            seen.add(tok)
             origin = root if tok.startswith("skills/") else base
-            if not os.path.exists(os.path.join(origin, tok)):
-                add("ERROR", name, "link-broken", tok)
+            if os.path.exists(os.path.join(origin, tok)):
+                seen.add(tok)
+            elif rule == "link-broken":
+                seen.add(tok)
+                add("ERROR", name, rule, tok)
+            elif (tok, "w") not in seen:
+                seen.add((tok, "w"))
+                add("WARN", name, rule, tok)
         # orphan refs
         refdir = os.path.join(base, "references")
         if os.path.isdir(refdir):
