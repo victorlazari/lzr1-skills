@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Decision record `docs/decisions/0001-lerian-skill-scope.md`: no new
+  Lerian-specific skills in this public MIT repo (they belong in the ring
+  plugin); `lerian-helm` audited, no non-public material found.
 - MIT `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md` and this changelog.
 - Phase 2 (content freshness and routing). Decisions: keep all 86 skills and
   differentiate overlapping ones with descriptions and cross-references (no

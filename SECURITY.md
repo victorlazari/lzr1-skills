@@ -20,6 +20,8 @@ In scope:
 Out of scope: the advice or opinions inside skill prose, and third-party tools
 the skills reference.
 
+Do not submit non-public Lerian material to this repository.
+
 ## Supported versions
 
 Only the latest release on `main` receives fixes.
