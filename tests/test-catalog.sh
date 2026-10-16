@@ -378,6 +378,12 @@ stale_case m5 pass 'Use claude-opus-4-5 here. (historical)'
 stale_case m6 fail 'Use claude-sonnet-5-5-beta here.'
 stale_case m7 fail 'Ask Claude Mythos about it.'
 stale_case m8 fail 'Use claude_3_opus here.'
+stale_case m10 pass 'See claude-opus-5-5.md for details.'
+stale_case m11 pass 'Pinned to claude-opus-5-5.'
+stale_case m12 pass 'Pinned (claude-opus-5-5) here.'
+stale_case m13 pass 'Use claude-sonnet-5-5-v2 here.'
+stale_case m14 fail 'Use claude-opus-5-5-20269999 here.'
+stale_case m15 fail 'Use claude-opus-5.5 here.'
 stale_case m9 pass 'Use claude-haiku-5-5. Then claude-fable-5-1, done.'
 printf 'PASS: model-id allow-list\n'
 
@@ -396,6 +402,14 @@ skill_case s4 pass 'x' 'Use when testing beta. Not for X: use `alpha`.'
 skill_case s5 pass 'Run `docker-compose up` first.'
 skill_case s6 fail 'For that, route to `ghost-skill` instead.'
 skill_case s7 pass 'Instead run `docker-compose` or `kubectl`.'
+skill_case s8 pass 'x' 'Use when testing beta. Use `kubectl` to deploy.'
+mkdir -p "$WORK/sr_s9/skills/beta/references" 2>/dev/null; make_fixture "$WORK/sr_s9"; mkdir -p "$WORK/sr_s9/skills/beta/references"; : > "$WORK/sr_s9/skills/beta/references/a.md"
+skill_case_keep() { printf -- '---\nname: beta\ndescription: %s\n---\n# Beta\nx\n' "$1" > "$WORK/sr_s9/skills/beta/SKILL.md"; expect_clean "skill-ref s9" "$WORK/sr_s9"; }
+skill_case_keep 'Use when testing beta. See `references/a.md`.'
+skill_case s10 pass 'Run `kubectl-neat` instead.'
+skill_case s11 pass 'Set `max-retries` and `read-only` instead of defaults.'
+skill_case s12 fail 'Please use `ghost-skill` instead.'
+skill_case s13 pass 'x' 'Use when testing beta. Use `docker-compose` locally.'
 printf 'PASS: skill-ref\n'
 
 # Real repo must be clean.

@@ -40,11 +40,15 @@ TRIGGER_RE = re.compile(r"use when|use for|triggers", re.I)
 # Scope: files under skills/ only; README.md and root docs are deliberately not scanned.
 _G = r"(?<![A-Za-z0-9])"
 VALID_MODELS = ("claude-fable-5-1", "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5")
-MODEL_RE = re.compile(r"(?<![A-Za-z0-9])claude-(?:fable|opus|sonnet|haiku|mythos)-[0-9][0-9A-Za-z.-]*",
-                      re.I)
+# Id = family + dash-separated digits, optional -suffix (only -vN is accepted, checked below); then a hard boundary so a trailing
+# ".md", sentence "." or ")" is fine but "-beta", "_x", ".5" (claude-opus-5.5) are not.
+MODEL_RE = re.compile(r"(?<![A-Za-z0-9])claude-(?:fable|opus|sonnet|haiku|mythos)-[0-9]+(?:-[0-9]+)*(?:\.[0-9]+)*"
+                      r"(?:-[A-Za-z][A-Za-z0-9_-]*)?(?![A-Za-z0-9_])", re.I)
+DATE_RE = re.compile(r"-20(?:2[4-9]|[3-9][0-9])(?:0[1-9]|1[0-2])(?:0[1-9]|[12][0-9]|3[01])$")
 DESC_PTR_RE = re.compile(r"(?:\b(?:use|see)\b|\bnot for\b[^`]*?:)\s*`([^`\n]+)`", re.I)
+# Body trigger: route/defer/hand off to, or "use `tok` instead". Bare "instead" is not a trigger.
+ROUTE_TOK_RE = re.compile(r"(?:route to|defer to|hand off to)|\buse\s+`[^`\n]+`\s*(?:\w+\s+){0,3}?instead", re.I)
 HYPHEN_RE = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)+$")
-ROUTE_RE = re.compile(r"route to|defer to|hand off to|instead", re.I)
 SKILL_REF_ALLOW = frozenset(("docker-compose",))
 STALE_PATTERNS = [
     _G + r"claude[- ]?3(?![A-Za-z])", _G + r"claude[- ]2(?!\d)", _G + r"claude-instant",
@@ -159,8 +163,8 @@ def main():
                         add("ERROR", name, "stale-ref", "%s:%d %s"
                             % (os.path.relpath(p, root), i, m.group(0)))
                     for m in MODEL_RE.finditer(ln):
-                        tok = m.group(0).rstrip(".-").lower()
-                        if not any(tok == v or re.fullmatch(re.escape(v) + r"-\d{8}", tok)
+                        tok = re.sub(r"-v[0-9]+$", "", m.group(0).lower())
+                        if not any(tok == v or (tok.startswith(v) and DATE_RE.fullmatch(tok[len(v):]))
                                    for v in VALID_MODELS):
                             add("ERROR", name, "stale-ref", "%s:%d %s"
                                 % (os.path.relpath(p, root), i, m.group(0)))
@@ -191,7 +195,8 @@ def main():
             add("ERROR", name, "desc-trigger",
                 "description has no 'use when'/'use for'/'triggers'")
         # skill pointers
-        ptrs = [m.group(1) for m in DESC_PTR_RE.finditer(desc)]
+        ptrs = [m.group(1) for m in DESC_PTR_RE.finditer(desc)
+                if HYPHEN_RE.match(m.group(1)) and m.group(1) not in SKILL_REF_ALLOW]
         infence = False
         for ln in text.splitlines():
             if ln.lstrip().startswith(("```", "~~~")):
@@ -202,7 +207,7 @@ def main():
             toks = SPAN_RE.findall(ln)
             if ln.lstrip().startswith("**Related skills:**"):
                 ptrs.extend(toks)
-            elif ROUTE_RE.search(ln):
+            elif ROUTE_TOK_RE.search(ln):
                 ptrs.extend(t for t in toks if HYPHEN_RE.match(t)
                             and t not in SKILL_REF_ALLOW)
         for t in dict.fromkeys(ptrs):
