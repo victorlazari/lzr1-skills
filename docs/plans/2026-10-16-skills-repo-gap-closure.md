@@ -37,7 +37,7 @@ Scope of the audit: structure, metadata, links, scripts, tests, installer, READM
 |-------|-----------|-------|--------|
 | 1 | Catalog is machine-verified in CI; governance files exist; known structural defects fixed | 1.1, 1.2, 1.3 | Complete |
 | 2 | Content is current, overlaps are routed, descriptions trigger reliably | 2.1, 2.2, 2.3 | Complete |
-| 3 | Every shipped script has lint + smoke coverage | 3.1, 3.2 | Epic-level |
+| 3 | Every shipped script has lint + smoke coverage | 3.1, 3.2 | Detailed |
 | 4 | Install path is pinned and verifiable; Lerian skill scope decided and delivered | 4.1, 4.2 | Epic-level |
 
 ---
@@ -296,21 +296,107 @@ Edge cases reachable: a skill dir without SKILL.md (report `fm-missing`, skip ot
 
 ## Phase 3: Script test depth
 
-### Epic 3.1: Static analysis gate for all scripts
+**Elaborated 2026-10-16 against `main` at `90f3711` (Phases 1 and 2 merged).** Measured facts: `shellcheck -x --severity=warning` over all 58 shell files under `skills/` reports 0 warnings or errors (16 info/style notes only); `ruff check --select E9,F` over `skills/` reports 8 F401 unused-import findings (7 auto-fixable); 61 of 88 files under `skills/*/scripts/` are not referenced by any test; the Phase 1 CI limits the installer and remediation suites to ubuntu because `skills/coderabbit-reviewer/scripts/{run-review,install-coderabbit}.sh` and `skills/coderabbit-reviewer/tests/test_wrappers.sh` use GNU `sha256sum` and `realpath -e`.
 
-**Goal:** `shellcheck` (sh) and `python3 -m py_compile` plus a pinned linter (ruff) (py) pass on all 55 shell and 31 Python scripts, blocking in CI.
-**Scope:** `skills/*/scripts/`, `.github/workflows/ci.yml`; macOS portability of `coderabbit-reviewer` scripts and installer tests (`sha256sum` with `shasum -a 256` fallback, replace `realpath -e`) so the installer suites can return to the macOS CI leg
-**Dependencies:** Phase 1 (CI exists)
-**Done when:** the informational shellcheck step from Task 1.2.1 is made blocking and green
+**Decisions recorded:**
+- **Smoke coverage is explicit, not guessed.** A registry file `tests/script-coverage.tsv` lists every `skills/*/scripts/*` file with a coverage level: `behavior` (an existing or new test exercises it), `help` (the script has a `--help` handler that is safe to run; the smoke test runs it in an isolated environment), or `static` (syntax, shebang and exec-bit checks only, with a written reason for scripts that need a browser, audio stack, network, calendar credentials, or start a server). The linter fails if a script has no registry row. This avoids blindly executing 61 unknown scripts.
+- **Static analysis gates only on what is already clean.** shellcheck at warning severity and ruff `E9,F` become blocking in CI; info-level shellcheck notes stay out of scope.
+- **macOS parity is a goal of this phase.** The coderabbit scripts get portable helpers; afterwards the macOS CI leg runs the full suites.
+
+### Epic 3.1: Static analysis gate and macOS parity
+
+**Goal:** CI blocks on shellcheck (warning) and ruff (E9,F) for all skill scripts, and every suite runs on both ubuntu and macOS.
+**Scope:** `skills/*/scripts/*.py`, `skills/hermes-agent/tests/test_hermes_preflight.py`, `skills/coderabbit-reviewer/{scripts,tests}/`, `tests/`, `.github/workflows/ci.yml`
+**Dependencies:** none
+**Done when:** `ruff check --select E9,F skills` and `shellcheck -x --severity=warning` over all skill shell files exit 0; `bash tests/test-installer.sh` and `bash tests/test-adversarial-remediations.sh` exit 0 on macOS (run locally on this Darwin host) and on ubuntu CI; the CI macOS leg runs them
 **Status:** Pending
 
-### Epic 3.2: Smoke tests per script
+#### Task 3.1.1: Clear the ruff findings
 
-**Goal:** Every script has a `--help` or dry-run smoke test and, for scripts that mutate state or touch credentials (`nemoclaw`, `gcalendar`, `tomate-pos80`, `meeting-engineering`), a test of the safe path in an isolated `HOME`, following the pattern in `tests/test-adversarial-remediations.sh` (mode assertions on credential files).
-**Scope:** `tests/`, per-skill `tests/` where a skill already has one
-**Dependencies:** Epic 3.1
-**Done when:** the catalog linter gains a `script-untested` WARN listing any script not referenced by a test, and the list is empty
+- [ ] Done
+
+**Context:** `ruff check --select E9,F --output-format concise skills` (ruff 0.8.6) reports F401 at `skills/coderabbit-reviewer/scripts/validate_findings.py:14` (`os`), `skills/hermes-agent/tests/test_hermes_preflight.py:10` (`stat`), `skills/legal-compliance/scripts/validate-compliance-checklist.py:4` (`re`), `skills/prompt/scripts/evaluate-prompt.py:15` (`os`), `skills/yaml-specialist/scripts/build_refactor_inventory.py:7` (`json`), `skills/yaml-specialist/scripts/chart_metadata.py:7` (`json`), `skills/yaml-specialist/scripts/scan_template_values.py:13` (`typing.Any`), `skills/yaml-specialist/scripts/yaml_common.py:23` (`CommentedSeq`).
+
+**Implementation vision:** Remove each unused import. For `yaml_common.py` first `grep -rn CommentedSeq skills/yaml-specialist`: if another module does `from yaml_common import CommentedSeq`, keep it and mark it a deliberate re-export (`# noqa: F401  re-exported for importers`); otherwise remove it. Do not auto-fix blindly: confirm each name is truly unused (e.g. not referenced in a string annotation or `__all__`). Edge case: self_check scripts hash or list files, so after editing run the yaml-specialist, hermes-agent, coderabbit-reviewer and security-review `self_check.py` scripts (they check file inventories) with the pinned venv deps installed as in CI, and update any inventory/checksum they keep if a changed file is listed there.
+
+**Files:**
+- Modify: the 8 files above (plus a self_check inventory file only if one lists them with hashes)
+
+**Verification:** `docker run --rm -v "$PWD":/mnt -w /mnt python:3.12-slim sh -c 'pip install -q ruff==0.8.6 && ruff check --select E9,F skills'` exits 0; `bash tests/test-installer.sh` still passes the self-check steps (full run is Task 3.1.3's gate; here run the per-skill `self_check.py` scripts in the pinned venv).
+
+**Done when:** ruff reports "All checks passed" and the self-checks still pass.
+
+#### Task 3.1.2: Portable sha256 and path canonicalization
+
+- [ ] Done
+
+**Context:** On macOS `sha256sum` and `realpath -e` do not exist. Usages: `skills/coderabbit-reviewer/scripts/install-coderabbit.sh:104,111,131,152,153`, `skills/coderabbit-reviewer/scripts/run-review.sh:60,174,204,263,268,275,319`, `skills/coderabbit-reviewer/tests/test_wrappers.sh:110`, `tests/test-adversarial-remediations.sh` (runs with `PATH="$fakebin:/usr/bin:/bin"`, lines ~69,103,122,255,259). `install.sh:263-264` already falls back to another hasher; read it for the house pattern. These scripts are security-hardened (canonicalization rejects symlink tricks), so behavior must stay identical.
+
+**Implementation vision:** Add two small functions to each of the two coderabbit scripts (they must stay self-contained single files, so do not introduce a shared sourced lib): `sha256_file` (prefers `sha256sum`, falls back to `shasum -a 256`, else `fail`) and `canonical_existing` (replacement for `realpath -e`: succeeds only if the path exists; resolves with `cd -P -- "$(dirname -- "$p")" && printf '%s/%s' "$(pwd -P)" "$(basename -- "$p")"` for files, `cd -P` for directories, and resolves a final-component symlink with a bounded `readlink` loop (max 40 hops) to preserve realpath semantics; an alternative is `python3 -I -c 'import os,sys; ...os.path.realpath' with an exists check` if python3 is already a hard dependency of the script, decide by reading it). The "required tool missing" messages (`sha256sum is required`) become "sha256sum or shasum is required". Update `sha256sums.txt` generation so the file format is identical on both hashers (`<hash>  <name>` two spaces); `shasum -a 256` already prints that. Keep `test_wrappers.sh` and the remediation test using the same fallback. Edge cases that are reachable: path with spaces, path that is a dangling symlink (must fail like `realpath -e`), relative path argument, trailing slash, hasher missing entirely (existing fail path).
+
+**Files:**
+- Modify: `skills/coderabbit-reviewer/scripts/install-coderabbit.sh`, `skills/coderabbit-reviewer/scripts/run-review.sh`, `skills/coderabbit-reviewer/tests/test_wrappers.sh`, `tests/test-adversarial-remediations.sh`
+- Test: the same two suites
+
+**Verification:** on this macOS host: `bash tests/test-adversarial-remediations.sh` and `bash tests/test-installer.sh` both exit 0 (the yaml-specialist self-check needs the pinned deps: create a venv under the scratchpad, `pip install -r skills/yaml-specialist/scripts/requirements.txt PyYAML==6.0.2`, and put its `bin` first on PATH). Also run both in `python:3.12-bookworm` (Linux) with the same venv approach to prove no Linux regression.
+
+**Done when:** both suites pass on macOS and Linux with no behavior change on Linux.
+
+#### Task 3.1.3: Blocking static analysis and full suites on macOS in CI
+
+- [ ] Done
+
+**Context:** `.github/workflows/ci.yml` runs the installer and remediation suites under `if: runner.os == 'Linux'` with a comment pointing to this epic; the venv step is also Linux-only; the skill-script shellcheck step has `continue-on-error: true`.
+
+**Implementation vision:** Remove the Linux-only conditions and the stale comment; the venv step runs on both OSes (macOS runners ship `python3`, `jq`, `node`; install `shellcheck` is unnecessary on macOS for tests, but the yaml-specialist self-check wants it: add a `brew install shellcheck` step guarded by `runner.os == 'macOS'`). Make the skill-script shellcheck step blocking (`--severity=warning`, drop `continue-on-error`, keep the nullglob form). Add a `ruff` step in the ubuntu job: `pip install ruff==0.8.6` into the same venv then `ruff check --select E9,F skills`; add `python3 -m compileall -q skills` with `PYTHONDONTWRITEBYTECODE` unset in a temp copy or accept the generated `__pycache__` (it is git-ignored after Task 3.1.4, so just run it and then delete caches). Add a top-level `.gitignore` containing `__pycache__/`, `*.pyc`, `.DS_Store`. Validate the workflow with `actionlint` through `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:latest`.
+
+**Files:**
+- Modify: `.github/workflows/ci.yml`
+- Create: `.gitignore`
+
+**Verification:** `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:latest` exits 0; after push, `gh pr checks` shows `test (ubuntu-latest)`, `test (macos-latest)` and `shellcheck` all passing with the suites running on both (confirm in the logs that the macOS leg printed the installer suite's PASS lines).
+
+**Done when:** CI is green with the suites on both OSes and static analysis blocking.
+
+### Epic 3.2: Script coverage registry and smoke tests
+
+**Goal:** Every file under `skills/*/scripts/` is registered with a coverage level, and a test enforces the level.
+**Scope:** `tests/script-coverage.tsv` (new), `tests/test-scripts.sh` (new), `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `.github/workflows/ci.yml`, `CONTRIBUTING.md`
+**Dependencies:** Epic 3.1 (CI parity first)
+**Done when:** `python3 -I scripts/lint_catalog.py` has an ERROR rule `script-untested` that passes; `bash tests/test-scripts.sh` exits 0 on macOS and ubuntu; CI runs it
 **Status:** Pending
+
+#### Task 3.2.1: Build the registry and the `script-untested` rule
+
+- [ ] Done
+
+**Context:** 88 files match `skills/*/scripts/*.{sh,py,js,mts}` plus other extensions in those directories (`git ls-files 'skills/*/scripts/*' | wc -l` gives the exact set, 90 at the audit; use it). 61 are not referenced by any test; those 27 that are referenced (e.g. via `tests/test-adversarial-remediations.sh`, skill-local `tests/`) are `behavior`.
+
+**Implementation vision:** TSV, columns `path<TAB>level<TAB>reason`, header row, sorted by path, `reason` required for `static` and empty otherwise. Generate the first version with a one-off script, then classify by reading each script: `behavior` if some test in `tests/` or `skills/*/tests/` invokes it by basename; `help` only if the source has a real `--help`/`-h` branch that exits 0 before doing any work (confirm by reading, never by guessing); everything else `static` with a short true reason (e.g. "needs Chrome and PulseAudio", "starts a local server", "writes to Google Calendar", "mutates database; dry-run flag required"). Scripts that already document a `--dry-run` or validate-only mode and exit 0 on missing input may be classified `help` only if `--help` itself is safe. Linter rule `script-untested` (ERROR): every non-test file under `skills/*/scripts/` must have a row; every row must point at an existing file; levels must be one of the three; `static` needs a reason; `behavior` rows must name a test file that mentions the basename (column 4 `test`). Fixtures in `tests/test-catalog.sh`: missing row fails, stale row fails, static without reason fails, valid registry passes. Edge case: files in skill subfolders other than `scripts/` (references, templates) are out of scope; `tests/` dirs inside skills are tests, not scripts.
+
+**Files:**
+- Create: `tests/script-coverage.tsv`
+- Modify: `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `CONTRIBUTING.md` (one paragraph: new scripts need a registry row and why)
+
+**Verification:** `python3 -I scripts/lint_catalog.py` prints 0 errors, 0 warnings; `bash tests/test-catalog.sh` exits 0 under bash and `/bin/bash`.
+
+**Done when:** adding an unregistered script to any skill fails the linter.
+
+#### Task 3.2.2: `tests/test-scripts.sh` enforces the registry
+
+- [ ] Done
+
+**Context:** `tests/test-installer.sh` shows the house style (isolated `HOME`, `mktemp -d`, trap cleanup, `fail()`). macOS has no `timeout`; use a `python3 -I` one-liner wrapper (`subprocess.run(..., timeout=N)`) for the time bound. Scripts must never run against the real `HOME` or repo as cwd.
+
+**Implementation vision:** For every registry row, in all levels: the file exists, is a regular file, is executable if it has a shebang or lives under `scripts/` with `.sh`/`.py` extension (matches the linter), passes the syntax check by extension (`bash -n`; `python3 -I -m py_compile` writing to a temp `PYTHONPYCACHEPREFIX`; `node --check` for `.js` when `node` exists, otherwise skip with a printed notice; `.mts` and other types skip the syntax step). For `help` rows additionally: run `<script> --help` with `env -i HOME=<tmp> PATH=<safe path> TMPDIR=<tmp>`, cwd = a fresh temp dir, stdin from `/dev/null`, 15-second bound, and require exit 0 with non-empty output; any other result fails the test with the captured output. For `behavior` rows: assert the named test file exists (the test itself runs elsewhere). Print one PASS line per level summary, not per file, plus a final count line `scripts: N static, M help, K behavior`. Python scripts needing optional deps (ruamel.yaml, jsonschema) are `behavior` or `static`, never `help`, so the smoke test needs no venv. Edge cases reachable: a `help` script that prompts on stdin (the bound plus `/dev/null` stops hangs, and the registry must not classify such a script `help`); a script that writes files in cwd (cwd is a throwaway temp dir).
+
+**Files:**
+- Create: `tests/test-scripts.sh` (mode 755)
+- Modify: `.github/workflows/ci.yml` (add step `Script smoke tests` on both OSes, after the catalog tests)
+
+**Verification:** `bash tests/test-scripts.sh` exits 0 on this macOS host and inside `python:3.12-bookworm` (install `nodejs` via apt there or accept the node skip notice); mutating the registry (change a `help` row for a script without `--help`) makes it fail (do this by hand once and report).
+
+**Done when:** `test-scripts.sh` is green on both OSes and a wrongly classified script fails it.
 
 ---
 
