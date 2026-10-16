@@ -312,6 +312,27 @@ printf '%s\n' "$out" | grep -F 'multi-line/block description not supported' >/de
 [[ $(printf '%s\n' "$out" | grep -c '^ERROR ') -eq 1 ]] || fail "multi-line description: want exactly 1 ERROR: $out"
 printf 'PASS: multi-line description single error\n'
 
+# --- stale-ref fixtures ---
+m=$WORK/s1; make_fixture "$m"
+printf 'Use model gpt-4o here.\n' > "$m/skills/beta/notes.md"
+expect_only_rule "stale model ref" stale-ref "$m"
+printf '%s\n' "$(python3 -I "$LINT" --root "$m" 2>&1 || true)" | grep -E 'notes\.md:1' >/dev/null \
+  || fail "stale-ref: file:line missing"
+
+m=$WORK/s2; make_fixture "$m"
+printf 'Use model gpt-4o here. (historical)\n' > "$m/skills/beta/notes.md"
+expect_clean "stale ref with (historical) marker" "$m"
+
+m=$WORK/s3; make_fixture "$m"
+printf 'Use <provider-model-id> here.\n' > "$m/skills/beta/notes.md"
+expect_clean "clean file no stale ref" "$m"
+
+m=$WORK/s4; make_fixture "$m"
+printf 'ok\nbuilt on Next.js 12 and CLAUDE-3 too\n' > "$m/skills/alpha/scripts/x.py"
+chmod 755 "$m/skills/alpha/scripts/x.py"
+expect_only_rule "stale ref in .py, case-insensitive" stale-ref "$m"
+printf 'PASS: stale-ref\n'
+
 # Real repo must be clean.
 rc=0
 out=$(python3 -I "$LINT" --root "$ROOT" 2>&1) || rc=$?

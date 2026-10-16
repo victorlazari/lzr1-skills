@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync symlink (ERROR); desc-trigger, link-broken-prose (WARN).
+       manifest-sync count-sync symlink stale-ref (ERROR); desc-trigger, link-broken-prose (WARN).
 """
 import argparse
 import os
@@ -23,6 +23,13 @@ SPAN_RE = re.compile(r"`([^`\n]+)`")
 BLOCK_RE = re.compile(r"^[>|][+-]?$")
 SKIP_CHARS = ("*", "<", "{", "$")
 TRIGGER_RE = re.compile(r"use when|use for|triggers", re.I)
+STALE_PATTERNS = [
+    r"claude[- ]?3", r"claude-(instant|2)", r"gpt-4o", r"gpt-4-turbo",
+    r"gpt-3\.5", r"text-davinci", r"gemini[- ]?1\.5", r"Next\.js 1[0-3]\b(?!\.\d)",
+]
+STALE_RE = re.compile("|".join("(?:%s)" % p for p in STALE_PATTERNS), re.I)
+STALE_EXEMPT = "(historical)"
+STALE_EXTS = (".md", ".yaml", ".yml", ".json", ".sh", ".py")
 
 
 def parse_frontmatter(text):
@@ -108,6 +115,16 @@ def main():
                 p = os.path.join(dp, n)
                 if os.path.islink(p):
                     add("ERROR", name, "symlink", os.path.relpath(p, root))
+        for dp, _, fns in os.walk(base):
+            for fn in sorted(fns):
+                p = os.path.join(dp, fn)
+                if not fn.lower().endswith(STALE_EXTS) or os.path.islink(p):
+                    continue
+                for i, ln in enumerate(read(p).splitlines(), 1):
+                    m = STALE_RE.search(ln)
+                    if m and STALE_EXEMPT not in ln:
+                        add("ERROR", name, "stale-ref", "%s:%d %s"
+                            % (os.path.relpath(p, root), i, m.group(0)))
         skill_md = os.path.join(base, "SKILL.md")
         if not os.path.isfile(skill_md):
             add("ERROR", name, "fm-missing", "SKILL.md not found")
