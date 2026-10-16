@@ -1,9 +1,11 @@
 ---
 name: database
-description: A comprehensive skill for database specialists covering architecture, indexing, query optimization, replication, and security for PostgreSQL and MongoDB. Triggers when advanced database operations, architecture design, performance tuning, or security audits are required.
+description: "Engine-agnostic database architecture, indexing, replication, high availability and security hardening for PostgreSQL and MongoDB. Use when designing a database architecture, choosing between relational and document models, planning replication, or auditing database security. Not for PostgreSQL 15+ server operations and tuning: use `postgres-15`; not for partitioning design: use `sql-partitioning`; not for MongoDB-only work: use `mongodb`."
 ---
 
 # Database Specialist Skill
+
+**Related skills:** `postgres-15`, `sql-partitioning`, `mongodb`
 
 ## Scope and Triggers
 Use this skill when you need to perform advanced database operations, architecture design, performance tuning, or security audits. It is particularly suited for tasks involving PostgreSQL (16/17) and MongoDB (7.0/8.0), including:

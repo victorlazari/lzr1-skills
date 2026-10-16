@@ -1,9 +1,11 @@
 ---
 name: bot
-description: Advanced Bot Engineering with OpenClaw, NemoClaw, and OpenShell
+description: "Building and securing bots and autonomous agents on the OpenClaw, NemoClaw and OpenShell ecosystems: plugins, memory systems, OpenShell sandboxes, multi-agent routing and bot security audits. Use when designing, building or auditing a bot, its channels, plugins or sandbox policies. Not for deploying or troubleshooting the runtimes themselves: use `openclaw` or `nemoclaw`."
 ---
 
 # Bot Specialist Skill
+
+**Related skills:** `openclaw`, `nemoclaw`, `masterclaw`, `security-review`
 
 ## Scope and Triggers
 

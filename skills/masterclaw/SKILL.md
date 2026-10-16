@@ -1,9 +1,11 @@
 ---
 name: masterclaw
-description: Complete operational playbook for managing OpenClaw agent gateways, NemoClaw distributed engines, and enterprise prompt architectures. Triggers on requests to configure, troubleshoot, or deploy OpenClaw/NemoClaw systems.
+description: "Combined operational playbook for OpenClaw gateways, NemoClaw engines and enterprise prompt architectures when a task spans more than one of them. Use when a task needs both gateway or engine operations and prompt architecture, or the target runtime is not yet known. Not for a single-runtime deployment: use `openclaw` or `nemoclaw`; not for prompt design alone: use `prompt`."
 ---
 
 # Masterclaw Operational Playbook
+
+**Related skills:** `openclaw`, `nemoclaw`, `prompt`, `bot`
 
 ## Scope and Triggers
 This skill provides the operational workflow for managing OpenClaw agent gateways, NemoClaw distributed engines, and enterprise prompt architectures.

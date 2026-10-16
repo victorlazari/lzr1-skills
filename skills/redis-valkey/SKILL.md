@@ -1,9 +1,11 @@
 ---
 name: redis-valkey
-description: Advanced Redis and Valkey production operations, troubleshooting, and migration guide. Triggers on latency, memory, hot keys, Lua script issues, or migration tasks.
+description: "Operating and troubleshooting Redis or Valkey in production: latency, memory pressure, hot keys, CLI incident response, cluster operations, and Lua script review. Use when a Redis or Valkey instance is slow, out of memory, CPU-bound, has hot keys, or a Lua script needs review. Not for valkey.conf authoring or Redis OSS to Valkey migration planning: use `valkey-redis`."
 ---
 
 # Redis and Valkey Operations Skill
+
+**Related skills:** `valkey-redis`, `database`, `docker`
 
 ## Scope and Triggers
 

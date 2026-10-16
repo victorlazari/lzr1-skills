@@ -1,9 +1,11 @@
 ---
 name: prompt-master
-description: "Prompt engineering, RAG, context optimization, and model-specific tuning mastery. Use for: organizing prompts and md files, designing prompting techniques (CoT, ToT, ReAct, self-consistency), building RAG/GraphRAG/Agentic-RAG pipelines, and reducing context/bootstrap size."
+description: "Prompting techniques (CoT, ToT, ReAct, self-consistency), RAG, GraphRAG and Agentic RAG pipelines, and context and bootstrap size reduction. Use when choosing a prompting technique, building or evaluating a RAG pipeline, organizing prompt markdown files, or cutting context size. Not for designing, securing or debugging a specific prompt system end to end: use `prompt`."
 ---
 
 # Prompt Master
+
+**Related skills:** `prompt`, `rag`, `masterclaw`
 
 This skill is the master knowledge base for prompt engineering, context engineering, and Retrieval-Augmented Generation (RAG). It distills guidance from official model documentation and verified research into targeted reference files. The main file stays lightweight; load reference files only when the task requires them, to minimize bootstrap size and context loading.
 

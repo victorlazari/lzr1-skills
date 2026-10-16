@@ -1,9 +1,11 @@
 ---
 name: postgres-15
-description: Advanced PostgreSQL 15+ Operations and Tech Support Guide for managing massive datasets, high concurrency, and complex operational requirements.
+description: "PostgreSQL 15+ production operations and tuning: autovacuum, memory settings, PgBouncer, lock contention, major upgrades, PITR and disaster recovery, RBAC, RLS and pgaudit. Use when operating, tuning, upgrading or securing a PostgreSQL 15+ server. Not for partitioning and sharding design: use `sql-partitioning`; not for engine-agnostic schema and architecture design: use `database`."
 ---
 
 # PostgreSQL 15+ Specialist
+
+**Related skills:** `sql-partitioning`, `database`
 
 ## Scope and Triggers
 

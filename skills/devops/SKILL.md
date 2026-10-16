@@ -1,9 +1,11 @@
 ---
 name: devops
-description: Advanced DevOps specialist skill covering AWS, Kubernetes, EKS, Helm, GitOps, VPC, Networking, and CI/CD pipelines. Triggers on infrastructure provisioning, deployment, or troubleshooting tasks.
+description: "Hands-on AWS, EKS, Helm, GitOps, VPC and CI/CD provisioning and troubleshooting, including Terraform and CloudFormation changes. Use when provisioning or debugging AWS networking, an EKS cluster, a Helm release, a GitOps flow or a deployment pipeline. Not for cross-cloud architecture, SRE, platform engineering or FinOps decisions: use `devops-infrastructure`."
 ---
 
 # DevOps Specialist
+
+**Related skills:** `devops-infrastructure`, `k8s-eks`, `lerian-helm`
 
 ## Scope and Triggers
 Use this skill when you need to:
