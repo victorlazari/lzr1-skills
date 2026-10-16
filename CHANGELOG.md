@@ -5,22 +5,6 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-### Fixed
-
-- Installer: archive listing validation and wget TLS-option checks now run in
-  the main shell, so a failure stops the install instead of only a subshell
-  (an invalid archive listing could previously still be extracted).
-- Installer: the unverified `main` fallback needs a second signal, a 404 from
-  the GitHub releases API, in addition to a 404 on `SHA256SUMS`; any other
-  outcome stops the install.
-- Installer: symlink and hardlink members are refused before extraction on the
-  verified release path as well as the branch path; wget uses `--tries=3` and
-  `--timeout=30`.
-- Release workflow: the first step rejects tag names that are not `vX.Y.Z`.
-- Catalog linter: `readme-flags` counts only flag tokens in `parse_args` and
-  `print_help` (not comments); the census block parser accepts CRLF and rejects
-  duplicate mechanism keys.
-
 ## [2.1.0] - 2026-10-16
 
 ### Added
@@ -36,12 +20,18 @@ All notable changes to this project are documented here. The format follows
   downloads the latest release archive and checks it against `SHA256SUMS`;
   `vX.Y.Z` pins a verified release; other refs are unverified snapshots;
   `doctor` reports source mode, ref and verification status. The unverified
-  `main` snapshot fallback happens only when the latest-release `SHA256SUMS`
-  returns HTTP 404; any other failure stops the install. Checksum parsing
-  accepts CRLF, `./` and `*` name forms and requires one 64-hex entry; branch
-  snapshots containing symlink or hardlink members are refused; wget downloads
-  require `--https-only` and TLS 1.2; the release workflow triggers only on
-  `vX.Y.Z` tags and CI runs `tests/test-release.sh`.
+  `main` snapshot fallback needs two signals: the latest-release `SHA256SUMS`
+  request returns HTTP 404 and the latest-release API request also returns 404
+  (no published, non-draft, non-prerelease release found); any other outcome
+  stops the install. Checksum parsing accepts CRLF, `./` and `*` name forms and
+  requires one 64-hex entry. The checksum protects against corruption and
+  mirror substitution, not against a compromised repository or release.
+  Symbolic links are rejected in every source mode (override, local, release
+  and branch), and symlink and hardlink archive members are refused before
+  extraction. The wget path requires `--https-only` and TLS 1.2 and uses
+  `--tries=3` and `--timeout=30`, otherwise the installer refuses to download.
+  The release workflow triggers only on `vX.Y.Z` tags and CI runs
+  `tests/test-release.sh`.
 - Release packaging `scripts/build-release.sh`, tag-triggered
   `.github/workflows/release.yml` and offline tests for the release and
   download paths.
@@ -56,6 +46,19 @@ All notable changes to this project are documented here. The format follows
 - Linter rules `stale-ref` (retired model and version identifiers) and
   `desc-trigger` (every description needs `use when`, `use for` or
   `triggers`) are ERRORs.
+
+### Fixed
+
+- Installer: archive listing validation and wget TLS-option checks run in the
+  main shell, so a failure stops the install instead of only a subshell.
+- Installer: the source symbolic-link scan no longer uses an early-exit pipe
+  (it could be skipped under `pipefail` with many links) and fails closed if
+  the scan itself fails; a failed managed-skill listing in `remove` is an error.
+- Release workflow: the first step rejects tag names that are not `vX.Y.Z`.
+- Catalog linter: `readme-flags` reads flags statically from the `print_help`
+  heredoc without executing `install.sh`, counts only code tokens in
+  `parse_args` and `print_help`, and accepts CRLF and rejects duplicate keys in
+  the census block; missing README sections use the new `readme-section` rule.
 
 ### Changed
 

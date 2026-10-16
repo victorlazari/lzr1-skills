@@ -170,4 +170,26 @@ if run_installer "$WORK/empty-home" --not-a-real-option >"$WORK/unknown.out" 2>&
 fi
 assert_contains "$WORK/unknown.out" 'Unknown argument'
 
+# Source symlink rejection must not be defeated by pipefail/SIGPIPE with many links.
+for n in 3000 1; do
+  src="$WORK/symsrc-$n"
+  mkdir -p "$src"
+  cp -R "$ROOT/skills" "$src/skills"
+  cp "$ROOT/skills-list.txt" "$src/skills-list.txt"
+  first=$(head -n 1 "$ROOT/skills-list.txt")
+  i=0
+  while [[ $i -lt $n ]]; do
+    ln -s /nonexistent-target "$src/skills/$first/link-$i"
+    i=$((i + 1))
+  done
+  mkdir -p "$WORK/symsrc-home-$n"
+  if HOME="$WORK/symsrc-home-$n" LZR1_SOURCE_DIR="$src" bash "$INSTALLER" --codex --yes >"$WORK/symsrc-$n.out" 2>&1; then
+    fail "source with $n symlink(s) unexpectedly installed"
+  fi
+  assert_contains "$WORK/symsrc-$n.out" 'must not contain symbolic links'
+  assert_absent "$WORK/symsrc-home-$n/.codex/skills"
+done
+
+printf 'PASS: source symlink rejection (3000 and 1 links)\n'
+
 printf 'PASS: installer end-to-end tests completed for %d skills without network access\n' "$EXPECTED"

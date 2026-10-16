@@ -372,14 +372,14 @@ fetch_sums() {
 }
 
 # confirm_no_release: second, independent signal before the unverified fallback.
-# Only a 404 from the releases API (no release exists) permits it.
+# Only a 404 from the releases API (no published, non-draft, non-prerelease release found) permits it.
 confirm_no_release() {
   http_status "https://api.github.com/repos/${REPO}/releases/latest" /dev/null \
-    || fail "Could not confirm that no release exists (${FETCH_ERR}); refusing to install unverified; use --ref main to override"
+    || fail "Could not confirm that no published release exists (${FETCH_ERR}); refusing to install unverified; use --ref main to override"
   case "${HTTP_CODE}" in
     404) return 0 ;;
     2[0-9][0-9]) fail "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override" ;;
-    *) fail "Could not confirm that no release exists (HTTP status ${HTTP_CODE}); refusing to install unverified; use --ref main to override" ;;
+    *) fail "Could not confirm that no published release exists (HTTP status ${HTTP_CODE}); refusing to install unverified; use --ref main to override" ;;
   esac
 }
 
@@ -509,7 +509,7 @@ fetch_branch_archive() {
 }
 
 initialize_source() {
-  local script_path script_dir rc
+  local script_path script_dir rc links_out
   ensure_work_root
 
   if [ -n "${SOURCE_OVERRIDE}" ]; then
@@ -537,7 +537,7 @@ initialize_source() {
         rc=$?
         if [ "${rc}" -eq 2 ]; then
           confirm_no_release
-          log_warn "No published release found; installing the unverified main snapshot"
+          log_warn "No published (non-draft, non-prerelease) release was found; installing the unverified main snapshot"
           SOURCE_MODE="branch"
           SOURCE_REF="${BRANCH}"
           fetch_branch_archive "${BRANCH}"
@@ -558,7 +558,10 @@ initialize_source() {
 
   [ -f "${SOURCE_ROOT}/skills-list.txt" ] && [ ! -L "${SOURCE_ROOT}/skills-list.txt" ] || fail "Source is missing a regular skills-list.txt"
   [ -d "${SOURCE_ROOT}/skills" ] && [ ! -L "${SOURCE_ROOT}/skills" ] || fail "Source is missing a safe skills directory"
-  if find "${SOURCE_ROOT}/skills" -type l -print 2>/dev/null | grep -q .; then
+  # No early-exit pipe: grep -q under pipefail would SIGPIPE find and skip this check.
+  links_out="${WORK_ROOT}/source-links.list"
+  find "${SOURCE_ROOT}/skills" -type l -print > "${links_out}" || fail "Could not scan the source for symbolic links"
+  if [ -s "${links_out}" ]; then
     fail "Source skill packages must not contain symbolic links"
   fi
   validate_manifest
@@ -971,7 +974,7 @@ remove_target() {
   assert_safe_target "${target}"
   [ -d "${target}" ] && [ ! -L "${target}" ] || { log_info "${label}: target not present"; return 0; }
   names="${WORK_ROOT}/remove.$$.${mode}.names"
-  managed_names "${target}" "${mode}" > "${names}"
+  managed_names "${target}" "${mode}" > "${names}" || fail "${label}: could not list managed skills"
   removed=0
   while IFS= read -r name; do
     case "${name}" in *[!a-z0-9-]*|'') log_warn "${label}: ignored invalid index entry"; continue ;; esac

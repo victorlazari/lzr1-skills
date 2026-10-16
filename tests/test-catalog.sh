@@ -32,7 +32,7 @@ make_fixture() {
   printf 'alpha\nbeta\n' > "$r/skills-list.txt"
   printf 'path\tlevel\treason\ttest\nskills/alpha/scripts/run.sh\tstatic\tfixture script, no safe invocation\t\n' \
     > "$r/tests/script-coverage.tsv"
-  printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=2\nprint_help() {\n  printf "usage\\n  --alpha  a\\n  --help   h\\n"\n}\nparse_args() {\n  case "$1" in\n    --alpha) ;;\n    --help) print_help; exit 0 ;;\n  esac\n}\nif [ "${1:-}" = "--help" ]; then\n  print_help\n  exit 0\nfi\n' > "$r/install.sh"
+  printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=2\nprint_help() {\n  cat <<EOF\nusage\n  --alpha  a\n  --help   h\nEOF\n}\nparse_args() {\n  case "$1" in\n    --alpha) ;;\n    --help) print_help; exit 0 ;;\n  esac\n}\nif [ "${1:-}" = "--help" ]; then\n  print_help\n  exit 0\nfi\n' > "$r/install.sh"
   printf 'EXPECTED=2\n' > "$r/tests/test-installer.sh"
   printf '![skills](https://img.shields.io/badge/skills-2-blue)\n2 curated AI skills\n\n## The Arsenal\n\n### Cat\n\n| Skill | What |\n|:--|:--|\n| `alpha` | a |\n| `beta` | b |\n\n## Equip Up\n\nRun `bash install.sh --alpha`.\n\n## Command Reference\n\n| `--alpha` | a |\n| `--help` | h |\n\n## Update & Remove\n\nRun `--alpha` again.\n\n## Other\n\nInstaller version: 1.2.3\n\n<!-- pattern-census:begin -->\nparallel-execution-protocol: 0\nmulti-specialist-spawning: 0\nrefuter-panel: 0\nconsistency-validator: 0\nconflict-resolving-synthesis: 0\n<!-- pattern-census:end -->\n' \
     > "$r/README.md"
@@ -551,7 +551,7 @@ sed -i.bak 's/^consistency-validator: 0/consistency-validator: 1/' "$m/README.md
 expect_clean "census numbers match a real hit" "$m"
 
 m=$WORK/rf1; make_fixture "$m"
-sed -i.bak 's/--help   h\\n"/--help   h\\n  --beta  b\\n"/' "$m/install.sh"; rm -f "$m/install.sh.bak"
+sed -i.bak 's/^  --help   h$/  --help   h\n  --beta  b/' "$m/install.sh"; rm -f "$m/install.sh.bak"
 expect_only_rule "installer flag undocumented in README" readme-flags "$m"
 
 m=$WORK/rf2; make_fixture "$m"
@@ -576,6 +576,19 @@ expect_clean "CRLF README census block passes" "$m"
 m=$WORK/rp5; make_fixture "$m"
 sed -i.bak 's/^refuter-panel: 0/refuter-panel: 0\nrefuter-panel: 0/' "$m/README.md"; rm -f "$m/README.md.bak"
 expect_only_rule "duplicate census key" readme-patterns "$m"
+m=$WORK/rs1; make_fixture "$m"
+sed -i.bak 's/^## Command Reference$/## Commands/' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README Command Reference missing" readme-section "$m"
+
+m=$WORK/rs2; make_fixture "$m"
+sed -i.bak 's/^## Equip Up$/## Setup/' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README Equip Up missing" readme-section "$m"
+
+# The linter must never execute install.sh from the scanned tree.
+m=$WORK/rx1; make_fixture "$m"
+{ printf 'touch "%s/executed"\n' "$WORK"; cat "$m/install.sh"; } > "$m/install.sh.new" && mv "$m/install.sh.new" "$m/install.sh"
+expect_clean "install.sh with side effects is not executed" "$m"
+[[ ! -e $WORK/executed ]] || fail "linter executed install.sh"
 printf 'PASS: readme-patterns and readme-flags fixtures\n'
 
 # Real repo must be clean.

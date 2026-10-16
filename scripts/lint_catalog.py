@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync readme-skills version-sync readme-patterns readme-flags symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
+       manifest-sync count-sync readme-skills version-sync readme-patterns readme-section readme-flags symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
 
 stale-ref model ids: any token claude-(fable|opus|sonnet|haiku|mythos)-<digit>... must be
 exactly one of VALID_MODELS, optionally followed by -YYYYMMDD; claude_<digit> and the spaced
@@ -40,8 +40,9 @@ the census count for the repo.
 
 readme-flags (static, no network): every --long-flag token in the README from "## Equip Up"
 through the end of the "## Update & Remove" section must appear in install.sh source, and every
---long-flag printed by `bash install.sh --help` must be mentioned in the README "## Command
-Reference" section.
+--long-flag in the print_help heredoc of install.sh (read statically; install.sh is never executed)
+must be mentioned in the README "## Command
+Reference" section. readme-section: a required README section is missing.
 """
 import argparse
 import importlib.util
@@ -514,24 +515,21 @@ def main():
                 if cur == "## Command Reference":
                     cmd.append(ln)
             if not sec:
-                add("ERROR", "-", "readme-flags", "README.md has no '## Equip Up' section")
+                add("ERROR", "-", "readme-section", "README.md has no '## Equip Up' section")
             for fl in sorted(set(FLAG_RE.findall("\n".join(sec)))):
                 if fl not in code_flags:
                     add("ERROR", "-", "readme-flags",
                         "README flag %s is not a token in install.sh parse_args/print_help (comments do not count)" % fl)
-            try:
-                hp = subprocess.run(["bash", ip, "--help"], stdin=subprocess.DEVNULL, capture_output=True,
-                                    text=True, timeout=30, cwd=root)
-                help_out = hp.stdout + hp.stderr
-                if hp.returncode != 0:
-                    add("ERROR", "-", "readme-flags", "install.sh --help exited %d" % hp.returncode)
-            except (OSError, subprocess.SubprocessError) as e:
-                help_out = ""
-                add("ERROR", "-", "readme-flags", "install.sh --help failed: %s" % e)
+            help_out = ""
+            hm = re.search(r"^print_help\(\) \{\n.*?<<-?\s*'?\"?(\w+)\"?'?[^\n]*\n(.*?)^\1$", isrc, re.S | re.M)
+            if hm:
+                help_out = hm.group(2)
+            else:
+                add("ERROR", "-", "readme-flags", "install.sh print_help has no heredoc to read flags from")
             cmdtext = "\n".join(cmd)
             if not cmd:
-                add("ERROR", "-", "readme-flags", "README.md has no '## Command Reference' section")
-            for fl in sorted(set(FLAG_RE.findall(help_out))):
+                add("ERROR", "-", "readme-section", "README.md has no '## Command Reference' section")
+            for fl in sorted(set(FLAG_RE.findall(help_out)) if cmd else ()):
                 if not re.search(re.escape(fl) + r"(?![A-Za-z0-9-])", cmdtext):
                     add("ERROR", "-", "readme-flags",
                         "install.sh --help flag %s not documented in README Command Reference" % fl)

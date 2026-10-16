@@ -261,7 +261,7 @@ printf 'PASS: SHA256SUMS without tarball entry refused\n'
 new_case "$SNAP"
 run_installer --codex --yes
 expect_ok
-expect_log "No published release found; installing the unverified main snapshot"
+expect_log "No published (non-draft, non-prerelease) release was found; installing the unverified main snapshot"
 expect_log "from branch source (ref: main), verified: no"
 expect_installed
 grep -F "codeload.github.com" "$FIX/requests.log" >/dev/null || fail "case 4: codeload not used"
@@ -314,7 +314,7 @@ done
 new_case "$SNAP"
 FAKE_SUMS_STATUS=404 run_installer --codex --yes
 expect_ok
-expect_log "No published release found"
+expect_log "No published (non-draft, non-prerelease) release was found"
 # Empty 200 body is a hard failure.
 new_case "$GOOD"
 : >"$FIX/SHA256SUMS"
@@ -365,7 +365,7 @@ printf 'PASS: ignored ref warns\n'
 new_case "$SNAP"
 FAKE_SUMS_STATUS=404 FAKE_API_STATUS=404 run_installer --codex --yes
 expect_ok
-expect_log "No published release found; installing the unverified main snapshot"
+expect_log "No published (non-draft, non-prerelease) release was found; installing the unverified main snapshot"
 new_case "$SNAP"
 FAKE_SUMS_STATUS=404 FAKE_API_STATUS=200 run_installer --codex --yes
 expect_fail_with "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override"
@@ -504,7 +504,7 @@ expect_fail_with "a release exists but SHA256SUMS is missing"
 new_case "$SNAP"
 INST_PATH="$WGETBIN:$NOCURL" FAKE_SUMS_STATUS=404 FAKE_API_STATUS=404 run_installer --codex --yes
 expect_ok
-expect_log "No published release found"
+expect_log "No published (non-draft, non-prerelease) release was found"
 printf 'PASS: wget path is fail-closed with retry limits\n'
 
 printf 'All installer download tests passed\n'
