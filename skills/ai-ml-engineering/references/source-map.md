@@ -8,8 +8,8 @@ This source map replaces the passive reading list and provides actionable, autho
 
 | Source | URL | When to Consult |
 |---|---|---|
-| OpenAI API | https://platform.openai.com/docs/ | For GPT-4o, text-embedding-3, and API usage. |
-| Anthropic Claude | https://docs.anthropic.com/claude/docs | For Claude 3.5 Sonnet, Opus, Haiku, and prompt caching. |
+| OpenAI API | https://platform.openai.com/docs/ | For current GPT model families, embeddings, and API usage. |
+| Anthropic Claude | https://docs.anthropic.com/claude/docs | For current Claude model families (Fable, Opus, Sonnet, Haiku) and prompt caching. |
 | Meta Llama 3 | https://llama.meta.com/docs/ | For Llama 3.1 open-source models. |
 | Hugging Face Transformers | https://huggingface.co/docs/transformers/ | For open-source models, tokenization, and fine-tuning. |
 | LangChain | https://python.langchain.com/docs/ | For LLM orchestration and agent frameworks. |

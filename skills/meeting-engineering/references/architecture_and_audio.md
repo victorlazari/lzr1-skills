@@ -12,7 +12,7 @@ The system is designed as a cascaded voice agent architecture optimized for low 
 2.  **Virtual Audio Layer**: PulseAudio creates virtual sinks and sources to route audio into and out of the headless browser.
 3.  **STT Layer**: Audio from the meeting is captured and streamed via WebSocket to a low-latency Speech-to-Text provider (e.g., ElevenLabs Scribe v2 Realtime).
 4.  **Turn Detection Layer**: Voice Activity Detection (VAD) and endpointing determine when the user has finished speaking.
-5.  **LLM Layer**: A fast LLM (e.g., GPT-4o-mini or GPT-5-mini via Groq) generates the response.
+5.  **LLM Layer**: A fast LLM (e.g., GPT-5-mini via Groq, or another provider's small tier) generates the response.
 6.  **TTS Layer**: Text is streamed to a low-latency Text-to-Speech provider (e.g., ElevenLabs Flash v2.5 or Multilingual v2) and played back into the meeting.
 
 ## Infrastructure and Containerization

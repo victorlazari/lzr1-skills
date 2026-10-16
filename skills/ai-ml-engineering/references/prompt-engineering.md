@@ -224,7 +224,7 @@ Test prompts against adversarial inputs:
 # prompt_config.yaml
 name: "customer_support_classifier"
 version: "2.3.1"
-model: "claude-3-5-sonnet-20240620"
+model: "claude-sonnet-5-5"
 temperature: 0.0
 max_tokens: 500
 system_prompt_file: "prompts/support_classifier_system.txt"
@@ -254,7 +254,7 @@ minimum_accuracy: 0.95
 - Leverage extended thinking for complex analysis
 - System prompts are strongly followed; use for persona and constraints
 
-### GPT-4o (OpenAI)
+### OpenAI GPT models
 
 - System message is powerful for setting behavior
 - JSON mode available for structured output
