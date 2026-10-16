@@ -49,6 +49,12 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           PYTHONPYCACHEPREFIX="$RUNNER_TEMP/pycache" python3 -I -m compileall -q skills
+      - name: Debug coderabbit self-check (temporary)
+        continue-on-error: true
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 python3 skills/coderabbit-reviewer/scripts/self_check.py 2>&1 | tail -40
+          echo rc=${PIPESTATUS[0]}
+          git config --global --list || true
       - name: Installer tests
         run: bash -x tests/test-installer.sh 2>&1 | tail -60; exit ${PIPESTATUS[0]}
       - name: Adversarial remediation tests
