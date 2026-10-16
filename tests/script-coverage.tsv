@@ -21,7 +21,7 @@ skills/dockerfile/scripts/lint-dockerfile.sh	static	no --help branch: the first 
 skills/french-teacher/scripts/validate-cefr.sh	help		
 skills/frontend-menu-design/scripts/validate-menu-a11y.js	help		
 skills/frontend/scripts/audit-deps.sh	static	no --help branch; audits package.json in cwd and runs npm	
-skills/gcalendar/scripts/batch_updater.py	static	writes to Google Calendar through manus-mcp-cli; no shebang so it cannot be run directly	
+skills/gcalendar/scripts/batch_updater.py	static	writes to Google Calendar by shelling out to manus-mcp-cli and needs a plan JSON file; has no shebang despite mode 755, so run it as python3 batch_updater.py	
 skills/gcalendar/scripts/validate_events.py	behavior		tests/test-adversarial-remediations.sh
 skills/go/scripts/security-audit.sh	behavior		tests/test-adversarial-remediations.sh
 skills/hermes-agent/scripts/hermes_preflight.py	behavior		skills/hermes-agent/tests/test_hermes_preflight.py

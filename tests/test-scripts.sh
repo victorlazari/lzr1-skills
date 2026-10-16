@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Enforces tests/script-coverage.tsv: every registered skill script exists,
-# has the right mode, passes a syntax check, and `help` rows really answer
-# --help with exit 0. Never runs scripts against the real HOME or repo cwd.
+# Validates the scripts REGISTERED in tests/script-coverage.tsv: each exists,
+# has the right mode and passes a syntax check; `help` rows really answer
+# --help with exit 0; `behavior` rows name an existing test file. It does not
+# prove an unregistered script is covered (scripts/lint_catalog.py does that),
+# and a `static` row for a script that answers --help is allowed.
+# Never runs scripts against the real HOME or repo cwd.
 # Set LZR1_REGISTRY to test against an alternate registry file.
 
 set -euo pipefail
@@ -125,7 +128,7 @@ while IFS= read -r line || [[ -n $line ]]; do
 done < "$REGISTRY"
 
 [[ $have_node -eq 1 || $node_skips -eq 0 ]] || printf 'NOTE: node not found; skipped node --check and --help for .js scripts\n'
-printf 'PASS: static rows checked (%s)\n' "$n_static"
+printf 'PASS: static rows syntax/mode checked (%s)\n' "$n_static"
 printf 'PASS: help rows ran --help (%s)\n' "$n_help"
-printf 'PASS: behavior rows have tests (%s)\n' "$n_behavior"
+printf 'PASS: behavior rows name an existing test file (%s)\n' "$n_behavior"
 printf 'scripts: %s static, %s help, %s behavior\n' "$n_static" "$n_help" "$n_behavior"

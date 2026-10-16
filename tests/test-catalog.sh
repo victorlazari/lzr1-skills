@@ -468,6 +468,31 @@ m=$WORK/su12; make_fixture "$m"; mkdir -p "$m/skills/alpha/scripts/__pycache__" 
 expect_clean "pycache and skill tests dir ignored" "$m"
 printf 'PASS: script-untested\n'
 
+m=$WORK/su13; make_fixture "$m"; printf '# run.sh is not tested here\n' > "$m/tests/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\ttests/t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "behavior mention only in comment" script-untested "$m"
+
+m=$WORK/su14; make_fixture "$m"; printf '  # run.sh here\nbash skills/alpha/scripts/run.sh\n' > "$m/tests/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\ttests/t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_clean "behavior real invocation passes" "$m"
+
+m=$WORK/su15; make_fixture "$m"; printf 'bash skills/alpha/scripts/run.sh\n' > "$WORK/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\t../t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "test path with .." script-untested "$m"
+
+m=$WORK/su16; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/../scripts/run.sh\tstatic\tfixture\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "unnormalized registry path" script-untested "$m"
+
+m=$WORK/su17; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tstatic\tfixture\t\nskills/alpha/scripts/run.sh\tstatic\tfixture\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "duplicate registry row" script-untested "$m"
+
+m=$WORK/su18; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\t/etc/hosts\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "absolute test path" script-untested "$m"
+printf 'PASS: script-untested hygiene\n'
+
 # Real repo must be clean.
 rc=0
 out=$(python3 -I "$LINT" --root "$ROOT" 2>&1) || rc=$?

@@ -26,6 +26,7 @@ that mentions the script basename). Rows must point at existing files.
 """
 import argparse
 import os
+import posixpath
 import re
 import sys
 
@@ -110,8 +111,25 @@ def load_registry(root):
 
 
 def mentions_basename(path, base):
+    """True if a non-comment line of the test mentions base (.sh/.py strip '#' lines)."""
     rx = re.compile(r"(?<![A-Za-z0-9_.-])" + re.escape(base) + r"(?![A-Za-z0-9_-])")
-    return bool(rx.search(read(path)))
+    lines = read(path).splitlines()
+    if path.endswith((".sh", ".py")):
+        lines = [l for l in lines if not l.lstrip().startswith("#")]
+    return any(rx.search(l) for l in lines)
+
+
+def bad_rel_path(p):
+    """Reason string if p is not a clean normalized repo-relative posix path, else None."""
+    if not p:
+        return "empty path"
+    if p.startswith("/") or "\\" in p:
+        return "path %r is absolute or has a backslash" % p
+    if ".." in p.split("/"):
+        return "path %r has a '..' segment" % p
+    if p != posixpath.normpath(p):
+        return "path %r is not normalized" % p
+    return None
 
 
 def parse_frontmatter(text):
@@ -368,13 +386,17 @@ def main():
         seen_paths = set()
         for lineno, path, level, reason, test in reg_rows or []:
             where = "%s:%d %s" % (REGISTRY, lineno, path)
-            if path in seen_paths:
+            norm = posixpath.normpath(path)
+            if norm in seen_paths:
                 add("ERROR", "-", "script-untested", where + " duplicate row")
-            seen_paths.add(path)
+            seen_paths.add(norm)
+            bp = bad_rel_path(path)
+            if bp:
+                add("ERROR", "-", "script-untested", where + " " + bp)
             if prev is not None and path < prev:
                 add("ERROR", "-", "script-untested", where + " rows must be sorted by path")
             prev = path
-            if not re.match(r"^skills/[^/]+/scripts/.+", path) or not os.path.isfile(os.path.join(root, path)):
+            if bp or not re.match(r"^skills/[^/]+/scripts/.+", path) or not os.path.isfile(os.path.join(root, path)):
                 add("ERROR", "-", "script-untested", where + " stale row: no such script file")
             if level not in LEVELS:
                 add("ERROR", "-", "script-untested", where + " level %r not in static|help|behavior" % level)
@@ -384,8 +406,11 @@ def main():
                 tp = os.path.join(root, test) if test else ""
                 if not test:
                     add("ERROR", "-", "script-untested", where + " behavior row needs a test file")
-                elif not os.path.isfile(tp):
-                    add("ERROR", "-", "script-untested", where + " test file %s not found" % test)
+                elif bad_rel_path(test):
+                    add("ERROR", "-", "script-untested", where + " test " + bad_rel_path(test))
+                elif not (os.path.isfile(tp) and not os.path.islink(tp)
+                          and os.path.realpath(tp).startswith(os.path.realpath(root) + os.sep)):
+                    add("ERROR", "-", "script-untested", where + " test file %s not found in repo" % test)
                 elif not mentions_basename(tp, os.path.basename(path)):
                     add("ERROR", "-", "script-untested", where + " test %s does not mention %s"
                         % (test, os.path.basename(path)))
