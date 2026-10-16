@@ -439,7 +439,7 @@ The installer chooses its source mode automatically and then applies the same fa
 
 ## Contributing
 
-Found a skill that belongs here? Have a better version of an existing one? PRs are open.
+Found a skill that belongs here? Have a better version of an existing one? PRs are open. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full authoring contract.
 
 ```bash
 git clone https://github.com/victorlazari/lzr1-skills.git
@@ -458,12 +458,12 @@ cd lzr1-skills
 
 ## License
 
-MIT — use it, fork it, ship it.
+MIT — use it, fork it, ship it. See [LICENSE](LICENSE).
 
 ---
 
 <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=100&section=footer" width="100%"/>
 
 <div align="center">
-<sub>Built by <a href="https://github.com/victorlazari">Victor Lazari</a> · <a href="https://github.com/victorlazari/lzr1-skills/issues">Report an issue</a></sub>
+<sub><a href="LICENSE">License</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="SECURITY.md">Security</a> · <a href="CHANGELOG.md">Changelog</a><br/>Built by <a href="https://github.com/victorlazari">Victor Lazari</a> · <a href="https://github.com/victorlazari/lzr1-skills/issues">Report an issue</a></sub>
 </div>

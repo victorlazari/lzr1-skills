@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Lint catalog
+        run: python3 -I scripts/lint_catalog.py
+      - name: Catalog linter tests
+        run: bash tests/test-catalog.sh
+      # Installer and remediation suites run on ubuntu only: the hardened
+      # coderabbit-reviewer scripts and these tests rely on GNU sha256sum and
+      # realpath -e, which stock macOS lacks. Portability is tracked in
+      # Epic 3.1 of docs/plans/2026-10-16-skills-repo-gap-closure.md.
+      # yaml-specialist never installs its pinned dependencies itself, so the
+      # installed-skill self-check needs them in an isolated venv. shellcheck
+      # and jq are preinstalled on ubuntu runners. PyYAML is used by the
+      # compose check in tests/test-adversarial-remediations.sh.
+      - name: Install reviewed yaml-specialist pins
+        if: runner.os == 'Linux'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --require-virtualenv -r skills/yaml-specialist/scripts/requirements.txt PyYAML==6.0.2
+          echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
+      - name: Installer tests
+        if: runner.os == 'Linux'
+        run: bash tests/test-installer.sh
+      - name: Adversarial remediation tests
+        if: runner.os == 'Linux'
+        run: bash tests/test-adversarial-remediations.sh
+
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Shellcheck installer and tests
+        run: shellcheck --severity=warning -x install.sh tests/*.sh
+      - name: Shellcheck skill scripts (informational)
+        continue-on-error: true
+        run: |
+          shopt -s nullglob
+          files=(skills/*/scripts/*.sh)
+          if [ "${#files[@]}" -gt 0 ]; then shellcheck -x "${files[@]}"; fi

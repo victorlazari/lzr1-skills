@@ -6,7 +6,7 @@ umask 077
 
 ROOT=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
 INSTALLER="$ROOT/install.sh"
-EXPECTED=86
+EXPECTED=$(wc -l < "$ROOT/skills-list.txt" | tr -d ' ')
 WORK=$(mktemp -d "${TMPDIR:-/tmp}/lzr1-installer-test.XXXXXXXX")
 cleanup() {
   rm -rf -- "$WORK"
