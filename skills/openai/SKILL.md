@@ -1,6 +1,6 @@
 ---
 name: openai
-description: Specialist in OpenAI API, Responses API, Realtime API, function calling, structured outputs, and current models (gpt-5.6, gpt-5.4).
+description: "OpenAI API development: Responses API, Realtime API, function calling, structured outputs, and tool_search. Use when integrating OpenAI models into an app, building agents with the Responses API, adding tool calls or strict JSON structured outputs, building realtime voice sessions, or setting up workload identity federation. Check the provider's current model list for names."
 ---
 
 # OpenAI Specialist Skill

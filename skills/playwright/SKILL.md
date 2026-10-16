@@ -1,6 +1,6 @@
 ---
 name: playwright
-description: Advanced Playwright End-to-End (E2E) testing techniques, configuration, and troubleshooting for modern web applications.
+description: "Playwright end-to-end testing: configuration, network mocking, visual regression, CI integration, and flaky-test troubleshooting. Use when setting up or tuning Playwright tests, mocking APIs or intercepting network calls, running multi-browser or mobile-emulation matrices, wiring Playwright into CI, or fixing flaky tests and timeouts. Not for scraping or other test frameworks."
 ---
 
 # Playwright E2E Specialist

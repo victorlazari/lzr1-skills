@@ -1,6 +1,6 @@
 ---
 name: rabbitmq-documentdb
-description: Specialist skill for integrating, managing, and troubleshooting RabbitMQ message brokers with Amazon DocumentDB.
+description: "Integrating RabbitMQ with Amazon DocumentDB: event-driven service design, exchange and queue setup, DocumentDB schemas and indexes, and CDC sync. Use when building or troubleshooting a system that pairs RabbitMQ with DocumentDB, designing data synchronization between them, or reviewing the integration's security. For RabbitMQ alone, see rabbitmq."
 ---
 
 # RabbitMQ & DocumentDB Specialist

@@ -1,6 +1,6 @@
 ---
 name: rag
-description: "Expert in Retrieval-Augmented Generation (RAG) architecture, including Adaptive RAG, agentic workflows, document chunking, embeddings, vector databases, and similarity search."
+description: "Retrieval-Augmented Generation architecture, including Adaptive and agentic RAG, chunking, embeddings, vector databases, and hybrid retrieval. Use when designing or tuning a RAG pipeline, choosing a vector store or embedding model, fixing hallucinations or irrelevant retrieval, implementing chunking or hybrid BM25 search, or auditing a RAG system for prompt injection and data privacy."
 ---
 
 # Retrieval-Augmented Generation (RAG) Specialist

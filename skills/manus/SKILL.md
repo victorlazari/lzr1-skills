@@ -1,6 +1,6 @@
 ---
 name: manus
-description: Orchestrate Manus v2 agent pipelines, configure sandboxes, manage WebMCP browser automation, and integrate with the Manus Control Plane.
+description: "Manus v2 agent platform work: orchestrating agent pipelines, configuring sandboxes, WebMCP browser automation, and the Manus Control Plane. Use when building or troubleshooting Manus agent clusters, sandbox network policies, WebMCP browser automation, Control Plane scheduling, or S3 multipart file uploads with Manus."
 ---
 
 # Manus Specialist Skill

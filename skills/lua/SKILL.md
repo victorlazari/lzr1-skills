@@ -1,6 +1,6 @@
 ---
 name: lua
-description: Execute Lua tasks including syntax validation, C API integration, sandboxing, and Redis scripting.
+description: "Lua scripting for embedded systems, game engines, and Redis, including syntax validation, C API integration, and sandboxing. Use when writing, debugging, or securing Lua scripts, embedding Lua in a C/C++ application, writing Redis EVAL scripts, or checking Lua syntax with luac or luacheck."
 ---
 
 # Lua Specialist Skill

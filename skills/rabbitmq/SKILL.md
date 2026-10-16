@@ -1,6 +1,6 @@
 ---
 name: rabbitmq
-description: Advanced RabbitMQ 4.x operations, troubleshooting, and architecture design focusing on Quorum Queues and Streams.
+description: "RabbitMQ 4.x operations, troubleshooting, and topology design, focused on Quorum Queues and Streams. Use when diagnosing RabbitMQ memory or disk alarms, partitions, or message backlogs, designing quorum queue, stream, or dead-letter topologies, tuning throughput or latency, or auditing cluster TLS and RBAC. Not for deploying new instances or legacy mirrored queues."
 ---
 
 # RabbitMQ Operations Specialist
