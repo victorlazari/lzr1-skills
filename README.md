@@ -5,6 +5,8 @@
 [![Stars](https://img.shields.io/github/stars/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills)
 [![License](https://img.shields.io/badge/license-MIT-06b6d4?style=flat-square&labelColor=1a1a2e)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-86-ec4899?style=flat-square&labelColor=1a1a2e)](skills/)
+[![CI](https://github.com/victorlazari/lzr1-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/victorlazari/lzr1-skills/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills/releases/latest)
 [![macOS](https://img.shields.io/badge/macOS-✓-a855f7?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Linux](https://img.shields.io/badge/Linux-✓-06b6d4?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Made with Bash](https://img.shields.io/badge/made%20with-bash-ec4899?style=flat-square&labelColor=1a1a2e&logo=gnubash&logoColor=white)](install.sh)
@@ -24,14 +26,18 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 ## Table of Contents
 
 - [What are Skills?](#what-are-skills)
-- [Parallel Agent Architecture](#parallel-agent-architecture) — the June 2026 upgrade across the original 84-skill baseline
+- [Parallel Agent Architecture](#parallel-agent-architecture) — three multi-agent patterns, counted from the skills
 - [The Arsenal](#the-arsenal) — 86 skills, organized by domain
+- [Choosing between overlapping skills](#choosing-between-overlapping-skills)
 - [The Armory](#the-armory) — 9 supported tools
 - [Equip Up](#equip-up) — 3 ways to install
 - [Command Reference](#command-reference)
 - [Update & Remove](#update--remove)
 - [How It Works](#how-it-works)
+- [Development](#development)
+- [Scope](#scope)
 - [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -53,16 +59,14 @@ Each skill in this arsenal is battle-tested and includes:
 
 ## Parallel Agent Architecture
 
-The original 84-skill baseline received a **parallel execution protocol** in June 2026. Instead of sequential analysis, those skills can fan out into specialized agents that work simultaneously, then synthesize findings that no single agent could surface alone.
-
-Three upgrade patterns cover that original 84-skill baseline. The newer `coderabbit-reviewer` and `yaml-specialist` skills deliberately use bounded, evidence-first local workflows: CodeRabbit findings are triaged before remediation, while YAML, Helm, schema, and Kubernetes evidence remains separated by validation layer. Neither skill manufactures parallelism where ordered verification is safer.
+Some skills describe an optional multi-agent execution protocol: independent work is split across sub-agents, then merged by a synthesis step. The figures below come from `scripts/pattern-census.py`, which counts, for each mechanism, the skills whose `SKILL.md` or `references/*.md` contain a literal, case-sensitive phrase (run `python3 -I scripts/pattern-census.py` to reproduce them). They are text counts, not a design document. The remaining skills are single-agent playbooks, and `coderabbit-reviewer`, `yaml-specialist` and `security-review` deliberately use bounded, evidence-first workflows where ordered verification is safer than concurrency.
 
 ---
 
-### Pattern B — Sequential → Parallel Fan-out
-*8 skills · highest analysis quality gain*
+### Pattern B — Parallel Execution Protocol
+*2 skills · all agents launch at once · criterion: the phrase "Parallel Execution Protocol"*
 
-Skills with multiple independent analysis phases now launch all of them simultaneously. A secrets scanner doesn't wait for a data-flow tracer. An audio/transport agent doesn't wait for a transcript pipeline agent. Each gets the full context window and a clean slate — no anchoring bias from prior phases.
+`devops-infrastructure` and `legendary-readme` define a **Parallel Execution Protocol**: when several independent domains are involved, every relevant agent launches at the same time, each with the full task context and its own reference file, and a synthesis step merges the results.
 
 ```
 BEFORE   Phase 1 ──▶ Phase 2 ──▶ Phase 3 ──▶ Phase N ──▶ Report
@@ -70,18 +74,19 @@ BEFORE   Phase 1 ──▶ Phase 2 ──▶ Phase 3 ──▶ Phase N ──▶
 AFTER    Phase 1 Agent ─┐
          Phase 2 Agent ─┤
          Phase 3 Agent ─┼──▶ Synthesis Agent ──▶ Unified Report
-         Phase N Agent ─┘    (cross-references all phases for
-                               interaction effects none could see alone)
+         Phase N Agent ─┘
 ```
 
-**Affected skills:** `security-review` · `trivy-scanner` · `meeting-engineering` · `legendary-readme` · `devops-infrastructure` · `web-tester-supreme` · `oncall-master-supreme` · `ticket-supreme`
+Other skills (for example `security-review`, `trivy-scanner`, `web-tester-supreme`, `ticket-supreme`, `oncall-master-supreme`) allow **conditional, bounded** parallel work only when branches are independent; they do not implement a launch-everything protocol.
+
+**Affected skills:** `devops-infrastructure` · `legendary-readme`
 
 ---
 
-### Pattern C — Reference-Selector → Multi-Specialist
-*22 skills · cross-domain insight*
+### Pattern C — Multi-Specialist Spawning
+*16 skills · cross-domain insight · criterion: at least one of the phrases "Cross-Domain Synthesizer", "Spawn Specialists" or "Multi-Specialist"*
 
-Skills that used to pick *one* reference domain now detect *all* relevant domains and spawn a specialist per domain in parallel. A task touching Go + Postgres + REST gets a Backend Specialist, a DB Specialist, and an API Specialist running simultaneously — then a Cross-Domain Synthesizer resolves contradictions between them before you write a line of code.
+`legal-compliance` and `sales` name their synthesizer after the domain, so they match through "Spawn Specialists" or "Multi-Specialist" rather than "Cross-Domain Synthesizer". These skills detect every relevant domain and spawn a specialist per domain, then a **Cross-Domain Synthesizer** merges the specialists' outputs and flags contradictions between them. A task touching Go + Postgres + REST gets a Backend Specialist, a DB Specialist and an API Specialist instead of one reference.
 
 ```
 BEFORE   Detect domain ──▶ Pick ONE reference ──▶ Work within it
@@ -90,26 +95,37 @@ BEFORE   Detect domain ──▶ Pick ONE reference ──▶ Work within it
 AFTER    Detect all relevant domains
               ├──▶ Domain A Specialist ─┐
               ├──▶ Domain B Specialist ─┼──▶ Cross-Domain Synthesizer
-              └──▶ Domain C Specialist ─┘    (surfaces contradictions
-                                              before you ship them)
+              └──▶ Domain C Specialist ─┘    (surfaces contradictions)
 ```
 
-**Affected skills:** `software-engineering` · `data-analytics` · `quality-assurance` · `security-engineering` · `ai-ml-engineering` · `executive-leadership` · `finance` · `design-ux` · `product-management` · `operations` · `sales` · `marketing` · `hr-people` · `legal-compliance` · `content-communications` · `research-development` · `customer-support` · `supply-chain` · `accessibility-testing` · `it-administration` · `roles-permissions` · `ai`
+**Affected skills:** `ai` · `content-communications` · `customer-support` · `data-analytics` · `design-ux` · `executive-leadership` · `finance` · `legal-compliance` · `marketing` · `product-management` · `quality-assurance` · `research-development` · `roles-permissions` · `sales` · `software-engineering` · `supply-chain`
 
 ---
 
-### Pattern A — Adversarial Verification + Upgraded Synthesis
-*54 skills · already spawning, now hardened*
+### Pattern A — Adversarial Verification
+*18 skills with a refuter panel · 22 mention a consistency validator · 15 with conflict-resolving synthesis*
 
-Skills that already spawned parallel agents received three additive upgrades:
+Skills that spawn parallel sub-agents add up to three verification steps. The counts differ because not every skill carries every step, and each count is a phrase match: "3 independent Refuter Agents", "Consistency Validator" and "actively resolves" respectively.
 
-| Addition | What it does |
-|:---------|:-------------|
-| **3× Refuter Panel** | For each significant finding, 3 independent agents are tasked to *refute* it. A finding is confirmed only if ≥2 refuters fail to disprove it. Eliminates plausible-but-wrong output before it reaches you. |
-| **Consistency Validator** | Before synthesis, one agent reviews all parallel outputs for contradictions and flags prerequisite sequencing — so you don't get two agents recommending incompatible approaches for the same component. |
-| **Upgraded Synthesis** | The synthesis step now actively resolves conflicts — picks a winner, annotates the reasoning, preserves the dissent as a footnote — instead of silently concatenating results. |
+| Mechanism | Skills | What it does |
+|:----------|:------:|:-------------|
+| **3× Refuter Panel** | 18 | For each significant finding, 3 independent agents try to *refute* it. A finding is confirmed only if at least 2 refuters fail to disprove it, and a contested finding keeps the dissent. |
+| **Consistency Validator** | 22 | Before synthesis, one agent reviews all parallel outputs for contradictions and missing prerequisites. |
+| **Conflict-resolving synthesis** | 15 | The synthesis step resolves contradictions, orders the plan by prerequisites and calibrates confidence instead of concatenating results. |
 
-**Affected skills:** all remaining 54 including `masterclaw` · `bash` · `nemoclaw` · `openclaw` · `prompt-master` · `rag` · `k8s-eks` · `otel-collector` · `manus` · and 45 more.
+**3× Refuter Panel (18):** `bot` · `claude` · `devops` · `frontend-menu-design` · `go` · `k8s-eks` · `mongodb` · `otel-collector` · `playwright` · `prompt` · `prompt-master` · `rabbitmq-documentdb` · `rag` · `redis-valkey` · `sql-partitioning` · `tech-support-ops` · `ticket-reports` · `vitest`
+
+**Consistency Validator (22):** the 18 skills above, plus `french-teacher`, `seaweedfs`, `spanish-teacher` and `speedtest`. `french-teacher` and `spanish-teacher` use the validator for CEFR level and sequencing checks rather than a refuter panel.
+
+**Conflict-resolving synthesis (15):** `claude` · `frontend-menu-design` · `go` · `mongodb` · `otel-collector` · `prompt` · `prompt-master` · `rabbitmq-documentdb` · `rag` · `redis-valkey` · `seaweedfs` · `sql-partitioning` · `tech-support-ops` · `ticket-reports` · `vitest`. Other skills word the same step differently (for example "Actively resolve" in `k8s-eks` and `playwright`) and are not counted.
+
+<!-- pattern-census:begin -->
+parallel-execution-protocol: 2
+multi-specialist-spawning: 16
+refuter-panel: 18
+consistency-validator: 22
+conflict-resolving-synthesis: 15
+<!-- pattern-census:end -->
 
 ---
 
@@ -119,152 +135,172 @@ Skills that already spawned parallel agents received three additive upgrades:
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `ai` | Advanced AI architectures (CNNs, Transformers, LLMs), training pipelines, deployment, and production AI security | Building and deploying AI systems end-to-end |
-| `ai-ml-engineering` | ML engineering, MLOps, LLM apps, RAG pipelines, NLP, computer vision, prompt engineering | ML from experimentation to production |
-| `masterclaw` | Combined OpenClaw + NemoClaw + prompt-architecture playbook | Full-lifecycle expert for the MasterClaw platform |
-| `openclaw` | Deploy and troubleshoot OpenClaw (Node.js) and ZeroClaw (Rust) runtimes | Building and operating OpenClaw deployments |
-| `nemoclaw` | NVIDIA NemoClaw deployment, onboarding and credential handling | Operating NemoClaw clusters at scale |
-| `manus` | Manus AI agent framework — task automation, multi-step workflows, tool orchestration, autonomous agents | Building Manus-powered automation |
-| `manus-workflows` | Manus workflow design patterns — parallel execution, state management, agent coordination, error recovery | Designing complex Manus workflow graphs |
-| `hermes-agent` | NousResearch Hermes Agent operations — discovery-first setup, providers, tools, memory, skills, automation, gateways, integrations, extensions, production hardening, offline preflight, and 98-page official-source provenance | Installing, configuring, auditing, troubleshooting, extending, or safely operating Hermes Agent |
-| `meeting-engineering` | Live virtual meeting assistants with voice — Playwright automation, audio pipelines, STT/LLM/TTS, Docker | Building real-time meeting bots |
-| `software-engineering` | Backend, frontend, fullstack, APIs, systems architecture, performance, Go/Rust and more | Any production code decision |
-| `coderabbit-reviewer` | Local CodeRabbit CLI reviews with deterministic NDJSON evidence, independent finding triage, and bounded remediation loops | Reviewing uncommitted or branch changes without silently publishing them |
-| `yaml-specialist` | YAML 1.2, JSON Schema, Helm, and Kubernetes configuration engineering with secret-safe analysis, explicit compatibility matrices, isolated rendering, and layered validation evidence | Authoring, auditing, validating, or safely refactoring YAML and Helm/Kubernetes configuration |
-| `quality-assurance` | Test strategy, automation frameworks, performance testing, API testing, QA processes | Shipping with confidence |
-| `research-development` | Innovation strategy, tech scouting, R&D management, emerging tech evaluation | Staying ahead of the curve |
+| `ai` | AI model design, training, deployment and troubleshooting: CNNs, RNNs, Transformers, LLMs, inference configuration, AI security audits | Building and running AI systems end to end |
+| `ai-ml-engineering` | ML engineering, MLOps, LLM applications, NLP, computer vision, RAG pipelines and fine-tuning | ML from experiment to production |
+| `masterclaw` | Combined OpenClaw gateway, NemoClaw engine and prompt-architecture playbook for tasks that span more than one, or whose runtime is unknown | Cross-runtime claw work |
+| `openclaw` | Deploy, configure and troubleshoot the OpenClaw (Node.js) and ZeroClaw (Rust) agent runtimes: workspace bootstrap files, config.toml, channel failures | Operating OpenClaw or ZeroClaw |
+| `nemoclaw` | NVIDIA NemoClaw deployment on DGX, WSL or Linux/macOS, guided onboarding, inference provider setup, credential handling | Operating NemoClaw |
+| `bot` | Build and secure bots on the OpenClaw, NemoClaw and OpenShell ecosystems: plugins, memory, sandboxes, multi-agent routing, security audits | Bots and agents on the claw runtimes |
+| `manus` | Manus v2 agent platform: agent pipelines and clusters, sandbox network policies, WebMCP browser automation, Control Plane scheduling, S3 multipart uploads | Building and operating Manus agent solutions |
+| `hermes-agent` | NousResearch Hermes Agent: install and update, providers and models, tools, memory and skills, cron, gateways, MCP/ACP/API integrations, plugins, production readiness | Operating and extending Hermes Agent |
+| `meeting-engineering` | Live Google Meet assistants: Playwright, PulseAudio and Xvfb audio routing, low-latency STT/LLM/TTS pipelines | Real-time meeting bots |
+| `coderabbit-reviewer` | Local CodeRabbit CLI reviews of Git changes with `--agent` event evidence, finding triage and bounded remediation | Pre-push review of local changes |
+| `research-development` | Innovation strategy, technical research methodology, R&D management, technology scouting, emerging technology evaluation | Evaluating what to build or adopt next |
 
 ### 🧠 Prompts & LLMs
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `prompt-master` | Prompting techniques, RAG pipelines, context-size reduction | Squeezing every token of performance |
-| `prompt` | Design, harden and debug prompts and prompt systems | Getting cleaner, more reliable AI outputs |
-| `claude` | Claude API/SDK integration — tool use, multi-turn, streaming, MCP, caching, computer use | Building Claude-powered applications |
-| `openai` | OpenAI API integration — function calling, Assistants API, fine-tuning, vision | Building OpenAI-powered applications |
-| `rag` | RAG architectures — chunking strategies, embedding models, retrieval patterns, reranking, evaluation | Knowledge-grounded AI applications |
+| `prompt` | Design, harden and debug prompts and prompt systems: architecture, injection and jailbreak defence, token and cache optimization, schemas, templates | One prompt system that must work and stay safe |
+| `prompt-master` | Prompting techniques (CoT, ToT, ReAct, self-consistency), RAG, GraphRAG and Agentic RAG pipelines, context and bootstrap size reduction | Choosing a technique or cutting context size |
+| `claude` | Claude models and API: integration, system prompts, tool use, vision, extended thinking, prompt caching, Artifacts | Apps built on Claude |
+| `openai` | OpenAI API: Responses API, Realtime API, function calling, structured outputs, tool_search | Apps built on OpenAI models |
+| `rag` | RAG architecture: adaptive and agentic RAG, chunking, embeddings, vector databases, hybrid retrieval, fixing irrelevant retrieval | Grounded retrieval pipelines |
 
 ### 📊 Data & Analytics
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `data-analytics` | Data engineering, analysis, BI, data visualization, data science, analytics engineering | Pipelines to dashboards |
+| `data-analytics` | Data engineering, analysis, BI, visualization, data science, warehouse design, SQL and analytics engineering | Pipelines to dashboards |
 
 ### 🎨 Design & Content
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `design-ux` | UX/UI design, design systems, user research, accessibility, interaction design, prototyping | Building interfaces people actually enjoy |
-| `content-communications` | Content strategy, technical writing, copywriting, developer relations, corporate comms | Making complex things readable |
-| `marketing` | Digital marketing, SEO, growth, brand strategy, demand gen, analytics | Campaigns that convert |
-| `web-presentation-creator` | Cinematic landing pages with GSAP animations, scrollytelling, video embeds, full HTML packages | Premium web experiences |
-| `one-page` | One-pagers, executive summaries, status updates, business cases | When one page has to do everything |
-| `legendary-readme` | README files that are both technically excellent and genuinely entertaining | First impressions that stick |
-| `frontend` | React, Next.js, TypeScript, state management, server components, accessibility | Building modern frontend applications |
-| `frontend-menu-design` | Navigation UX, dropdown patterns, mobile menus, mega menus, keyboard accessibility | Menus that don't frustrate people |
+| `design-ux` | UX and UI design, design systems, user research, accessibility, interaction design, information architecture | Interfaces people can use |
+| `content-communications` | Content strategy, technical writing, copywriting, corporate communications, developer relations | Making complex things readable |
+| `marketing` | Digital and content marketing, SEO, growth, brand strategy, marketing analytics, demand generation | Campaigns and positioning |
+| `one-page` | One-page presentations and reports: executive summaries, status updates, business cases, pitches, launches | One page that has to do everything |
+| `legendary-readme` | GitHub README writing and polish: banners, badges, diagrams, tables, tone, light and dark mode | Project front pages |
+
+### 🖥️ Frontend & Web
+
+| Skill | What it does | Best for |
+|:------|:-------------|:---------|
+| `frontend` | React and Next.js App Router frontends: Server Components, TypeScript, Tailwind CSS, state management, testing, rendering and bundle performance | Building and auditing modern frontends |
+| `frontend-menu-design` | Navigation menu architecture: mega menus, mobile drawers, RBAC-driven visibility, animation, keyboard and WCAG behavior in React and Next.js | Menus that are usable and accessible |
+| `web-presentation-creator` | Premium landing pages: cinematic scrollytelling, GSAP animation, complex media, complete HTML or ZIP packages | Showcase web pages |
 
 ### 🔧 DevOps & Infrastructure
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `devops-infrastructure` | Cross-cloud architecture, IaC, SRE, platform engineering, FinOps | Infra that doesn't page you at 3am |
-| `devops` | Hands-on AWS/EKS/Helm/GitOps/VPC provisioning and troubleshooting | Streamlining the path from commit to production |
-| `docker` | Run and operate containers and Compose; hardening and troubleshooting | Containers that actually work in prod |
-| `dockerfile` | Author and optimize Dockerfiles (multi-stage, BuildKit, hardening) | Lean, secure, reproducible images |
-| `k8s-eks` | Kubernetes on AWS EKS — workloads, networking, IAM, autoscaling, node groups | Running K8s without the PhD |
-| `lerian-helm` | Lerian platform Helm chart engineering with strict Lerian conventions and security patterns | Lerian-compliant Helm deployments |
-| `cron-master` | Cron across local and Docker environments — Supercronic, Ofelia, host-to-container patterns | Scheduled tasks that actually run |
-| `trivy-scanner` | Trivy security scanning — vulnerabilities, misconfigs, secrets, SBOM, compliance, reports | Knowing what's lurking in your images |
-| `it-administration` | Endpoint management, IAM, IT security, SaaS administration, IT ops | Running the machine that runs the machines |
-| `otel-collector` | OpenTelemetry Collector — pipeline config, processors, exporters, sampling, Alloy | Telemetry that reaches its destination |
+| `devops-infrastructure` | Cross-cloud architecture, Infrastructure as Code, SRE, platform engineering, networking, AI/MLOps infrastructure, FinOps | Infrastructure design decisions |
+| `devops` | Hands-on AWS, EKS, Helm, GitOps, VPC and CI/CD provisioning and troubleshooting, including Terraform and CloudFormation | Provisioning and debugging AWS delivery |
+| `docker` | Run and operate containers and Compose: Buildx multi-platform builds, runtime hardening, Docker Scout, networking, storage and performance troubleshooting | Containers that run and stay healthy |
+| `dockerfile` | Author and optimize Dockerfiles: multi-stage builds, layer caching, BuildKit mounts, non-root and secret handling, Hadolint and Trivy in CI | Lean, safe images |
+| `k8s-eks` | Kubernetes and AWS EKS operations, incident troubleshooting, networking and cluster management | EKS incidents and cluster work |
+| `lerian-helm` | Helm deployments, golang-migrate migrations and security validation for Lerian Studio charts under Restricted Pod Security Standards | Deploying Lerian Studio |
+| `yaml-specialist` | YAML, JSON Schema, Helm values contracts and Kubernetes manifest authoring, linting, rendering and validation | Config files that validate |
+| `cron-master` | Cron scheduling locally and in Docker: crontab, Supercronic, Ofelia, host-to-container execution | Scheduled jobs that run |
+| `trivy-scanner` | Trivy scans of repositories, filesystems, images, Kubernetes and SBOMs: vulnerabilities, misconfigurations, secrets, licenses, VEX, CI, air-gapped use | Knowing what ships in your images |
+| `otel-collector` | OpenTelemetry Collector configuration, OTTL, scaling, connectors (routing, spanmetrics), custom builds, OOM diagnosis | Telemetry pipelines |
+| `it-administration` | Endpoint management, identity and access management, IT security, SaaS administration, IT operations | Running company IT |
+| `speedtest` | Ookla Speedtest methodology and CLI, custom OoklaServer, latency and jitter analysis, network throughput troubleshooting | Network performance diagnosis |
 
 ### 🗄️ Databases & Storage
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `database` | Engine-agnostic DB design and security (PostgreSQL and MongoDB) | Getting the schema right the first time |
-| `postgres-15` | PostgreSQL 15+ operations, tuning, upgrades, DR and security | High-performance Postgres at scale |
-| `mongodb` | MongoDB — schema design, aggregation pipelines, indexing, Atlas, transactions | Document-model application data |
-| `redis-valkey` | Operate and troubleshoot Redis/Valkey: latency, memory, hot keys, Lua | Fast data that lives at the edge of your stack |
-| `valkey-redis` | Valkey config (valkey.conf) and Redis OSS to Valkey migration | Moving from Redis to Valkey |
-| `rabbitmq` | RabbitMQ — exchanges, queues, routing, dead letters, shovel, clustering | Reliable async message delivery |
-| `rabbitmq-documentdb` | RabbitMQ + DocumentDB integration — event-sourcing patterns, consumer groups, idempotency | Message-driven document persistence |
-| `sql-partitioning` | Partitioning and sharding design for large SQL tables | Tables that don't grind to a halt at 100M rows |
-| `seaweedfs` | SeaweedFS distributed storage — volumes, topology, S3 API, tiered storage, erasure coding | Cheap, scalable blob storage on your own infra |
+| `database` | Engine-agnostic architecture, indexing, replication, high availability and security hardening for PostgreSQL and MongoDB | Choosing and designing the data layer |
+| `postgres-15` | PostgreSQL 15+ operations: autovacuum, memory, PgBouncer, locks, major upgrades, PITR and DR, RBAC, RLS, pgaudit | Running Postgres in production |
+| `sql-partitioning` | Partitioning and sharding for very large SQL tables: declarative partitioning, pruning, pg_partman, zero-downtime migration | Tables too big for one heap |
+| `mongodb` | MongoDB operations at scale: query optimization, sharding, backup and restore, log analysis | Running MongoDB |
+| `redis-valkey` | Operate Redis or Valkey in production: latency, memory pressure, hot keys, CLI incident response, cluster operations, Lua script review | Slow or full Redis/Valkey |
+| `valkey-redis` | Valkey administration: valkey.conf, hardening, Redis OSS 7.2 or earlier to Valkey migration | Configuring or migrating to Valkey |
+| `rabbitmq` | RabbitMQ 4.x operations and topology design, with Quorum Queues and Streams: alarms, partitions, backlogs, dead letters, tuning | Reliable messaging |
+| `rabbitmq-documentdb` | RabbitMQ with Amazon DocumentDB: event-driven service design, exchange and queue setup, schemas, indexes, CDC sync | Message-driven document persistence |
+| `seaweedfs` | SeaweedFS: Master, Volume and Filer servers, Kubernetes operator and CSI driver, erasure coding, tiered storage, S3 API | Self-hosted blob storage |
 
 ### 🔐 Security
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `security-engineering` | AppSec, cloud security, DevSecOps, threat modeling, incident response, IAM | Secure by design, not by accident |
-| `security-review` | Exhaustive line-by-line code security review — OWASP, CWE, credentials, PII leaks, supply chain | The review that catches what others miss |
-| `passkeys` | WebAuthn/Passkey implementation — FIDO2, authenticator types, credential management, UX | Passwordless auth that actually ships |
-| `roles-permissions` | RBAC/ABAC/ReBAC with Casbin, Casdoor, multi-tenant authorization, IDOR prevention | Authorization models that don't explode in production |
+| `security-engineering` | Application and cloud security, DevSecOps, security architecture, threat modeling, compliance, incident response | Designing security in |
+| `security-review` | Evidence-backed security reviews of code, config, CI/CD, dependencies, infrastructure, mobile and AI integrations, with validated findings | Deep repository audits |
+| `passkeys` | FIDO2 and WebAuthn passkeys: registration, authentication, recovery, Conditional UI, synced versus device-bound credentials, IdP/SSO integration | Passwordless login |
+| `roles-permissions` | Authorization with Casbin and Casdoor: RBAC, ABAC, ReBAC, multi-tenant isolation, IDOR and privilege-escalation prevention | Permission models |
 
 ### 💻 Languages & Runtimes
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `bash` | Advanced Bash/shell scripting, text processing, POSIX compliance, process management | Automation scripts that survive the next developer |
-| `go` | Go expert — concurrency patterns, stdlib, testing, performance, idiomatic Go | Writing Go that senior Go engineers won't rewrite |
-| `lua` | Lua scripting — embedding, coroutines, metatables, OOP patterns, Luarocks | Lightweight, embeddable scripting |
-| `go-lua` | Go + Lua integration — embedding scripts, sandboxing, extension systems, gopher-lua | Building scriptable Go applications |
-| `speedtest` | Network speed testing, latency measurement, bandwidth diagnostics, jitter analysis | Understanding what your network is actually doing |
+| `software-engineering` | Backend, frontend, fullstack, mobile, API design, systems architecture, database and performance engineering, language-specific expertise | General production code decisions |
+| `bash` | Bash and shell scripting, text processing, process management, POSIX compliance | Scripts that survive |
+| `go` | Go troubleshooting and scaling: performance, memory and goroutine leaks, govulncheck security audits, modernization | Fixing and hardening Go |
+| `lua` | Lua for embedded systems, game engines and Redis: syntax validation, C API embedding, sandboxing | Writing and securing Lua |
+| `go-lua` | Go and Lua operations: pprof profiling, GOGC/GOMEMLIMIT tuning, goroutine leaks, CGO, Redis Lua scripts, migrations | Go performance work with Lua in the mix |
 
 ### 💼 Business & Operations
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `executive-leadership` | CEO/CTO/CFO strategy, board management, fundraising, org transformation | C-suite decisions with data |
-| `finance` | FP&A, financial modeling, SaaS metrics, fundraising, cash flow, investor materials | Numbers that tell the right story |
-| `hr-people` | Talent acquisition, people ops, org development, compensation, employee experience | Building teams, not just orgs |
-| `legal-compliance` | Corporate law, contracts, IP, GDPR/CCPA, regulatory compliance, risk management | Staying out of trouble |
-| `operations` | Business ops, project management, process optimization, vendor management, excellence | The unsexy work that makes everything work |
-| `product-management` | Product strategy, roadmapping, discovery, prioritization, PRDs, growth | Shipping the right thing |
-| `sales` | B2B sales, sales engineering, account management, RevOps, GTM strategy | Pipeline to close |
-| `customer-support` | Support ops, technical support, knowledge management, escalation workflows, CX | Support that actually helps |
-| `supply-chain` | Procurement, vendor management, supply chain analytics, logistics, strategic sourcing | Getting things from A to B |
-| `accessibility-testing` | WCAG 2.1 AA, ARIA, keyboard navigation, screen reader compatibility, remediation | Accessible by default, not by lawsuit |
+| `executive-leadership` | CEO, CTO, CFO, COO, VP Engineering and Chief of Staff strategy: board management, fundraising, organizational transformation | Executive decisions |
+| `finance` | FP&A, accounting, treasury, financial modeling, SaaS metrics, fundraising, investor materials | Financial planning |
+| `hr-people` | Talent acquisition, people operations, organizational development, compensation and benefits, employee experience, HR analytics | People programs |
+| `legal-compliance` | Corporate law, contracts, IP, GDPR/CCPA data privacy, regulatory compliance, risk management | Legal and compliance groundwork |
+| `operations` | Business operations, project management, process optimization, vendor management, operational excellence | Running the business |
+| `product-management` | Product strategy, roadmapping, discovery, prioritization, PRDs, growth, technical product management | Deciding what to build |
+| `sales` | B2B sales, sales engineering, account management, revenue operations, go-to-market | Pipeline to close |
+| `supply-chain` | Procurement, vendor management, supply chain analytics, logistics, inventory, strategic sourcing | Sourcing and logistics |
 
 ### 🎯 Support, Ticketing & On-call
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `jira-field-schemas` | Jira custom field configuration, schemas, screen layouts, field contexts | Jira that works the way your team thinks |
-| `jira-jsm-oncall` | Jira Service Management on-call setup — schedules, escalations, SLA policies | On-call that respects sleep schedules |
-| `jira-status-workflows` | Jira workflow design — status transitions, validators, post-functions, automation | Workflows people actually follow |
-| `ticket-reports` | Advanced ticket reporting, JQL queries, BI integration, predictive analytics, executive dashboards | Ticket data that drives decisions |
-| `ticket-supreme` | Ticket specification and sprint-ready acceptance criteria — scope, estimation, risk, dependencies | Tickets that don't come back as surprises |
-| `oncall-master-supreme` | Incident management, on-call runbooks, blast radius analysis, postmortems | Incidents resolved, not just closed |
-| `tech-support-ops` | Technical support operations — tooling, escalation paths, SLA management, knowledge workflows | Support at scale without chaos |
+| `customer-support` | Support operations, technical support, knowledge management, support metrics, escalation workflows, customer experience | Support processes |
+| `tech-support-ops` | Sev-1/Sev-2 triage, root cause analysis, blameless post-mortems, SLO/SLI and error-budget tracking, MTTA/MTTR | Critical incident handling |
+| `oncall-master-supreme` | On-call systems: HA/DR, ChatOps war rooms, runbooks and auto-remediation, SLOs, follow-the-sun schedules, postmortems | Running on-call |
+| `jira-field-schemas` | Jira field schemes, field contexts and screen schemes, with checks against the skill's recorded 2026 limits | Jira field architecture |
+| `jira-jsm-oncall` | Jira Service Management SLAs, alert routing, on-call schedules, Edge Connector, CMDB-linked incident workflows, automation rules | JSM alerting and on-call |
+| `jira-status-workflows` | Jira workflow state machines: transitions, conditions, validators, post-functions, workflow properties, ScriptRunner | Jira workflows |
+| `ticket-reports` | Ticket reporting: JQL, SLA and team-performance dashboards, BI loading, predictive analytics, ITIL 4 measurement | Ticket data that informs |
+| `ticket-supreme` | Design and build enterprise ticketing systems: high availability, real-time communication, SLA modeling, security, omnichannel, AI/ML | Building a ticketing system |
 
 ### 🌐 Integrations & APIs
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `gcalendar` | Bulk Google Calendar event validation, duplicate removal, timezone conversion, MCP workflows | Calendar chaos → order |
-| `google-workspace-bot-integration` | Bot commands and workflows across Gmail, Calendar, Sheets, Docs, Drive, Forms, Contacts | Full Workspace automation |
-| `slack` | Slack bot development — Block Kit, webhooks, Bolt framework, slash commands, modals | Slack bots that don't feel like bots |
-| `vonage-voice` | Vonage Voice API — outbound calls, IVR, NCCO, DTMF/ASR, webhooks, call control | Programmable voice, done right |
-| `voip-oncall` | VoIP-based on-call systems — SIP, call routing, escalation trees, failover | On-call that reaches a human |
-| `wikijs` | Wiki.js knowledge management — pages, navigation, API, permissions, theming | Company knowledge that people actually find |
-| `playwright` | Playwright automation — browser testing, E2E workflows, scraping, network interception | Tests that survive a redesign |
-| `vitest` | Vitest unit testing — fast, ESM-native, coverage, mocking, snapshot testing | Unit tests that run before you lose patience |
-| `tomate-pos80` | Tomate POS-80 thermal printer — raw ESC/POS commands, encoding, barcodes, receipt templates | Your AI can now print receipts |
-| `bot` | Build and secure bots on OpenClaw/NemoClaw/OpenShell (channels, plugins, sandboxes) | Bots that have a real conversation |
+| `gcalendar` | Google Calendar via MCP tools: bulk validation, duplicate removal, timezone conversion, scheduling | Calendar cleanup |
+| `google-workspace-bot-integration` | Bot commands and workflows across Gmail, Calendar, Sheets, Slides, Docs, Drive, Forms, Contacts, Tasks, Chat and Events | Workspace bots |
+| `slack` | Slack apps with Bolt or Deno, Block Kit messages, events, slash commands, OAuth, Web API and CLI | Slack apps |
+| `vonage-voice` | Vonage Voice API: outbound calls, NCCO actions, IVR, DTMF/ASR input, answer and event webhooks, REST call control | Programmable voice |
+| `voip-oncall` | VoIP on-call services: IVR incident acknowledgment, WebRTC war rooms, voice alerting with Twilio or Vonage, SIP trunks, telecom compliance | Voice-based on-call |
+| `wikijs` | Wiki.js administration: Git sync, GraphQL content automation, enterprise deployments | Wiki administration |
+| `manus-workflows` | n8n workflow design on its AI agent architecture: scheduling, file handling, messaging patterns, retries and recovery | n8n automations |
+| `tomate-pos80` | Tomate POS-80 thermal receipt printer (MDK-080, MDK-081, MDK-08260): raw print commands, encoding, barcodes and QR codes, receipt templates | Printing receipts |
 
 ### 🧪 Testing & Quality
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `web-tester-supreme` | Comprehensive web testing — functional, visual regression, a11y, performance, client-side security | The test suite that catches everything |
+| `quality-assurance` | Test strategy, test plans, automation frameworks, performance and security testing, AI testing, QA processes | Planning how to test |
+| `playwright` | Playwright E2E: configuration, network mocking, visual regression, multi-browser and mobile matrices, CI, flaky tests | Playwright suites |
+| `vitest` | Vitest 4.1 for Next.js 16 and React 19: mocking (Prisma, Valkey, RabbitMQ), snapshots, test tags, component and hook tests | Unit tests |
+| `web-tester-supreme` | Web E2E for Next.js apps: RBAC validation, degraded-state and network-failure behavior, data visualization and observability checks | App-level web test suites |
+| `accessibility-testing` | Automated accessibility testing with Axe-core and Playwright: WCAG violations, known-issue snapshots, focus, dynamic trees, contrast | Accessibility checks |
 
 ### 🌍 Language Teaching
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `french-teacher` | French language instruction — grammar, vocabulary, conversation, DELF/DALF preparation | Learning French with a patient, knowledgeable teacher |
-| `spanish-teacher` | Spanish language instruction — grammar, vocabulary, conversation, DELE preparation | Learning Spanish without the textbook grind |
+| `french-teacher` | French CEFR level assessment, targeted A1-C2 exercises and reading passages, alignment with Council of Europe descriptors | Teaching French |
+| `spanish-teacher` | Spanish A1-C2: grammar, vocabulary, exercises and quizzes, dialects, cultural competence, curriculum design | Teaching Spanish |
+
+---
+
+## Choosing between overlapping skills
+
+Six groups of skills sit close together. Each skill's own description names its neighbour for the other case; this table is the short version.
+
+| Group | Lanes |
+|:------|:------|
+| Redis and Valkey | `redis-valkey`: a running instance is slow, out of memory, CPU-bound, has hot keys, or a Lua script needs review. `valkey-redis`: writing or hardening the Valkey config file, or migrating from Redis OSS 7.2 or earlier. |
+| DevOps | `devops`: hands-on AWS networking, EKS, Helm, GitOps or CI/CD provisioning and debugging. `devops-infrastructure`: cross-cloud architecture, IaC practice, SRE, platform engineering, FinOps. |
+| Prompts | `prompt`: designing, securing or debugging one prompt system. `prompt-master`: choosing a prompting technique, building RAG pipelines, cutting context size. |
+| Claw runtimes | `openclaw`: deploy or troubleshoot OpenClaw or ZeroClaw. `nemoclaw`: deploy and onboard NVIDIA NemoClaw. `bot`: build or audit bots, plugins and OpenShell sandboxes on top of them. `masterclaw`: the task spans more than one runtime, or the runtime is not yet known. |
+| PostgreSQL and data design | `postgres-15`: operate, tune, upgrade or secure a PostgreSQL 15+ server. `sql-partitioning`: partition or shard very large tables. `database`: engine-agnostic architecture, replication and security across PostgreSQL and MongoDB. |
+| Containers | `docker`: run, debug or harden containers and Compose stacks. `dockerfile`: write, shrink or audit a Dockerfile. |
 
 ---
 
@@ -290,13 +326,23 @@ The installer detects these tools automatically and installs skills to their con
 
 ### Option 1 — one-line curl installer
 
-The required one-line command remains available and launches an interactive target menu. Like every `curl | bash` pattern, it executes the fetched script immediately; use the inspect-first alternative below when your trust policy requires review before execution.
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash
 ```
 
-In piped mode, the script downloads **one repository archive**, validates that `skills-list.txt` exactly matches 86 package directories, and then installs complete packages. It does not fall back to a stale embedded list or continue after a partial catalog download.
+This installs the **latest verified release**: the script downloads the release archive `lzr1-skills.tar.gz` and `SHA256SUMS`, checks the archive against the checksum, and only then extracts it. Fallback to the unverified `main` snapshot requires two independent signals: the latest-release `SHA256SUMS` request returns HTTP 404 **and** a status-only request to `https://api.github.com/repos/victorlazari/lzr1-skills/releases/latest` also returns 404. GitHub answers 404 there when the repository has no published (non-draft, non-prerelease) release, so a draft-only or prerelease-only repository also qualifies; the fallback is skipped unless both signals report absence. If that API request returns 2xx, the install stops with "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override"; any other status or a transport failure stops it too. The fallback prints a warning. Downloads use `curl` restricted to HTTPS and TLS 1.2 with retry and time limits; when only `wget` is available the installer requires wget's HTTPS-only mode and TLS 1.2 plus a retry limit of 3 and a 30 second timeout, and it refuses to download if that `wget` cannot provide them (exact options under How It Works). Symbolic links in the skills tree are rejected in every source mode. The command launches an interactive target menu; like every `curl | bash` pattern it executes the fetched script immediately, so use the inspect-first alternative below when your trust policy requires review.
+
+**Pin a release** (checksum-verified; fails instead of falling back if the tag or its checksums cannot be downloaded):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- --ref v2.1.0 --codex --yes
+```
+
+**Explicit unverified snapshot** (any ref that is not a `vX.Y.Z` tag is a branch snapshot, installed without checksum verification and with a warning):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- --ref main --detected --yes
+```
 
 **Inspect first, then run the exact saved file:**
 
@@ -313,11 +359,21 @@ bash install.sh --detected --yes
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- --detected --yes
 ```
 
-`LZR1_AUTO=1` remains an automation shorthand for detected targets. `LZRI_AUTO=1` is retained as a backward-compatible alias.
+**Verify a release by hand** (the installer does the same comparison):
+
+```bash
+curl -fsSLO https://github.com/victorlazari/lzr1-skills/releases/latest/download/lzr1-skills.tar.gz
+curl -fsSLO https://github.com/victorlazari/lzr1-skills/releases/latest/download/SHA256SUMS
+shasum -a 256 -c SHA256SUMS
+```
+
+The release tarball is a `git archive` of the tag, so it includes tests and docs alongside the skills.
+
+**Trust model.** The checksum protects against corruption in transit and against a mirror or proxy substituting the archive. Because the unverified fallback needs HTTP 404 on both the latest-release checksum file and the latest-release API (the two-signal rule), an attacker who blocks or breaks either request causes the install to fail rather than to downgrade. A TLS-terminating proxy that falsifies both responses is outside the threat model: the checksum protects against corruption and mirror substitution, not against a compromised repository or a network position that can forge HTTPS. It does not protect against a compromised repository or release: both assets come from the same place, and releases are not signed yet. Any `--ref` that is not a release tag, and the `main` fallback, are unverified snapshots with no checksum at all. Symbolic links are rejected in every source mode, and `wget` is used only in HTTPS-only mode with TLS 1.2. Report integrity problems as described in [SECURITY.md](SECURITY.md).
 
 ### Option 2 — Clone and run
 
-Full local control. Works offline after cloning.
+Full local control. Works offline after cloning; the clone is the source, so `--ref` does not apply.
 
 ```bash
 git clone https://github.com/victorlazari/lzr1-skills.git
@@ -335,31 +391,40 @@ bash install.sh --all --dry-run                # validate and preview without wr
 
 ### Option 3 — Update existing install
 
-Revalidates the latest source snapshot and reinstalls complete packages to whichever tools are recorded in the managed state file.
+Revalidates the latest source and reinstalls complete packages to whichever tools are recorded in the managed state file.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- update
 ```
 
+Installer version: 2.1.0
+
 ---
 
 ## Command Reference
+
+Generated from `bash install.sh --help`; run it for the authoritative text.
+
+```text
+bash install.sh [command] [target options] [behavior options]
+```
 
 ### Subcommands
 
 | Command | What it does |
 |:--------|:-------------|
-| `install` | Install skills (default) |
-| `update` | Re-download and reinstall to previously selected tools |
-| `remove` | Remove installed skills |
-| `doctor` | Check installation health — verifies every skill file |
+| `install` | Install the complete skill catalog (default) |
+| `update` | Reinstall to explicitly selected or previously saved targets |
+| `remove` | Remove only content carrying lzr1 ownership markers |
+| `doctor` | Validate the source catalog and report managed target coverage and the source mode, ref and verification status |
+| `help` | Show the help text |
 
 ### Tool Flags
 
 | Flag | Target |
 |:-----|:-------|
 | `--claude-code` | `~/.claude/skills/` |
-| `--claude-desktop` | Platform-specific Claude Desktop path |
+| `--claude-desktop` | Platform-specific Claude Desktop skills directory |
 | `--codex` | `~/.codex/skills/` |
 | `--opencode` | `~/.config/opencode/skill/` |
 | `--factory` | `~/.factory/skills/` |
@@ -367,26 +432,29 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 | `--vscode` | `~/.vscode/lzr1-skills/` |
 | `--antigravity` | `~/.antigravity-ide/rules/` |
 | `--agy` | `~/.gemini/antigravity-cli/skills/` |
-| `--detected` | Every tool whose config directory already exists |
-| `--all` | All nine targets, including undetected tools |
+| `--detected` | Select all currently detected tools |
+| `--all` | Select all nine tools, including undetected tools |
 
 ### Behavior Flags
 
 | Flag | What it does |
 |:-----|:-------------|
-| `--dry-run`, `-n` | Validate the source and preview destination changes without writing |
+| `--dry-run`, `-n` | Validate the source and preview destination changes only |
 | `--verbose`, `-v` | Show per-skill activity |
-| `--yes`, `-y` | Disable interactive selection; a target flag is still required |
-| `--force` | Back up and replace an unowned same-name collision |
+| `--yes`, `-y` | Non-interactive confirmation mode; does not select targets |
+| `--force` | Back up and replace unowned name collisions |
+| `--ref <value>` | Archive source when run via curl (env: `LZR1_REF`). Default: latest published release, checksum-verified. A tag such as `v2.1.0` pins a verified release. Any other value is a branch snapshot (unverified). Allowed characters: `A-Z a-z 0-9 . _ / -`; an empty value is rejected |
 | `--version` | Show installer version |
-| `--help`, `-h` | Full help text |
+| `--help`, `-h` | Show the help text |
 
 ### Environment Variables
 
 | Variable | Effect |
 |:---------|:-------|
-| `LZR1_AUTO=1` | Skip the interactive menu and select detected tools |
-| `LZRI_AUTO=1` | Backward-compatible alias for `LZR1_AUTO=1` |
+| `LZR1_AUTO=1` | Automation shorthand: select detected tools without the interactive menu |
+| `LZRI_AUTO=1` | Backward-compatible alias for `LZR1_AUTO` |
+| `LZR1_REF` | Same as `--ref`; the flag wins when both are given |
+| `LZR1_SOURCE_DIR` | Install from this local directory instead of a clone or download (source mode `override`) |
 
 ---
 
@@ -421,19 +489,57 @@ bash install.sh doctor
 
 ## How It Works
 
-The installer chooses its source mode automatically and then applies the same fail-closed catalog validation in both modes.
+The installer chooses its source mode and then applies the same fail-closed catalog validation in every mode. The success line reads `Validated N skills from <mode> source (ref: X), verified: yes|no`, and `doctor` reports `Source: <mode>, ref <r>, verified <yes|no>`.
 
-**Local mode** — a clone is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 86 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. No network is required after cloning.
+**Source modes** — `override` (`LZR1_SOURCE_DIR`), `local` (running from a clone), `release` (checksum-verified release archive) and `branch` (unverified snapshot of a ref).
 
-**Curl mode** — the one-line script downloads a single GitHub repository archive over HTTPS, rejects unsafe archive paths and symbolic links, validates the same exact 86-skill manifest-to-directory contract, and installs from that coherent snapshot. There is no hardcoded-list fallback and no per-file partial-download mode. The downloaded archive’s SHA-256 is printed for evidence; because `main` is mutable, pin or independently verify a trusted revision when your policy requires immutable provenance.
+**Manifest validation** — the source is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 86 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. Unsafe archive paths and symbolic links are rejected. There is no hardcoded-list fallback.
+
+**Checksum verification and fallback** — with no `--ref`, the installer downloads `SHA256SUMS` and `lzr1-skills.tar.gz` from the latest release and refuses to extract on a mismatch. Fallback to the unverified `main` snapshot requires two independent signals: the latest-release `SHA256SUMS` request returns HTTP 404 **and** a status-only request to `https://api.github.com/repos/victorlazari/lzr1-skills/releases/latest` also returns 404. GitHub answers 404 there when the repository has no published (non-draft, non-prerelease) release, so a draft-only or prerelease-only repository also qualifies; the fallback is skipped unless both signals report absence. If that API request returns 2xx, the install stops with "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override"; any other status or a transport failure stops it too. Any other failure of the checksum request (timeout, DNS, TLS, 5xx, 403/429, other 4xx, or an empty body) also stops the install and names the status, and you may then re-run with `--ref main` to install the snapshot knowingly. Blocking or failing either request therefore cannot downgrade an install. An explicit `vX.Y.Z` tag never falls back: a missing release exits non-zero. Any other ref is an unverified snapshot, with a warning. A missing `sha256sum`/`shasum` tool is an error for verified modes. Downloads use `curl` with `--proto '=https' --tlsv1.2`, retries and timeouts; the `wget` path requires `--https-only` and TLS 1.2 (`--secure-protocol=TLSv1_2`) plus `--tries=3` and `--timeout=30`, and the installer refuses to download when `wget` lacks those options. Symbolic links in the source skills tree are rejected in every source mode (override, local, release and branch); the check runs on the extracted or supplied tree, and the installer also rejects symbolic-link and hardlink members before extracting an archive.
 
 **Destination layouts** — package-native tools receive `skills/<name>/` directories. Flat-rule tools receive `<name>.md` plus a hidden `.lzr1-skill-resources/<name>/` package mirror; entrypoint links are rewritten to that mirror so referenced materials continue to resolve.
 
-**Ownership and replacement** — each installed package has a repository ownership marker, and each target has a managed index. Updates stage a complete replacement before swapping it into place. Unowned collisions fail closed unless `--force` is explicit, in which case the prior content is backed up rather than deleted.
+**Ownership markers and backups** — each installed package carries a `.lzr1-managed` ownership marker, and each target has a managed index. Updates stage a complete replacement before swapping it into place. Unowned collisions fail closed unless `--force` is explicit, in which case the prior content is moved to `.lzr1-backups/<run-id>/` inside that target rather than deleted.
 
-**State and locking** — successful target selections are merged into `~/.lzr1-skills-state`; subset removals delete only those records. A per-user lock prevents overlapping write operations. `--dry-run` performs source validation and target preflight without writing installer state or target content.
+**State and locking** — successful target selections are merged into the state file `~/.lzr1-skills-state`; subset removals delete only those records. A per-user lock directory, `~/.lzr1-skills-lock`, prevents overlapping write operations. `--dry-run` performs source validation and target preflight without writing installer state or target content.
 
-**Tool detection** — the installer checks each tool’s current config directory at startup. Detected tools are labeled in the interactive menu; undetected targets can still be selected explicitly and their directories will be created safely.
+**Tool detection** — the installer checks each tool's current config directory at startup. Detected tools are labeled in the interactive menu; undetected targets can still be selected explicitly and their directories will be created safely.
+
+---
+
+## Development
+
+Run everything from the repository root. Python tooling runs isolated with `-I`.
+
+```bash
+python3 -I scripts/lint_catalog.py    # catalog linter: manifest, frontmatter, links, counts, stale refs, script registry
+bash tests/test-catalog.sh            # negative fixtures for the linter
+bash tests/test-scripts.sh            # smoke tests for the scripts registered in tests/script-coverage.tsv
+bash tests/test-installer.sh          # installer behavior in a sandboxed HOME
+bash tests/test-installer-download.sh # offline tests of the verified download path (fake curl)
+bash tests/test-adversarial-remediations.sh
+bash tests/test-release.sh            # offline test of scripts/build-release.sh
+```
+
+**Script-coverage registry** — `tests/script-coverage.tsv` lists every script under `skills/*/scripts/` with a level: `behavior` (a test exercises it), `help` (its `--help` is run in an isolated environment) or `static` (syntax and mode checks only, with a written reason). The linter fails when a script has no row.
+
+**CI** (`.github/workflows/ci.yml`, on pushes to `main` and on pull requests):
+
+| Job | Runs on | Steps |
+|:----|:--------|:------|
+| `test` | ubuntu and macOS | linter, `test-catalog.sh`, `test-scripts.sh`, `test-installer.sh`, `test-installer-download.sh`, `test-release.sh`, `test-adversarial-remediations.sh` |
+| `test` (Linux leg only) | ubuntu | ruff (`E9,F`) over `skills/`, `compileall` of skill Python |
+| `shellcheck` | ubuntu | shellcheck at warning severity over `install.sh`, `tests/*.sh` and skill shell scripts |
+
+Pushing a `vX.Y.Z` tag (glob `v[0-9]*.[0-9]*.[0-9]*`) runs `.github/workflows/release.yml`, whose first step rejects any tag name not matching `^v[0-9]+[.][0-9]+[.][0-9]+$` (the glob alone also matches names such as `v1.2.3garbage`) before anything is published, and which then builds `lzr1-skills.tar.gz` and `SHA256SUMS` with `scripts/build-release.sh`.
+
+More: [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [CHANGELOG.md](CHANGELOG.md) · [LICENSE](LICENSE) · [docs/decisions/](docs/decisions/)
+
+---
+
+## Scope
+
+This public, MIT-licensed repository does not add Lerian-specific skills; those belong in the ring plugin, and non-public Lerian material must not be submitted here. The existing `lerian-helm` skill was audited with a keyword and pattern search, which found no credentials, internal hostnames, account ids, or personal or customer names; whether the chart conventions it describes are public is the repository owner's confirmation, tracked as an open item in the decision record. See [docs/decisions/0001-lerian-skill-scope.md](docs/decisions/0001-lerian-skill-scope.md).
 
 ---
 

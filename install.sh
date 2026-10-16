@@ -7,8 +7,7 @@ umask 077
 
 REPO="victorlazari/lzr1-skills"
 BRANCH="main"
-ARCHIVE_URL="https://codeload.github.com/${REPO}/tar.gz/refs/heads/${BRANCH}"
-VERSION="2.0.0"
+VERSION="2.1.0"
 EXPECTED_SKILL_COUNT=86
 STATE_FILE="${HOME:-}/.lzr1-skills-state"
 LOCK_DIR="${HOME:-}/.lzr1-skills-lock"
@@ -24,6 +23,9 @@ HAS_TARGET_FLAG=false
 SELECT_DETECTED=false
 SOURCE_ROOT=""
 SOURCE_MODE=""
+SOURCE_REF=""
+SOURCE_VERIFIED="no"
+REF="${LZR1_REF:-}"
 WORK_ROOT=""
 SKILL_NAMES=""
 SKILL_COUNT=0
@@ -141,12 +143,16 @@ BEHAVIOR OPTIONS
   --verbose, -v        Show per-skill activity
   --yes, -y            Non-interactive confirmation mode; does not select targets
   --force              Back up and replace unowned name collisions
+  --ref <value>        Archive source when run via curl (env: LZR1_REF). Default: latest
+                       published release, checksum-verified. A tag such as v2.1.0 pins a
+                       verified release. Any other value is a branch snapshot (unverified).
   --version            Show installer version
   --help, -h           Show this help
 
 SAFE NON-INTERACTIVE EXAMPLES
   curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --detected --yes
   bash install.sh --codex --claude-code --dry-run
+  curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --ref v2.1.0 --codex --yes
   bash install.sh update
   bash install.sh remove --codex
 
@@ -194,6 +200,12 @@ parse_args() {
       --verbose|-v) VERBOSE=true ;;
       --yes|-y) YES_MODE=true ;;
       --force) FORCE=true ;;
+      --ref)
+        [ "$#" -ge 2 ] || fail "--ref requires a value"
+        [ -n "$2" ] || fail "--ref value must not be empty"
+        REF=$2
+        shift
+        ;;
       --version) printf 'lzr1-skills v%s\n' "${VERSION}"; exit 0 ;;
       --help|-h) print_help; exit 0 ;;
       --) ;;
@@ -269,6 +281,19 @@ sha256_file() {
   fi
 }
 
+# wget_secure_flags: sets WGET_FLAGS. Called directly (never inside $(...)) so
+# that fail terminates the installer instead of only a subshell.
+WGET_FLAGS=""
+wget_secure_flags() {
+  local help
+  WGET_FLAGS=""
+  help=$(wget --help 2>&1 || true)
+  case "${help}" in *--https-only*) ;; *) fail "This wget lacks --https-only; install curl or a full wget (refusing to download without TLS protection)" ;; esac
+  case "${help}" in *--secure-protocol*) ;; *) fail "This wget lacks --secure-protocol; install curl or a full wget (refusing to download without TLS protection)" ;; esac
+  WGET_FLAGS="--https-only --secure-protocol=TLSv1_2 --tries=3 --timeout=30"
+  [ -n "${WGET_FLAGS}" ] || fail "Internal error: empty wget flags"
+}
+
 download_file() {
   local url destination
   url=$1
@@ -279,17 +304,93 @@ download_file() {
       --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 20 --max-time 300 \
       --output "${destination}" "${url}" || return 1
   elif command -v wget >/dev/null 2>&1; then
-    wget -q -O "${destination}" "${url}" || return 1
+    wget_secure_flags
+    # shellcheck disable=SC2086
+    wget -q ${WGET_FLAGS} -O "${destination}" "${url}" || return 1
   else
     fail "curl or wget is required in piped mode"
   fi
   [ -s "${destination}" ] || return 1
 }
 
+# http_status <url> <dest>: status-only request (the body goes to <dest> and is
+# never parsed). Returns 0 with HTTP_CODE set when a status was obtained, 1 on a
+# transport failure (message left in FETCH_ERR, HTTP_CODE empty).
+FETCH_ERR=""
+HTTP_CODE=""
+http_status() {
+  local url destination rc errfile
+  url=$1
+  destination=$2
+  FETCH_ERR=""
+  HTTP_CODE=""
+  case "${url}" in https://*) ;; *) fail "Refusing non-HTTPS download URL" ;; esac
+  if command -v curl >/dev/null 2>&1; then
+    HTTP_CODE=$(curl --silent --show-error --location --write-out '%{http_code}' \
+      --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 20 --max-time 300 \
+      --output "${destination}" "${url}")
+    rc=$?
+    if [ "${rc}" -ne 0 ]; then
+      HTTP_CODE=""
+      FETCH_ERR="transport failure (curl exit ${rc})"
+      return 1
+    fi
+  elif command -v wget >/dev/null 2>&1; then
+    wget_secure_flags
+    errfile="${WORK_ROOT}/wget-status.err"
+    # shellcheck disable=SC2086
+    wget -S ${WGET_FLAGS} -O "${destination}" "${url}" >/dev/null 2>"${errfile}"
+    HTTP_CODE=$(grep -E '^[[:space:]]*HTTP/[0-9.]+ [0-9]{3}' "${errfile}" | tail -n 1 | awk '{print $2}')
+  else
+    fail "curl or wget is required in piped mode"
+  fi
+  if [ -z "${HTTP_CODE}" ]; then
+    FETCH_ERR="could not determine the HTTP status"
+    return 1
+  fi
+  return 0
+}
+
+# fetch_sums <url> <dest>: status-aware download of SHA256SUMS.
+# Returns 0 on HTTP 2xx with a non-empty body, 2 on HTTP 404 (candidate "no
+# release"; the caller must confirm it), and 1 for every other outcome
+# (message left in FETCH_ERR).
+fetch_sums() {
+  local url destination
+  url=$1
+  destination=$2
+  http_status "${url}" "${destination}" || return 1
+  case "${HTTP_CODE}" in
+    404) return 2 ;;
+    2[0-9][0-9])
+      if [ -s "${destination}" ]; then return 0; fi
+      FETCH_ERR="HTTP ${HTTP_CODE} with an empty body"
+      return 1
+      ;;
+    *) FETCH_ERR="HTTP status ${HTTP_CODE}"; return 1 ;;
+  esac
+}
+
+# confirm_no_release: second, independent signal before the unverified fallback.
+# Only a 404 from the releases API (no published, non-draft, non-prerelease release found) permits it.
+confirm_no_release() {
+  http_status "https://api.github.com/repos/${REPO}/releases/latest" /dev/null \
+    || fail "Could not confirm that no published release exists (${FETCH_ERR}); refusing to install unverified; use --ref main to override"
+  case "${HTTP_CODE}" in
+    404) return 0 ;;
+    2[0-9][0-9]) fail "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override" ;;
+    *) fail "Could not confirm that no published release exists (HTTP status ${HTTP_CODE}); refusing to install unverified; use --ref main to override" ;;
+  esac
+}
+
+# validate_archive_listing <listing>: sets ARCHIVE_TOP. Called directly (never
+# inside $(...)) so that fail terminates the installer.
+ARCHIVE_TOP=""
 validate_archive_listing() {
   local listing top CR entry component
   listing=$1
   top=""
+  ARCHIVE_TOP=""
   CR=$(printf '\r')
   while IFS= read -r entry || [ -n "${entry}" ]; do
     [ -n "${entry}" ] || fail "Archive contains an empty path"
@@ -303,6 +404,11 @@ validate_archive_listing() {
     esac
     component=${entry%%/*}
     [ -n "${component}" ] || fail "Archive has an invalid top-level path"
+    # A root-level file (no directory component) is not a top-level directory.
+    case "${entry}" in
+      */*) ;;
+      *) fail "Archive has an invalid top-level path (file at the archive root)" ;;
+    esac
     if [ -z "${top}" ]; then
       top=${component}
     elif [ "${component}" != "${top}" ]; then
@@ -310,17 +416,107 @@ validate_archive_listing() {
     fi
   done < "${listing}"
   [ -n "${top}" ] || fail "Archive listing is empty"
-  printf '%s\n' "${top}"
+  ARCHIVE_TOP=${top}
+}
+
+validate_ref() {
+  case "${REF}" in
+    "") return 0 ;;
+    *[!A-Za-z0-9._/-]*) fail "Invalid ref: only A-Z a-z 0-9 . _ / - are allowed" ;;
+    -*|/*|*..*) fail "Invalid ref: must not start with - or / or contain .." ;;
+  esac
+}
+
+is_release_tag() {
+  case "$1" in
+    v[0-9]*.[0-9]*.[0-9]*) ;;
+    *) return 1 ;;
+  esac
+  case "${1#v}" in
+    *[!0-9.]*|.*|*..*|*.) return 1 ;;
+  esac
+  [ "$(printf '%s' "${1#v}" | tr -cd '.' | wc -c | tr -d ' ')" = 2 ]
+}
+
+extract_verified_archive() {
+  local archive listing extract_dir line
+  archive=$1
+  listing="${WORK_ROOT}/archive.list"
+  extract_dir="${WORK_ROOT}/archive"
+  command -v tar >/dev/null 2>&1 || fail "tar is required in piped mode"
+  tar -tzf "${archive}" > "${listing}" || fail "Repository archive cannot be listed"
+  validate_archive_listing "${listing}"
+  [ -n "${ARCHIVE_TOP}" ] || fail "Archive has no top-level directory"
+  tar -tvzf "${archive}" > "${WORK_ROOT}/archive.verbose" || fail "Repository archive cannot be listed"
+  while IFS= read -r line || [ -n "${line}" ]; do
+    case "${line}" in
+      ""|-*|d*) ;;
+      *) fail "Archive contains a non-regular member (symlink or hardlink); refusing to extract" ;;
+    esac
+  done < "${WORK_ROOT}/archive.verbose"
+  mkdir -p "${extract_dir}" || fail "Cannot create archive extraction directory"
+  tar -xzf "${archive}" -C "${extract_dir}" || fail "Repository archive extraction failed"
+  SOURCE_ROOT="${extract_dir}/${ARCHIVE_TOP}"
+  [ -d "${SOURCE_ROOT}" ] && [ ! -L "${SOURCE_ROOT}" ] || fail "Extracted repository root is unsafe"
+}
+
+fetch_release_archive() {
+  local base sums archive expected actual matches rc
+  base=$1
+  sums="${WORK_ROOT}/SHA256SUMS"
+  archive="${WORK_ROOT}/lzr1-skills.tar.gz"
+  fetch_sums "${base}/SHA256SUMS" "${sums}"
+  rc=$?
+  if [ "${rc}" -eq 2 ]; then return 2; fi
+  if [ "${rc}" -ne 0 ]; then
+    if [ -z "${REF}" ]; then
+      fail "Could not fetch the latest-release SHA256SUMS: ${FETCH_ERR}. Refusing to fall back silently; re-run with --ref main to install the unverified snapshot knowingly"
+    fi
+    fail "Could not fetch SHA256SUMS for ${REF}: ${FETCH_ERR}"
+  fi
+  download_file "${base}/lzr1-skills.tar.gz" "${archive}" || fail "Release archive download failed"
+  matches=$(tr -d '\r' < "${sums}" | awk '{n=$2; sub(/^\*/,"",n); sub(/^\.\//,"",n); if (n == "lzr1-skills.tar.gz") print $1}')
+  [ -n "${matches}" ] || fail "SHA256SUMS has no entry for lzr1-skills.tar.gz"
+  [ "$(printf '%s\n' "${matches}" | wc -l | tr -d ' ')" = 1 ] || fail "SHA256SUMS has multiple entries for lzr1-skills.tar.gz"
+  expected=$(printf '%s' "${matches}" | tr 'A-F' 'a-f')
+  case "${expected}" in
+    *[!0-9a-f]*) fail "SHA256SUMS entry is not a valid SHA-256 (non-hex characters)" ;;
+  esac
+  [ "${#expected}" -eq 64 ] || fail "SHA256SUMS entry is not a valid SHA-256 (expected 64 hex characters)"
+  actual=$(sha256_file "${archive}") || fail "Cannot compute the archive SHA-256"
+  [ -n "${actual}" ] || fail "Cannot compute the archive SHA-256"
+  [ "${actual}" != "unavailable" ] || fail "Cannot verify release: no sha256sum or shasum available"
+  if [ "${actual}" != "${expected}" ]; then
+    log_error "Expected SHA-256: ${expected}"
+    log_error "Actual SHA-256:   ${actual}"
+    fail "Release archive checksum mismatch; refusing to extract"
+  fi
+  log_ok "Release archive checksum verified (${actual})"
+  extract_verified_archive "${archive}"
+  SOURCE_VERIFIED="yes"
+  return 0
+}
+
+fetch_branch_archive() {
+  local branch archive
+  branch=$1
+  archive="${WORK_ROOT}/repository.tar.gz"
+  log_warn "Installing an unverified snapshot of ${branch}; use a release tag for checksum verification"
+  download_file "https://codeload.github.com/${REPO}/tar.gz/refs/heads/${branch}" "${archive}" || fail "Repository archive download failed"
+  log_info "Downloaded archive SHA-256: $(sha256_file "${archive}")"
+  extract_verified_archive "${archive}"
+  SOURCE_VERIFIED="no"
 }
 
 initialize_source() {
-  local script_path script_dir archive listing extract_dir top
+  local script_path script_dir rc links_out
   ensure_work_root
 
   if [ -n "${SOURCE_OVERRIDE}" ]; then
     [ -d "${SOURCE_OVERRIDE}" ] || fail "LZR1_SOURCE_DIR is not a directory"
     SOURCE_ROOT=$(cd "${SOURCE_OVERRIDE}" 2>/dev/null && pwd -P) || fail "Cannot resolve LZR1_SOURCE_DIR"
     SOURCE_MODE="override"
+    [ -z "${REF}" ] || log_warn "Ignoring --ref/LZR1_REF (${REF}): using LZR1_SOURCE_DIR"
   else
     script_path=${BASH_SOURCE[0]:-}
     if [ -n "${script_path}" ] && [ -f "${script_path}" ]; then
@@ -331,31 +527,45 @@ initialize_source() {
     if [ -n "${script_dir}" ] && [ -f "${script_dir}/skills-list.txt" ] && [ -d "${script_dir}/skills" ]; then
       SOURCE_ROOT="${script_dir}"
       SOURCE_MODE="local"
+      [ -z "${REF}" ] || log_warn "Ignoring --ref/LZR1_REF (${REF}): running from a local checkout"
     else
-      SOURCE_MODE="archive"
-      archive="${WORK_ROOT}/repository.tar.gz"
-      listing="${WORK_ROOT}/archive.list"
-      extract_dir="${WORK_ROOT}/archive"
-      mkdir -p "${extract_dir}" || fail "Cannot create archive extraction directory"
-      log_info "Downloading one repository snapshot from GitHub"
-      download_file "${ARCHIVE_URL}" "${archive}" || fail "Repository archive download failed"
-      command -v tar >/dev/null 2>&1 || fail "tar is required in piped mode"
-      tar -tzf "${archive}" > "${listing}" || fail "Repository archive cannot be listed"
-      top=$(validate_archive_listing "${listing}")
-      tar -xzf "${archive}" -C "${extract_dir}" || fail "Repository archive extraction failed"
-      SOURCE_ROOT="${extract_dir}/${top}"
-      [ -d "${SOURCE_ROOT}" ] && [ ! -L "${SOURCE_ROOT}" ] || fail "Extracted repository root is unsafe"
-      log_info "Downloaded archive SHA-256: $(sha256_file "${archive}")"
+      log_info "Downloading from GitHub"
+      if [ -z "${REF}" ]; then
+        SOURCE_MODE="release"
+        SOURCE_REF="latest"
+        fetch_release_archive "https://github.com/${REPO}/releases/latest/download"
+        rc=$?
+        if [ "${rc}" -eq 2 ]; then
+          confirm_no_release
+          log_warn "No published (non-draft, non-prerelease) release was found; installing the unverified main snapshot"
+          SOURCE_MODE="branch"
+          SOURCE_REF="${BRANCH}"
+          fetch_branch_archive "${BRANCH}"
+        fi
+      elif is_release_tag "${REF}"; then
+        SOURCE_MODE="release"
+        SOURCE_REF="${REF}"
+        fetch_release_archive "https://github.com/${REPO}/releases/download/${REF}"
+        rc=$?
+        [ "${rc}" -eq 0 ] || fail "Release ${REF} not found or its checksums could not be downloaded"
+      else
+        SOURCE_MODE="branch"
+        SOURCE_REF="${REF}"
+        fetch_branch_archive "${REF}"
+      fi
     fi
   fi
 
   [ -f "${SOURCE_ROOT}/skills-list.txt" ] && [ ! -L "${SOURCE_ROOT}/skills-list.txt" ] || fail "Source is missing a regular skills-list.txt"
   [ -d "${SOURCE_ROOT}/skills" ] && [ ! -L "${SOURCE_ROOT}/skills" ] || fail "Source is missing a safe skills directory"
-  if find "${SOURCE_ROOT}/skills" -type l -print 2>/dev/null | grep -q .; then
+  # No early-exit pipe: grep -q under pipefail would SIGPIPE find and skip this check.
+  links_out="${WORK_ROOT}/source-links.list"
+  find "${SOURCE_ROOT}/skills" -type l -print > "${links_out}" || fail "Could not scan the source for symbolic links"
+  if [ -s "${links_out}" ]; then
     fail "Source skill packages must not contain symbolic links"
   fi
   validate_manifest
-  log_ok "Validated ${SKILL_COUNT} skills from ${SOURCE_MODE} source"
+  log_ok "Validated ${SKILL_COUNT} skills from ${SOURCE_MODE} source${SOURCE_REF:+ (ref: ${SOURCE_REF})}, verified: ${SOURCE_VERIFIED}"
 }
 
 validate_manifest() {
@@ -764,7 +974,7 @@ remove_target() {
   assert_safe_target "${target}"
   [ -d "${target}" ] && [ ! -L "${target}" ] || { log_info "${label}: target not present"; return 0; }
   names="${WORK_ROOT}/remove.$$.${mode}.names"
-  managed_names "${target}" "${mode}" > "${names}"
+  managed_names "${target}" "${mode}" > "${names}" || fail "${label}: could not list managed skills"
   removed=0
   while IFS= read -r name; do
     case "${name}" in *[!a-z0-9-]*|'') log_warn "${label}: ignored invalid index entry"; continue ;; esac
@@ -963,7 +1173,7 @@ EOF
 
 doctor() {
   printf '\n%sDoctor report%s\n' "${BOLD}" "${RESET}"
-  printf '  Source: %s (%s skills)\n' "${SOURCE_MODE}" "${SKILL_COUNT}"
+  printf '  Source: %s, ref %s, verified %s (%s skills)\n' "${SOURCE_MODE}" "${SOURCE_REF:-n/a}" "${SOURCE_VERIFIED}" "${SKILL_COUNT}"
   doctor_target "Claude Code" "${PATH_CLAUDE_CODE}/skills" package
   doctor_target "Claude Desktop" "${PATH_CLAUDE_DESKTOP}/skills" package
   doctor_target "Codex" "${PATH_CODEX}/skills" package
@@ -1036,6 +1246,7 @@ main() {
   [ -n "${HOME:-}" ] || fail "HOME is required"
   case "${HOME}" in /*) ;; *) fail "HOME must be an absolute path" ;; esac
   parse_args "$@"
+  validate_ref
   detect_os_and_tools
 
   if [ "${SELECT_DETECTED}" = true ]; then

@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
+       manifest-sync count-sync readme-skills version-sync readme-patterns readme-section readme-flags symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
 
 stale-ref model ids: any token claude-(fable|opus|sonnet|haiku|mythos)-<digit>... must be
 exactly one of VALID_MODELS, optionally followed by -YYYYMMDD; claude_<digit> and the spaced
@@ -23,11 +23,33 @@ script-untested: every file under skills/*/scripts/ (recursive; __pycache__, *.p
 (header path<TAB>level<TAB>reason<TAB>test, rows bytewise sorted by path, no duplicates). Level is
 static (reason required), help (--help is safe) or behavior (test = existing file under the repo
 that mentions the script basename). Rows must point at existing files.
+
+readme-skills: only the README section from "## The Arsenal" up to the next "## " heading is
+scanned. Each table row whose first cell is a single backticked name counts as an entry; every
+skill directory must appear exactly once and no entry may name a skill that is absent
+from it. Names elsewhere in the README (patterns, routing prose) are ignored.
+
+version-sync: VERSION="x.y.z" in install.sh must equal the first "## [x.y.z]" heading of
+CHANGELOG.md that is not [Unreleased], and README.md must contain "Installer version: <VERSION>"
+(every occurrence must carry that version).
+
+readme-patterns: README.md must hold a block between the HTML comments <!-- pattern-census:begin -->
+and <!-- pattern-census:end --> with one "mechanism: N" line per mechanism of
+scripts/pattern-census.py (loaded via importlib, the single source of truth); each N must equal
+the census count for the repo.
+
+readme-flags (static, no network): every --long-flag token in the README from "## Equip Up"
+through the end of the "## Update & Remove" section must appear in install.sh source, and every
+--long-flag in the print_help heredoc of install.sh (read statically; install.sh is never executed)
+must be mentioned in the README "## Command
+Reference" section. readme-section: a required README section is missing.
 """
 import argparse
+import importlib.util
 import os
 import posixpath
 import re
+import subprocess
 import sys
 
 _STOP = r"[^\s)`\"'\]>]"
@@ -65,6 +87,7 @@ STALE_PATTERNS = [
     r"Next\.js 1[0-2](?!\d)", r"Next\.js 13(?!\d)(?!\.[4-9](?!\d))",
 ]
 STALE_RE = re.compile("|".join("(?:%s)" % p for p in STALE_PATTERNS), re.I)
+FLAG_RE = re.compile(r"(?<![A-Za-z0-9-])--[a-z][a-z0-9-]*")
 STALE_EXEMPT = "(historical)"
 STALE_EXTS = (".md", ".yaml", ".yml", ".json", ".sh", ".py", ".txt", ".toml", ".ts",
               ".tsx", ".js", ".mjs", ".html", ".jinja", ".j2")
@@ -378,6 +401,138 @@ def main():
             elif v != count:
                 add("ERROR", "-", "count-sync",
                     "%s %s=%d but %d skill directories" % (rel, label, v, count))
+
+    if not args.skill:
+        rp = os.path.join(root, "README.md")
+        rtext = read(rp) if os.path.isfile(rp) else ""
+        sec, insec, found = [], False, False
+        for ln in rtext.splitlines():
+            if re.match(r"^## ", ln):
+                insec = ln.strip() == "## The Arsenal"
+                found = found or insec
+                continue
+            if insec:
+                sec.append(ln)
+        if not found:
+            add("ERROR", "-", "readme-skills", "README.md has no '## The Arsenal' section")
+        else:
+            rows = [m.group(1) for m in (re.match(r"^\|\s*`([^`]+)`\s*\|", l) for l in sec) if m]
+            counts = {}
+            for r in rows:
+                counts[r] = counts.get(r, 0) + 1
+            for n in names:
+                if counts.get(n, 0) == 0:
+                    add("ERROR", "-", "readme-skills", "%s missing from README Arsenal tables" % n)
+            for n, c in sorted(counts.items()):
+                if c > 1:
+                    add("ERROR", "-", "readme-skills", "%s appears %d times in README Arsenal tables" % (n, c))
+                if n not in known:
+                    add("ERROR", "-", "readme-skills", "%s in README Arsenal is not in skills-list.txt" % n)
+
+        ver = None
+        ip = os.path.join(root, "install.sh")
+        if os.path.isfile(ip):
+            vm = re.search(r'^VERSION="([^"]+)"', read(ip), re.M)
+            ver = vm.group(1) if vm else None
+        if ver is None:
+            add("ERROR", "-", "version-sync", "install.sh: VERSION=\"...\" not found")
+        else:
+            cp = os.path.join(root, "CHANGELOG.md")
+            rel = None
+            if os.path.isfile(cp):
+                for m in re.finditer(r"^## \[([^\]]+)\]", read(cp), re.M):
+                    if m.group(1).lower() != "unreleased":
+                        rel = m.group(1)
+                        break
+            if rel is None:
+                add("ERROR", "-", "version-sync", "CHANGELOG.md has no released '## [x.y.z]' section")
+            elif rel != ver:
+                add("ERROR", "-", "version-sync",
+                    "install.sh VERSION=%s but newest CHANGELOG section is %s" % (ver, rel))
+            phr = re.findall(r"Installer version: (\S+)", rtext)
+            if not phr:
+                add("ERROR", "-", "version-sync", "README.md lacks 'Installer version: %s'" % ver)
+            for v in phr:
+                if v != ver:
+                    add("ERROR", "-", "version-sync",
+                        "README.md says Installer version: %s but VERSION=%s" % (v, ver))
+
+    if not args.skill:
+        rp = os.path.join(root, "README.md")
+        rtext = read(rp) if os.path.isfile(rp) else ""
+        cm = re.search(r"<!-- pattern-census:begin -->\r?\n(.*?)<!-- pattern-census:end -->", rtext, re.S)
+        if not cm:
+            add("ERROR", "-", "readme-patterns",
+                "README.md lacks the <!-- pattern-census:begin --> ... <!-- pattern-census:end --> block")
+        else:
+            sys.dont_write_bytecode = True
+            cpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pattern-census.py")
+            spec = importlib.util.spec_from_file_location("pattern_census", cpath)
+            cmod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(cmod)
+            expect = cmod.census(root)
+            have = {}
+            for ln in cm.group(1).splitlines():
+                m = re.match(r"^([a-z-]+): (\d+)$", ln.strip())
+                if m:
+                    if m.group(1) in have:
+                        add("ERROR", "-", "readme-patterns",
+                            "census block repeats mechanism '%s'" % m.group(1))
+                    have[m.group(1)] = int(m.group(2))
+            for mech, skills in sorted(expect.items()):
+                if mech not in have:
+                    add("ERROR", "-", "readme-patterns", "census block lacks '%s: N'" % mech)
+                elif have[mech] != len(skills):
+                    add("ERROR", "-", "readme-patterns",
+                        "%s: README says %d but census finds %d" % (mech, have[mech], len(skills)))
+            for mech in sorted(set(have) - set(expect)):
+                add("ERROR", "-", "readme-patterns", "census block names unknown mechanism '%s'" % mech)
+
+        ip = os.path.join(root, "install.sh")
+        if os.path.isfile(ip) and rtext:
+            isrc = read(ip)
+            code_flags = set()
+            for fname in ("parse_args", "print_help"):
+                fm = re.search(r"^%s\(\) \{\n(.*?)^\}" % fname, isrc, re.S | re.M)
+                if not fm:
+                    add("ERROR", "-", "readme-flags", "install.sh lacks a %s() function" % fname)
+                    continue
+                body = "\n".join(l for l in fm.group(1).splitlines() if not l.lstrip().startswith("#"))
+                code_flags.update(FLAG_RE.findall(body))
+            sec, cmd = [], []
+            cur, in_range, past_upd = None, False, False
+            for ln in rtext.splitlines():
+                if re.match(r"^## ", ln):
+                    cur = ln.strip()
+                    if cur == "## Equip Up":
+                        in_range = True
+                    elif in_range and past_upd:
+                        in_range = False
+                    if cur == "## Update & Remove":
+                        past_upd = True
+                if in_range:
+                    sec.append(ln)
+                if cur == "## Command Reference":
+                    cmd.append(ln)
+            if not sec:
+                add("ERROR", "-", "readme-section", "README.md has no '## Equip Up' section")
+            for fl in sorted(set(FLAG_RE.findall("\n".join(sec)))):
+                if fl not in code_flags:
+                    add("ERROR", "-", "readme-flags",
+                        "README flag %s is not a token in install.sh parse_args/print_help (comments do not count)" % fl)
+            help_out = ""
+            hm = re.search(r"^print_help\(\) \{\n.*?<<-?\s*'?\"?(\w+)\"?'?[^\n]*\n(.*?)^\1$", isrc, re.S | re.M)
+            if hm:
+                help_out = hm.group(2)
+            else:
+                add("ERROR", "-", "readme-flags", "install.sh print_help has no heredoc to read flags from")
+            cmdtext = "\n".join(cmd)
+            if not cmd:
+                add("ERROR", "-", "readme-section", "README.md has no '## Command Reference' section")
+            for fl in sorted(set(FLAG_RE.findall(help_out)) if cmd else ()):
+                if not re.search(re.escape(fl) + r"(?![A-Za-z0-9-])", cmdtext):
+                    add("ERROR", "-", "readme-flags",
+                        "install.sh --help flag %s not documented in README Command Reference" % fl)
 
     if not args.skill:
         for pr in reg_problems:

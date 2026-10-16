@@ -38,7 +38,7 @@ Scope of the audit: structure, metadata, links, scripts, tests, installer, READM
 | 1 | Catalog is machine-verified in CI; governance files exist; known structural defects fixed | 1.1, 1.2, 1.3 | Complete |
 | 2 | Content is current, overlaps are routed, descriptions trigger reliably | 2.1, 2.2, 2.3 | Complete |
 | 3 | Every shipped script has lint + smoke coverage | 3.1, 3.2 | Complete |
-| 4 | Install path is pinned and verifiable; Lerian skill scope decided and delivered | 4.1, 4.2 | Epic-level |
+| 4 | Install path is verified; Lerian scope decided; README verified against the code | 4.1, 4.2, 4.3 | Complete |
 
 ---
 
@@ -400,23 +400,133 @@ Edge cases reachable: a skill dir without SKILL.md (report `fm-missing`, skip ot
 
 ---
 
-## Phase 4: Distribution and Lerian coverage
+## Phase 4: Distribution, Lerian scope and README
+
+**Elaborated 2026-10-16 against `main` at `fb53bd7` (Phases 1-3 merged).** Facts that shaped this elaboration: `install.sh` downloads `https://codeload.github.com/${REPO}/tar.gz/refs/heads/${BRANCH}` (`install.sh:8-9`), logs but never verifies the archive's SHA-256 (`install.sh:354`), and already has a hardened `download_file` (HTTPS-only, TLS 1.2) and `validate_archive_listing` (single top-level root, no traversal); `sha256_file` already falls back from `sha256sum` to `shasum -a 256` (`install.sh:261`); `--version` prints the installer version (`install.sh:195`), so a new ref flag needs another name; the README has 14 category tables under "The Arsenal", sections "Equip Up", "Command Reference", "Update & Remove", "How It Works", "Contributing", "License" (headings at README lines 116-459).
+
+**Decisions recorded:**
+- **Trust model: checksum, not signatures.** A release tarball plus `SHA256SUMS` published by a tag workflow; the installer verifies the tarball against the checksums file fetched from the same release over HTTPS before extracting. This detects corruption, truncation and CDN or mirror substitution; it does NOT protect against a compromised repository or maintainer account (the checksum comes from the same place as the archive). Signatures or provenance attestations are a documented non-goal for now, stated honestly in README and SECURITY.md.
+- **The documented one-liner must keep working in every state.** `curl -fsSL .../main/install.sh | bash` (the script itself is still fetched from `main`) installs the **latest published release**, verified. If no release exists yet (HTTP 404 on the latest-release URL), the installer falls back to the `main` snapshot with an explicit WARN that it is unverified. `--ref <tag>` pins a release (verified); `--ref main` (or any branch name) is the explicit unverified escape hatch. A local checkout (`bash install.sh` from a clone) is unchanged and needs no network.
+- **Release assets use fixed names** (`lzr1-skills.tar.gz`, `SHA256SUMS`), so "latest" resolves through GitHub's `releases/latest/download/<name>` redirect without parsing API JSON or needing `jq`.
+- **Lerian scope: no new Lerian-specific skills in this public repo.** The repository is public and MIT-licensed; Lerian internals (Midaz and Tracer are ELv2, the other products are closed source, and internal conventions are not public) cannot be republished under MIT without the copyright holders' decision. `lerian-helm` stays (it documents public Helm chart conventions) but is audited for non-public material. Candidate Lerian skills belong in the separate ring plugin. Recorded in `docs/decisions/0001-lerian-skill-scope.md` and CHANGELOG.
+- **Version bump to 2.1.0** (new installer behavior); a linter rule keeps `VERSION` in `install.sh` equal to the newest released section in CHANGELOG.md.
 
 ### Epic 4.1: Pinned, verifiable install
 
-**Goal:** `curl | bash` installs a tagged release with a verified checksum instead of the mutable `main` tarball.
-**Scope:** `install.sh` (`BRANCH`, `ARCHIVE_URL`, `download_file`, `validate_archive_listing`), release workflow, README install section, CHANGELOG
-**Dependencies:** Phase 1 (CI, CHANGELOG); decision on signing (checksum only vs. checksum plus signature)
-**Done when:** a tag push publishes a tarball and `SHA256SUMS`; installer defaults to the latest tag, verifies the checksum before extracting, and keeps an explicit `--ref main` escape hatch; the installer tests cover a corrupted-archive failure
+**Goal:** The installer verifies what it installs, and a tag push publishes a verifiable release.
+**Scope:** `install.sh`, `.github/workflows/release.yml` (new), `tests/test-installer.sh`, `tests/test-release.sh` (new), `SECURITY.md`
+**Dependencies:** none
+**Done when:** `tests/test-installer.sh` covers verified install, corrupted archive, missing checksum entry, checksum file missing, no-release fallback with WARN, and `--ref main` WARN, all offline; `release.yml` passes `actionlint` and its packaging step is exercised by `tests/test-release.sh`; `bash install.sh --help` documents `--ref`
 **Status:** Pending
 
-### Epic 4.2: Lerian skill scope
+#### Task 4.1.1: Release packaging script and workflow
 
-**Goal:** A decision, then delivery, on which Lerian-specific skills belong in this public catalog versus the separate ring plugin.
-**Scope:** `skills/lerian-helm`, candidate new skills (Go service conventions, Midaz ledger modelling, multi-tenancy), licensing review of anything derived from non-public Lerian material
-**Dependencies:** owner decision; confirmation that the content is publishable under the MIT license added in Task 1.2.2 (Midaz and Tracer are ELv2, Lerian products are mostly closed source, so copying their internals into an MIT repo is a legal question, not a technical one)
-**Done when:** decision recorded in CHANGELOG.md; any approved skills pass the linter and ship with tests
+- [ ] Done
+
+**Context:** There is no release automation and no tags in the repo (`git tag` is empty). `git archive` output has a single top-level directory when `--prefix=<name>/` is given, which is what `validate_archive_listing` (`install.sh:289`) requires. CI uses `permissions: contents: read` and SHA-pinned actions (`.github/workflows/ci.yml`).
+
+**Implementation vision:** Put the logic in `scripts/build-release.sh` so it is testable without GitHub: usage `scripts/build-release.sh <tag> <out-dir>`; refuses a tag not matching `^v[0-9]+\.[0-9]+\.[0-9]+$`; refuses when the tag's `install.sh` `VERSION` differs from the tag without the `v` (read with `git show <tag>:install.sh`); runs `git archive --format=tar.gz --prefix=lzr1-skills-<tag>/ -o <out-dir>/lzr1-skills.tar.gz <tag>` (gzip level default; reproducibility via `git archive`'s deterministic output, mtime from the commit); writes `<out-dir>/SHA256SUMS` containing one line `<hash>  lzr1-skills.tar.gz` using the same sha256sum/shasum fallback as the installer; verifies the produced pair by re-reading the checksum. `.github/workflows/release.yml`: trigger `push` of tags `v*`, one job with `permissions: contents: write`, steps: checkout (same pinned SHA as ci.yml, `fetch-depth: 0`), run `scripts/build-release.sh "$GITHUB_REF_NAME" dist`, then `gh release create "$GITHUB_REF_NAME" dist/lzr1-skills.tar.gz dist/SHA256SUMS --title "$GITHUB_REF_NAME" --notes-file` extracted from the matching CHANGELOG.md section (if the section is missing the job fails, so a release cannot ship without notes). `GH_TOKEN: ${{ github.token }}`. No third-party release actions. Edge cases: tag on a commit whose CHANGELOG lacks the section (fail); re-running the job for an existing release (use `gh release create` and let it fail loudly rather than overwrite).
+
+**Files:**
+- Create: `scripts/build-release.sh` (mode 755), `.github/workflows/release.yml`
+- Test: `tests/test-release.sh` (create, mode 755)
+
+**Verification:** `bash tests/test-release.sh` exits 0: in a temp git repo it creates a commit with `install.sh` `VERSION="9.9.9"` and a CHANGELOG, tags `v9.9.9`, runs the script, asserts the tarball has exactly one top-level directory, `SHA256SUMS` verifies (`shasum -a 256 -c` or `sha256sum -c`), and that a mismatching tag (`v9.9.8`) and a malformed tag (`9.9.9`) are refused. `docker run --rm -v "$PWD":/repo -w /repo rhysd/actionlint:latest` exits 0.
+
+**Done when:** a pushed `vX.Y.Z` tag would publish both assets, and the packaging logic is covered by an offline test.
+
+#### Task 4.1.2: Verified download in `install.sh`
+
+- [ ] Done
+
+**Context:** `initialize_source` (`install.sh:316-359`) has three modes: `LZR1_SOURCE_DIR` override, local checkout, and archive download. Only the archive mode changes. `download_file` is HTTPS-only. `fail` exits non-zero. Tests stub network with fake `curl` on PATH (see how `tests/test-adversarial-remediations.sh` builds `$fakebin`).
+
+**Implementation vision:** Add `REF=""` (env `LZR1_REF`, flag `--ref <value>`; reject empty value and values with characters outside `[A-Za-z0-9._/-]`). Resolve the mode: empty REF or a REF matching `^v[0-9]+\.[0-9]+\.[0-9]+$` means release mode; any other REF means branch mode (unverified). Release mode URLs: base `https://github.com/${REPO}/releases/latest/download` for empty REF, `https://github.com/${REPO}/releases/download/${REF}` for a tag. Steps: download `SHA256SUMS` then `lzr1-skills.tar.gz` into `WORK_ROOT`; find the line whose second field is exactly `lzr1-skills.tar.gz` (exactly one, else fail); compare its hash with `sha256_file` of the tarball, failing with "checksum mismatch" and printing both hashes; fail if `sha256_file` returns `unavailable` (cannot verify). Only after verification run the existing `tar -tzf` / `validate_archive_listing` / extraction path (extract that block into a function `extract_verified_archive` shared by both modes). If the empty-REF `SHA256SUMS` download fails (the `download_file` call returns non-zero because of a 404), fall back to branch mode on `main` with `log_warn "No published release found; installing the unverified main snapshot"`. For an explicit tag whose download fails, fail (no silent fallback). Branch mode keeps today's `codeload` URL built from the ref (`refs/heads/${REF}` for non-tag refs) and logs `log_warn "Installing an unverified snapshot of ${REF}; use a release tag for checksum verification"`. `print_help` documents `--ref` and `LZR1_REF`; `doctor` and `--dry-run` output name the resolved source (mode, ref, verified yes/no). Bump `VERSION` to `2.1.0`. Constraint: keep Bash 3.2 compatibility (no `mapfile`, no associative arrays, no `${var,,}`); keep the `piped mode` guard messages; never `eval` the ref.
+
+**Files:**
+- Modify: `install.sh`
+
+**Verification:** `bash install.sh --help | grep -- '--ref'` prints the option; `bash install.sh --ref 'bad ref' --dry-run` and `bash install.sh --ref '' --dry-run` fail with a clear message; the offline suite from Task 4.1.3 passes.
+
+**Done when:** a corrupted or unverifiable release archive is never extracted.
+
+#### Task 4.1.3: Offline tests for the verified download
+
+- [ ] Done
+
+**Context:** `tests/test-installer.sh` runs the installer with `LZR1_SOURCE_DIR`; the archive path is untested. A fake `curl` in a temp `bin` dir placed first on PATH lets the real `download_file` run against local files.
+
+**Implementation vision:** New section in `tests/test-installer.sh` (or a new `tests/test-installer-download.sh` if the file gets unwieldy; prefer the new file and call it from CI) that builds a release pair with `scripts/build-release.sh` from the current working tree via a temp git clone with a tag, then runs the installer as `cat install.sh | HOME=<tmp> PATH=<fakebin>:$PATH bash -s -- --codex --yes` (piped mode, so `BASH_SOURCE` is empty and archive mode is used). The fake `curl` parses the last argument (URL) and the `--output` argument and copies from a fixture dir keyed by URL suffix; it exits 22 with no output for URLs mapped to "404". Cases: (1) latest release verified install succeeds and the log says verified; (2) tarball byte-flipped, checksum unchanged: fails with "checksum mismatch", and `$HOME/.codex/skills` does not exist; (3) `SHA256SUMS` lacks the tarball line: fails; (4) `SHA256SUMS` 404 on latest: falls back, WARN printed, install succeeds from a fake `codeload` archive; (5) `--ref v9.9.9` with the tag asset missing: fails with no fallback; (6) `--ref main`: WARN printed, installs from fake `codeload`; (7) `--ref 'a b'` rejected. Run under `/bin/bash` too (macOS 3.2).
+
+**Files:**
+- Create: `tests/test-installer-download.sh` (mode 755)
+- Modify: `tests/script-coverage.tsv` only if a skill script is added (none expected), `.github/workflows/ci.yml` (add the step on both OSes)
+
+**Verification:** `bash tests/test-installer-download.sh` and `/bin/bash tests/test-installer-download.sh` exit 0 on this macOS host and in `python:3.12-bookworm`; each negative case asserts the specific message.
+
+**Done when:** all seven cases pass and CI runs the suite on both OSes.
+
+### Epic 4.2: Lerian scope decision
+
+**Goal:** The Lerian scope decision is recorded and `lerian-helm` is audited.
+**Scope:** `docs/decisions/0001-lerian-skill-scope.md` (new), `skills/lerian-helm/`, `CHANGELOG.md`, `SECURITY.md`
+**Dependencies:** none
+**Done when:** the decision record exists, `lerian-helm` contains no non-public material, and the CHANGELOG states the decision
 **Status:** Pending
+
+#### Task 4.2.1: Decision record and `lerian-helm` audit
+
+- [ ] Done
+
+**Context:** `skills/lerian-helm/` has `SKILL.md`, `references/complete-reference.md` and `scripts/validate-security.sh`; the repo is public and MIT (`LICENSE`).
+
+**Implementation vision:** Read all files in `skills/lerian-helm/`. Flag, and report rather than silently delete, anything that looks non-public: internal hostnames or domains other than `lerianstudio.github.io`/`github.com/LerianStudio`/`docs.lerian.studio`, internal registry or account ids, tokens, employee names, customer names, private repository paths. If nothing is found, say so in the record with the grep patterns used. Write `docs/decisions/0001-lerian-skill-scope.md` (Status, Context, Decision, Consequences, Alternatives considered: copy internals under MIT; relicense the repo; separate private repo; ring plugin) containing the decision from the Phase 4 block above and the legal rationale without legal advice claims. Add a CHANGELOG line under Unreleased and one sentence to `SECURITY.md` ("Do not submit non-public Lerian material to this repository"). Edge case: if the audit finds non-public material, remove it from the working tree in this task, record it in the decision, and note that git history still contains it (history rewrite is the owner's call, out of scope).
+
+**Files:**
+- Create: `docs/decisions/0001-lerian-skill-scope.md`
+- Modify: `CHANGELOG.md`, `SECURITY.md`, `skills/lerian-helm/**` (only if the audit finds something)
+
+**Verification:** `python3 -I scripts/lint_catalog.py` 0 errors, 0 warnings; the report lists the grep patterns and their results.
+
+**Done when:** record merged and audit result stated.
+
+### Epic 4.3: README and release metadata, 100% accurate
+
+**Goal:** The README is verified against the code by tooling, not by eye.
+**Scope:** `README.md`, `CHANGELOG.md`, `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `CONTRIBUTING.md`
+**Dependencies:** Epic 4.1 (install behavior), Epic 4.2 (scope statement)
+**Done when:** the new linter rules `readme-skills` and `version-sync` pass on the real tree and have failing fixtures; every command, flag and environment variable shown in the README matches `bash install.sh --help` and `install.sh` source; every skill appears exactly once in the README arsenal tables with a description consistent with its `SKILL.md`; the Pattern A/B/C numbers are true
+**Status:** Pending
+
+#### Task 4.3.1: `readme-skills` and `version-sync` linter rules
+
+- [ ] Done
+
+**Context:** `scripts/lint_catalog.py` already has `count-sync` extracting numbers from README, `install.sh` and tests. README tables use the form `| \`skill-name\` | ... |` under `### <emoji> Category` headings inside `## The Arsenal`.
+
+**Implementation vision:** `readme-skills` (ERROR): parse the rows of the Arsenal tables (first cell a backticked name); every skill directory must appear exactly once; no name in the tables may be absent from `skills-list.txt`; the per-category counts need not be checked. `version-sync` (ERROR): `VERSION` in `install.sh` must equal the first `## [x.y.z]` heading in `CHANGELOG.md` that is not `[Unreleased]`; additionally the README must not contain a different `vX.Y.Z` installer version string than `VERSION` where it names the current version (match the exact phrase used after Task 4.3.2 writes it: `Installer version: <VERSION>`; add this check in that task, not here, to avoid a dangling rule). Fixtures in `tests/test-catalog.sh`: skill missing from README fails, duplicated skill fails, README row for a non-existent skill fails, VERSION/CHANGELOG mismatch fails, matching passes. Edge case: the rule must scope to the Arsenal section only, since backticked skill names also appear in the Pattern sections and routing prose.
+
+**Files:**
+- Modify: `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `CONTRIBUTING.md` (one sentence each for the new rules)
+
+**Verification:** `bash tests/test-catalog.sh` exits 0 under bash and `/bin/bash`; the real-tree run is expected to FAIL `version-sync` until Task 4.1.2 bumped `VERSION` and Task 4.3.2 added the CHANGELOG section, so order tasks: 4.1.2, 4.3.2 (CHANGELOG part), 4.3.1.
+
+**Done when:** README drift against the catalog fails CI.
+
+#### Task 4.3.2: Rewrite the README against reality
+
+- [ ] Done
+
+**Context:** Current README (460 lines) predates Phases 1-4: it describes the installer's old behavior, has no CI/lint/test documentation, links no governance files except via the footer, and makes quantitative claims (Pattern B "8 skills", Pattern C "22 skills", Pattern A "54 skills", "3x Refuter Panel", "Consistency Validator", "Upgraded Synthesis") that were never machine-verified. The skill tables carry one-line descriptions that Phase 2 changed for 15 skills.
+
+**Implementation vision:** Work section by section, verifying each statement against the source, and keep the existing visual style (banner, badges, emoji headings, tables) rather than redesigning it. Required content: (1) badges: skills count (kept in sync by `count-sync`), license, CI status badge for `.github/workflows/ci.yml`, latest release badge; (2) "Equip Up": the curl one-liner explained as "installs the latest verified release; falls back to the unverified main snapshot only when no release exists", pinned install with `--ref vX.Y.Z`, the explicit unverified `--ref main`, the local clone path, how to verify a release by hand (`curl` both assets then `shasum -a 256 -c SHA256SUMS`), and the trust model paragraph (checksum protects against corruption and mirror substitution, not against a compromised repository; no signatures yet) matching SECURITY.md; (3) "Command Reference": regenerate from `bash install.sh --help` output so subcommands, tool flags, behavior flags, `--ref`, and environment variables (`LZR1_AUTO`, `LZRI_AUTO`, `LZR1_SOURCE_DIR`, `LZR1_REF` and whatever else the code reads: grep `install.sh` for `LZR1_`/`LZRI_`) are exactly right, including each flag's real target directory; (4) "How It Works": state manifest validation, ownership markers, `.lzr1-backups/`, state file `~/.lzr1-skills-state`, lock dir, checksum verification and fallback; (5) a new "Choosing between overlapping skills" table (the six Phase 2 groups, one row per group naming the lane of each skill); (6) a new "Development" section: how to run `python3 -I scripts/lint_catalog.py`, each test script, the script-coverage registry, CI matrix (what runs where), and links to CONTRIBUTING.md, SECURITY.md, CHANGELOG.md, LICENSE and `docs/decisions/`; (7) Arsenal tables: every one of the 86 skills exactly once, each description rewritten from the skill's current `description:` and body (no copy-paste of marketing claims), placed in the most fitting category; check the category memberships and add a category if a skill has none; (8) Pattern A/B/C: for each claimed number, compute the truth by grepping the `SKILL.md` files (and references) for the mechanisms named (refuter panel, consistency validator, fan-out, multi-specialist). Rewrite the claims to what is true: change the numbers, or rename the claim to what the skills actually contain, or drop a pattern that no skill implements, and list every change in the task report; (9) text `Installer version: <VERSION>` once, matching `install.sh`; (10) "Scope" paragraph stating the Lerian decision in one or two sentences; (11) update the Table of Contents to the final headings. Also write the `## [2.1.0]` section in CHANGELOG.md covering Phases 1-4 (added linter, CI, registry, verified install, release workflow, governance, routing and description changes, model-id refresh, macOS parity, decisions) with today's date 2026-10-16, keep `## [Unreleased]` empty above it, and bump `VERSION` is done in Task 4.1.2. Edge cases: README line count is not a goal; remove claims you cannot verify instead of softening them; keep emoji headings consistent; do not invent features.
+
+**Files:**
+- Modify: `README.md`, `CHANGELOG.md`
+
+**Verification:** `python3 -I scripts/lint_catalog.py` 0 errors 0 warnings (including the Task 4.3.1 rules once both land); a one-off script (inline, report its output) extracts every `--flag` and `LZR1_*` token from README and asserts each appears in `install.sh`, and every `--flag` printed by `bash install.sh --help` appears in README; every relative link and every `](path)` target in README exists on disk.
+
+**Done when:** the three checks above pass and the Pattern claims are reconciled with the code.
 
 ---
 
