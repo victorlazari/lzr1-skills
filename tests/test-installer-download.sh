@@ -75,6 +75,13 @@ while [ $# -gt 0 ]; do
   shift
 done
 printf '%s\n' "$url" >>"$FAKE_FIXTURE/requests.log"
+case "$url" in
+  https://api.github.com/*/releases/latest)
+    if [ -n "${FAKE_API_EXIT:-}" ]; then exit "$FAKE_API_EXIT"; fi
+    printf '%s' "${FAKE_API_STATUS:-404}"
+    exit 0
+    ;;
+esac
 if [ -n "$wout" ] && [ -n "${FAKE_SUMS_EXIT:-}" ]; then exit "$FAKE_SUMS_EXIT"; fi
 if [ -n "$wout" ] && [ -n "${FAKE_SUMS_STATUS:-}" ]; then printf '%s' "$FAKE_SUMS_STATUS"; exit 0; fi
 case "$url" in
@@ -91,6 +98,76 @@ cp "$src" "$out"
 [ -z "$wout" ] || printf '200'
 CURL
 chmod 755 "$FAKEBIN/curl"
+
+# tar wrapper: records every invocation, then runs the real tar.
+REALTAR=$(command -v tar)
+cat >"$FAKEBIN/tar" <<TAR
+#!/usr/bin/env bash
+printf '%s\\n' "\$*" >>"\${TAR_LOG:-/dev/null}"
+exec "$REALTAR" "\$@"
+TAR
+chmod 755 "$FAKEBIN/tar"
+
+# Stub wget (only used with curl hidden): serves the same fixtures as the fake curl.
+WGETBIN=$WORK/wgetbin
+mkdir -p "$WGETBIN"
+cp "$FAKEBIN/tar" "$WGETBIN/tar"
+cat >"$WGETBIN/wget" <<'WGET'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >>"$FAKE_FIXTURE/wget.log"
+if [ "${1:-}" = "--help" ]; then
+  if [ "${FAKE_WGET_HELP:-full}" = full ]; then
+    printf 'GNU Wget\n  --https-only\n  --secure-protocol=PR\n'
+  else
+    printf 'BusyBox wget\n  -q  quiet\n  -O  output\n'
+  fi
+  exit 0
+fi
+out=""; url=""; hdr=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -O) out=$2; shift ;;
+    -S) hdr=1 ;;
+    https://*) url=$1 ;;
+  esac
+  shift
+done
+printf '%s\n' "$url" >>"$FAKE_FIXTURE/requests.log"
+status() { [ -z "$hdr" ] || printf '  HTTP/1.1 %s X\n' "$1" >&2; }
+case "$url" in
+  https://api.github.com/*/releases/latest)
+    if [ -n "${FAKE_API_EXIT:-}" ]; then exit "$FAKE_API_EXIT"; fi
+    c=${FAKE_API_STATUS:-404}
+    status "$c"; : >"$out"
+    case "$c" in 2*) exit 0 ;; *) exit 8 ;; esac
+    ;;
+esac
+if [ -n "${FAKE_SUMS_STATUS:-}" ] && [ "${url%/SHA256SUMS}" != "$url" ]; then
+  status "$FAKE_SUMS_STATUS"; : >"$out"
+  case "$FAKE_SUMS_STATUS" in 2*) exit 0 ;; *) exit 8 ;; esac
+fi
+case "$url" in
+  */SHA256SUMS) src=$FAKE_FIXTURE/SHA256SUMS ;;
+  */lzr1-skills.tar.gz) src=$FAKE_FIXTURE/lzr1-skills.tar.gz ;;
+  */refs/heads/*) src=$FAKE_FIXTURE/codeload.tar.gz ;;
+  *) status 404; exit 8 ;;
+esac
+if [ ! -f "$src" ]; then status 404; : >"$out"; exit 8; fi
+status 200
+cp "$src" "$out"
+WGET
+chmod 755 "$WGETBIN/wget"
+
+# NOCURL: every system tool except curl and wget (to force the wget code path).
+NOCURL=$WORK/nocurl
+mkdir -p "$NOCURL"
+for d in /usr/bin /bin; do
+  for f in "$d"/*; do
+    b=${f##*/}
+    case $b in curl|wget) continue ;; esac
+    [[ -e $NOCURL/$b ]] || ln -s "$f" "$NOCURL/$b" 2>/dev/null || true
+  done
+done
 
 CASE_N=0
 HOME_DIR=""
@@ -110,7 +187,11 @@ new_case() {
 # run_installer <installer args...>: piped mode, isolated HOME, fake curl first.
 run_installer() {
   set +e
-  cat "$INSTALLER" | env HOME="$HOME_DIR" FAKE_FIXTURE="$FIX" FAKE_SUMS_STATUS="${FAKE_SUMS_STATUS:-}" FAKE_SUMS_EXIT="${FAKE_SUMS_EXIT:-}" PATH="$FAKEBIN:$PATH" \
+  TAR_LOG=$WORK/tar$CASE_N.log
+  : >"$TAR_LOG"
+  cat "$INSTALLER" | env HOME="$HOME_DIR" FAKE_FIXTURE="$FIX" FAKE_SUMS_STATUS="${FAKE_SUMS_STATUS:-}" FAKE_SUMS_EXIT="${FAKE_SUMS_EXIT:-}" \
+    FAKE_API_STATUS="${FAKE_API_STATUS:-}" FAKE_API_EXIT="${FAKE_API_EXIT:-}" FAKE_WGET_HELP="${FAKE_WGET_HELP:-full}" TAR_LOG="$TAR_LOG" \
+    PATH="${INST_PATH:-$FAKEBIN:$PATH}" \
     bash -s -- "$@" >"$LOG" 2>&1
   RC=$?
   set -e
@@ -184,6 +265,7 @@ expect_log "No published release found; installing the unverified main snapshot"
 expect_log "from branch source (ref: main), verified: no"
 expect_installed
 grep -F "codeload.github.com" "$FIX/requests.log" >/dev/null || fail "case 4: codeload not used"
+grep -F "https://api.github.com/repos/" "$FIX/requests.log" | grep -F "/releases/latest" >/dev/null || fail "case 4: releases API not consulted"
 printf 'PASS: no release falls back to unverified main\n'
 
 # 5. Explicit tag whose assets are missing: no fallback.
@@ -278,5 +360,151 @@ set -e
 expect_ok
 expect_log "Ignoring --ref"
 printf 'PASS: ignored ref warns\n'
+
+# 12. 404 on SHA256SUMS needs a second signal: the releases API must also say 404.
+new_case "$SNAP"
+FAKE_SUMS_STATUS=404 FAKE_API_STATUS=404 run_installer --codex --yes
+expect_ok
+expect_log "No published release found; installing the unverified main snapshot"
+new_case "$SNAP"
+FAKE_SUMS_STATUS=404 FAKE_API_STATUS=200 run_installer --codex --yes
+expect_fail_with "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override"
+if grep -F "codeload.github.com" "$FIX/requests.log" >/dev/null; then fail "case 12 (api 200): must not fall back"; fi
+for st in 500 403 301; do
+  new_case "$SNAP"
+  FAKE_SUMS_STATUS=404 FAKE_API_STATUS=$st run_installer --codex --yes
+  expect_fail_with "--ref main"
+  expect_log "HTTP status $st"
+  if grep -F "codeload.github.com" "$FIX/requests.log" >/dev/null; then fail "case 12 (api $st): must not fall back"; fi
+done
+new_case "$SNAP"
+FAKE_SUMS_STATUS=404 FAKE_API_EXIT=28 run_installer --codex --yes
+expect_fail_with "curl exit 28"
+if grep -F "codeload.github.com" "$FIX/requests.log" >/dev/null; then fail "case 12 (api transport): must not fall back"; fi
+printf 'PASS: 404 downgrade needs the releases API to also say 404\n'
+
+# Archive helpers (python tarfile) for the hostile and benign tarball cases.
+MK=$WORK/mk.py
+cat >"$MK" <<'PY'
+import io, os, sys, tarfile
+mode, src, out, pwn = sys.argv[1:5]
+base = {}
+with tarfile.open(src) as t:
+    for m in t.getmembers():
+        if m.isfile():
+            base[m.name] = t.extractfile(m).read()
+        # directories are implied
+prefix = "lzr1-skills-main/"
+def add(t, name, data=b"x\n", typ=tarfile.REGTYPE, link=""):
+    ti = tarfile.TarInfo(name)
+    ti.type = typ
+    ti.mode = 0o644
+    if typ == tarfile.REGTYPE:
+        ti.size = len(data)
+        t.addfile(ti, io.BytesIO(data))
+    else:
+        ti.linkname = link
+        t.addfile(ti)
+with tarfile.open(out, "w:gz", format=tarfile.GNU_FORMAT) as t:
+    if mode == "abs":
+        add(t, pwn)
+    elif mode == "dotdot":
+        add(t, prefix + "../escape.txt")
+    elif mode == "tworoots":
+        add(t, prefix + "skills-list.txt")
+        add(t, "other-root/x.txt")
+    elif mode == "rootfile":
+        for n, d in base.items():
+            add(t, n[len(prefix):], d)
+    elif mode in ("symlink", "hardlink", "benign"):
+        for n, d in base.items():
+            add(t, n, d)
+        first = [n for n in base if n.startswith(prefix + "skills/")][0]
+        skilldir = first.rsplit("/", 1)[0] + "/"
+        if mode == "symlink":
+            add(t, skilldir + "evil-link", typ=tarfile.SYMTYPE, link="/etc/passwd")
+        elif mode == "hardlink":
+            add(t, skilldir + "evil-hard", typ=tarfile.LNKTYPE, link=first)
+        else:
+            add(t, skilldir + "l file with spaces.txt")
+            add(t, skilldir + "lib dir/l again.txt")
+            add(t, skilldir + "x-ray notes.txt")
+PY
+
+tarball_case() { # <mode> <path: release|branch> ; builds fixture and runs
+  local mode=$1 path=$2 args
+  PWN=$WORK/pwned-$mode-$path
+  new_case "$GOOD"
+  rm -f "$FIX/codeload.tar.gz"
+  if [[ $path == release ]]; then
+    python3 -I "$MK" "$mode" "$SNAP/codeload.tar.gz" "$FIX/lzr1-skills.tar.gz" "$PWN"
+    sum=$( (command -v sha256sum >/dev/null && sha256sum "$FIX/lzr1-skills.tar.gz") || shasum -a 256 "$FIX/lzr1-skills.tar.gz")
+    printf '%s  lzr1-skills.tar.gz\n' "${sum%% *}" >"$FIX/SHA256SUMS"
+    args=(--codex --yes)
+  else
+    python3 -I "$MK" "$mode" "$SNAP/codeload.tar.gz" "$FIX/codeload.tar.gz" "$PWN"
+    args=(--ref main --codex --yes)
+  fi
+  run_installer "${args[@]}"
+}
+
+expect_no_extraction() {
+  grep -F -- "-xzf" "$TAR_LOG" >/dev/null && { cat "$LOG" "$TAR_LOG" >&2; fail "case $CASE_N: tar extraction ran"; }
+  [[ ! -e $PWN ]] || fail "case $CASE_N: absolute-path member was written"
+  return 0
+}
+
+# 13. Hostile listings fail before ANY extraction (verified release path and unverified branch path).
+for path in release branch; do
+  for pair in "abs:Archive contains an absolute path" \
+              "dotdot:Archive contains path traversal components" \
+              "tworoots:Archive contains multiple top-level roots" \
+              "rootfile:Archive has an invalid top-level path"; do
+    mode=${pair%%:*}; msg=${pair#*:}
+    tarball_case "$mode" "$path"
+    expect_fail_with "$msg"
+    expect_no_extraction
+  done
+done
+printf 'PASS: hostile archive listings refused before extraction (release and branch)\n'
+
+# 14. Member types: symlink and hardlink refused before extraction; spaces and a leading l accepted.
+for path in release branch; do
+  for mode in symlink hardlink; do
+    tarball_case "$mode" "$path"
+    expect_fail_with "non-regular member"
+    expect_no_extraction
+  done
+  tarball_case benign "$path"
+  expect_ok
+  expect_installed
+done
+printf 'PASS: link members refused, benign names accepted (%s)\n' "$(tar --version 2>&1 | head -n 1)"
+
+# 15. wget path (curl hidden).
+new_case "$GOOD"
+INST_PATH="$WGETBIN:$NOCURL" FAKE_WGET_HELP=lacking run_installer --codex --yes
+expect_fail_with "lacks --https-only"
+if grep -E 'https://' "$FIX/wget.log" >/dev/null 2>&1; then cat "$FIX/wget.log" >&2; fail "case 15: wget must not download without TLS options"; fi
+[[ ! -e $FIX/requests.log ]] || fail "case 15: nothing should be requested"
+new_case "$GOOD"
+INST_PATH="$WGETBIN:$NOCURL" FAKE_WGET_HELP=lacking run_installer --ref main --codex --yes
+expect_fail_with "lacks --https-only"
+[[ ! -e $FIX/requests.log ]] || fail "case 15: branch path must not request anything"
+new_case "$GOOD"
+INST_PATH="$WGETBIN:$NOCURL" run_installer --codex --yes
+expect_ok
+expect_log "Release archive checksum verified"
+grep -E -- '--tries=3' "$FIX/wget.log" >/dev/null || fail "case 15: wget lacks --tries=3"
+grep -E -- '--timeout=[0-9]+' "$FIX/wget.log" >/dev/null || fail "case 15: wget lacks --timeout"
+grep -F -- '--https-only' "$FIX/wget.log" >/dev/null || fail "case 15: wget lacks --https-only"
+new_case "$SNAP"
+INST_PATH="$WGETBIN:$NOCURL" FAKE_SUMS_STATUS=404 FAKE_API_STATUS=200 run_installer --codex --yes
+expect_fail_with "a release exists but SHA256SUMS is missing"
+new_case "$SNAP"
+INST_PATH="$WGETBIN:$NOCURL" FAKE_SUMS_STATUS=404 FAKE_API_STATUS=404 run_installer --codex --yes
+expect_ok
+expect_log "No published release found"
+printf 'PASS: wget path is fail-closed with retry limits\n'
 
 printf 'All installer download tests passed\n'

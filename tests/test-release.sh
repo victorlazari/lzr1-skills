@@ -69,4 +69,19 @@ expect_refused 9.9.9 'invalid tag'
 expect_refused v9.9.8 'does not match'
 expect_refused v1.2.3 'not found'
 
+# The release workflow's first step must reject tags that only match the loose glob.
+WF=$ROOT/.github/workflows/release.yml
+[[ -f $WF ]] || fail "missing release workflow"
+step=$(awk '/- name: Validate tag name/{f=1;next} f&&/- uses:/{exit} f' "$WF")
+[[ -n $step ]] || fail "release.yml lacks the Validate tag name step"
+first=$(grep -n -- '- name:\|- uses:' "$WF" | head -n 1)
+case $first in *'Validate tag name'*) ;; *) fail "tag validation must be the first step: $first" ;; esac
+for t in v1.2.3garbage v1.2.3-rc1 v1.2 v1.2.3.4 vx.y.z 'v1.2.3 '; do
+  if (GITHUB_REF_NAME=$t bash -c "$(printf '%s\n' "$step" | sed 's/^ *run: |$//')") >/dev/null 2>&1; then
+    fail "tag '$t' passed workflow validation"
+  fi
+done
+GITHUB_REF_NAME=v1.2.3 bash -c "$(printf '%s\n' "$step" | sed 's/^ *run: |$//')" >/dev/null 2>&1 || fail "v1.2.3 rejected by workflow validation"
+printf 'PASS: release tag validation step\n'
+
 printf 'PASS: release packaging\n'

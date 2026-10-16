@@ -281,16 +281,21 @@ sha256_file() {
   fi
 }
 
+# wget_secure_flags: sets WGET_FLAGS. Called directly (never inside $(...)) so
+# that fail terminates the installer instead of only a subshell.
+WGET_FLAGS=""
 wget_secure_flags() {
   local help
+  WGET_FLAGS=""
   help=$(wget --help 2>&1 || true)
   case "${help}" in *--https-only*) ;; *) fail "This wget lacks --https-only; install curl or a full wget (refusing to download without TLS protection)" ;; esac
   case "${help}" in *--secure-protocol*) ;; *) fail "This wget lacks --secure-protocol; install curl or a full wget (refusing to download without TLS protection)" ;; esac
-  printf '%s' "--https-only --secure-protocol=TLSv1_2"
+  WGET_FLAGS="--https-only --secure-protocol=TLSv1_2 --tries=3 --timeout=30"
+  [ -n "${WGET_FLAGS}" ] || fail "Internal error: empty wget flags"
 }
 
 download_file() {
-  local url destination flags
+  local url destination
   url=$1
   destination=$2
   case "${url}" in https://*) ;; *) fail "Refusing non-HTTPS download URL" ;; esac
@@ -299,62 +304,93 @@ download_file() {
       --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 20 --max-time 300 \
       --output "${destination}" "${url}" || return 1
   elif command -v wget >/dev/null 2>&1; then
-    flags=$(wget_secure_flags)
+    wget_secure_flags
     # shellcheck disable=SC2086
-    wget -q ${flags} -O "${destination}" "${url}" || return 1
+    wget -q ${WGET_FLAGS} -O "${destination}" "${url}" || return 1
   else
     fail "curl or wget is required in piped mode"
   fi
   [ -s "${destination}" ] || return 1
 }
 
-# fetch_sums <url> <dest>: status-aware download of SHA256SUMS.
-# Returns 0 on HTTP 2xx with a non-empty body, 2 on HTTP 404 (no release),
-# and 1 for every other outcome (message left in FETCH_ERR).
+# http_status <url> <dest>: status-only request (the body goes to <dest> and is
+# never parsed). Returns 0 with HTTP_CODE set when a status was obtained, 1 on a
+# transport failure (message left in FETCH_ERR, HTTP_CODE empty).
 FETCH_ERR=""
-fetch_sums() {
-  local url destination code rc errfile flags
+HTTP_CODE=""
+http_status() {
+  local url destination rc errfile
   url=$1
   destination=$2
   FETCH_ERR=""
+  HTTP_CODE=""
   case "${url}" in https://*) ;; *) fail "Refusing non-HTTPS download URL" ;; esac
   if command -v curl >/dev/null 2>&1; then
-    code=$(curl --silent --show-error --location --write-out '%{http_code}' \
+    HTTP_CODE=$(curl --silent --show-error --location --write-out '%{http_code}' \
       --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 20 --max-time 300 \
       --output "${destination}" "${url}")
     rc=$?
     if [ "${rc}" -ne 0 ]; then
+      HTTP_CODE=""
       FETCH_ERR="transport failure (curl exit ${rc})"
       return 1
     fi
   elif command -v wget >/dev/null 2>&1; then
-    flags=$(wget_secure_flags)
-    errfile="${WORK_ROOT}/wget-sums.err"
+    wget_secure_flags
+    errfile="${WORK_ROOT}/wget-status.err"
     # shellcheck disable=SC2086
-    wget -S ${flags} -O "${destination}" "${url}" >/dev/null 2>"${errfile}"
-    code=$(grep -E '^[[:space:]]*HTTP/[0-9.]+ [0-9]{3}' "${errfile}" | tail -n 1 | awk '{print $2}')
-    if [ -z "${code}" ]; then
-      FETCH_ERR="could not determine the HTTP status (wget)"
-      return 1
-    fi
+    wget -S ${WGET_FLAGS} -O "${destination}" "${url}" >/dev/null 2>"${errfile}"
+    HTTP_CODE=$(grep -E '^[[:space:]]*HTTP/[0-9.]+ [0-9]{3}' "${errfile}" | tail -n 1 | awk '{print $2}')
   else
     fail "curl or wget is required in piped mode"
   fi
-  case "${code}" in
+  if [ -z "${HTTP_CODE}" ]; then
+    FETCH_ERR="could not determine the HTTP status"
+    return 1
+  fi
+  return 0
+}
+
+# fetch_sums <url> <dest>: status-aware download of SHA256SUMS.
+# Returns 0 on HTTP 2xx with a non-empty body, 2 on HTTP 404 (candidate "no
+# release"; the caller must confirm it), and 1 for every other outcome
+# (message left in FETCH_ERR).
+fetch_sums() {
+  local url destination
+  url=$1
+  destination=$2
+  http_status "${url}" "${destination}" || return 1
+  case "${HTTP_CODE}" in
     404) return 2 ;;
     2[0-9][0-9])
       if [ -s "${destination}" ]; then return 0; fi
-      FETCH_ERR="HTTP ${code} with an empty body"
+      FETCH_ERR="HTTP ${HTTP_CODE} with an empty body"
       return 1
       ;;
-    *) FETCH_ERR="HTTP status ${code}"; return 1 ;;
+    *) FETCH_ERR="HTTP status ${HTTP_CODE}"; return 1 ;;
   esac
 }
 
+# confirm_no_release: second, independent signal before the unverified fallback.
+# Only a 404 from the releases API (no release exists) permits it.
+confirm_no_release() {
+  http_status "https://api.github.com/repos/${REPO}/releases/latest" /dev/null \
+    || fail "Could not confirm that no release exists (${FETCH_ERR}); refusing to install unverified; use --ref main to override"
+  case "${HTTP_CODE}" in
+    404) return 0 ;;
+    2[0-9][0-9]) fail "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override" ;;
+    *) fail "Could not confirm that no release exists (HTTP status ${HTTP_CODE}); refusing to install unverified; use --ref main to override" ;;
+  esac
+}
+
+# validate_archive_listing <listing>: sets ARCHIVE_TOP. Called directly (never
+# inside $(...)) so that fail terminates the installer.
+ARCHIVE_TOP=""
 validate_archive_listing() {
   local listing top CR entry component
   listing=$1
   top=""
+  ARCHIVE_TOP=""
   CR=$(printf '\r')
   while IFS= read -r entry || [ -n "${entry}" ]; do
     [ -n "${entry}" ] || fail "Archive contains an empty path"
@@ -368,6 +404,11 @@ validate_archive_listing() {
     esac
     component=${entry%%/*}
     [ -n "${component}" ] || fail "Archive has an invalid top-level path"
+    # A root-level file (no directory component) is not a top-level directory.
+    case "${entry}" in
+      */*) ;;
+      *) fail "Archive has an invalid top-level path (file at the archive root)" ;;
+    esac
     if [ -z "${top}" ]; then
       top=${component}
     elif [ "${component}" != "${top}" ]; then
@@ -375,7 +416,7 @@ validate_archive_listing() {
     fi
   done < "${listing}"
   [ -n "${top}" ] || fail "Archive listing is empty"
-  printf '%s\n' "${top}"
+  ARCHIVE_TOP=${top}
 }
 
 validate_ref() {
@@ -398,16 +439,24 @@ is_release_tag() {
 }
 
 extract_verified_archive() {
-  local archive listing extract_dir top
+  local archive listing extract_dir line
   archive=$1
   listing="${WORK_ROOT}/archive.list"
   extract_dir="${WORK_ROOT}/archive"
-  mkdir -p "${extract_dir}" || fail "Cannot create archive extraction directory"
   command -v tar >/dev/null 2>&1 || fail "tar is required in piped mode"
   tar -tzf "${archive}" > "${listing}" || fail "Repository archive cannot be listed"
-  top=$(validate_archive_listing "${listing}")
+  validate_archive_listing "${listing}"
+  [ -n "${ARCHIVE_TOP}" ] || fail "Archive has no top-level directory"
+  tar -tvzf "${archive}" > "${WORK_ROOT}/archive.verbose" || fail "Repository archive cannot be listed"
+  while IFS= read -r line || [ -n "${line}" ]; do
+    case "${line}" in
+      ""|-*|d*) ;;
+      *) fail "Archive contains a non-regular member (symlink or hardlink); refusing to extract" ;;
+    esac
+  done < "${WORK_ROOT}/archive.verbose"
+  mkdir -p "${extract_dir}" || fail "Cannot create archive extraction directory"
   tar -xzf "${archive}" -C "${extract_dir}" || fail "Repository archive extraction failed"
-  SOURCE_ROOT="${extract_dir}/${top}"
+  SOURCE_ROOT="${extract_dir}/${ARCHIVE_TOP}"
   [ -d "${SOURCE_ROOT}" ] && [ ! -L "${SOURCE_ROOT}" ] || fail "Extracted repository root is unsafe"
 }
 
@@ -434,7 +483,8 @@ fetch_release_archive() {
     *[!0-9a-f]*) fail "SHA256SUMS entry is not a valid SHA-256 (non-hex characters)" ;;
   esac
   [ "${#expected}" -eq 64 ] || fail "SHA256SUMS entry is not a valid SHA-256 (expected 64 hex characters)"
-  actual=$(sha256_file "${archive}")
+  actual=$(sha256_file "${archive}") || fail "Cannot compute the archive SHA-256"
+  [ -n "${actual}" ] || fail "Cannot compute the archive SHA-256"
   [ "${actual}" != "unavailable" ] || fail "Cannot verify release: no sha256sum or shasum available"
   if [ "${actual}" != "${expected}" ]; then
     log_error "Expected SHA-256: ${expected}"
@@ -454,14 +504,6 @@ fetch_branch_archive() {
   log_warn "Installing an unverified snapshot of ${branch}; use a release tag for checksum verification"
   download_file "https://codeload.github.com/${REPO}/tar.gz/refs/heads/${branch}" "${archive}" || fail "Repository archive download failed"
   log_info "Downloaded archive SHA-256: $(sha256_file "${archive}")"
-  command -v tar >/dev/null 2>&1 || fail "tar is required in piped mode"
-  tar -tvzf "${archive}" > "${WORK_ROOT}/archive.verbose" || fail "Repository archive cannot be listed"
-  while IFS= read -r line || [ -n "${line}" ]; do
-    case "${line}" in
-      ""|-*|d*) ;;
-      *) fail "Snapshot contains a non-regular member (symlink or hardlink); refusing to extract" ;;
-    esac
-  done < "${WORK_ROOT}/archive.verbose"
   extract_verified_archive "${archive}"
   SOURCE_VERIFIED="no"
 }
@@ -494,6 +536,7 @@ initialize_source() {
         fetch_release_archive "https://github.com/${REPO}/releases/latest/download"
         rc=$?
         if [ "${rc}" -eq 2 ]; then
+          confirm_no_release
           log_warn "No published release found; installing the unverified main snapshot"
           SOURCE_MODE="branch"
           SOURCE_REF="${BRANCH}"

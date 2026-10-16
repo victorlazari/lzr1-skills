@@ -459,7 +459,7 @@ def main():
     if not args.skill:
         rp = os.path.join(root, "README.md")
         rtext = read(rp) if os.path.isfile(rp) else ""
-        cm = re.search(r"<!-- pattern-census:begin -->\n(.*?)<!-- pattern-census:end -->", rtext, re.S)
+        cm = re.search(r"<!-- pattern-census:begin -->\r?\n(.*?)<!-- pattern-census:end -->", rtext, re.S)
         if not cm:
             add("ERROR", "-", "readme-patterns",
                 "README.md lacks the <!-- pattern-census:begin --> ... <!-- pattern-census:end --> block")
@@ -474,6 +474,9 @@ def main():
             for ln in cm.group(1).splitlines():
                 m = re.match(r"^([a-z-]+): (\d+)$", ln.strip())
                 if m:
+                    if m.group(1) in have:
+                        add("ERROR", "-", "readme-patterns",
+                            "census block repeats mechanism '%s'" % m.group(1))
                     have[m.group(1)] = int(m.group(2))
             for mech, skills in sorted(expect.items()):
                 if mech not in have:
@@ -487,6 +490,14 @@ def main():
         ip = os.path.join(root, "install.sh")
         if os.path.isfile(ip) and rtext:
             isrc = read(ip)
+            code_flags = set()
+            for fname in ("parse_args", "print_help"):
+                fm = re.search(r"^%s\(\) \{\n(.*?)^\}" % fname, isrc, re.S | re.M)
+                if not fm:
+                    add("ERROR", "-", "readme-flags", "install.sh lacks a %s() function" % fname)
+                    continue
+                body = "\n".join(l for l in fm.group(1).splitlines() if not l.lstrip().startswith("#"))
+                code_flags.update(FLAG_RE.findall(body))
             sec, cmd = [], []
             cur, in_range, past_upd = None, False, False
             for ln in rtext.splitlines():
@@ -505,8 +516,9 @@ def main():
             if not sec:
                 add("ERROR", "-", "readme-flags", "README.md has no '## Equip Up' section")
             for fl in sorted(set(FLAG_RE.findall("\n".join(sec)))):
-                if fl not in isrc:
-                    add("ERROR", "-", "readme-flags", "README flag %s does not appear in install.sh" % fl)
+                if fl not in code_flags:
+                    add("ERROR", "-", "readme-flags",
+                        "README flag %s is not a token in install.sh parse_args/print_help (comments do not count)" % fl)
             try:
                 hp = subprocess.run(["bash", ip, "--help"], stdin=subprocess.DEVNULL, capture_output=True,
                                     text=True, timeout=30, cwd=root)

@@ -32,7 +32,7 @@ make_fixture() {
   printf 'alpha\nbeta\n' > "$r/skills-list.txt"
   printf 'path\tlevel\treason\ttest\nskills/alpha/scripts/run.sh\tstatic\tfixture script, no safe invocation\t\n' \
     > "$r/tests/script-coverage.tsv"
-  printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=2\nif [ "${1:-}" = "--help" ]; then\n  printf "usage\\n  --alpha  a\\n  --help   h\\n"\n  exit 0\nfi\n' > "$r/install.sh"
+  printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=2\nprint_help() {\n  printf "usage\\n  --alpha  a\\n  --help   h\\n"\n}\nparse_args() {\n  case "$1" in\n    --alpha) ;;\n    --help) print_help; exit 0 ;;\n  esac\n}\nif [ "${1:-}" = "--help" ]; then\n  print_help\n  exit 0\nfi\n' > "$r/install.sh"
   printf 'EXPECTED=2\n' > "$r/tests/test-installer.sh"
   printf '![skills](https://img.shields.io/badge/skills-2-blue)\n2 curated AI skills\n\n## The Arsenal\n\n### Cat\n\n| Skill | What |\n|:--|:--|\n| `alpha` | a |\n| `beta` | b |\n\n## Equip Up\n\nRun `bash install.sh --alpha`.\n\n## Command Reference\n\n| `--alpha` | a |\n| `--help` | h |\n\n## Update & Remove\n\nRun `--alpha` again.\n\n## Other\n\nInstaller version: 1.2.3\n\n<!-- pattern-census:begin -->\nparallel-execution-protocol: 0\nmulti-specialist-spawning: 0\nrefuter-panel: 0\nconsistency-validator: 0\nconflict-resolving-synthesis: 0\n<!-- pattern-census:end -->\n' \
     > "$r/README.md"
@@ -560,6 +560,22 @@ expect_only_rule "README flag unknown to install.sh" readme-flags "$m"
 
 m=$WORK/rf3; make_fixture "$m"
 expect_clean "README flags consistent with install.sh" "$m"
+m=$WORK/rf4; make_fixture "$m"
+printf '# supports --ghost soon\n' >> "$m/install.sh"
+sed -i.bak 's/^Run `--alpha` again\./Run `--alpha` and `--ghost`./' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README flag present only in an install.sh comment" readme-flags "$m"
+
+m=$WORK/rf5; make_fixture "$m"
+sed -i.bak 's/^Run `--alpha` again\./Run `--alpha` and `--alp`./' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README flag is only a prefix of a real flag" readme-flags "$m"
+
+m=$WORK/rp4; make_fixture "$m"
+sed -i.bak 's/$/\r/' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_clean "CRLF README census block passes" "$m"
+
+m=$WORK/rp5; make_fixture "$m"
+sed -i.bak 's/^refuter-panel: 0/refuter-panel: 0\nrefuter-panel: 0/' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "duplicate census key" readme-patterns "$m"
 printf 'PASS: readme-patterns and readme-flags fixtures\n'
 
 # Real repo must be clean.

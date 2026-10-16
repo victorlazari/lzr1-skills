@@ -330,7 +330,7 @@ The installer detects these tools automatically and installs skills to their con
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash
 ```
 
-This installs the **latest verified release**: the script downloads the release archive `lzr1-skills.tar.gz` and `SHA256SUMS`, checks the archive against the checksum, and only then extracts it. Fallback to the unverified `main` snapshot happens only when the latest-release checksum file returns HTTP 404 (no release published); any other failure stops the install; blocking or failing that request therefore cannot downgrade an install. The fallback prints a warning. The command launches an interactive target menu; like every `curl | bash` pattern it executes the fetched script immediately, so use the inspect-first alternative below when your trust policy requires review.
+This installs the **latest verified release**: the script downloads the release archive `lzr1-skills.tar.gz` and `SHA256SUMS`, checks the archive against the checksum, and only then extracts it. Fallback to the unverified `main` snapshot requires two independent signals: the latest-release `SHA256SUMS` request returns HTTP 404 **and** a status-only request to `https://api.github.com/repos/victorlazari/lzr1-skills/releases/latest` also returns 404 (no release exists). If that API request returns 2xx, the install stops with "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override"; any other status or a transport failure stops it too. The fallback prints a warning. The command launches an interactive target menu; like every `curl | bash` pattern it executes the fetched script immediately, so use the inspect-first alternative below when your trust policy requires review.
 
 **Pin a release** (checksum-verified; fails instead of falling back if the tag or its checksums cannot be downloaded):
 
@@ -369,7 +369,7 @@ shasum -a 256 -c SHA256SUMS
 
 The release tarball is a `git archive` of the tag, so it includes tests and docs alongside the skills.
 
-**Trust model.** The checksum protects against corruption in transit and against a mirror or proxy substituting the archive. Because the unverified fallback is limited to an HTTP 404 on the latest-release checksum file, an attacker who blocks or breaks that request causes the install to fail rather than to downgrade. It does not protect against a compromised repository or release: both assets come from the same place, and releases are not signed yet. Report integrity problems as described in [SECURITY.md](SECURITY.md).
+**Trust model.** The checksum protects against corruption in transit and against a mirror or proxy substituting the archive. Because the unverified fallback needs HTTP 404 on both the latest-release checksum file and the releases API, an attacker who blocks or breaks either request causes the install to fail rather than to downgrade. A TLS-terminating proxy that falsifies both responses is outside the threat model: the checksum protects against corruption and mirror substitution, not against a compromised repository or a network position that can forge HTTPS. It does not protect against a compromised repository or release: both assets come from the same place, and releases are not signed yet. Report integrity problems as described in [SECURITY.md](SECURITY.md).
 
 ### Option 2 — Clone and run
 
@@ -495,7 +495,7 @@ The installer chooses its source mode and then applies the same fail-closed cata
 
 **Manifest validation** — the source is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 86 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. Unsafe archive paths and symbolic links are rejected. There is no hardcoded-list fallback.
 
-**Checksum verification and fallback** — with no `--ref`, the installer downloads `SHA256SUMS` and `lzr1-skills.tar.gz` from the latest release and refuses to extract on a mismatch. Fallback to the unverified `main` snapshot happens only when the latest-release checksum file returns HTTP 404 (no release published); any other failure (timeout, DNS, TLS, 5xx, 403/429, other 4xx, or an empty body) stops the install and names the status, and you may then re-run with `--ref main` to install the snapshot knowingly. Blocking or failing that request therefore cannot downgrade an install. An explicit `vX.Y.Z` tag never falls back: a missing release exits non-zero. Any other ref is an unverified snapshot, with a warning. A missing `sha256sum`/`shasum` tool is an error for verified modes.
+**Checksum verification and fallback** — with no `--ref`, the installer downloads `SHA256SUMS` and `lzr1-skills.tar.gz` from the latest release and refuses to extract on a mismatch. Fallback to the unverified `main` snapshot requires two independent signals: the latest-release `SHA256SUMS` request returns HTTP 404 **and** a status-only request to `https://api.github.com/repos/victorlazari/lzr1-skills/releases/latest` also returns 404 (no release exists). If that API request returns 2xx, the install stops with "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override"; any other status or a transport failure stops it too. Any other failure of the checksum request (timeout, DNS, TLS, 5xx, 403/429, other 4xx, or an empty body) also stops the install and names the status, and you may then re-run with `--ref main` to install the snapshot knowingly. Blocking or failing either request therefore cannot downgrade an install. An explicit `vX.Y.Z` tag never falls back: a missing release exits non-zero. Any other ref is an unverified snapshot, with a warning. A missing `sha256sum`/`shasum` tool is an error for verified modes.
 
 **Destination layouts** — package-native tools receive `skills/<name>/` directories. Flat-rule tools receive `<name>.md` plus a hidden `.lzr1-skill-resources/<name>/` package mirror; entrypoint links are rewritten to that mirror so referenced materials continue to resolve.
 
@@ -531,7 +531,7 @@ bash tests/test-release.sh            # offline test of scripts/build-release.sh
 | `test` (Linux leg only) | ubuntu | ruff (`E9,F`) over `skills/`, `compileall` of skill Python |
 | `shellcheck` | ubuntu | shellcheck at warning severity over `install.sh`, `tests/*.sh` and skill shell scripts |
 
-Pushing a `vX.Y.Z` tag (glob `v[0-9]*.[0-9]*.[0-9]*`) runs `.github/workflows/release.yml`, which builds `lzr1-skills.tar.gz` and `SHA256SUMS` with `scripts/build-release.sh`.
+Pushing a `vX.Y.Z` tag (glob `v[0-9]*.[0-9]*.[0-9]*`) runs `.github/workflows/release.yml`, whose first step rejects any tag name not matching `^v[0-9]+[.][0-9]+[.][0-9]+$` (the glob alone also matches names such as `v1.2.3garbage`) before anything is published, and which then builds `lzr1-skills.tar.gz` and `SHA256SUMS` with `scripts/build-release.sh`.
 
 More: [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [CHANGELOG.md](CHANGELOG.md) · [LICENSE](LICENSE) · [docs/decisions/](docs/decisions/)
 

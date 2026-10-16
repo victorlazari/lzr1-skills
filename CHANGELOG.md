@@ -5,6 +5,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Installer: archive listing validation and wget TLS-option checks now run in
+  the main shell, so a failure stops the install instead of only a subshell
+  (an invalid archive listing could previously still be extracted).
+- Installer: the unverified `main` fallback needs a second signal, a 404 from
+  the GitHub releases API, in addition to a 404 on `SHA256SUMS`; any other
+  outcome stops the install.
+- Installer: symlink and hardlink members are refused before extraction on the
+  verified release path as well as the branch path; wget uses `--tries=3` and
+  `--timeout=30`.
+- Release workflow: the first step rejects tag names that are not `vX.Y.Z`.
+- Catalog linter: `readme-flags` counts only flag tokens in `parse_args` and
+  `print_help` (not comments); the census block parser accepts CRLF and rejects
+  duplicate mechanism keys.
+
 ## [2.1.0] - 2026-10-16
 
 ### Added
