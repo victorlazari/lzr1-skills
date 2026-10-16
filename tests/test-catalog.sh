@@ -88,7 +88,7 @@ printf 'x\n' > "$m/skills/alpha/references/unused.md"
 expect_only_rule "unreferenced reference file" ref-orphan "$m"
 
 m=$WORK/m6; make_fixture "$m"
-chmod -x "$m/skills/alpha/scripts/run.sh"
+chmod 644 "$m/skills/alpha/scripts/run.sh"
 expect_only_rule "script not executable" exec-bit "$m"
 
 m=$WORK/m7; make_fixture "$m"

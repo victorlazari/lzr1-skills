@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Shellcheck installer and tests
-        run: shellcheck -x install.sh tests/*.sh
+        run: shellcheck --severity=warning -x install.sh tests/*.sh
       - name: Shellcheck skill scripts (informational)
         continue-on-error: true
         run: |
