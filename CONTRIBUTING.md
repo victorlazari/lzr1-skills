@@ -37,7 +37,13 @@ contract. Read its docstring and rules before opening a PR.
    - the "N curated AI skills" sentence in `README.md`
    - `EXPECTED` in `tests/test-installer.sh`, only if it is a literal; when it
      is derived from `skills-list.txt` it needs no edit.
-4. Run the checks:
+   - one table row `| \`<name>\` | ... |` in the README "The Arsenal" section
+     (`readme-skills` fails if a skill is missing, listed twice, or listed
+     without existing).
+4. When releasing, keep `VERSION` in `install.sh`, the newest released
+   `## [x.y.z]` heading in `CHANGELOG.md` and the README line
+   `Installer version: x.y.z` identical (`version-sync`).
+5. Run the checks:
 
    ```bash
    python3 -I scripts/lint_catalog.py
@@ -47,7 +53,7 @@ contract. Read its docstring and rules before opening a PR.
    bash tests/test-adversarial-remediations.sh
    ```
 
-5. Add an entry under `## [Unreleased]` in `CHANGELOG.md`.
+6. Add an entry under `## [Unreleased]` in `CHANGELOG.md`.
 
 ## Pull requests
 

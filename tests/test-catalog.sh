@@ -32,10 +32,11 @@ make_fixture() {
   printf 'alpha\nbeta\n' > "$r/skills-list.txt"
   printf 'path\tlevel\treason\ttest\nskills/alpha/scripts/run.sh\tstatic\tfixture script, no safe invocation\t\n' \
     > "$r/tests/script-coverage.tsv"
-  printf 'EXPECTED_SKILL_COUNT=2\n' > "$r/install.sh"
+  printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=2\n' > "$r/install.sh"
   printf 'EXPECTED=2\n' > "$r/tests/test-installer.sh"
-  printf '![skills](https://img.shields.io/badge/skills-2-blue)\n2 curated AI skills\n' \
+  printf '![skills](https://img.shields.io/badge/skills-2-blue)\n2 curated AI skills\n\n## The Arsenal\n\n### Cat\n\n| Skill | What |\n|:--|:--|\n| `alpha` | a |\n| `beta` | b |\n\n## Other\n\nInstaller version: 1.2.3\n' \
     > "$r/README.md"
+  printf '# Changelog\n\n## [Unreleased]\n\n## [1.2.3] - 2026-01-01\n\n## [1.0.0]\n' > "$r/CHANGELOG.md"
 }
 
 # expect_rule NAME RULE ROOT: linter must exit 1 and print the rule id.
@@ -100,7 +101,7 @@ printf -- '---\nname: gamma\ndescription: Use when testing gamma.\n---\n' > "$m/
 expect_rule "skill absent from manifest" manifest-sync "$m"
 
 m=$WORK/m8; make_fixture "$m"
-printf 'EXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
+printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
 expect_only_rule "count constant changed" count-sync "$m"
 
 m=$WORK/m9; make_fixture "$m"
@@ -212,12 +213,12 @@ printf 'PASS: desc-trigger accepts use when\n'
 
 # (d) README badge drift.
 m=$WORK/g4; make_fixture "$m"
-printf '![skills](https://img.shields.io/badge/skills-3-blue)\n2 curated AI skills\n' > "$m/README.md"
+printf '![skills](https://img.shields.io/badge/skills-3-blue)\n2 curated AI skills\n\n## The Arsenal\n\n| `alpha` | x |\n| `beta` | x |\n\n## Other\n\nInstaller version: 1.2.3\n' > "$m/README.md"
 expect_only_rule "README badge drift" count-sync "$m"
 
 # (e) README phrase missing entirely.
 m=$WORK/g5; make_fixture "$m"
-printf '![skills](https://img.shields.io/badge/skills-2-blue)\n' > "$m/README.md"
+printf '![skills](https://img.shields.io/badge/skills-2-blue)\n\n## The Arsenal\n\n| `alpha` | x |\n| `beta` | x |\n\n## Other\n\nInstaller version: 1.2.3\n' > "$m/README.md"
 expect_only_rule "README phrase missing" count-sync "$m"
 printf '%s\n' "$(python3 -I "$LINT" --root "$m" 2>&1 || true)" | grep -F 'pattern for' | grep -F 'not found' >/dev/null \
   || fail "README phrase missing: no 'pattern ... not found' message"
@@ -230,7 +231,7 @@ expect_only_rule "stale manifest entry" manifest-sync "$m"
 # (g) --skill mode checks only that skill, skips manifest-sync/count-sync.
 m=$WORK/g7; make_fixture "$m"
 printf 'alpha\nbeta\nzeta\n' > "$m/skills-list.txt"
-printf 'EXPECTED_SKILL_COUNT=9\n' > "$m/install.sh"
+printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=9\n' > "$m/install.sh"
 printf -- '---\nname: wrong\ndescription: Use when x.\n---\n' > "$m/skills/beta/SKILL.md"
 rc=0
 out=$(python3 -I "$LINT" --root "$m" --skill alpha 2>&1) || rc=$?
@@ -298,17 +299,17 @@ printf 'PASS: prose word-boundary and skip chars\n'
 m=$WORK/n6; make_fixture "$m"
 ln -s nowhere "$m/skills/dangling"
 printf 'alpha\nbeta\ndangling\n' > "$m/skills-list.txt"
-printf 'EXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
+printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
 printf 'EXPECTED=3\n' > "$m/tests/test-installer.sh"
-printf '![skills](https://img.shields.io/badge/skills-3-blue)\n3 curated AI skills\n' > "$m/README.md"
+printf '![skills](https://img.shields.io/badge/skills-3-blue)\n3 curated AI skills\n\n## The Arsenal\n\n| `alpha` | x |\n| `beta` | x |\n| `dangling` | x |\n\n## Other\n\nInstaller version: 1.2.3\n' > "$m/README.md"
 expect_only_rule "dangling symlink under skills/" symlink "$m"
 
 m=$WORK/n7; make_fixture "$m"
 ln -s beta/SKILL.md "$m/skills/file-link"
 printf 'alpha\nbeta\nfile-link\n' > "$m/skills-list.txt"
-printf 'EXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
+printf 'VERSION="1.2.3"\nEXPECTED_SKILL_COUNT=3\n' > "$m/install.sh"
 printf 'EXPECTED=3\n' > "$m/tests/test-installer.sh"
-printf '![skills](https://img.shields.io/badge/skills-3-blue)\n3 curated AI skills\n' > "$m/README.md"
+printf '![skills](https://img.shields.io/badge/skills-3-blue)\n3 curated AI skills\n\n## The Arsenal\n\n| `alpha` | x |\n| `beta` | x |\n| `file-link` | x |\n\n## Other\n\nInstaller version: 1.2.3\n' > "$m/README.md"
 expect_only_rule "symlink-to-file under skills/" symlink "$m"
 
 m=$WORK/n8; make_fixture "$m"
@@ -492,6 +493,48 @@ m=$WORK/su18; make_fixture "$m"
 printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\t/etc/hosts\n' > "$m/tests/script-coverage.tsv"
 expect_only_rule "absolute test path" script-untested "$m"
 printf 'PASS: script-untested hygiene\n'
+
+# readme-skills and version-sync.
+m=$WORK/rs1; make_fixture "$m"
+sed -i.bak '/^| `beta`/d' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "skill missing from README arsenal" readme-skills "$m"
+
+m=$WORK/rs2; make_fixture "$m"
+sed -i.bak 's/^| `beta` | b |/| `beta` | b |\n| `beta` | again |/' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "skill duplicated in README arsenal" readme-skills "$m"
+
+m=$WORK/rs3; make_fixture "$m"
+sed -i.bak 's/^| `beta` | b |/| `beta` | b |\n| `ghost` | g |/' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README row for nonexistent skill" readme-skills "$m"
+
+m=$WORK/rs4; make_fixture "$m"
+sed -i.bak 's/^## Other/## Other\n\nSee `ghost` and `beta`./' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_clean "backticked names outside arsenal ignored" "$m"
+
+m=$WORK/rs5; make_fixture "$m"
+sed -i.bak '/^## The Arsenal/d' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README arsenal section missing" readme-skills "$m"
+
+m=$WORK/vs1; make_fixture "$m"
+printf '# Changelog\n\n## [Unreleased]\n\n## [1.2.2] - 2026-01-01\n' > "$m/CHANGELOG.md"
+expect_only_rule "VERSION != CHANGELOG" version-sync "$m"
+
+m=$WORK/vs2; make_fixture "$m"
+sed -i.bak 's/^Installer version: 1.2.3/Installer version: 1.2.2/' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README installer version mismatch" version-sync "$m"
+
+m=$WORK/vs3; make_fixture "$m"
+printf '# Changelog\n\n## [Unreleased]\n' > "$m/CHANGELOG.md"
+expect_only_rule "CHANGELOG has no release section" version-sync "$m"
+
+m=$WORK/vs4; make_fixture "$m"
+sed -i.bak '/^Installer version/d' "$m/README.md"; rm -f "$m/README.md.bak"
+expect_only_rule "README lacks installer version phrase" version-sync "$m"
+
+m=$WORK/vs5; make_fixture "$m"
+sed -i.bak '/^VERSION=/d' "$m/install.sh"; rm -f "$m/install.sh.bak"
+expect_only_rule "install.sh lacks VERSION" version-sync "$m"
+printf 'PASS: readme-skills and version-sync fixtures\n'
 
 # Real repo must be clean.
 rc=0

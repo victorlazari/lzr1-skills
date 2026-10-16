@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
+       manifest-sync count-sync readme-skills version-sync symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
 
 stale-ref model ids: any token claude-(fable|opus|sonnet|haiku|mythos)-<digit>... must be
 exactly one of VALID_MODELS, optionally followed by -YYYYMMDD; claude_<digit> and the spaced
@@ -23,6 +23,15 @@ script-untested: every file under skills/*/scripts/ (recursive; __pycache__, *.p
 (header path<TAB>level<TAB>reason<TAB>test, rows bytewise sorted by path, no duplicates). Level is
 static (reason required), help (--help is safe) or behavior (test = existing file under the repo
 that mentions the script basename). Rows must point at existing files.
+
+readme-skills: only the README section from "## The Arsenal" up to the next "## " heading is
+scanned. Each table row whose first cell is a single backticked name counts as an entry; every
+skill directory must appear exactly once and no entry may name a skill that is absent
+from it. Names elsewhere in the README (patterns, routing prose) are ignored.
+
+version-sync: VERSION="x.y.z" in install.sh must equal the first "## [x.y.z]" heading of
+CHANGELOG.md that is not [Unreleased], and README.md must contain "Installer version: <VERSION>"
+(every occurrence must carry that version).
 """
 import argparse
 import os
@@ -378,6 +387,61 @@ def main():
             elif v != count:
                 add("ERROR", "-", "count-sync",
                     "%s %s=%d but %d skill directories" % (rel, label, v, count))
+
+    if not args.skill:
+        rp = os.path.join(root, "README.md")
+        rtext = read(rp) if os.path.isfile(rp) else ""
+        sec, insec, found = [], False, False
+        for ln in rtext.splitlines():
+            if re.match(r"^## ", ln):
+                insec = ln.strip() == "## The Arsenal"
+                found = found or insec
+                continue
+            if insec:
+                sec.append(ln)
+        if not found:
+            add("ERROR", "-", "readme-skills", "README.md has no '## The Arsenal' section")
+        else:
+            rows = [m.group(1) for m in (re.match(r"^\|\s*`([^`]+)`\s*\|", l) for l in sec) if m]
+            counts = {}
+            for r in rows:
+                counts[r] = counts.get(r, 0) + 1
+            for n in names:
+                if counts.get(n, 0) == 0:
+                    add("ERROR", "-", "readme-skills", "%s missing from README Arsenal tables" % n)
+            for n, c in sorted(counts.items()):
+                if c > 1:
+                    add("ERROR", "-", "readme-skills", "%s appears %d times in README Arsenal tables" % (n, c))
+                if n not in known:
+                    add("ERROR", "-", "readme-skills", "%s in README Arsenal is not in skills-list.txt" % n)
+
+        ver = None
+        ip = os.path.join(root, "install.sh")
+        if os.path.isfile(ip):
+            vm = re.search(r'^VERSION="([^"]+)"', read(ip), re.M)
+            ver = vm.group(1) if vm else None
+        if ver is None:
+            add("ERROR", "-", "version-sync", "install.sh: VERSION=\"...\" not found")
+        else:
+            cp = os.path.join(root, "CHANGELOG.md")
+            rel = None
+            if os.path.isfile(cp):
+                for m in re.finditer(r"^## \[([^\]]+)\]", read(cp), re.M):
+                    if m.group(1).lower() != "unreleased":
+                        rel = m.group(1)
+                        break
+            if rel is None:
+                add("ERROR", "-", "version-sync", "CHANGELOG.md has no released '## [x.y.z]' section")
+            elif rel != ver:
+                add("ERROR", "-", "version-sync",
+                    "install.sh VERSION=%s but newest CHANGELOG section is %s" % (ver, rel))
+            phr = re.findall(r"Installer version: (\S+)", rtext)
+            if not phr:
+                add("ERROR", "-", "version-sync", "README.md lacks 'Installer version: %s'" % ver)
+            for v in phr:
+                if v != ver:
+                    add("ERROR", "-", "version-sync",
+                        "README.md says Installer version: %s but VERSION=%s" % (v, ver))
 
     if not args.skill:
         for pr in reg_problems:
