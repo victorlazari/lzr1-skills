@@ -7,8 +7,7 @@ umask 077
 
 REPO="victorlazari/lzr1-skills"
 BRANCH="main"
-ARCHIVE_URL="https://codeload.github.com/${REPO}/tar.gz/refs/heads/${BRANCH}"
-VERSION="2.0.0"
+VERSION="2.1.0"
 EXPECTED_SKILL_COUNT=86
 STATE_FILE="${HOME:-}/.lzr1-skills-state"
 LOCK_DIR="${HOME:-}/.lzr1-skills-lock"
@@ -24,6 +23,9 @@ HAS_TARGET_FLAG=false
 SELECT_DETECTED=false
 SOURCE_ROOT=""
 SOURCE_MODE=""
+SOURCE_REF=""
+SOURCE_VERIFIED="no"
+REF="${LZR1_REF:-}"
 WORK_ROOT=""
 SKILL_NAMES=""
 SKILL_COUNT=0
@@ -141,12 +143,16 @@ BEHAVIOR OPTIONS
   --verbose, -v        Show per-skill activity
   --yes, -y            Non-interactive confirmation mode; does not select targets
   --force              Back up and replace unowned name collisions
+  --ref <value>        Archive source when run via curl (env: LZR1_REF). Default: latest
+                       published release, checksum-verified. A tag such as v2.1.0 pins a
+                       verified release. Any other value is a branch snapshot (unverified).
   --version            Show installer version
   --help, -h           Show this help
 
 SAFE NON-INTERACTIVE EXAMPLES
   curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --detected --yes
   bash install.sh --codex --claude-code --dry-run
+  curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash -s -- --ref v2.1.0 --codex --yes
   bash install.sh update
   bash install.sh remove --codex
 
@@ -194,6 +200,12 @@ parse_args() {
       --verbose|-v) VERBOSE=true ;;
       --yes|-y) YES_MODE=true ;;
       --force) FORCE=true ;;
+      --ref)
+        [ "$#" -ge 2 ] || fail "--ref requires a value"
+        [ -n "$2" ] || fail "--ref value must not be empty"
+        REF=$2
+        shift
+        ;;
       --version) printf 'lzr1-skills v%s\n' "${VERSION}"; exit 0 ;;
       --help|-h) print_help; exit 0 ;;
       --) ;;
@@ -313,8 +325,76 @@ validate_archive_listing() {
   printf '%s\n' "${top}"
 }
 
+validate_ref() {
+  case "${REF}" in
+    "") return 0 ;;
+    *[!A-Za-z0-9._/-]*) fail "Invalid ref: only A-Z a-z 0-9 . _ / - are allowed" ;;
+    -*|/*|*..*) fail "Invalid ref: must not start with - or / or contain .." ;;
+  esac
+}
+
+is_release_tag() {
+  case "$1" in
+    v[0-9]*.[0-9]*.[0-9]*) ;;
+    *) return 1 ;;
+  esac
+  case "${1#v}" in
+    *[!0-9.]*|.*|*..*|*.) return 1 ;;
+  esac
+  [ "$(printf '%s' "${1#v}" | tr -cd '.' | wc -c | tr -d ' ')" = 2 ]
+}
+
+extract_verified_archive() {
+  local archive listing extract_dir top
+  archive=$1
+  listing="${WORK_ROOT}/archive.list"
+  extract_dir="${WORK_ROOT}/archive"
+  mkdir -p "${extract_dir}" || fail "Cannot create archive extraction directory"
+  command -v tar >/dev/null 2>&1 || fail "tar is required in piped mode"
+  tar -tzf "${archive}" > "${listing}" || fail "Repository archive cannot be listed"
+  top=$(validate_archive_listing "${listing}")
+  tar -xzf "${archive}" -C "${extract_dir}" || fail "Repository archive extraction failed"
+  SOURCE_ROOT="${extract_dir}/${top}"
+  [ -d "${SOURCE_ROOT}" ] && [ ! -L "${SOURCE_ROOT}" ] || fail "Extracted repository root is unsafe"
+}
+
+fetch_release_archive() {
+  local base sums archive expected actual matches
+  base=$1
+  sums="${WORK_ROOT}/SHA256SUMS"
+  archive="${WORK_ROOT}/lzr1-skills.tar.gz"
+  download_file "${base}/SHA256SUMS" "${sums}" || return 2
+  download_file "${base}/lzr1-skills.tar.gz" "${archive}" || fail "Release archive download failed"
+  matches=$(awk '$2 == "lzr1-skills.tar.gz" {print $1}' "${sums}")
+  [ -n "${matches}" ] || fail "SHA256SUMS has no entry for lzr1-skills.tar.gz"
+  [ "$(printf '%s\n' "${matches}" | wc -l | tr -d ' ')" = 1 ] || fail "SHA256SUMS has multiple entries for lzr1-skills.tar.gz"
+  expected=${matches}
+  actual=$(sha256_file "${archive}")
+  [ "${actual}" != "unavailable" ] || fail "Cannot verify release: no sha256sum or shasum available"
+  if [ "${actual}" != "${expected}" ]; then
+    log_error "Expected SHA-256: ${expected}"
+    log_error "Actual SHA-256:   ${actual}"
+    fail "Release archive checksum mismatch; refusing to extract"
+  fi
+  log_ok "Release archive checksum verified (${actual})"
+  extract_verified_archive "${archive}"
+  SOURCE_VERIFIED="yes"
+  return 0
+}
+
+fetch_branch_archive() {
+  local branch archive
+  branch=$1
+  archive="${WORK_ROOT}/repository.tar.gz"
+  log_warn "Installing an unverified snapshot of ${branch}; use a release tag for checksum verification"
+  download_file "https://codeload.github.com/${REPO}/tar.gz/refs/heads/${branch}" "${archive}" || fail "Repository archive download failed"
+  log_info "Downloaded archive SHA-256: $(sha256_file "${archive}")"
+  extract_verified_archive "${archive}"
+  SOURCE_VERIFIED="no"
+}
+
 initialize_source() {
-  local script_path script_dir archive listing extract_dir top
+  local script_path script_dir rc
   ensure_work_root
 
   if [ -n "${SOURCE_OVERRIDE}" ]; then
@@ -332,20 +412,29 @@ initialize_source() {
       SOURCE_ROOT="${script_dir}"
       SOURCE_MODE="local"
     else
-      SOURCE_MODE="archive"
-      archive="${WORK_ROOT}/repository.tar.gz"
-      listing="${WORK_ROOT}/archive.list"
-      extract_dir="${WORK_ROOT}/archive"
-      mkdir -p "${extract_dir}" || fail "Cannot create archive extraction directory"
-      log_info "Downloading one repository snapshot from GitHub"
-      download_file "${ARCHIVE_URL}" "${archive}" || fail "Repository archive download failed"
-      command -v tar >/dev/null 2>&1 || fail "tar is required in piped mode"
-      tar -tzf "${archive}" > "${listing}" || fail "Repository archive cannot be listed"
-      top=$(validate_archive_listing "${listing}")
-      tar -xzf "${archive}" -C "${extract_dir}" || fail "Repository archive extraction failed"
-      SOURCE_ROOT="${extract_dir}/${top}"
-      [ -d "${SOURCE_ROOT}" ] && [ ! -L "${SOURCE_ROOT}" ] || fail "Extracted repository root is unsafe"
-      log_info "Downloaded archive SHA-256: $(sha256_file "${archive}")"
+      log_info "Downloading from GitHub"
+      if [ -z "${REF}" ]; then
+        SOURCE_MODE="release"
+        SOURCE_REF="latest"
+        fetch_release_archive "https://github.com/${REPO}/releases/latest/download"
+        rc=$?
+        if [ "${rc}" -eq 2 ]; then
+          log_warn "No published release found; installing the unverified main snapshot"
+          SOURCE_MODE="branch"
+          SOURCE_REF="${BRANCH}"
+          fetch_branch_archive "${BRANCH}"
+        fi
+      elif is_release_tag "${REF}"; then
+        SOURCE_MODE="release"
+        SOURCE_REF="${REF}"
+        fetch_release_archive "https://github.com/${REPO}/releases/download/${REF}"
+        rc=$?
+        [ "${rc}" -eq 0 ] || fail "Release ${REF} not found or its checksums could not be downloaded"
+      else
+        SOURCE_MODE="branch"
+        SOURCE_REF="${REF}"
+        fetch_branch_archive "${REF}"
+      fi
     fi
   fi
 
@@ -355,7 +444,7 @@ initialize_source() {
     fail "Source skill packages must not contain symbolic links"
   fi
   validate_manifest
-  log_ok "Validated ${SKILL_COUNT} skills from ${SOURCE_MODE} source"
+  log_ok "Validated ${SKILL_COUNT} skills from ${SOURCE_MODE} source${SOURCE_REF:+ (ref: ${SOURCE_REF})}, verified: ${SOURCE_VERIFIED}"
 }
 
 validate_manifest() {
@@ -963,7 +1052,7 @@ EOF
 
 doctor() {
   printf '\n%sDoctor report%s\n' "${BOLD}" "${RESET}"
-  printf '  Source: %s (%s skills)\n' "${SOURCE_MODE}" "${SKILL_COUNT}"
+  printf '  Source: %s, ref %s, verified %s (%s skills)\n' "${SOURCE_MODE}" "${SOURCE_REF:-n/a}" "${SOURCE_VERIFIED}" "${SKILL_COUNT}"
   doctor_target "Claude Code" "${PATH_CLAUDE_CODE}/skills" package
   doctor_target "Claude Desktop" "${PATH_CLAUDE_DESKTOP}/skills" package
   doctor_target "Codex" "${PATH_CODEX}/skills" package
@@ -1036,6 +1125,7 @@ main() {
   [ -n "${HOME:-}" ] || fail "HOME is required"
   case "${HOME}" in /*) ;; *) fail "HOME must be an absolute path" ;; esac
   parse_args "$@"
+  validate_ref
   detect_os_and_tools
 
   if [ "${SELECT_DETECTED}" = true ]; then
