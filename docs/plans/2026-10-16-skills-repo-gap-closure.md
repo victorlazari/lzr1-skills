@@ -38,7 +38,7 @@ Scope of the audit: structure, metadata, links, scripts, tests, installer, READM
 | 1 | Catalog is machine-verified in CI; governance files exist; known structural defects fixed | 1.1, 1.2, 1.3 | Complete |
 | 2 | Content is current, overlaps are routed, descriptions trigger reliably | 2.1, 2.2, 2.3 | Complete |
 | 3 | Every shipped script has lint + smoke coverage | 3.1, 3.2 | Complete |
-| 4 | Install path is verified; Lerian scope decided; README verified against the code | 4.1, 4.2, 4.3 | Detailed |
+| 4 | Install path is verified; Lerian scope decided; README verified against the code | 4.1, 4.2, 4.3 | Complete |
 
 ---
 
