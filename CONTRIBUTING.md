@@ -42,6 +42,7 @@ contract. Read its docstring and rules before opening a PR.
    ```bash
    python3 -I scripts/lint_catalog.py
    bash tests/test-catalog.sh
+   bash tests/test-scripts.sh
    bash tests/test-installer.sh
    bash tests/test-adversarial-remediations.sh
    ```
