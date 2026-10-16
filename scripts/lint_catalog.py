@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync symlink stale-ref (ERROR); desc-trigger, link-broken-prose (WARN).
+       manifest-sync count-sync symlink stale-ref desc-trigger (ERROR); link-broken-prose (WARN).
 """
 import argparse
 import os
@@ -149,7 +149,7 @@ def main():
         elif len(desc) > 1024:
             add("ERROR", name, "fm-desc", "description is %d chars (max 1024)" % len(desc))
         if desc and not TRIGGER_RE.search(desc):
-            add("WARN", name, "desc-trigger",
+            add("ERROR", name, "desc-trigger",
                 "description has no 'use when'/'use for'/'triggers'")
         # links
         seen = set()

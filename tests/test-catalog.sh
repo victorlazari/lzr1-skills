@@ -191,16 +191,22 @@ long=$(python3 -I -c 'print("Use when " + "x" * 1030)')
 printf -- '---\nname: beta\ndescription: %s\n---\n# Beta\n' "$long" > "$m/skills/beta/SKILL.md"
 expect_only_rule "description over 1024 chars" fm-desc "$m"
 
-# (c) no trigger words: WARN only, exit 0.
+# (c) no trigger words: ERROR, exit 1.
 m=$WORK/g3; make_fixture "$m"
 printf -- '---\nname: beta\ndescription: A plain description.\n---\n# Beta\n' > "$m/skills/beta/SKILL.md"
 rc=0
 out=$(python3 -I "$LINT" --root "$m" 2>&1) || rc=$?
-[[ $rc -eq 0 ]] || fail "desc-trigger: expected exit 0, got $rc: $out"
-printf '%s\n' "$out" | grep -E '^WARN beta: desc-trigger' >/dev/null \
-  || fail "desc-trigger: WARN missing: $out"
-printf '%s\n' "$out" | grep -E '^ERROR ' >/dev/null && fail "desc-trigger: unexpected ERROR: $out"
-printf 'PASS: desc-trigger warn\n'
+[[ $rc -eq 1 ]] || fail "desc-trigger: expected exit 1, got $rc: $out"
+printf '%s\n' "$out" | grep -E '^ERROR beta: desc-trigger' >/dev/null \
+  || fail "desc-trigger: ERROR missing: $out"
+printf '%s\n' "$out" | grep -E '^WARN beta: desc-trigger' >/dev/null && fail "desc-trigger: still a WARN: $out"
+printf 'PASS: desc-trigger error\n'
+# desc-trigger positive: "Use when" passes.
+printf -- '---\nname: beta\ndescription: A plain description. Use when testing.\n---\n# Beta\n' > "$m/skills/beta/SKILL.md"
+rc=0
+out=$(python3 -I "$LINT" --root "$m" 2>&1) || rc=$?
+[[ $rc -eq 0 ]] || fail "desc-trigger positive: expected exit 0, got $rc: $out"
+printf 'PASS: desc-trigger accepts use when\n'
 
 # (d) README badge drift.
 m=$WORK/g4; make_fixture "$m"
