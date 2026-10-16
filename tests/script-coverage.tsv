@@ -1,0 +1,91 @@
+path	level	reason	test
+skills/accessibility-testing/scripts/validate-a11y.sh	help		
+skills/ai/scripts/validate-ai-config.py	help		
+skills/bash/scripts/validate-bash.sh	help		
+skills/bot/scripts/validate-bot-config.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/coderabbit-reviewer/scripts/install-coderabbit.sh	behavior		skills/coderabbit-reviewer/tests/test_wrappers.sh
+skills/coderabbit-reviewer/scripts/run-review.sh	behavior		skills/coderabbit-reviewer/tests/test_wrappers.sh
+skills/coderabbit-reviewer/scripts/self_check.py	behavior		tests/test-installer.sh
+skills/coderabbit-reviewer/scripts/validate_findings.py	behavior		skills/coderabbit-reviewer/tests/test_validate_findings.py
+skills/cron-master/scripts/docker-cron-wrapper.sh	static	no --help branch; needs a container name and runs docker exec on it	
+skills/database/scripts/dry-run-migration.sh	help		
+skills/database/scripts/test-replication.sh	help		
+skills/database/scripts/validate-indexes.sh	help		
+skills/database/scripts/validate-security.sh	help		
+skills/devops-infrastructure/scripts/check-versions.sh	behavior		tests/test-adversarial-remediations.sh
+skills/devops/scripts/dry-run-deploy.sh	help		
+skills/devops/scripts/validate-iac.sh	help		
+skills/docker/scripts/validate-compose.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/docker/scripts/validate-dockerfile.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/dockerfile/scripts/lint-dockerfile.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/french-teacher/scripts/validate-cefr.sh	help		
+skills/frontend-menu-design/scripts/validate-menu-a11y.js	help		
+skills/frontend/scripts/audit-deps.sh	static	no --help branch; audits package.json in cwd and runs npm	
+skills/gcalendar/scripts/batch_updater.py	static	writes to Google Calendar by shelling out to manus-mcp-cli and needs a plan JSON file; has no shebang despite mode 755, so run it as python3 batch_updater.py	
+skills/gcalendar/scripts/validate_events.py	behavior		tests/test-adversarial-remediations.sh
+skills/go/scripts/security-audit.sh	behavior		tests/test-adversarial-remediations.sh
+skills/hermes-agent/scripts/hermes_preflight.py	behavior		skills/hermes-agent/tests/test_hermes_preflight.py
+skills/hermes-agent/scripts/self_check.py	behavior		tests/test-installer.sh
+skills/jira-field-schemas/scripts/audit-fields.py	behavior		tests/test-adversarial-remediations.sh
+skills/jira-jsm-oncall/scripts/test-webhook.sh	behavior		tests/test-adversarial-remediations.sh
+skills/jira-jsm-oncall/scripts/validate-jql.sh	behavior		tests/test-adversarial-remediations.sh
+skills/jira-status-workflows/scripts/validate-workflow-schema.py	help		
+skills/k8s-eks/scripts/verify-cluster-health.sh	help		
+skills/legal-compliance/scripts/validate-compliance-checklist.py	help		
+skills/lerian-helm/scripts/validate-security.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/lua/scripts/validate-lua.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/manus-workflows/scripts/validate-workflow.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/meeting-engineering/scripts/audio_bridge.py	static	needs PulseAudio (parec/paplay) and an STT service; no --help branch	
+skills/meeting-engineering/scripts/meet-entrypoint.sh	static	starts Xvfb and PulseAudio for a meeting container; no --help branch	
+skills/meeting-engineering/scripts/meet_joiner.py	static	needs Playwright and non-headless Chrome on Xvfb to join Google Meet	
+skills/meeting-engineering/scripts/setup_pulse_devices.sh	static	needs a running PulseAudio server (pactl); no --help branch	
+skills/mongodb/scripts/verify-mongodb-version.sh	help		
+skills/nemoclaw/scripts/local-credential-helper.mts	behavior		tests/test-adversarial-remediations.sh
+skills/oncall-master-supreme/scripts/validate-config.sh	static	requires jq before it reaches the --help branch, so --help exits 1 without jq	
+skills/one-page/scripts/validate_html.py	help		
+skills/operations/scripts/validate-vendor-scorecard.py	help		
+skills/otel-collector/scripts/validate-pipeline.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/passkeys/scripts/validate-webauthn-config.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/playwright/scripts/verify-playwright-env.sh	static	no --help branch; checks node/npx and Playwright browsers on the host	
+skills/postgres-15/scripts/analyze-bloat.sql	static	SQL file meant for psql against a live PostgreSQL database; not executable	
+skills/postgres-15/scripts/check-pg-version.sh	static	requires psql before it reaches the --help branch, so --help exits 1 without psql	
+skills/product-management/scripts/validate-prd.py	help		
+skills/prompt/scripts/evaluate-prompt.py	help		
+skills/rabbitmq-documentdb/scripts/validate-config.sh	static	its --help prints usage and exits 1	
+skills/rabbitmq/scripts/validate-topology.sh	static	requires jq before it reaches the --help branch, so --help exits 1 without jq	
+skills/rag/scripts/validate-rag-config.sh	help		
+skills/redis-valkey/scripts/redis-health-check.sh	static	no --help branch; first argument is a host and it connects with redis-cli	
+skills/redis-valkey/scripts/valkey-migration-check.sh	static	no --help branch; first argument is a host and it connects with redis-cli	
+skills/roles-permissions/scripts/validate-policies.sh	help		
+skills/seaweedfs/scripts/verify-cluster-health.sh	static	no --help branch; first argument is a URL and it curls a SeaweedFS cluster	
+skills/security-engineering/scripts/verify-owasp.sh	static	no --help branch; fetches owasp.org over the network	
+skills/security-review/scripts/inventory.py	help		
+skills/security-review/scripts/self_check.py	behavior		tests/test-installer.sh
+skills/security-review/scripts/validate_report.py	help		
+skills/slack/scripts/validate-block-kit.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
+skills/spanish-teacher/scripts/validate-curriculum.py	behavior		tests/test-adversarial-remediations.sh
+skills/speedtest/scripts/verify-ooklaserver.sh	help		
+skills/sql-partitioning/scripts/dry-run-migration.sh	help		
+skills/sql-partitioning/scripts/validate-partition-config.sh	help		
+skills/supply-chain/scripts/validate-vendor.sh	help		
+skills/tech-support-ops/scripts/metrics-calculator.py	behavior		tests/test-adversarial-remediations.sh
+skills/tomate-pos80/scripts/example.py	help		
+skills/trivy-scanner/scripts/comprehensive_scan.sh	help		
+skills/trivy-scanner/scripts/setup_ignore.sh	help		
+skills/valkey-redis/scripts/migration-helper.sh	help		
+skills/voip-oncall/scripts/test-ivr.sh	help		
+skills/web-presentation-creator/scripts/preview-server.py	static	no --help branch; starts a local HTTP server on port 8000	
+skills/web-presentation-creator/scripts/validate-package.sh	static	no --help branch; first argument is a package path, --help exits 1 as not found	
+skills/web-tester-supreme/scripts/run-tests.sh	behavior		tests/test-adversarial-remediations.sh
+skills/wikijs/scripts/check-version.sh	help		
+skills/wikijs/scripts/validate-git-sync.sh	help		
+skills/yaml-specialist/scripts/build_refactor_inventory.py	behavior		skills/yaml-specialist/tests/test_yaml_specialist.py
+skills/yaml-specialist/scripts/chart_metadata.py	behavior		skills/yaml-specialist/tests/test_yaml_specialist.py
+skills/yaml-specialist/scripts/list_dependency_repositories.py	behavior		skills/yaml-specialist/tests/test_yaml_specialist.py
+skills/yaml-specialist/scripts/rendered_manifest_lint.py	behavior		skills/yaml-specialist/tests/test_yaml_specialist.py
+skills/yaml-specialist/scripts/requirements.txt	static	pip requirements data file, not an executable script	
+skills/yaml-specialist/scripts/scan_template_values.py	behavior		skills/yaml-specialist/tests/test_yaml_specialist.py
+skills/yaml-specialist/scripts/self_check.py	behavior		tests/test-installer.sh
+skills/yaml-specialist/scripts/validate_chart.sh	behavior		skills/yaml-specialist/tests/test_validate_chart.sh
+skills/yaml-specialist/scripts/values_contract_lint.py	behavior		skills/yaml-specialist/tests/test_yaml_specialist.py
+skills/yaml-specialist/scripts/yaml_common.py	static	shared library module imported by sibling scripts, not a CLI	

@@ -230,7 +230,7 @@ fi
 
 HELM_KUBE_ARGS=()
 if [[ -n "$KUBE_VERSION" ]]; then HELM_KUBE_ARGS+=(--kube-version "$KUBE_VERSION"); fi
-run_step helm-lint-default helm lint "$VALIDATION_CHART" --strict "${HELM_KUBE_ARGS[@]}"
+run_step helm-lint-default helm lint "$VALIDATION_CHART" --strict ${HELM_KUBE_ARGS[@]+"${HELM_KUBE_ARGS[@]}"}
 
 CHART_TYPE="application"
 set +e
@@ -248,7 +248,7 @@ elif [[ "$SKIP_TEMPLATE" == true ]]; then
   mark_incomplete template-scenario "values-template scenario skipped by explicit assessment-only option."
 fi
 
-for entry in "${VALUES_FILES[@]}"; do
+for entry in ${VALUES_FILES[@]+"${VALUES_FILES[@]}"}; do
   if [[ "$entry" != *=* ]]; then
     echo "invalid --values $entry; use LABEL=PATH" >&2
     exit 2
@@ -278,9 +278,9 @@ else
     label="${SCENARIO_LABELS[$index]}"
     values_path="${SCENARIO_PATHS[$index]}"
     manifest="$WORK_DIR/rendered/$label.yaml"
-    helm_args=(template "$RELEASE" "$VALIDATION_CHART" --namespace "$NAMESPACE" --include-crds "${HELM_KUBE_ARGS[@]}")
+    helm_args=(template "$RELEASE" "$VALIDATION_CHART" --namespace "$NAMESPACE" --include-crds ${HELM_KUBE_ARGS[@]+"${HELM_KUBE_ARGS[@]}"})
     if [[ -n "$values_path" ]]; then helm_args+=(-f "$values_path"); fi
-    run_step "helm-lint-$label" helm lint "$VALIDATION_CHART" --strict "${HELM_KUBE_ARGS[@]}" ${values_path:+-f "$values_path"}
+    run_step "helm-lint-$label" helm lint "$VALIDATION_CHART" --strict ${HELM_KUBE_ARGS[@]+"${HELM_KUBE_ARGS[@]}"} ${values_path:+-f "$values_path"}
 
     printf '==> render-%s\n' "$label"
     set +e
@@ -292,7 +292,7 @@ else
 
     if [[ "$render_rc" -eq 0 ]]; then
       manifest_args=(--input "$manifest" --default-namespace "$NAMESPACE" --pod-security-profile "$POD_SECURITY_PROFILE" --format json)
-      for allowed_ref in "${ALLOWED_EXTERNAL_REFS[@]}"; do manifest_args+=(--allow-external-ref "$allowed_ref"); done
+      for allowed_ref in ${ALLOWED_EXTERNAL_REFS[@]+"${ALLOWED_EXTERNAL_REFS[@]}"}; do manifest_args+=(--allow-external-ref "$allowed_ref"); done
       run_step "manifest-$label" python3 "$SCRIPT_DIR/rendered_manifest_lint.py" "${manifest_args[@]}"
 
       if command -v kubeconform >/dev/null 2>&1 && [[ -n "$KUBE_VERSION" && "${#SCHEMA_LOCATIONS[@]}" -gt 0 ]]; then

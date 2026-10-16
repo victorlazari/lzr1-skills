@@ -20,7 +20,7 @@ from typing import Any, Iterable, Iterator, Mapping, Sequence
 try:
     import ruamel.yaml
     from ruamel.yaml import YAML
-    from ruamel.yaml.comments import CommentedMap, CommentedSeq
+    from ruamel.yaml.comments import CommentedMap
 except ImportError as exc:  # pragma: no cover - explicit dependency guard
     raise SystemExit(
         "missing dependency: install the exact versions in scripts/requirements.txt "

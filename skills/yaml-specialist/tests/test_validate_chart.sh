@@ -127,6 +127,7 @@ assert_rc 2 "$RUN_RC" "cluster consent gate"
 grep -q -- '--server-dry-run requires --allow-cluster and --context NAME' "$TMP_ROOT/cluster-gate.stderr" || fail "cluster gate message missing"
 
 # A complete local run uses only fake executables and explicit local schema input.
+file_mode() { stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"; }
 COMPLETE_OUT="$TMP_ROOT/complete-evidence"
 run_capture "$TMP_ROOT/complete" env PATH="$FAKE_BIN:$SYSTEM_PATH" "$VALIDATOR" \
   --chart "$APP_CHART" \
@@ -141,9 +142,9 @@ grep -q $'^kubeconform-default\t0\tcomplete$' "$COMPLETE_OUT/results/steps.tsv" 
 grep -q $'^kubeconform-values-template\t0\tcomplete$' "$COMPLETE_OUT/results/steps.tsv" || fail "overlay kubeconform stage missing"
 if grep -q '^kubectl.* apply .*--dry-run=server' "$FAKE_TOOL_LOG"; then fail "default local run attempted server dry-run"; fi
 if grep -q $'^helm\tdependency build' "$FAKE_TOOL_LOG"; then fail "default local run built dependencies"; fi
-[[ "$(stat -c '%a' "$COMPLETE_OUT")" == "700" ]] || fail "evidence directory is not mode 0700"
-[[ "$(stat -c '%a' "$COMPLETE_OUT/REPORT.md")" == "600" ]] || fail "report is not mode 0600"
-[[ "$(stat -c '%a' "$COMPLETE_OUT/rendered/default.yaml")" == "600" ]] || fail "rendered evidence is not mode 0600"
+[[ "$(file_mode "$COMPLETE_OUT")" == "700" ]] || fail "evidence directory is not mode 0700"
+[[ "$(file_mode "$COMPLETE_OUT/REPORT.md")" == "600" ]] || fail "report is not mode 0600"
+[[ "$(file_mode "$COMPLETE_OUT/rendered/default.yaml")" == "600" ]] || fail "rendered evidence is not mode 0600"
 
 # Explicitly authorized server dry-run reaches only the fake kubectl with the exact context.
 : >"$FAKE_TOOL_LOG"

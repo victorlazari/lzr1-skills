@@ -42,6 +42,38 @@ fail() {
   exit 64
 }
 
+# Portable replacements for GNU `sha256sum` and `realpath -e` (absent on macOS).
+sha256_file() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum -- "$1"
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 -- "$1"
+  else
+    fail 'sha256sum or shasum is required'
+  fi
+}
+
+canonical_existing() {
+  local p=$1 hops=0 target dir
+  [[ -e $p ]] || return 1
+  while [[ -L $p ]]; do
+    hops=$((hops + 1))
+    ((hops <= 40)) || return 1
+    target=$(readlink -- "$p") || return 1
+    case "$target" in
+      /*) p=$target ;;
+      *) p="$(dirname -- "$p")/$target" ;;
+    esac
+    [[ -e $p ]] || return 1
+  done
+  if [[ -d $p ]]; then
+    (cd -P -- "$p" && pwd -P)
+    return
+  fi
+  dir=$(cd -P -- "$(dirname -- "$p")" && pwd -P) || return 1
+  printf '%s/%s\n' "${dir%/}" "$(basename -- "$p")"
+}
+
 while (($#)); do
   case "$1" in
     --fetch-preview)
@@ -101,14 +133,13 @@ EOF
   exit 0
 fi
 
-command -v sha256sum >/dev/null 2>&1 || fail 'sha256sum is required'
-command -v realpath >/dev/null 2>&1 || fail 'realpath is required'
+command -v sha256sum >/dev/null 2>&1 || command -v shasum >/dev/null 2>&1 || fail 'sha256sum or shasum is required'
 
 if [[ $mode == fetch ]]; then
   command -v curl >/dev/null 2>&1 || fail 'curl is required for --fetch-preview'
   [[ ! -e $fetch_dir && ! -L $fetch_dir ]] || fail 'fetch directory must not already exist'
   parent=$(dirname -- "$fetch_dir")
-  parent=$(realpath -e -- "$parent") || fail 'cannot canonicalize fetch-directory parent'
+  parent=$(canonical_existing "$parent") || fail 'cannot canonicalize fetch-directory parent'
   destination="$parent/$(basename -- "$fetch_dir")"
   mkdir -m 700 -- "$destination" || fail 'cannot create protected fetch directory'
   installer="$destination/coderabbit-install.sh"
@@ -128,7 +159,7 @@ if [[ $mode == fetch ]]; then
 
   [[ -s $installer && ! -L $installer ]] || fail 'downloaded installer is empty or unsafe'
   chmod 600 "$installer" "$headers"
-  digest=$(sha256sum "$installer" | awk '{print $1}')
+  digest=$(sha256_file "$installer" | awk '{print $1}')
   {
     printf 'source_url=%s\n' "$INSTALLER_URL"
     printf 'sha256=%s\n' "$digest"
@@ -149,8 +180,8 @@ fi
 [[ $ack_side_effects -eq 1 ]] || fail '--execute-reviewed requires --ack-installer-side-effects'
 [[ $expected_sha256 =~ ^[a-f0-9]{64}$ ]] || fail '--expected-sha256 must be 64 lowercase hexadecimal characters'
 [[ -f $reviewed_file && ! -L $reviewed_file ]] || fail 'reviewed installer must be a regular non-symlink file'
-reviewed_file=$(realpath -e -- "$reviewed_file") || fail 'cannot canonicalize reviewed installer path'
-actual_sha256=$(sha256sum "$reviewed_file" | awk '{print $1}')
+reviewed_file=$(canonical_existing "$reviewed_file") || fail 'cannot canonicalize reviewed installer path'
+actual_sha256=$(sha256_file "$reviewed_file" | awk '{print $1}')
 [[ $actual_sha256 == "$expected_sha256" ]] || fail "digest mismatch: expected $expected_sha256, got $actual_sha256"
 
 first_line=$(head -n 1 -- "$reviewed_file")

@@ -30,6 +30,8 @@ make_fixture() {
   printf -- '---\nname: beta\ndescription: Use when testing beta.\n---\n# Beta\n' \
     > "$r/skills/beta/SKILL.md"
   printf 'alpha\nbeta\n' > "$r/skills-list.txt"
+  printf 'path\tlevel\treason\ttest\nskills/alpha/scripts/run.sh\tstatic\tfixture script, no safe invocation\t\n' \
+    > "$r/tests/script-coverage.tsv"
   printf 'EXPECTED_SKILL_COUNT=2\n' > "$r/install.sh"
   printf 'EXPECTED=2\n' > "$r/tests/test-installer.sh"
   printf '![skills](https://img.shields.io/badge/skills-2-blue)\n2 curated AI skills\n' \
@@ -336,6 +338,8 @@ expect_clean "clean file no stale ref" "$m"
 m=$WORK/s4; make_fixture "$m"
 printf 'ok\nbuilt on Next.js 12 and CLAUDE-3 too\n' > "$m/skills/alpha/scripts/x.py"
 chmod 755 "$m/skills/alpha/scripts/x.py"
+printf 'path\tlevel\treason\ttest\nskills/alpha/scripts/run.sh\tstatic\tfixture\t\nskills/alpha/scripts/x.py\tstatic\tfixture\t\n' \
+  > "$m/tests/script-coverage.tsv"
 expect_only_rule "stale ref in .py, case-insensitive" stale-ref "$m"
 printf 'PASS: stale-ref\n'
 
@@ -411,6 +415,83 @@ skill_case s11 pass 'Set `max-retries` and `read-only` instead of defaults.'
 skill_case s12 fail 'Please use `ghost-skill` instead.'
 skill_case s13 pass 'x' 'Use when testing beta. Use `docker-compose` locally.'
 printf 'PASS: skill-ref\n'
+
+# script-untested: registry tests/script-coverage.tsv (path<TAB>level<TAB>reason<TAB>test).
+SC_HDR='path\tlevel\treason\ttest\n'
+add_script() { # add_script ROOT RELPATH
+  printf '#!/usr/bin/env bash\ntrue\n' > "$1/$2"; chmod 755 "$1/$2"
+}
+m=$WORK/su1; make_fixture "$m"; add_script "$m" skills/alpha/scripts/extra.sh
+expect_only_rule "unregistered script" script-untested "$m"
+
+m=$WORK/su2; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/gone.sh\tstatic\tx\t\nskills/alpha/scripts/run.sh\tstatic\tfixture\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "stale registry row" script-untested "$m"
+
+m=$WORK/su3; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tstatic\t\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "static without reason" script-untested "$m"
+
+m=$WORK/su4; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tsmoke\tx\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "unknown level" script-untested "$m"
+
+m=$WORK/su5; make_fixture "$m"; rm "$m/tests/script-coverage.tsv"
+expect_only_rule "missing registry" script-untested "$m"
+
+m=$WORK/su6; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "behavior without test" script-untested "$m"
+
+m=$WORK/su7; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\ttests/nope.sh\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "behavior test file missing" script-untested "$m"
+
+m=$WORK/su8; make_fixture "$m"; printf 'echo other\n' > "$m/tests/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\ttests/t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "behavior test lacks basename" script-untested "$m"
+
+m=$WORK/su9; make_fixture "$m"; printf 'bash skills/alpha/scripts/run.sh\n' > "$m/tests/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\ttests/t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_clean "script-untested behavior row valid" "$m"
+
+m=$WORK/su10; make_fixture "$m"; add_script "$m" skills/alpha/scripts/b.sh
+printf "$SC_HDR"'skills/alpha/scripts/b.sh\thelp\t\t\nskills/alpha/scripts/run.sh\tstatic\tfixture\t\n' > "$m/tests/script-coverage.tsv"
+expect_clean "script-untested help+static valid" "$m"
+
+m=$WORK/su11; make_fixture "$m"; add_script "$m" skills/alpha/scripts/b.sh
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tstatic\tfixture\t\nskills/alpha/scripts/b.sh\thelp\t\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "unsorted registry" script-untested "$m"
+
+m=$WORK/su12; make_fixture "$m"; mkdir -p "$m/skills/alpha/scripts/__pycache__" "$m/skills/alpha/tests"
+: > "$m/skills/alpha/scripts/__pycache__/x.pyc"; : > "$m/skills/alpha/tests/test_x.py"
+expect_clean "pycache and skill tests dir ignored" "$m"
+printf 'PASS: script-untested\n'
+
+m=$WORK/su13; make_fixture "$m"; printf '# run.sh is not tested here\n' > "$m/tests/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\ttests/t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "behavior mention only in comment" script-untested "$m"
+
+m=$WORK/su14; make_fixture "$m"; printf '  # run.sh here\nbash skills/alpha/scripts/run.sh\n' > "$m/tests/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\ttests/t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_clean "behavior real invocation passes" "$m"
+
+m=$WORK/su15; make_fixture "$m"; printf 'bash skills/alpha/scripts/run.sh\n' > "$WORK/t.sh"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\t../t.sh\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "test path with .." script-untested "$m"
+
+m=$WORK/su16; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/../scripts/run.sh\tstatic\tfixture\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "unnormalized registry path" script-untested "$m"
+
+m=$WORK/su17; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tstatic\tfixture\t\nskills/alpha/scripts/run.sh\tstatic\tfixture\t\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "duplicate registry row" script-untested "$m"
+
+m=$WORK/su18; make_fixture "$m"
+printf "$SC_HDR"'skills/alpha/scripts/run.sh\tbehavior\t\t/etc/hosts\n' > "$m/tests/script-coverage.tsv"
+expect_only_rule "absolute test path" script-untested "$m"
+printf 'PASS: script-untested hygiene\n'
 
 # Real repo must be clean.
 rc=0

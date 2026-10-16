@@ -107,7 +107,7 @@ set -eu
 printf 'executed\n' >"${INSTALL_TEST_MARKER:?}"
 INSTALL
 chmod 0600 "$WORK/reviewed-installer.sh"
-digest=$(sha256sum "$WORK/reviewed-installer.sh" | awk '{print $1}')
+if command -v sha256sum >/dev/null 2>&1; then digest=$(sha256sum "$WORK/reviewed-installer.sh" | awk '{print $1}'); else digest=$(shasum -a 256 "$WORK/reviewed-installer.sh" | awk '{print $1}'); fi
 export INSTALL_TEST_MARKER="$WORK/install-marker"
 if "$INSTALLER" --execute-reviewed "$WORK/reviewed-installer.sh" --expected-sha256 "$(printf '0%.0s' {1..64})" --ack-installer-side-effects >"$WORK/bad-digest.out" 2>&1; then
   fail 'mismatched installer digest unexpectedly succeeded'

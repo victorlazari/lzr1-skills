@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync symlink stale-ref desc-trigger skill-ref (ERROR); link-broken-prose (WARN).
+       manifest-sync count-sync symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
 
 stale-ref model ids: any token claude-(fable|opus|sonnet|haiku|mythos)-<digit>... must be
 exactly one of VALID_MODELS, optionally followed by -YYYYMMDD; claude_<digit> and the spaced
@@ -17,9 +17,16 @@ ONLY in these places, and must then be a name listed in skills-list.txt:
       tokens matching ^[a-z][a-z0-9]*(-[a-z0-9]+)+$ (hyphenated; so no "/", ".", leading
       "-", spaces). Names in SKILL_REF_ALLOW (hyphenated commands) are skipped.
 Fenced code blocks are ignored for (b) and (c).
+
+script-untested: every file under skills/*/scripts/ (recursive; __pycache__, *.pyc and
+.DS_Store ignored; skill tests/ dirs are not scripts) needs a row in tests/script-coverage.tsv
+(header path<TAB>level<TAB>reason<TAB>test, rows bytewise sorted by path, no duplicates). Level is
+static (reason required), help (--help is safe) or behavior (test = existing file under the repo
+that mentions the script basename). Rows must point at existing files.
 """
 import argparse
 import os
+import posixpath
 import re
 import sys
 
@@ -61,6 +68,68 @@ STALE_RE = re.compile("|".join("(?:%s)" % p for p in STALE_PATTERNS), re.I)
 STALE_EXEMPT = "(historical)"
 STALE_EXTS = (".md", ".yaml", ".yml", ".json", ".sh", ".py", ".txt", ".toml", ".ts",
               ".tsx", ".js", ".mjs", ".html", ".jinja", ".j2")
+
+
+REGISTRY = "tests/script-coverage.tsv"
+LEVELS = ("static", "help", "behavior")
+SCRIPT_SKIP_DIRS = ("__pycache__",)
+SCRIPT_SKIP_FILES = (".DS_Store",)
+
+
+def skill_scripts(root, name):
+    """Repo-relative posix paths of every script file of one skill."""
+    base = os.path.join(root, "skills", name, "scripts")
+    found = []
+    for dp, dns, fns in os.walk(base):
+        dns[:] = sorted(d for d in dns if d not in SCRIPT_SKIP_DIRS)
+        for fn in fns:
+            if fn in SCRIPT_SKIP_FILES or fn.endswith(".pyc"):
+                continue
+            found.append(os.path.relpath(os.path.join(dp, fn), root).replace(os.sep, "/"))
+    return sorted(found)
+
+
+def load_registry(root):
+    """Return (rows, problems). rows: list of (lineno, path, level, reason, test)."""
+    path = os.path.join(root, REGISTRY)
+    if not os.path.isfile(path):
+        return None, ["%s missing" % REGISTRY]
+    lines = read(path).replace("\r\n", "\n").split("\n")
+    while lines and lines[-1] == "":
+        lines.pop()
+    problems, rows = [], []
+    if not lines or lines[0].split("\t") != ["path", "level", "reason", "test"]:
+        problems.append("%s: header must be path<TAB>level<TAB>reason<TAB>test" % REGISTRY)
+        return rows, problems
+    for i, ln in enumerate(lines[1:], 2):
+        cols = ln.split("\t")
+        if len(cols) != 4:
+            problems.append("%s:%d expected 4 tab-separated columns, got %d" % (REGISTRY, i, len(cols)))
+            continue
+        rows.append((i,) + tuple(c.strip() for c in cols))
+    return rows, problems
+
+
+def mentions_basename(path, base):
+    """True if a non-comment line of the test mentions base (.sh/.py strip '#' lines)."""
+    rx = re.compile(r"(?<![A-Za-z0-9_.-])" + re.escape(base) + r"(?![A-Za-z0-9_-])")
+    lines = read(path).splitlines()
+    if path.endswith((".sh", ".py")):
+        lines = [l for l in lines if not l.lstrip().startswith("#")]
+    return any(rx.search(l) for l in lines)
+
+
+def bad_rel_path(p):
+    """Reason string if p is not a clean normalized repo-relative posix path, else None."""
+    if not p:
+        return "empty path"
+    if p.startswith("/") or "\\" in p:
+        return "path %r is absolute or has a backslash" % p
+    if ".." in p.split("/"):
+        return "path %r has a '..' segment" % p
+    if p != posixpath.normpath(p):
+        return "path %r is not normalized" % p
+    return None
 
 
 def parse_frontmatter(text):
@@ -135,6 +204,8 @@ def main():
         print("ERROR %s: fm-missing skill directory not found" % args.skill)
         return 1
 
+    reg_rows, reg_problems = load_registry(root)
+    registered = set(r[1] for r in reg_rows or [])
     known = set(names)
     mp = os.path.join(root, "skills-list.txt")
     if os.path.isfile(mp):
@@ -257,6 +328,10 @@ def main():
                                      + r"(?![A-Za-z0-9_-])", text):
                         add("ERROR", name, "ref-orphan",
                             os.path.relpath(os.path.join(dp, fn), base))
+        # script registry: every script needs a row
+        for rel in skill_scripts(root, name):
+            if rel not in registered:
+                add("ERROR", name, "script-untested", "%s has no row in %s" % (rel, REGISTRY))
         # exec bits
         scdir = os.path.join(base, "scripts")
         if os.path.isdir(scdir):
@@ -303,6 +378,42 @@ def main():
             elif v != count:
                 add("ERROR", "-", "count-sync",
                     "%s %s=%d but %d skill directories" % (rel, label, v, count))
+
+    if not args.skill:
+        for pr in reg_problems:
+            add("ERROR", "-", "script-untested", pr)
+        prev = None
+        seen_paths = set()
+        for lineno, path, level, reason, test in reg_rows or []:
+            where = "%s:%d %s" % (REGISTRY, lineno, path)
+            norm = posixpath.normpath(path)
+            if norm in seen_paths:
+                add("ERROR", "-", "script-untested", where + " duplicate row")
+            seen_paths.add(norm)
+            bp = bad_rel_path(path)
+            if bp:
+                add("ERROR", "-", "script-untested", where + " " + bp)
+            if prev is not None and path < prev:
+                add("ERROR", "-", "script-untested", where + " rows must be sorted by path")
+            prev = path
+            if bp or not re.match(r"^skills/[^/]+/scripts/.+", path) or not os.path.isfile(os.path.join(root, path)):
+                add("ERROR", "-", "script-untested", where + " stale row: no such script file")
+            if level not in LEVELS:
+                add("ERROR", "-", "script-untested", where + " level %r not in static|help|behavior" % level)
+            elif level == "static" and not reason:
+                add("ERROR", "-", "script-untested", where + " static row needs a reason")
+            elif level == "behavior":
+                tp = os.path.join(root, test) if test else ""
+                if not test:
+                    add("ERROR", "-", "script-untested", where + " behavior row needs a test file")
+                elif bad_rel_path(test):
+                    add("ERROR", "-", "script-untested", where + " test " + bad_rel_path(test))
+                elif not (os.path.isfile(tp) and not os.path.islink(tp)
+                          and os.path.realpath(tp).startswith(os.path.realpath(root) + os.sep)):
+                    add("ERROR", "-", "script-untested", where + " test file %s not found in repo" % test)
+                elif not mentions_basename(tp, os.path.basename(path)):
+                    add("ERROR", "-", "script-untested", where + " test %s does not mention %s"
+                        % (test, os.path.basename(path)))
 
     for level, skill, rule, detail in out:
         print(("%s %s: %s %s" % (level, skill, rule, detail)).rstrip())

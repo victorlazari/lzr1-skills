@@ -10,7 +10,7 @@ import stat
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Mapping
 
 import values_contract_lint as contract
 import yaml_common as common

@@ -15,6 +15,14 @@ contract. Read its docstring and rules before opening a PR.
   named in `SKILL.md`, and every path `SKILL.md` names exists.
 - Scripts (`.sh`, `.py`) are executable (`chmod +x`, then
   `git update-index --chmod=+x <path>` if needed).
+- Every file under a skill's `scripts/` has a row in `tests/script-coverage.tsv`
+  (`path`, `level`, `reason`, `test`, sorted by path), or the linter fails with
+  `script-untested`. Levels: `behavior` (a test under `tests/` or `skills/*/tests/`
+  invokes the script; name that file in `test`), `help` (you read the source and
+  `--help`/`-h` exits 0 before doing any work), or `static` (anything else; `reason` is
+  required and must say why, for example "writes to Google Calendar" or "starts a local
+  server"). Classify by reading the script, never by guessing, and never mark a script
+  `help` if it prompts, needs network or optional dependencies before reaching `--help`.
 - No symlinks inside skills.
 - `skills-list.txt` matches the skill directories on disk exactly.
 
@@ -34,6 +42,7 @@ contract. Read its docstring and rules before opening a PR.
    ```bash
    python3 -I scripts/lint_catalog.py
    bash tests/test-catalog.sh
+   bash tests/test-scripts.sh
    bash tests/test-installer.sh
    bash tests/test-adversarial-remediations.sh
    ```
