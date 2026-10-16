@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import sys
-import re
 
 def validate_artifact(file_path, framework, dry_run=False):
     try:

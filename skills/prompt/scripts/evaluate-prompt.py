@@ -12,7 +12,6 @@ Usage:
 import argparse
 import json
 import sys
-import os
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Evaluate prompt outputs using LLM-as-a-judge.")
