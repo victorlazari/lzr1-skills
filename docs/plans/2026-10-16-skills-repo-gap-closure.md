@@ -36,7 +36,7 @@ Scope of the audit: structure, metadata, links, scripts, tests, installer, READM
 | Phase | Milestone | Epics | Status |
 |-------|-----------|-------|--------|
 | 1 | Catalog is machine-verified in CI; governance files exist; known structural defects fixed | 1.1, 1.2, 1.3 | Complete |
-| 2 | Content is current, overlaps are routed, descriptions trigger reliably | 2.1, 2.2, 2.3 | Detailed |
+| 2 | Content is current, overlaps are routed, descriptions trigger reliably | 2.1, 2.2, 2.3 | Complete |
 | 3 | Every shipped script has lint + smoke coverage | 3.1, 3.2 | Epic-level |
 | 4 | Install path is pinned and verifiable; Lerian skill scope decided and delivered | 4.1, 4.2 | Epic-level |
 
