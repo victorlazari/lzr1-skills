@@ -35,8 +35,8 @@ Scope of the audit: structure, metadata, links, scripts, tests, installer, READM
 
 | Phase | Milestone | Epics | Status |
 |-------|-----------|-------|--------|
-| 1 | Catalog is machine-verified in CI; governance files exist; known structural defects fixed | 1.1, 1.2, 1.3 | Detailed |
-| 2 | Content is current, overlaps are routed, descriptions trigger reliably | 2.1, 2.2, 2.3 | Epic-level |
+| 1 | Catalog is machine-verified in CI; governance files exist; known structural defects fixed | 1.1, 1.2, 1.3 | Complete |
+| 2 | Content is current, overlaps are routed, descriptions trigger reliably | 2.1, 2.2, 2.3 | Detailed |
 | 3 | Every shipped script has lint + smoke coverage | 3.1, 3.2 | Epic-level |
 | 4 | Install path is pinned and verifiable; Lerian skill scope decided and delivered | 4.1, 4.2 | Epic-level |
 
@@ -186,29 +186,111 @@ Edge cases reachable: a skill dir without SKILL.md (report `fm-missing`, skip ot
 
 ## Phase 2: Content freshness and routing
 
+**Elaborated 2026-10-16 against `main` at `96d439d` (Phase 1 merged).** Facts that shaped this elaboration: the stale-identifier scan found 11 hits in 5 areas (fewer than the audit estimate); 38 skills lack a trigger phrase in `description:`; `scripts/lint_catalog.py` already emits `desc-trigger` as WARN (`scripts/lint_catalog.py:135`).
+
+**Decisions recorded (owner delegated Phase 2; conservative defaults chosen, each reversible):**
+- **Overlap groups: keep all 86 skills, differentiate and cross-reference.** No merges or deprecations in this phase. Merging changes the manifest and the installer's marker-owned install state for existing users; that is a Phase 4 / release-note decision. Each skill in a group gets a description that says what it is for and names its neighbour for the other case.
+- **Model identifiers: never invent them.** Claude names use the current family (Fable 5.1 `claude-fable-5-1`, Opus 5.5 `claude-opus-5-5`, Sonnet 5.5 `claude-sonnet-5-5`, Haiku 5.5 `claude-haiku-5-5`). For OpenAI and Google, replace retired names with tier descriptions plus "check the provider's current model list" rather than guessing names.
+- **Thin-skill depth (`claude`, `go-lua`, `openclaw`): deferred.** Adding reference content without an authoritative source repeats the staleness problem this phase removes. Their descriptions are fixed here; depth waits for a sourced content pass.
+
 ### Epic 2.1: Stale model and version references
 
-**Goal:** No skill recommends retired or superseded models or versions as current.
-**Scope:** `skills/ai-ml-engineering/references/`, `skills/claude/`, `skills/openai/`, `skills/prompt*/`, `skills/frontend/references/`, `skills/go*/`, `skills/database/`, `skills/postgres-15/`
-**Dependencies:** Phase 1
-**Done when:** a repo-wide scan for known-stale identifiers (Claude 3.x, `claude-3-*`, GPT-4o, Gemini 1.5, Next.js 13-framing, Go versions below the supported set) returns only intentional historical mentions, each annotated; the scan is a linter rule so it cannot regress
+**Goal:** No skill recommends retired or superseded models or versions as current, and the linter keeps it that way.
+**Scope:** `skills/ai-ml-engineering/references/{computer-vision,llm-applications,prompt-engineering,source-map}.md`, `skills/prompt/templates/modular-prompt.yaml`, `skills/meeting-engineering/references/{architecture_and_audio,low_latency_pipelines}.md`, `skills/frontend/references/nextjs-app-router.md`, `scripts/lint_catalog.py`, `tests/test-catalog.sh`
+**Dependencies:** none
+**Done when:** `python3 -I scripts/lint_catalog.py` reports no `stale-ref` hit outside the allowlist; every allowlisted mention is annotated as historical in the file; the rule has failing fixtures
 **Status:** Pending
 
-### Epic 2.2: Overlap resolution and routing
+#### Task 2.1.1: Refresh stale identifiers in content
 
-**Goal:** For each overlapping skill group (G8), the owner decision is applied and each skill's description states when to choose it over its neighbours.
-**Scope:** `redis-valkey`/`valkey-redis`, `devops`/`devops-infrastructure`, `prompt`/`prompt-master`, `masterclaw`/`openclaw`/`nemoclaw`/`bot`, `postgres-15`/`sql-partitioning`/`database`, `docker`/`dockerfile`, README tables, `skills-list.txt`, installer count
-**Dependencies:** Phase 1; an owner decision per group (merge, keep-and-differentiate, or deprecate). Merging changes the skill count in four places, which the `count-sync` rule will enforce.
-**Done when:** each group has a recorded decision in CHANGELOG.md and no two skills have interchangeable descriptions
+- [ ] Done
+
+**Context:** Hits (from `git grep -niE 'claude[- ]3|gpt-4o|gemini[- ]1\.5|gpt-3\.5|text-davinci|Next\.js 1[0-3]'`): `ai-ml-engineering/references/computer-vision.md:143-145`, `llm-applications.md:21,22,213`, `prompt-engineering.md:227,257`, `source-map.md:11,12`; `meeting-engineering/references/architecture_and_audio.md:15` and `low_latency_pipelines.md:56` (GPT-4o-mini alongside gpt-5-mini); `prompt/templates/modular-prompt.yaml:11` (`model: "gpt-4o"`); `frontend/references/nextjs-app-router.md:4` ("the new paradigm ... introduced in Next.js 13").
+
+**Implementation vision:** Read each file around the hit before editing; keep the table or example shape, change only the model/version content. Claude rows and code examples use the current family listed in the Phase 2 decisions (frontier tier: Opus 5.5 or Fable 5.1; standard: Sonnet 5.5; fast/cheap: Haiku 5.5; example API call uses `claude-sonnet-5-5`). OpenAI and Google rows become tier labels with a pointer to the provider's model docs; the `gpt-4o` template default becomes a `<provider-model-id>` placeholder with a comment, since a template must not pin a name that will rot. The `source-map.md` rows keep the doc URLs but describe "current Claude/GPT model families", not named retired models. For Next.js, state that the App Router is the standard routing model (stable since Next.js 13.4) and drop "new paradigm". Edge cases: a historical mention that is the point of the sentence (e.g. a migration note) stays but gets the annotation `(historical)` on the same line; none expected in the 11 hits.
+
+**Files:**
+- Modify: `skills/ai-ml-engineering/references/computer-vision.md`, `skills/ai-ml-engineering/references/llm-applications.md`, `skills/ai-ml-engineering/references/prompt-engineering.md`, `skills/ai-ml-engineering/references/source-map.md`, `skills/prompt/templates/modular-prompt.yaml`, `skills/meeting-engineering/references/architecture_and_audio.md`, `skills/meeting-engineering/references/low_latency_pipelines.md`, `skills/frontend/references/nextjs-app-router.md`
+
+**Verification:** `git grep -niE 'claude[- ]3|claude-3|gpt-4o|gemini[- ]1\.5|gpt-3\.5|text-davinci|Next\.js 1[0-3]\b' -- skills` prints nothing (or only `(historical)`-annotated lines); `python3 -I scripts/lint_catalog.py` still reports 0 errors; the YAML template still parses (`python3 -I -c "import sys; print(open('skills/prompt/templates/modular-prompt.yaml').read()[:1])"` is not enough, so use `ruby -ryaml -e 'YAML.load_file(ARGV[0])' skills/prompt/templates/modular-prompt.yaml`).
+
+**Done when:** the grep is clean and no file was changed outside the listed hits' tables, examples and prose.
+
+#### Task 2.1.2: `stale-ref` linter rule
+
+- [ ] Done
+
+**Context:** `scripts/lint_catalog.py` has an ERROR/WARN `add(level, skill, rule, msg)` pattern (see `scripts/lint_catalog.py:135`), and `tests/test-catalog.sh` builds fixtures with `make_fixture` and asserts with `expect_only_rule`.
+
+**Implementation vision:** New rule `stale-ref` (ERROR): scan every `*.md`, `*.yaml`, `*.yml`, `*.json`, `*.sh`, `*.py` under each skill for the case-insensitive pattern list in a module constant `STALE_PATTERNS`: `claude[- ]?3`, `claude-(instant|2)`, `gpt-4o`, `gpt-4-turbo`, `gpt-3\.5`, `text-davinci`, `gemini[- ]?1\.5`, `Next\.js 1[0-3]\b`. A line is exempt if it contains the literal marker `(historical)`. Skip the pattern constant's own file (`scripts/lint_catalog.py` is outside `skills/`, so no special case is needed). Report `file:line`. Fixtures: a file with `gpt-4o` fails; the same line with `(historical)` passes; a clean file passes. This rule is an ERROR from the start because Task 2.1.1 clears the tree first (order: 2.1.1 then 2.1.2).
+
+**Files:**
+- Modify: `scripts/lint_catalog.py`, `tests/test-catalog.sh`
+
+**Verification:** `bash tests/test-catalog.sh` exits 0 and prints `PASS: stale-ref`; `python3 -I scripts/lint_catalog.py` reports 0 errors on the real tree.
+
+**Done when:** a regression of any stale pattern fails CI.
+
+### Epic 2.2: Overlap routing
+
+**Goal:** For each of the six overlap groups, a reader (or an agent choosing a skill) can tell from the description alone which one to pick.
+**Scope:** `SKILL.md` frontmatter and the first screen of body for the 15 skills below
+**Dependencies:** none (descriptions only; the linter's `desc-trigger` rule is promoted in Epic 2.3 after these land)
+**Done when:** every skill in every group has a `description:` under 1024 characters containing a trigger phrase ("Use when") and a "Not for X: use `<neighbour>`" clause; a "Related skills" line under the title links the neighbours
 **Status:** Pending
 
-### Epic 2.3: Description and depth pass
+#### Task 2.2.1: Route the six overlap groups
 
-**Goal:** Every `description:` carries a trigger, and thin skills (`claude`, `go-lua`, `openclaw` at two files each, plus the smallest SKILL.md files) reach the catalog's median depth or are folded into a neighbour.
-**Scope:** all 86 `SKILL.md` frontmatter; the thin skills named above
-**Dependencies:** Epic 2.2 (do not deepen a skill that is about to be merged)
-**Done when:** `desc-trigger` is promoted from WARN to ERROR and passes
+- [ ] Done
+
+**Context:** Current descriptions (read at elaboration): `redis-valkey` "Advanced Redis and Valkey production operations, troubleshooting, and migration" vs `valkey-redis` "managing Valkey ... valkey.conf ... migrations from Redis OSS to Valkey" (both claim migration); `devops` (AWS/K8s/EKS/Helm/GitOps) vs `devops-infrastructure` (cloud architecture, K8s, CI/CD, IaC, SRE, FinOps); `prompt` (prompt architecture and security) vs `prompt-master` (CoT/ToT/ReAct, RAG, context size); `masterclaw`, `openclaw` (OpenClaw Node.js and ZeroClaw Rust runtimes), `nemoclaw` (NVIDIA NemoClaw), `bot` ("Advanced Bot Engineering with OpenClaw, NemoClaw, and OpenShell"); `postgres-15`, `sql-partitioning`, `database`; `docker`, `dockerfile`.
+
+**Implementation vision:** Assign each skill one lane and write the descriptions to match. Lanes: `redis-valkey` = operating and troubleshooting Redis or Valkey (latency, memory, hot keys, Lua); `valkey-redis` = Valkey-specific config (`valkey.conf`) and Redis OSS to Valkey migration; `devops` = hands-on AWS/EKS/Helm/GitOps/VPC provisioning and troubleshooting; `devops-infrastructure` = cross-cloud architecture, IaC, SRE, platform engineering and FinOps decisions; `prompt` = designing, hardening and debugging prompts and prompt systems; `prompt-master` = prompting techniques, RAG pipelines and context-size reduction; `openclaw` = deploying and troubleshooting OpenClaw/ZeroClaw runtimes; `nemoclaw` = NVIDIA NemoClaw platform deployment and credential handling; `masterclaw` = the combined operational playbook when a task spans both or needs gateway plus prompt architecture; `bot` = building bots on those runtimes (channels, OpenShell), deferring runtime ops to `openclaw`/`nemoclaw`; `postgres-15` = PostgreSQL 15+ operations and tuning; `sql-partitioning` = partitioning and sharding design; `database` = engine-agnostic design (PostgreSQL and MongoDB) and security; `docker` = running and operating containers and Compose; `dockerfile` = authoring and optimizing Dockerfiles. Do not change skill names or directory names. Each description: one sentence of scope, "Use when ...", and "Not for X: use `<skill>`". Add one line `**Related skills:** \`a\`, \`b\`` directly under the H1 in each SKILL.md. Check that the Related lines name only skills that exist in `skills-list.txt`. Also update the README catalog table rows for any skill whose one-line purpose changed (keep rows short).
+
+**Files:**
+- Modify: `skills/{redis-valkey,valkey-redis,devops,devops-infrastructure,prompt,prompt-master,masterclaw,openclaw,nemoclaw,bot,postgres-15,sql-partitioning,database,docker,dockerfile}/SKILL.md`, `README.md` (only affected table rows)
+
+**Verification:** `python3 -I scripts/lint_catalog.py` reports 0 errors; `python3 -I - <<'PY'` check (inline) that each of the 15 descriptions has length under 1024, contains "use when" (case-insensitive) and names at least one neighbour in backticks that exists in `skills-list.txt`; prints `ok 15/15`.
+
+**Done when:** the inline check prints `ok 15/15`.
+
+### Epic 2.3: Description triggers and enforcement
+
+**Goal:** Every `description:` carries a trigger and the linter enforces it.
+**Scope:** the 23 remaining skills from the 38 `desc-trigger` warnings that are not in Epic 2.2, plus `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `CONTRIBUTING.md`
+**Dependencies:** Epics 2.1 and 2.2 (so the promotion lands on a clean tree)
+**Done when:** `desc-trigger` is an ERROR rule, `python3 -I scripts/lint_catalog.py` reports 0 errors and 0 warnings, CONTRIBUTING.md states the rule
 **Status:** Pending
+
+#### Task 2.3.1: Add triggers to the remaining 23 descriptions
+
+- [ ] Done
+
+**Context:** The 38 warnings are: accessibility-testing, bot, claude, docker, french-teacher, frontend, frontend-menu-design, go-lua, jira-field-schemas, jira-jsm-oncall, jira-status-workflows, lerian-helm, lua, manus, manus-workflows, meeting-engineering, nemoclaw, openai, openclaw, otel-collector, passkeys, playwright, postgres-15, rabbitmq, rabbitmq-documentdb, rag, roles-permissions, seaweedfs, slack, spanish-teacher, sql-partitioning, tech-support-ops, ticket-reports, ticket-supreme, valkey-redis, vitest, voip-oncall, web-tester-supreme. Task 2.2.1 covers bot, docker, nemoclaw, openclaw, postgres-15, sql-partitioning, valkey-redis, so 31 remain; of those, the batch below lists them all.
+
+**Implementation vision:** For each of the 31 skills not handled in Task 2.2.1, read its `SKILL.md` (title, first section) and rewrite only the `description:` line to: one-sentence scope, then "Use when <concrete trigger conditions the user would phrase>", under 1024 characters, single line, no YAML block scalars, quoted if it contains a colon. Do not change body text. Preserve any distinguishing detail already in the description (e.g. the Claude model list in `claude`, "Lerian conventions" in `lerian-helm`). Work in 3 batches of about 10 for sizing; batches are independent and may run in parallel because they touch disjoint files.
+
+**Files:**
+- Modify: `skills/<each of the 31 skills>/SKILL.md` (frontmatter line only)
+
+**Verification:** `python3 -I scripts/lint_catalog.py | grep -c desc-trigger` prints `0`; 0 errors.
+
+**Done when:** no skill lacks a trigger phrase.
+
+#### Task 2.3.2: Promote `desc-trigger` to ERROR
+
+- [ ] Done
+
+**Context:** `desc-trigger` is a WARN at `scripts/lint_catalog.py:135` and documented in its docstring at line 5; `CONTRIBUTING.md` lists the authoring contract.
+
+**Implementation vision:** Change the level to ERROR, update the docstring, add a fixture (description without trigger words fails; with "Use when" passes) and flip the Phase 1 fixture that asserted the WARN-only behavior (`tests/test-catalog.sh` fixture "desc-trigger WARN exit 0") to assert ERROR and exit 1. Add one sentence to `CONTRIBUTING.md` stating the rule and the accepted phrases (`use when`, `use for`, `triggers`).
+
+**Files:**
+- Modify: `scripts/lint_catalog.py`, `tests/test-catalog.sh`, `CONTRIBUTING.md`
+
+**Verification:** `bash tests/test-catalog.sh` exits 0 under `/bin/bash` and bash 5; `python3 -I scripts/lint_catalog.py` prints `0 error(s), 0 warning(s)`.
+
+**Done when:** a skill without a trigger fails the linter and CI.
 
 ---
 
