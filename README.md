@@ -5,6 +5,8 @@
 [![Stars](https://img.shields.io/github/stars/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills)
 [![License](https://img.shields.io/badge/license-MIT-06b6d4?style=flat-square&labelColor=1a1a2e)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-86-ec4899?style=flat-square&labelColor=1a1a2e)](skills/)
+[![CI](https://github.com/victorlazari/lzr1-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/victorlazari/lzr1-skills/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills/releases/latest)
 [![macOS](https://img.shields.io/badge/macOS-✓-a855f7?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Linux](https://img.shields.io/badge/Linux-✓-06b6d4?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Made with Bash](https://img.shields.io/badge/made%20with-bash-ec4899?style=flat-square&labelColor=1a1a2e&logo=gnubash&logoColor=white)](install.sh)
@@ -290,13 +292,23 @@ The installer detects these tools automatically and installs skills to their con
 
 ### Option 1 — one-line curl installer
 
-The required one-line command remains available and launches an interactive target menu. Like every `curl | bash` pattern, it executes the fetched script immediately; use the inspect-first alternative below when your trust policy requires review before execution.
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash
 ```
 
-In piped mode, the script downloads **one repository archive**, validates that `skills-list.txt` exactly matches 86 package directories, and then installs complete packages. It does not fall back to a stale embedded list or continue after a partial catalog download.
+This installs the **latest verified release**: the script downloads the release archive `lzr1-skills.tar.gz` and `SHA256SUMS`, checks the archive against the checksum, and only then extracts it. It falls back to the **unverified `main` snapshot only when no release exists** (it prints a warning when that happens). The command launches an interactive target menu; like every `curl | bash` pattern it executes the fetched script immediately, so use the inspect-first alternative below when your trust policy requires review.
+
+**Pin a release** (checksum-verified; fails instead of falling back if the tag or its checksums cannot be downloaded):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- --ref v2.1.0 --codex --yes
+```
+
+**Explicit unverified snapshot** (any ref that is not a `vX.Y.Z` tag is a branch snapshot, installed without checksum verification and with a warning):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- --ref main --detected --yes
+```
 
 **Inspect first, then run the exact saved file:**
 
@@ -313,11 +325,19 @@ bash install.sh --detected --yes
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- --detected --yes
 ```
 
-`LZR1_AUTO=1` remains an automation shorthand for detected targets. `LZRI_AUTO=1` is retained as a backward-compatible alias.
+**Verify a release by hand** (the installer does the same comparison):
+
+```bash
+curl -fsSLO https://github.com/victorlazari/lzr1-skills/releases/latest/download/lzr1-skills.tar.gz
+curl -fsSLO https://github.com/victorlazari/lzr1-skills/releases/latest/download/SHA256SUMS
+shasum -a 256 -c SHA256SUMS
+```
+
+**Trust model.** The checksum protects against corruption in transit and against a mirror or proxy substituting the archive. It does not protect against a compromised repository or release: both assets come from the same place, and releases are not signed yet. Report integrity problems as described in [SECURITY.md](SECURITY.md).
 
 ### Option 2 — Clone and run
 
-Full local control. Works offline after cloning.
+Full local control. Works offline after cloning; the clone is the source, so `--ref` does not apply.
 
 ```bash
 git clone https://github.com/victorlazari/lzr1-skills.git
@@ -335,31 +355,40 @@ bash install.sh --all --dry-run                # validate and preview without wr
 
 ### Option 3 — Update existing install
 
-Revalidates the latest source snapshot and reinstalls complete packages to whichever tools are recorded in the managed state file.
+Revalidates the latest source and reinstalls complete packages to whichever tools are recorded in the managed state file.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/install.sh | bash -s -- update
 ```
 
+Installer version: 2.1.0
+
 ---
 
 ## Command Reference
+
+Generated from `bash install.sh --help`; run it for the authoritative text.
+
+```text
+bash install.sh [command] [target options] [behavior options]
+```
 
 ### Subcommands
 
 | Command | What it does |
 |:--------|:-------------|
-| `install` | Install skills (default) |
-| `update` | Re-download and reinstall to previously selected tools |
-| `remove` | Remove installed skills |
-| `doctor` | Check installation health — verifies every skill file |
+| `install` | Install the complete skill catalog (default) |
+| `update` | Reinstall to explicitly selected or previously saved targets |
+| `remove` | Remove only content carrying lzr1 ownership markers |
+| `doctor` | Validate the source catalog and report managed target coverage and the source mode, ref and verification status |
+| `help` | Show the help text |
 
 ### Tool Flags
 
 | Flag | Target |
 |:-----|:-------|
 | `--claude-code` | `~/.claude/skills/` |
-| `--claude-desktop` | Platform-specific Claude Desktop path |
+| `--claude-desktop` | Platform-specific Claude Desktop skills directory |
 | `--codex` | `~/.codex/skills/` |
 | `--opencode` | `~/.config/opencode/skill/` |
 | `--factory` | `~/.factory/skills/` |
@@ -367,26 +396,29 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 | `--vscode` | `~/.vscode/lzr1-skills/` |
 | `--antigravity` | `~/.antigravity-ide/rules/` |
 | `--agy` | `~/.gemini/antigravity-cli/skills/` |
-| `--detected` | Every tool whose config directory already exists |
-| `--all` | All nine targets, including undetected tools |
+| `--detected` | Select all currently detected tools |
+| `--all` | Select all nine tools, including undetected tools |
 
 ### Behavior Flags
 
 | Flag | What it does |
 |:-----|:-------------|
-| `--dry-run`, `-n` | Validate the source and preview destination changes without writing |
+| `--dry-run`, `-n` | Validate the source and preview destination changes only |
 | `--verbose`, `-v` | Show per-skill activity |
-| `--yes`, `-y` | Disable interactive selection; a target flag is still required |
-| `--force` | Back up and replace an unowned same-name collision |
+| `--yes`, `-y` | Non-interactive confirmation mode; does not select targets |
+| `--force` | Back up and replace unowned name collisions |
+| `--ref <value>` | Archive source when run via curl (env: `LZR1_REF`). Default: latest published release, checksum-verified. A tag such as `v2.1.0` pins a verified release. Any other value is a branch snapshot (unverified). Allowed characters: `A-Z a-z 0-9 . _ / -`; an empty value is rejected |
 | `--version` | Show installer version |
-| `--help`, `-h` | Full help text |
+| `--help`, `-h` | Show the help text |
 
 ### Environment Variables
 
 | Variable | Effect |
 |:---------|:-------|
-| `LZR1_AUTO=1` | Skip the interactive menu and select detected tools |
-| `LZRI_AUTO=1` | Backward-compatible alias for `LZR1_AUTO=1` |
+| `LZR1_AUTO=1` | Automation shorthand: select detected tools without the interactive menu |
+| `LZRI_AUTO=1` | Backward-compatible alias for `LZR1_AUTO` |
+| `LZR1_REF` | Same as `--ref`; the flag wins when both are given |
+| `LZR1_SOURCE_DIR` | Install from this local directory instead of a clone or download (source mode `override`) |
 
 ---
 
@@ -421,19 +453,57 @@ bash install.sh doctor
 
 ## How It Works
 
-The installer chooses its source mode automatically and then applies the same fail-closed catalog validation in both modes.
+The installer chooses its source mode and then applies the same fail-closed catalog validation in every mode. The success line reads `Validated N skills from <mode> source (ref: X), verified: yes|no`, and `doctor` reports `Source: <mode>, ref <r>, verified <yes|no>`.
 
-**Local mode** — a clone is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 86 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. No network is required after cloning.
+**Source modes** — `override` (`LZR1_SOURCE_DIR`), `local` (running from a clone), `release` (checksum-verified release archive) and `branch` (unverified snapshot of a ref).
 
-**Curl mode** — the one-line script downloads a single GitHub repository archive over HTTPS, rejects unsafe archive paths and symbolic links, validates the same exact 86-skill manifest-to-directory contract, and installs from that coherent snapshot. There is no hardcoded-list fallback and no per-file partial-download mode. The downloaded archive’s SHA-256 is printed for evidence; because `main` is mutable, pin or independently verify a trusted revision when your policy requires immutable provenance.
+**Manifest validation** — the source is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 86 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. Unsafe archive paths and symbolic links are rejected. There is no hardcoded-list fallback.
+
+**Checksum verification and fallback** — with no `--ref`, the installer downloads `SHA256SUMS` and `lzr1-skills.tar.gz` from the latest release and refuses to extract on a mismatch. If no `SHA256SUMS` can be downloaded it falls back to the unverified `main` snapshot with a warning. An explicit `vX.Y.Z` tag never falls back: a missing release exits non-zero. Any other ref is an unverified snapshot, with a warning. A missing `sha256sum`/`shasum` tool is an error for verified modes.
 
 **Destination layouts** — package-native tools receive `skills/<name>/` directories. Flat-rule tools receive `<name>.md` plus a hidden `.lzr1-skill-resources/<name>/` package mirror; entrypoint links are rewritten to that mirror so referenced materials continue to resolve.
 
-**Ownership and replacement** — each installed package has a repository ownership marker, and each target has a managed index. Updates stage a complete replacement before swapping it into place. Unowned collisions fail closed unless `--force` is explicit, in which case the prior content is backed up rather than deleted.
+**Ownership markers and backups** — each installed package carries a `.lzr1-managed` ownership marker, and each target has a managed index. Updates stage a complete replacement before swapping it into place. Unowned collisions fail closed unless `--force` is explicit, in which case the prior content is moved to `.lzr1-backups/<run-id>/` inside that target rather than deleted.
 
-**State and locking** — successful target selections are merged into `~/.lzr1-skills-state`; subset removals delete only those records. A per-user lock prevents overlapping write operations. `--dry-run` performs source validation and target preflight without writing installer state or target content.
+**State and locking** — successful target selections are merged into the state file `~/.lzr1-skills-state`; subset removals delete only those records. A per-user lock directory, `~/.lzr1-skills-lock`, prevents overlapping write operations. `--dry-run` performs source validation and target preflight without writing installer state or target content.
 
-**Tool detection** — the installer checks each tool’s current config directory at startup. Detected tools are labeled in the interactive menu; undetected targets can still be selected explicitly and their directories will be created safely.
+**Tool detection** — the installer checks each tool's current config directory at startup. Detected tools are labeled in the interactive menu; undetected targets can still be selected explicitly and their directories will be created safely.
+
+---
+
+## Development
+
+Run everything from the repository root. Python tooling runs isolated with `-I`.
+
+```bash
+python3 -I scripts/lint_catalog.py    # catalog linter: manifest, frontmatter, links, counts, stale refs, script registry
+bash tests/test-catalog.sh            # negative fixtures for the linter
+bash tests/test-scripts.sh            # smoke tests for the scripts registered in tests/script-coverage.tsv
+bash tests/test-installer.sh          # installer behavior in a sandboxed HOME
+bash tests/test-installer-download.sh # offline tests of the verified download path (fake curl)
+bash tests/test-adversarial-remediations.sh
+bash tests/test-release.sh            # offline test of scripts/build-release.sh
+```
+
+**Script-coverage registry** — `tests/script-coverage.tsv` lists every script under `skills/*/scripts/` with a level: `behavior` (a test exercises it), `help` (its `--help` is run in an isolated environment) or `static` (syntax and mode checks only, with a written reason). The linter fails when a script has no row.
+
+**CI** (`.github/workflows/ci.yml`, on pushes to `main` and on pull requests):
+
+| Job | Runs on | Steps |
+|:----|:--------|:------|
+| `test` | ubuntu and macOS | linter, `test-catalog.sh`, `test-scripts.sh`, `test-installer.sh`, `test-installer-download.sh`, `test-adversarial-remediations.sh` |
+| `test` (Linux leg only) | ubuntu | ruff (`E9,F`) over `skills/`, `compileall` of skill Python |
+| `shellcheck` | ubuntu | shellcheck at warning severity over `install.sh`, `tests/*.sh` and skill shell scripts |
+
+`tests/test-release.sh` is not part of CI; run it locally when you change `scripts/build-release.sh`. Pushing a `v*` tag runs `.github/workflows/release.yml`, which builds `lzr1-skills.tar.gz` and `SHA256SUMS` with `scripts/build-release.sh`.
+
+More: [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [CHANGELOG.md](CHANGELOG.md) · [LICENSE](LICENSE) · [docs/decisions/](docs/decisions/)
+
+---
+
+## Scope
+
+This public, MIT-licensed repository does not add Lerian-specific skills; those belong in the ring plugin, and non-public Lerian material must not be submitted here. The existing `lerian-helm` skill was audited and contains no non-public material. See [docs/decisions/0001-lerian-skill-scope.md](docs/decisions/0001-lerian-skill-scope.md).
 
 ---
 
