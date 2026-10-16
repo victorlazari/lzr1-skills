@@ -121,152 +121,172 @@ Skills that already spawned parallel agents received three additive upgrades:
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `ai` | Advanced AI architectures (CNNs, Transformers, LLMs), training pipelines, deployment, and production AI security | Building and deploying AI systems end-to-end |
-| `ai-ml-engineering` | ML engineering, MLOps, LLM apps, RAG pipelines, NLP, computer vision, prompt engineering | ML from experimentation to production |
-| `masterclaw` | Combined OpenClaw + NemoClaw + prompt-architecture playbook | Full-lifecycle expert for the MasterClaw platform |
-| `openclaw` | Deploy and troubleshoot OpenClaw (Node.js) and ZeroClaw (Rust) runtimes | Building and operating OpenClaw deployments |
-| `nemoclaw` | NVIDIA NemoClaw deployment, onboarding and credential handling | Operating NemoClaw clusters at scale |
-| `manus` | Manus AI agent framework — task automation, multi-step workflows, tool orchestration, autonomous agents | Building Manus-powered automation |
-| `manus-workflows` | Manus workflow design patterns — parallel execution, state management, agent coordination, error recovery | Designing complex Manus workflow graphs |
-| `hermes-agent` | NousResearch Hermes Agent operations — discovery-first setup, providers, tools, memory, skills, automation, gateways, integrations, extensions, production hardening, offline preflight, and 98-page official-source provenance | Installing, configuring, auditing, troubleshooting, extending, or safely operating Hermes Agent |
-| `meeting-engineering` | Live virtual meeting assistants with voice — Playwright automation, audio pipelines, STT/LLM/TTS, Docker | Building real-time meeting bots |
-| `software-engineering` | Backend, frontend, fullstack, APIs, systems architecture, performance, Go/Rust and more | Any production code decision |
-| `coderabbit-reviewer` | Local CodeRabbit CLI reviews with deterministic NDJSON evidence, independent finding triage, and bounded remediation loops | Reviewing uncommitted or branch changes without silently publishing them |
-| `yaml-specialist` | YAML 1.2, JSON Schema, Helm, and Kubernetes configuration engineering with secret-safe analysis, explicit compatibility matrices, isolated rendering, and layered validation evidence | Authoring, auditing, validating, or safely refactoring YAML and Helm/Kubernetes configuration |
-| `quality-assurance` | Test strategy, automation frameworks, performance testing, API testing, QA processes | Shipping with confidence |
-| `research-development` | Innovation strategy, tech scouting, R&D management, emerging tech evaluation | Staying ahead of the curve |
+| `ai` | AI model design, training, deployment and troubleshooting: CNNs, RNNs, Transformers, LLMs, inference configuration, AI security audits | Building and running AI systems end to end |
+| `ai-ml-engineering` | ML engineering, MLOps, LLM applications, NLP, computer vision, RAG pipelines and fine-tuning | ML from experiment to production |
+| `masterclaw` | Combined OpenClaw gateway, NemoClaw engine and prompt-architecture playbook for tasks that span more than one, or whose runtime is unknown | Cross-runtime claw work |
+| `openclaw` | Deploy, configure and troubleshoot the OpenClaw (Node.js) and ZeroClaw (Rust) agent runtimes: workspace bootstrap files, config.toml, channel failures | Operating OpenClaw or ZeroClaw |
+| `nemoclaw` | NVIDIA NemoClaw deployment on DGX, WSL or Linux/macOS, guided onboarding, inference provider setup, credential handling | Operating NemoClaw |
+| `bot` | Build and secure bots on the OpenClaw, NemoClaw and OpenShell ecosystems: plugins, memory, sandboxes, multi-agent routing, security audits | Bots and agents on the claw runtimes |
+| `manus` | Manus v2 agent platform: agent pipelines and clusters, sandbox network policies, WebMCP browser automation, Control Plane scheduling, S3 multipart uploads | Building and operating Manus agent solutions |
+| `hermes-agent` | NousResearch Hermes Agent: install and update, providers and models, tools, memory and skills, cron, gateways, MCP/ACP/API integrations, plugins, production readiness | Operating and extending Hermes Agent |
+| `meeting-engineering` | Live Google Meet assistants: Playwright, PulseAudio and Xvfb audio routing, low-latency STT/LLM/TTS pipelines | Real-time meeting bots |
+| `coderabbit-reviewer` | Local CodeRabbit CLI reviews of Git changes with `--agent` event evidence, finding triage and bounded remediation | Pre-push review of local changes |
+| `research-development` | Innovation strategy, technical research methodology, R&D management, technology scouting, emerging technology evaluation | Evaluating what to build or adopt next |
 
 ### 🧠 Prompts & LLMs
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `prompt-master` | Prompting techniques, RAG pipelines, context-size reduction | Squeezing every token of performance |
-| `prompt` | Design, harden and debug prompts and prompt systems | Getting cleaner, more reliable AI outputs |
-| `claude` | Claude API/SDK integration — tool use, multi-turn, streaming, MCP, caching, computer use | Building Claude-powered applications |
-| `openai` | OpenAI API integration — function calling, Assistants API, fine-tuning, vision | Building OpenAI-powered applications |
-| `rag` | RAG architectures — chunking strategies, embedding models, retrieval patterns, reranking, evaluation | Knowledge-grounded AI applications |
+| `prompt` | Design, harden and debug prompts and prompt systems: architecture, injection and jailbreak defence, token and cache optimization, schemas, templates | One prompt system that must work and stay safe |
+| `prompt-master` | Prompting techniques (CoT, ToT, ReAct, self-consistency), RAG, GraphRAG and Agentic RAG pipelines, context and bootstrap size reduction | Choosing a technique or cutting context size |
+| `claude` | Claude models and API: integration, system prompts, tool use, vision, extended thinking, prompt caching, Artifacts | Apps built on Claude |
+| `openai` | OpenAI API: Responses API, Realtime API, function calling, structured outputs, tool_search | Apps built on OpenAI models |
+| `rag` | RAG architecture: adaptive and agentic RAG, chunking, embeddings, vector databases, hybrid retrieval, fixing irrelevant retrieval | Grounded retrieval pipelines |
 
 ### 📊 Data & Analytics
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `data-analytics` | Data engineering, analysis, BI, data visualization, data science, analytics engineering | Pipelines to dashboards |
+| `data-analytics` | Data engineering, analysis, BI, visualization, data science, warehouse design, SQL and analytics engineering | Pipelines to dashboards |
 
 ### 🎨 Design & Content
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `design-ux` | UX/UI design, design systems, user research, accessibility, interaction design, prototyping | Building interfaces people actually enjoy |
-| `content-communications` | Content strategy, technical writing, copywriting, developer relations, corporate comms | Making complex things readable |
-| `marketing` | Digital marketing, SEO, growth, brand strategy, demand gen, analytics | Campaigns that convert |
-| `web-presentation-creator` | Cinematic landing pages with GSAP animations, scrollytelling, video embeds, full HTML packages | Premium web experiences |
-| `one-page` | One-pagers, executive summaries, status updates, business cases | When one page has to do everything |
-| `legendary-readme` | README files that are both technically excellent and genuinely entertaining | First impressions that stick |
-| `frontend` | React, Next.js, TypeScript, state management, server components, accessibility | Building modern frontend applications |
-| `frontend-menu-design` | Navigation UX, dropdown patterns, mobile menus, mega menus, keyboard accessibility | Menus that don't frustrate people |
+| `design-ux` | UX and UI design, design systems, user research, accessibility, interaction design, information architecture | Interfaces people can use |
+| `content-communications` | Content strategy, technical writing, copywriting, corporate communications, developer relations | Making complex things readable |
+| `marketing` | Digital and content marketing, SEO, growth, brand strategy, marketing analytics, demand generation | Campaigns and positioning |
+| `one-page` | One-page presentations and reports: executive summaries, status updates, business cases, pitches, launches | One page that has to do everything |
+| `legendary-readme` | GitHub README writing and polish: banners, badges, diagrams, tables, tone, light and dark mode | Project front pages |
+
+### 🖥️ Frontend & Web
+
+| Skill | What it does | Best for |
+|:------|:-------------|:---------|
+| `frontend` | React and Next.js App Router frontends: Server Components, TypeScript, Tailwind CSS, state management, testing, rendering and bundle performance | Building and auditing modern frontends |
+| `frontend-menu-design` | Navigation menu architecture: mega menus, mobile drawers, RBAC-driven visibility, animation, keyboard and WCAG behavior in React and Next.js | Menus that are usable and accessible |
+| `web-presentation-creator` | Premium landing pages: cinematic scrollytelling, GSAP animation, complex media, complete HTML or ZIP packages | Showcase web pages |
 
 ### 🔧 DevOps & Infrastructure
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `devops-infrastructure` | Cross-cloud architecture, IaC, SRE, platform engineering, FinOps | Infra that doesn't page you at 3am |
-| `devops` | Hands-on AWS/EKS/Helm/GitOps/VPC provisioning and troubleshooting | Streamlining the path from commit to production |
-| `docker` | Run and operate containers and Compose; hardening and troubleshooting | Containers that actually work in prod |
-| `dockerfile` | Author and optimize Dockerfiles (multi-stage, BuildKit, hardening) | Lean, secure, reproducible images |
-| `k8s-eks` | Kubernetes on AWS EKS — workloads, networking, IAM, autoscaling, node groups | Running K8s without the PhD |
-| `lerian-helm` | Lerian platform Helm chart engineering with strict Lerian conventions and security patterns | Lerian-compliant Helm deployments |
-| `cron-master` | Cron across local and Docker environments — Supercronic, Ofelia, host-to-container patterns | Scheduled tasks that actually run |
-| `trivy-scanner` | Trivy security scanning — vulnerabilities, misconfigs, secrets, SBOM, compliance, reports | Knowing what's lurking in your images |
-| `it-administration` | Endpoint management, IAM, IT security, SaaS administration, IT ops | Running the machine that runs the machines |
-| `otel-collector` | OpenTelemetry Collector — pipeline config, processors, exporters, sampling, Alloy | Telemetry that reaches its destination |
+| `devops-infrastructure` | Cross-cloud architecture, Infrastructure as Code, SRE, platform engineering, networking, AI/MLOps infrastructure, FinOps | Infrastructure design decisions |
+| `devops` | Hands-on AWS, EKS, Helm, GitOps, VPC and CI/CD provisioning and troubleshooting, including Terraform and CloudFormation | Provisioning and debugging AWS delivery |
+| `docker` | Run and operate containers and Compose: Buildx multi-platform builds, runtime hardening, Docker Scout, networking, storage and performance troubleshooting | Containers that run and stay healthy |
+| `dockerfile` | Author and optimize Dockerfiles: multi-stage builds, layer caching, BuildKit mounts, non-root and secret handling, Hadolint and Trivy in CI | Lean, safe images |
+| `k8s-eks` | Kubernetes and AWS EKS operations, incident troubleshooting, networking and cluster management | EKS incidents and cluster work |
+| `lerian-helm` | Helm deployments, golang-migrate migrations and security validation for Lerian Studio charts under Restricted Pod Security Standards | Deploying Lerian Studio |
+| `yaml-specialist` | YAML, JSON Schema, Helm values contracts and Kubernetes manifest authoring, linting, rendering and validation | Config files that validate |
+| `cron-master` | Cron scheduling locally and in Docker: crontab, Supercronic, Ofelia, host-to-container execution | Scheduled jobs that run |
+| `trivy-scanner` | Trivy scans of repositories, filesystems, images, Kubernetes and SBOMs: vulnerabilities, misconfigurations, secrets, licenses, VEX, CI, air-gapped use | Knowing what ships in your images |
+| `otel-collector` | OpenTelemetry Collector configuration, OTTL, scaling, connectors (routing, spanmetrics), custom builds, OOM diagnosis | Telemetry pipelines |
+| `it-administration` | Endpoint management, identity and access management, IT security, SaaS administration, IT operations | Running company IT |
+| `speedtest` | Ookla Speedtest methodology and CLI, custom OoklaServer, latency and jitter analysis, network throughput troubleshooting | Network performance diagnosis |
 
 ### 🗄️ Databases & Storage
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `database` | Engine-agnostic DB design and security (PostgreSQL and MongoDB) | Getting the schema right the first time |
-| `postgres-15` | PostgreSQL 15+ operations, tuning, upgrades, DR and security | High-performance Postgres at scale |
-| `mongodb` | MongoDB — schema design, aggregation pipelines, indexing, Atlas, transactions | Document-model application data |
-| `redis-valkey` | Operate and troubleshoot Redis/Valkey: latency, memory, hot keys, Lua | Fast data that lives at the edge of your stack |
-| `valkey-redis` | Valkey config (valkey.conf) and Redis OSS to Valkey migration | Moving from Redis to Valkey |
-| `rabbitmq` | RabbitMQ — exchanges, queues, routing, dead letters, shovel, clustering | Reliable async message delivery |
-| `rabbitmq-documentdb` | RabbitMQ + DocumentDB integration — event-sourcing patterns, consumer groups, idempotency | Message-driven document persistence |
-| `sql-partitioning` | Partitioning and sharding design for large SQL tables | Tables that don't grind to a halt at 100M rows |
-| `seaweedfs` | SeaweedFS distributed storage — volumes, topology, S3 API, tiered storage, erasure coding | Cheap, scalable blob storage on your own infra |
+| `database` | Engine-agnostic architecture, indexing, replication, high availability and security hardening for PostgreSQL and MongoDB | Choosing and designing the data layer |
+| `postgres-15` | PostgreSQL 15+ operations: autovacuum, memory, PgBouncer, locks, major upgrades, PITR and DR, RBAC, RLS, pgaudit | Running Postgres in production |
+| `sql-partitioning` | Partitioning and sharding for very large SQL tables: declarative partitioning, pruning, pg_partman, zero-downtime migration | Tables too big for one heap |
+| `mongodb` | MongoDB operations at scale: query optimization, sharding, backup and restore, log analysis | Running MongoDB |
+| `redis-valkey` | Operate Redis or Valkey in production: latency, memory pressure, hot keys, CLI incident response, cluster operations, Lua script review | Slow or full Redis/Valkey |
+| `valkey-redis` | Valkey administration: valkey.conf, hardening, Redis OSS 7.2 or earlier to Valkey migration | Configuring or migrating to Valkey |
+| `rabbitmq` | RabbitMQ 4.x operations and topology design, with Quorum Queues and Streams: alarms, partitions, backlogs, dead letters, tuning | Reliable messaging |
+| `rabbitmq-documentdb` | RabbitMQ with Amazon DocumentDB: event-driven service design, exchange and queue setup, schemas, indexes, CDC sync | Message-driven document persistence |
+| `seaweedfs` | SeaweedFS: Master, Volume and Filer servers, Kubernetes operator and CSI driver, erasure coding, tiered storage, S3 API | Self-hosted blob storage |
 
 ### 🔐 Security
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `security-engineering` | AppSec, cloud security, DevSecOps, threat modeling, incident response, IAM | Secure by design, not by accident |
-| `security-review` | Exhaustive line-by-line code security review — OWASP, CWE, credentials, PII leaks, supply chain | The review that catches what others miss |
-| `passkeys` | WebAuthn/Passkey implementation — FIDO2, authenticator types, credential management, UX | Passwordless auth that actually ships |
-| `roles-permissions` | RBAC/ABAC/ReBAC with Casbin, Casdoor, multi-tenant authorization, IDOR prevention | Authorization models that don't explode in production |
+| `security-engineering` | Application and cloud security, DevSecOps, security architecture, threat modeling, compliance, incident response | Designing security in |
+| `security-review` | Evidence-backed security reviews of code, config, CI/CD, dependencies, infrastructure, mobile and AI integrations, with validated findings | Deep repository audits |
+| `passkeys` | FIDO2 and WebAuthn passkeys: registration, authentication, recovery, Conditional UI, synced versus device-bound credentials, IdP/SSO integration | Passwordless login |
+| `roles-permissions` | Authorization with Casbin and Casdoor: RBAC, ABAC, ReBAC, multi-tenant isolation, IDOR and privilege-escalation prevention | Permission models |
 
 ### 💻 Languages & Runtimes
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `bash` | Advanced Bash/shell scripting, text processing, POSIX compliance, process management | Automation scripts that survive the next developer |
-| `go` | Go expert — concurrency patterns, stdlib, testing, performance, idiomatic Go | Writing Go that senior Go engineers won't rewrite |
-| `lua` | Lua scripting — embedding, coroutines, metatables, OOP patterns, Luarocks | Lightweight, embeddable scripting |
-| `go-lua` | Go + Lua integration — embedding scripts, sandboxing, extension systems, gopher-lua | Building scriptable Go applications |
-| `speedtest` | Network speed testing, latency measurement, bandwidth diagnostics, jitter analysis | Understanding what your network is actually doing |
+| `software-engineering` | Backend, frontend, fullstack, mobile, API design, systems architecture, database and performance engineering, language-specific expertise | General production code decisions |
+| `bash` | Bash and shell scripting, text processing, process management, POSIX compliance | Scripts that survive |
+| `go` | Go troubleshooting and scaling: performance, memory and goroutine leaks, govulncheck security audits, modernization | Fixing and hardening Go |
+| `lua` | Lua for embedded systems, game engines and Redis: syntax validation, C API embedding, sandboxing | Writing and securing Lua |
+| `go-lua` | Go and Lua operations: pprof profiling, GOGC/GOMEMLIMIT tuning, goroutine leaks, CGO, Redis Lua scripts, migrations | Go performance work with Lua in the mix |
 
 ### 💼 Business & Operations
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `executive-leadership` | CEO/CTO/CFO strategy, board management, fundraising, org transformation | C-suite decisions with data |
-| `finance` | FP&A, financial modeling, SaaS metrics, fundraising, cash flow, investor materials | Numbers that tell the right story |
-| `hr-people` | Talent acquisition, people ops, org development, compensation, employee experience | Building teams, not just orgs |
-| `legal-compliance` | Corporate law, contracts, IP, GDPR/CCPA, regulatory compliance, risk management | Staying out of trouble |
-| `operations` | Business ops, project management, process optimization, vendor management, excellence | The unsexy work that makes everything work |
-| `product-management` | Product strategy, roadmapping, discovery, prioritization, PRDs, growth | Shipping the right thing |
-| `sales` | B2B sales, sales engineering, account management, RevOps, GTM strategy | Pipeline to close |
-| `customer-support` | Support ops, technical support, knowledge management, escalation workflows, CX | Support that actually helps |
-| `supply-chain` | Procurement, vendor management, supply chain analytics, logistics, strategic sourcing | Getting things from A to B |
-| `accessibility-testing` | WCAG 2.1 AA, ARIA, keyboard navigation, screen reader compatibility, remediation | Accessible by default, not by lawsuit |
+| `executive-leadership` | CEO, CTO, CFO, COO, VP Engineering and Chief of Staff strategy: board management, fundraising, organizational transformation | Executive decisions |
+| `finance` | FP&A, accounting, treasury, financial modeling, SaaS metrics, fundraising, investor materials | Financial planning |
+| `hr-people` | Talent acquisition, people operations, organizational development, compensation and benefits, employee experience, HR analytics | People programs |
+| `legal-compliance` | Corporate law, contracts, IP, GDPR/CCPA data privacy, regulatory compliance, risk management | Legal and compliance groundwork |
+| `operations` | Business operations, project management, process optimization, vendor management, operational excellence | Running the business |
+| `product-management` | Product strategy, roadmapping, discovery, prioritization, PRDs, growth, technical product management | Deciding what to build |
+| `sales` | B2B sales, sales engineering, account management, revenue operations, go-to-market | Pipeline to close |
+| `supply-chain` | Procurement, vendor management, supply chain analytics, logistics, inventory, strategic sourcing | Sourcing and logistics |
 
 ### 🎯 Support, Ticketing & On-call
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `jira-field-schemas` | Jira custom field configuration, schemas, screen layouts, field contexts | Jira that works the way your team thinks |
-| `jira-jsm-oncall` | Jira Service Management on-call setup — schedules, escalations, SLA policies | On-call that respects sleep schedules |
-| `jira-status-workflows` | Jira workflow design — status transitions, validators, post-functions, automation | Workflows people actually follow |
-| `ticket-reports` | Advanced ticket reporting, JQL queries, BI integration, predictive analytics, executive dashboards | Ticket data that drives decisions |
-| `ticket-supreme` | Ticket specification and sprint-ready acceptance criteria — scope, estimation, risk, dependencies | Tickets that don't come back as surprises |
-| `oncall-master-supreme` | Incident management, on-call runbooks, blast radius analysis, postmortems | Incidents resolved, not just closed |
-| `tech-support-ops` | Technical support operations — tooling, escalation paths, SLA management, knowledge workflows | Support at scale without chaos |
+| `customer-support` | Support operations, technical support, knowledge management, support metrics, escalation workflows, customer experience | Support processes |
+| `tech-support-ops` | Sev-1/Sev-2 triage, root cause analysis, blameless post-mortems, SLO/SLI and error-budget tracking, MTTA/MTTR | Critical incident handling |
+| `oncall-master-supreme` | On-call systems: HA/DR, ChatOps war rooms, runbooks and auto-remediation, SLOs, follow-the-sun schedules, postmortems | Running on-call |
+| `jira-field-schemas` | Jira field schemes, field contexts and screen schemes, with checks against the skill's recorded 2026 limits | Jira field architecture |
+| `jira-jsm-oncall` | Jira Service Management SLAs, alert routing, on-call schedules, Edge Connector, CMDB-linked incident workflows, automation rules | JSM alerting and on-call |
+| `jira-status-workflows` | Jira workflow state machines: transitions, conditions, validators, post-functions, workflow properties, ScriptRunner | Jira workflows |
+| `ticket-reports` | Ticket reporting: JQL, SLA and team-performance dashboards, BI loading, predictive analytics, ITIL 4 measurement | Ticket data that informs |
+| `ticket-supreme` | Design and build enterprise ticketing systems: high availability, real-time communication, SLA modeling, security, omnichannel, AI/ML | Building a ticketing system |
 
 ### 🌐 Integrations & APIs
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `gcalendar` | Bulk Google Calendar event validation, duplicate removal, timezone conversion, MCP workflows | Calendar chaos → order |
-| `google-workspace-bot-integration` | Bot commands and workflows across Gmail, Calendar, Sheets, Docs, Drive, Forms, Contacts | Full Workspace automation |
-| `slack` | Slack bot development — Block Kit, webhooks, Bolt framework, slash commands, modals | Slack bots that don't feel like bots |
-| `vonage-voice` | Vonage Voice API — outbound calls, IVR, NCCO, DTMF/ASR, webhooks, call control | Programmable voice, done right |
-| `voip-oncall` | VoIP-based on-call systems — SIP, call routing, escalation trees, failover | On-call that reaches a human |
-| `wikijs` | Wiki.js knowledge management — pages, navigation, API, permissions, theming | Company knowledge that people actually find |
-| `playwright` | Playwright automation — browser testing, E2E workflows, scraping, network interception | Tests that survive a redesign |
-| `vitest` | Vitest unit testing — fast, ESM-native, coverage, mocking, snapshot testing | Unit tests that run before you lose patience |
-| `tomate-pos80` | Tomate POS-80 thermal printer — raw ESC/POS commands, encoding, barcodes, receipt templates | Your AI can now print receipts |
-| `bot` | Build and secure bots on OpenClaw/NemoClaw/OpenShell (channels, plugins, sandboxes) | Bots that have a real conversation |
+| `gcalendar` | Google Calendar via MCP tools: bulk validation, duplicate removal, timezone conversion, scheduling | Calendar cleanup |
+| `google-workspace-bot-integration` | Bot commands and workflows across Gmail, Calendar, Sheets, Slides, Docs, Drive, Forms, Contacts, Tasks, Chat and Events | Workspace bots |
+| `slack` | Slack apps with Bolt or Deno, Block Kit messages, events, slash commands, OAuth, Web API and CLI | Slack apps |
+| `vonage-voice` | Vonage Voice API: outbound calls, NCCO actions, IVR, DTMF/ASR input, answer and event webhooks, REST call control | Programmable voice |
+| `voip-oncall` | VoIP on-call services: IVR incident acknowledgment, WebRTC war rooms, voice alerting with Twilio or Vonage, SIP trunks, telecom compliance | Voice-based on-call |
+| `wikijs` | Wiki.js administration: Git sync, GraphQL content automation, enterprise deployments | Wiki administration |
+| `manus-workflows` | n8n workflow design on its AI agent architecture: scheduling, file handling, messaging patterns, retries and recovery | n8n automations |
+| `tomate-pos80` | Tomate POS-80 thermal receipt printer (MDK-080, MDK-081, MDK-08260): raw print commands, encoding, barcodes and QR codes, receipt templates | Printing receipts |
 
 ### 🧪 Testing & Quality
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `web-tester-supreme` | Comprehensive web testing — functional, visual regression, a11y, performance, client-side security | The test suite that catches everything |
+| `quality-assurance` | Test strategy, test plans, automation frameworks, performance and security testing, AI testing, QA processes | Planning how to test |
+| `playwright` | Playwright E2E: configuration, network mocking, visual regression, multi-browser and mobile matrices, CI, flaky tests | Playwright suites |
+| `vitest` | Vitest 4.1 for Next.js 16 and React 19: mocking (Prisma, Valkey, RabbitMQ), snapshots, test tags, component and hook tests | Unit tests |
+| `web-tester-supreme` | Web E2E for Next.js apps: RBAC validation, degraded-state and network-failure behavior, data visualization and observability checks | App-level web test suites |
+| `accessibility-testing` | Automated accessibility testing with Axe-core and Playwright: WCAG violations, known-issue snapshots, focus, dynamic trees, contrast | Accessibility checks |
 
 ### 🌍 Language Teaching
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `french-teacher` | French language instruction — grammar, vocabulary, conversation, DELF/DALF preparation | Learning French with a patient, knowledgeable teacher |
-| `spanish-teacher` | Spanish language instruction — grammar, vocabulary, conversation, DELE preparation | Learning Spanish without the textbook grind |
+| `french-teacher` | French CEFR level assessment, targeted A1-C2 exercises and reading passages, alignment with Council of Europe descriptors | Teaching French |
+| `spanish-teacher` | Spanish A1-C2: grammar, vocabulary, exercises and quizzes, dialects, cultural competence, curriculum design | Teaching Spanish |
+
+---
+
+## Choosing between overlapping skills
+
+Six groups of skills sit close together. Each skill's own description names its neighbour for the other case; this table is the short version.
+
+| Group | Lanes |
+|:------|:------|
+| Redis and Valkey | `redis-valkey`: a running instance is slow, out of memory, CPU-bound, has hot keys, or a Lua script needs review. `valkey-redis`: writing or hardening the Valkey config file, or migrating from Redis OSS 7.2 or earlier. |
+| DevOps | `devops`: hands-on AWS networking, EKS, Helm, GitOps or CI/CD provisioning and debugging. `devops-infrastructure`: cross-cloud architecture, IaC practice, SRE, platform engineering, FinOps. |
+| Prompts | `prompt`: designing, securing or debugging one prompt system. `prompt-master`: choosing a prompting technique, building RAG pipelines, cutting context size. |
+| Claw runtimes | `openclaw`: deploy or troubleshoot OpenClaw or ZeroClaw. `nemoclaw`: deploy and onboard NVIDIA NemoClaw. `bot`: build or audit bots, plugins and OpenShell sandboxes on top of them. `masterclaw`: the task spans more than one runtime, or the runtime is not yet known. |
+| PostgreSQL and data design | `postgres-15`: operate, tune, upgrade or secure a PostgreSQL 15+ server. `sql-partitioning`: partition or shard very large tables. `database`: engine-agnostic architecture, replication and security across PostgreSQL and MongoDB. |
+| Containers | `docker`: run, debug or harden containers and Compose stacks. `dockerfile`: write, shrink or audit a Dockerfile. |
 
 ---
 
