@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
-Rules: fm-missing fm-name fm-desc link-broken ref-orphan exec-bit
+Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
        manifest-sync count-sync symlink (ERROR); desc-trigger (WARN).
 """
 import argparse
@@ -9,7 +9,15 @@ import os
 import re
 import sys
 
-LINK_RE = re.compile(r"(?:references|scripts|templates|assets)/[^\s)`\"'\]>,;]+")
+_STOP = r"[^\s)`\"'\]>]"
+PATH_RE = re.compile(
+    r"(?:\.\./)+" + _STOP + r"+"
+    r"|skills/[A-Za-z0-9_.-]+/" + _STOP + r"+"
+    r"|(?:references|scripts|templates|assets)/" + _STOP + r"+"
+)
+MDLINK_RE = re.compile(r"\]\(\s*<?([^)\s>]+)")
+SPAN_RE = re.compile(r"`([^`\n]+)`")
+BLOCK_RE = re.compile(r"^[>|][+-]?$")
 SKIP_CHARS = ("*", "<", "{", "$")
 TRIGGER_RE = re.compile(r"use when|use for|triggers", re.I)
 
@@ -21,22 +29,29 @@ def parse_frontmatter(text):
     for i in range(1, len(lines)):
         if lines[i].strip() == "---":
             fm = {}
+            bad = []
             for ln in lines[1:i]:
                 if not ln.strip() or ln.lstrip().startswith("#"):
                     continue
                 m = re.match(r"^([A-Za-z0-9_-]+)\s*:\s*(.*)$", ln)
                 if not m:
+                    bad.append(ln.strip()[:60])
                     continue
                 v = m.group(2).strip()
+                if BLOCK_RE.match(v):
+                    bad.append("%s: %s (block scalar)" % (m.group(1), v))
+                    fm["__block_" + m.group(1)] = v
+                    continue
                 if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
                     v = v[1:-1]
                 fm[m.group(1)] = v
+            fm["__bad"] = bad
             return fm
     return None
 
 
 def read(path):
-    with open(path, encoding="utf-8", errors="replace") as f:
+    with open(path, encoding="utf-8-sig", errors="replace") as f:
         return f.read()
 
 
@@ -71,6 +86,9 @@ def main():
 
     for name in targets:
         base = os.path.join(sdir, name)
+        if os.path.islink(base):
+            add("ERROR", name, "symlink", os.path.relpath(base, root))
+            continue
         # symlinks anywhere inside the skill
         for dp, dns, fns in os.walk(base):
             for n in dns + fns:
@@ -89,8 +107,16 @@ def main():
         if fm.get("name") != name:
             add("ERROR", name, "fm-name",
                 "name %r != directory %r" % (fm.get("name"), name))
+        for b in fm.get("__bad", []):
+            if b.startswith("description:"):
+                add("ERROR", name, "fm-desc", "block scalar not allowed: " + b)
+            else:
+                add("ERROR", name, "fm-syntax",
+                    "frontmatter must be single-line 'key: value': " + b)
         desc = fm.get("description", "")
-        if not desc:
+        if "__block_description" in fm:
+            pass
+        elif not desc:
             add("ERROR", name, "fm-desc", "description absent or empty")
         elif len(desc) > 1024:
             add("ERROR", name, "fm-desc", "description is %d chars (max 1024)" % len(desc))
@@ -99,19 +125,29 @@ def main():
                 "description has no 'use when'/'use for'/'triggers'")
         # links
         seen = set()
-        for m in LINK_RE.finditer(text):
-            tok = m.group(0).rstrip(".:")
-            if any(c in tok for c in SKIP_CHARS) or tok in seen:
+        cands = [m.group(1) for m in MDLINK_RE.finditer(text)]
+        for sm in SPAN_RE.finditer(text):
+            cands.extend(PATH_RE.findall(sm.group(1)))
+        for raw in cands:
+            if "://" in raw:
+                continue
+            pm = PATH_RE.match(raw)
+            if not pm:
+                continue
+            tok = pm.group(0).split("#", 1)[0].rstrip("!?,.;:")
+            if not tok or any(c in tok for c in SKIP_CHARS) or tok in seen:
                 continue
             seen.add(tok)
-            if not os.path.exists(os.path.join(base, tok)):
+            origin = root if tok.startswith("skills/") else base
+            if not os.path.exists(os.path.join(origin, tok)):
                 add("ERROR", name, "link-broken", tok)
         # orphan refs
         refdir = os.path.join(base, "references")
         if os.path.isdir(refdir):
             for dp, _, fns in os.walk(refdir):
                 for fn in sorted(fns):
-                    if fn not in text:
+                    if not re.search(r"(?<![A-Za-z0-9_.-])" + re.escape(fn)
+                                     + r"(?![A-Za-z0-9_-])", text):
                         add("ERROR", name, "ref-orphan",
                             os.path.relpath(os.path.join(dp, fn), base))
         # exec bits
@@ -131,6 +167,10 @@ def main():
         if os.path.isfile(mpath):
             listed = [l.strip() for l in read(mpath).splitlines()
                       if l.strip() and not l.strip().startswith("#")]
+            if len(listed) != len(set(listed)):
+                add("ERROR", "-", "manifest-sync", "skills-list.txt contains duplicate lines")
+            if listed != sorted(listed):
+                add("ERROR", "-", "manifest-sync", "skills-list.txt must be bytewise sorted")
             a, b = set(names), set(listed)
             if a != b:
                 add("ERROR", "-", "manifest-sync",
