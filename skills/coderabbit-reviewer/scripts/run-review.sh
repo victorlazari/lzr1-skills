@@ -216,7 +216,7 @@ if [[ -n $base_commit ]]; then
 fi
 
 config_files=()
-for config_input in "${config_inputs[@]}"; do
+for config_input in ${config_inputs[@]+"${config_inputs[@]}"}; do
   config_file=$(canonical_existing_file "$config_input") || fail "context file is missing, symlinked, or not regular: $config_input"
   case "$config_file" in
     "$repo_root"/*) ;;
@@ -251,7 +251,7 @@ esac
 [[ -n $base_ref ]] && review_cmd+=(--base "$base_ref")
 [[ -n $base_commit ]] && review_cmd+=(--base-commit "$base_commit")
 [[ -n $region ]] && review_cmd+=(--region "$region")
-for config_file in "${config_files[@]}"; do
+for config_file in ${config_files[@]+"${config_files[@]}"}; do
   review_cmd+=(--config "$config_file")
 done
 secret_index=-1

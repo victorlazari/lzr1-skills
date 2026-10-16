@@ -51,13 +51,6 @@ jobs:
           # -I ignores PYTHONPYCACHEPREFIX, so pass the prefix with -X; otherwise
           # __pycache__ lands in skills/ and the packages self-check rejects it.
           python3 -I -X pycache_prefix="$RUNNER_TEMP/pycache" -m compileall -q skills
-      - name: Debug self-checks (temporary)
-        continue-on-error: true
-        run: |
-          for s in coderabbit-reviewer yaml-specialist security-review hermes-agent; do
-            echo "=== $s"; PYTHONDONTWRITEBYTECODE=1 python3 skills/$s/scripts/self_check.py 2>&1 | tail -15; echo "rc=${PIPESTATUS[0]}"
-          done
-          which python3 shasum sha256sum realpath jq shellcheck node || true
       - name: Installer tests
         run: bash tests/test-installer.sh
       - name: Adversarial remediation tests
