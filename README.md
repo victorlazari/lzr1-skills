@@ -59,12 +59,12 @@ Each skill in this arsenal is battle-tested and includes:
 
 ## Parallel Agent Architecture
 
-Some skills describe an optional multi-agent execution protocol: independent work is split across sub-agents, then merged by a synthesis step. The numbers below are counted from the `SKILL.md` and `references/` files in this repository (a skill is listed when its text contains the named mechanism), not from a design document. The remaining skills are single-agent playbooks, and `coderabbit-reviewer`, `yaml-specialist` and `security-review` deliberately use bounded, evidence-first workflows where ordered verification is safer than concurrency.
+Some skills describe an optional multi-agent execution protocol: independent work is split across sub-agents, then merged by a synthesis step. The figures below come from `scripts/pattern-census.py`, which counts, for each mechanism, the skills whose `SKILL.md` or `references/*.md` contain a literal, case-sensitive phrase (run `python3 -I scripts/pattern-census.py` to reproduce them). They are text counts, not a design document. The remaining skills are single-agent playbooks, and `coderabbit-reviewer`, `yaml-specialist` and `security-review` deliberately use bounded, evidence-first workflows where ordered verification is safer than concurrency.
 
 ---
 
 ### Pattern B — Parallel Execution Protocol
-*2 skills · all agents launch at once*
+*2 skills · all agents launch at once · criterion: the phrase "Parallel Execution Protocol"*
 
 `devops-infrastructure` and `legendary-readme` define a **Parallel Execution Protocol**: when several independent domains are involved, every relevant agent launches at the same time, each with the full task context and its own reference file, and a synthesis step merges the results.
 
@@ -84,9 +84,9 @@ Other skills (for example `security-review`, `trivy-scanner`, `web-tester-suprem
 ---
 
 ### Pattern C — Multi-Specialist Spawning
-*16 skills · cross-domain insight*
+*16 skills · cross-domain insight · criterion: at least one of the phrases "Cross-Domain Synthesizer", "Spawn Specialists" or "Multi-Specialist"*
 
-These skills detect every relevant domain and spawn a specialist per domain, then a **Cross-Domain Synthesizer** merges the specialists' outputs and flags contradictions between them. A task touching Go + Postgres + REST gets a Backend Specialist, a DB Specialist and an API Specialist instead of one reference.
+`legal-compliance` and `sales` name their synthesizer after the domain, so they match through "Spawn Specialists" or "Multi-Specialist" rather than "Cross-Domain Synthesizer". These skills detect every relevant domain and spawn a specialist per domain, then a **Cross-Domain Synthesizer** merges the specialists' outputs and flags contradictions between them. A task touching Go + Postgres + REST gets a Backend Specialist, a DB Specialist and an API Specialist instead of one reference.
 
 ```
 BEFORE   Detect domain ──▶ Pick ONE reference ──▶ Work within it
@@ -103,19 +103,29 @@ AFTER    Detect all relevant domains
 ---
 
 ### Pattern A — Adversarial Verification
-*18 skills with a refuter panel · 20 with a consistency validator · 15 with conflict-resolving synthesis*
+*18 skills with a refuter panel · 22 mention a consistency validator · 15 with conflict-resolving synthesis*
 
-Skills that spawn parallel sub-agents add up to three verification steps. The counts differ because not every skill carries every step.
+Skills that spawn parallel sub-agents add up to three verification steps. The counts differ because not every skill carries every step, and each count is a phrase match: "3 independent Refuter Agents", "Consistency Validator" and "actively resolves" respectively.
 
 | Mechanism | Skills | What it does |
 |:----------|:------:|:-------------|
 | **3× Refuter Panel** | 18 | For each significant finding, 3 independent agents try to *refute* it. A finding is confirmed only if at least 2 refuters fail to disprove it, and a contested finding keeps the dissent. |
-| **Consistency Validator** | 20 | Before synthesis, one agent reviews all parallel outputs for contradictions and missing prerequisites. |
+| **Consistency Validator** | 22 | Before synthesis, one agent reviews all parallel outputs for contradictions and missing prerequisites. |
 | **Conflict-resolving synthesis** | 15 | The synthesis step resolves contradictions, orders the plan by prerequisites and calibrates confidence instead of concatenating results. |
 
-**Affected skills:** `bot` · `claude` · `devops` · `frontend-menu-design` · `go` · `k8s-eks` · `mongodb` · `otel-collector` · `playwright` · `prompt` · `prompt-master` · `rabbitmq-documentdb` · `rag` · `redis-valkey` · `sql-partitioning` · `tech-support-ops` · `ticket-reports` · `vitest`
+**3× Refuter Panel (18):** `bot` · `claude` · `devops` · `frontend-menu-design` · `go` · `k8s-eks` · `mongodb` · `otel-collector` · `playwright` · `prompt` · `prompt-master` · `rabbitmq-documentdb` · `rag` · `redis-valkey` · `sql-partitioning` · `tech-support-ops` · `ticket-reports` · `vitest`
 
-The skills above carry the refuter panel. The consistency validator is additionally present in `seaweedfs` and `speedtest`.
+**Consistency Validator (22):** the 18 skills above, plus `french-teacher`, `seaweedfs`, `spanish-teacher` and `speedtest`. `french-teacher` and `spanish-teacher` use the validator for CEFR level and sequencing checks rather than a refuter panel.
+
+**Conflict-resolving synthesis (15):** `claude` · `frontend-menu-design` · `go` · `mongodb` · `otel-collector` · `prompt` · `prompt-master` · `rabbitmq-documentdb` · `rag` · `redis-valkey` · `seaweedfs` · `sql-partitioning` · `tech-support-ops` · `ticket-reports` · `vitest`. Other skills word the same step differently (for example "Actively resolve" in `k8s-eks` and `playwright`) and are not counted.
+
+<!-- pattern-census:begin -->
+parallel-execution-protocol: 2
+multi-specialist-spawning: 16
+refuter-panel: 18
+consistency-validator: 22
+conflict-resolving-synthesis: 15
+<!-- pattern-census:end -->
 
 ---
 
@@ -529,7 +539,7 @@ More: [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [CHANG
 
 ## Scope
 
-This public, MIT-licensed repository does not add Lerian-specific skills; those belong in the ring plugin, and non-public Lerian material must not be submitted here. The existing `lerian-helm` skill was audited and contains no non-public material. See [docs/decisions/0001-lerian-skill-scope.md](docs/decisions/0001-lerian-skill-scope.md).
+This public, MIT-licensed repository does not add Lerian-specific skills; those belong in the ring plugin, and non-public Lerian material must not be submitted here. The existing `lerian-helm` skill was audited with a keyword and pattern search, which found no credentials, internal hostnames, account ids, or personal or customer names; whether the chart conventions it describes are public is the repository owner's confirmation, tracked as an open item in the decision record. See [docs/decisions/0001-lerian-skill-scope.md](docs/decisions/0001-lerian-skill-scope.md).
 
 ---
 

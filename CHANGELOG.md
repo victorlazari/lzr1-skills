@@ -32,7 +32,10 @@ All notable changes to this project are documented here. The format follows
 - Governance: `LICENSE` (MIT), `CONTRIBUTING.md`, `SECURITY.md` and this
   changelog.
 - Decision record `docs/decisions/0001-lerian-skill-scope.md`: no new
-  Lerian-specific skills in this public repo; `lerian-helm` audited.
+  Lerian-specific skills in this public repo; `lerian-helm` passed a keyword
+  and pattern audit (no credentials, internal hostnames, account ids or
+  personal or customer names found); confirmation that its chart conventions
+  are public remains an open item for the repository owner.
 
 - Linter rules `stale-ref` (retired model and version identifiers) and
   `desc-trigger` (every description needs `use when`, `use for` or

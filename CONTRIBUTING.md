@@ -43,7 +43,15 @@ contract. Read its docstring and rules before opening a PR.
 4. When releasing, keep `VERSION` in `install.sh`, the newest released
    `## [x.y.z]` heading in `CHANGELOG.md` and the README line
    `Installer version: x.y.z` identical (`version-sync`).
-5. Run the checks:
+5. When you change a multi-agent mechanism in a skill, run
+   `python3 -I scripts/pattern-census.py` (add `--json` for machine output; it is
+   not a skill script, so it has no row in `tests/script-coverage.tsv`) and update the README
+   block between `<!-- pattern-census:begin -->` and `<!-- pattern-census:end -->`;
+   `readme-patterns` fails when a number in that block differs from the census.
+6. `readme-flags` fails when a `--flag` in the README sections from "Equip Up" to
+   "Update & Remove" is absent from `install.sh`, or when a flag printed by
+   `bash install.sh --help` is not mentioned in the README "Command Reference".
+7. Run the checks:
 
    ```bash
    python3 -I scripts/lint_catalog.py

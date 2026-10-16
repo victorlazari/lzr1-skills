@@ -2,7 +2,7 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync readme-skills version-sync symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
+       manifest-sync count-sync readme-skills version-sync readme-patterns readme-flags symlink stale-ref desc-trigger skill-ref script-untested (ERROR); link-broken-prose (WARN).
 
 stale-ref model ids: any token claude-(fable|opus|sonnet|haiku|mythos)-<digit>... must be
 exactly one of VALID_MODELS, optionally followed by -YYYYMMDD; claude_<digit> and the spaced
@@ -32,11 +32,23 @@ from it. Names elsewhere in the README (patterns, routing prose) are ignored.
 version-sync: VERSION="x.y.z" in install.sh must equal the first "## [x.y.z]" heading of
 CHANGELOG.md that is not [Unreleased], and README.md must contain "Installer version: <VERSION>"
 (every occurrence must carry that version).
+
+readme-patterns: README.md must hold a block between the HTML comments <!-- pattern-census:begin -->
+and <!-- pattern-census:end --> with one "mechanism: N" line per mechanism of
+scripts/pattern-census.py (loaded via importlib, the single source of truth); each N must equal
+the census count for the repo.
+
+readme-flags (static, no network): every --long-flag token in the README from "## Equip Up"
+through the end of the "## Update & Remove" section must appear in install.sh source, and every
+--long-flag printed by `bash install.sh --help` must be mentioned in the README "## Command
+Reference" section.
 """
 import argparse
+import importlib.util
 import os
 import posixpath
 import re
+import subprocess
 import sys
 
 _STOP = r"[^\s)`\"'\]>]"
@@ -74,6 +86,7 @@ STALE_PATTERNS = [
     r"Next\.js 1[0-2](?!\d)", r"Next\.js 13(?!\d)(?!\.[4-9](?!\d))",
 ]
 STALE_RE = re.compile("|".join("(?:%s)" % p for p in STALE_PATTERNS), re.I)
+FLAG_RE = re.compile(r"(?<![A-Za-z0-9-])--[a-z][a-z0-9-]*")
 STALE_EXEMPT = "(historical)"
 STALE_EXTS = (".md", ".yaml", ".yml", ".json", ".sh", ".py", ".txt", ".toml", ".ts",
               ".tsx", ".js", ".mjs", ".html", ".jinja", ".j2")
@@ -442,6 +455,74 @@ def main():
                 if v != ver:
                     add("ERROR", "-", "version-sync",
                         "README.md says Installer version: %s but VERSION=%s" % (v, ver))
+
+    if not args.skill:
+        rp = os.path.join(root, "README.md")
+        rtext = read(rp) if os.path.isfile(rp) else ""
+        cm = re.search(r"<!-- pattern-census:begin -->\n(.*?)<!-- pattern-census:end -->", rtext, re.S)
+        if not cm:
+            add("ERROR", "-", "readme-patterns",
+                "README.md lacks the <!-- pattern-census:begin --> ... <!-- pattern-census:end --> block")
+        else:
+            sys.dont_write_bytecode = True
+            cpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pattern-census.py")
+            spec = importlib.util.spec_from_file_location("pattern_census", cpath)
+            cmod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(cmod)
+            expect = cmod.census(root)
+            have = {}
+            for ln in cm.group(1).splitlines():
+                m = re.match(r"^([a-z-]+): (\d+)$", ln.strip())
+                if m:
+                    have[m.group(1)] = int(m.group(2))
+            for mech, skills in sorted(expect.items()):
+                if mech not in have:
+                    add("ERROR", "-", "readme-patterns", "census block lacks '%s: N'" % mech)
+                elif have[mech] != len(skills):
+                    add("ERROR", "-", "readme-patterns",
+                        "%s: README says %d but census finds %d" % (mech, have[mech], len(skills)))
+            for mech in sorted(set(have) - set(expect)):
+                add("ERROR", "-", "readme-patterns", "census block names unknown mechanism '%s'" % mech)
+
+        ip = os.path.join(root, "install.sh")
+        if os.path.isfile(ip) and rtext:
+            isrc = read(ip)
+            sec, cmd = [], []
+            cur, in_range, past_upd = None, False, False
+            for ln in rtext.splitlines():
+                if re.match(r"^## ", ln):
+                    cur = ln.strip()
+                    if cur == "## Equip Up":
+                        in_range = True
+                    elif in_range and past_upd:
+                        in_range = False
+                    if cur == "## Update & Remove":
+                        past_upd = True
+                if in_range:
+                    sec.append(ln)
+                if cur == "## Command Reference":
+                    cmd.append(ln)
+            if not sec:
+                add("ERROR", "-", "readme-flags", "README.md has no '## Equip Up' section")
+            for fl in sorted(set(FLAG_RE.findall("\n".join(sec)))):
+                if fl not in isrc:
+                    add("ERROR", "-", "readme-flags", "README flag %s does not appear in install.sh" % fl)
+            try:
+                hp = subprocess.run(["bash", ip, "--help"], stdin=subprocess.DEVNULL, capture_output=True,
+                                    text=True, timeout=30, cwd=root)
+                help_out = hp.stdout + hp.stderr
+                if hp.returncode != 0:
+                    add("ERROR", "-", "readme-flags", "install.sh --help exited %d" % hp.returncode)
+            except (OSError, subprocess.SubprocessError) as e:
+                help_out = ""
+                add("ERROR", "-", "readme-flags", "install.sh --help failed: %s" % e)
+            cmdtext = "\n".join(cmd)
+            if not cmd:
+                add("ERROR", "-", "readme-flags", "README.md has no '## Command Reference' section")
+            for fl in sorted(set(FLAG_RE.findall(help_out))):
+                if not re.search(re.escape(fl) + r"(?![A-Za-z0-9-])", cmdtext):
+                    add("ERROR", "-", "readme-flags",
+                        "install.sh --help flag %s not documented in README Command Reference" % fl)
 
     if not args.skill:
         for pr in reg_problems:

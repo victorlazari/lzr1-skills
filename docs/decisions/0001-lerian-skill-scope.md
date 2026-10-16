@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted (2026-10-16). Reversible by the repository owner.
+Accepted (2026-10-16), with one open item for the repository owner (see
+Open items). Reversible by the repository owner.
 
 ## Context
 
@@ -14,7 +15,8 @@ unless the copyright holders decide to do so. This note is a scoping decision,
 not legal advice.
 
 The one Lerian-named skill already present, `skills/lerian-helm/`, was
-audited for non-public material (2026-10-16). Files read: `SKILL.md`,
+audited with a keyword and pattern search for non-public material
+(2026-10-16). Files read: `SKILL.md`,
 `references/complete-reference.md`, `scripts/validate-security.sh`.
 
 Grep patterns used (case-insensitive where marked `-i`), all run recursively
@@ -29,16 +31,26 @@ over `skills/lerian-helm/`:
 - People and customers: `@[a-z0-9-]+\.[a-z]{2,}|gandalf|customer|cliente` (-i). No matches.
 - Local paths and private IPs: `/Users/|/home/|10\.x|192\.168|172\.16-31`. No matches.
 
-Result: no non-public material found; nothing was removed. The only registry
+Result: the patterns above found no credentials, internal hostnames, account
+ids, or personal or customer names; nothing was removed. The only registry
 reference is the public `oci://registry-1.docker.io/bitnamicharts/postgresql`.
+A pattern search cannot show that the chart conventions the skill describes are
+public; that needs the owner's confirmation (see Open items).
 
 ## Decision
 
 - No new Lerian-specific skills are added to this public repository.
-- `lerian-helm` stays, because it documents public Helm and Kubernetes
-  conventions, and is re-audited whenever it changes.
+- `lerian-helm` stays provisionally: the audit found no credentials or
+  identifiers, and it is re-audited whenever it changes. Whether the
+  conventions it documents are public is for the owner to confirm.
 - Candidate Lerian skills belong in the separate ring plugin.
 - Non-public Lerian material must not be submitted here (see `SECURITY.md`).
+
+## Open items
+
+- Repository owner: confirm that the Helm chart conventions described in
+  `skills/lerian-helm/` are public and may be published under MIT. Until
+  then the skill's status rests on the pattern audit only.
 
 ## Consequences
 
