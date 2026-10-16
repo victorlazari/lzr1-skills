@@ -48,15 +48,11 @@ jobs:
       - name: Compile skill Python
         if: runner.os == 'Linux'
         run: |
-          PYTHONPYCACHEPREFIX="$RUNNER_TEMP/pycache" python3 -I -m compileall -q skills
-      - name: Debug coderabbit self-check (temporary)
-        continue-on-error: true
-        run: |
-          PYTHONDONTWRITEBYTECODE=1 python3 skills/coderabbit-reviewer/scripts/self_check.py 2>&1 | tail -40
-          echo rc=${PIPESTATUS[0]}
-          git config --global --list || true
+          # -I ignores PYTHONPYCACHEPREFIX, so pass the prefix with -X; otherwise
+          # __pycache__ lands in skills/ and the packages self-check rejects it.
+          python3 -I -X pycache_prefix="$RUNNER_TEMP/pycache" -m compileall -q skills
       - name: Installer tests
-        run: bash -x tests/test-installer.sh 2>&1 | tail -60; exit ${PIPESTATUS[0]}
+        run: bash tests/test-installer.sh
       - name: Adversarial remediation tests
         run: bash tests/test-adversarial-remediations.sh
 
