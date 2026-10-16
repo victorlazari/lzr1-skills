@@ -1,6 +1,6 @@
 ---
 name: security-engineering
-description: Comprehensive cybersecurity skill covering application security, cloud security, DevSecOps, security architecture, and compliance. Use when performing security reviews, designing secure systems, implementing security controls, conducting threat modeling, or responding to security incidents. Routes deep code review to security-review and incident communication to post-mortem-master.
+description: Comprehensive cybersecurity skill covering application security, cloud security, DevSecOps, security architecture, and compliance. Use when performing security reviews, designing secure systems, implementing security controls, conducting threat modeling, or responding to security incidents. Routes deep code review to security-review and incident post-mortems to tech-support-ops.
 ---
 
 # Security Engineering
@@ -18,8 +18,8 @@ Expert-level cybersecurity covering the full security spectrum: application secu
 
 **Escalation Boundaries:**
 - For exhaustive, line-by-line code security audits, secret scanning, or IaC checks, route to `security-review`.
-- For writing customer-facing incident reports or communication slide decks, route to `post-mortem-master`.
-- For adopting a specific security persona (e.g., penetration-tester) for a broader workflow, route to `ai-teammates`.
+- For customer-facing incident reports and post-mortems, route to `tech-support-ops`.
+- For adopting a specific security persona (e.g., penetration-tester) for a broader workflow, route to a dedicated AI persona skill, if installed.
 
 ## Preconditions
 

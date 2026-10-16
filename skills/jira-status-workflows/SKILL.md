@@ -1,6 +1,6 @@
 ---
 name: jira-status-workflows
-description: Advanced Jira workflow configuration, complex state management, ITSM integration, and troubleshooting.
+description: Advanced Jira workflow configuration, complex state management, ITSM integration, and troubleshooting. Use when designing or auditing Jira workflow state machines, configuring transitions, conditions, validators or post-functions, setting workflow properties, or wiring ScriptRunner or Automation into transitions.
 ---
 
 # Jira Status & Workflows
@@ -13,9 +13,9 @@ Use this skill when you need to:
 - Integrate ScriptRunner (HAPI) or Jira Automation into workflow transitions.
 
 **Cross-Skill Routing:**
-- `jira-jql-search`: Route when the task requires querying issues rather than modifying workflow configurations.
-- `jira-automation-rules`: Route when the task focuses purely on Jira Automation rules rather than core workflow state machines.
-- `jira-project-admin`: Route when the task involves project-level settings (screens, fields, permissions) outside of workflow schemes.
+- A dedicated Jira JQL search skill, if installed: Route when the task requires querying issues rather than modifying workflow configurations.
+- A dedicated Jira automation skill, if installed: Route when the task focuses purely on Jira Automation rules rather than core workflow state machines.
+- A dedicated Jira project administration skill, if installed: Route when the task involves project-level settings (screens, fields, permissions) outside of workflow schemes.
 
 ## Preconditions
 - Identify the target project type (Software vs. JSM) and required states.

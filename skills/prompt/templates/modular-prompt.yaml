@@ -8,7 +8,7 @@ description: "Extracts key entities and summarizes a given text document."
 
 model_config:
   provider: "openai"
-  model: "gpt-4o"
+  model: "<provider-model-id>"  # set to a current model from your provider; do not pin a name that will rot
   temperature: 0.2
   max_tokens: 1024
   top_p: 0.95

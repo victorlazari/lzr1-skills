@@ -121,9 +121,9 @@ Skills that already spawned parallel agents received three additive upgrades:
 |:------|:-------------|:---------|
 | `ai` | Advanced AI architectures (CNNs, Transformers, LLMs), training pipelines, deployment, and production AI security | Building and deploying AI systems end-to-end |
 | `ai-ml-engineering` | ML engineering, MLOps, LLM apps, RAG pipelines, NLP, computer vision, prompt engineering | ML from experimentation to production |
-| `masterclaw` | OpenClaw, NemoClaw & Enterprise Prompt Engineering — multi-agent systems, distributed stream-processing, production ops & incident response | Full-lifecycle expert for the MasterClaw platform |
-| `openclaw` | OpenClaw agent runtime — session management, 3-layer memory, channel workers, WhatsApp/Signal/Telegram, multi-agent orchestration | Building and operating OpenClaw deployments |
-| `nemoclaw` | NemoClaw distributed engine — LSM-tree storage, Raft consensus, stream processing, active-active CRDT replication | Operating NemoClaw clusters at scale |
+| `masterclaw` | Combined OpenClaw + NemoClaw + prompt-architecture playbook | Full-lifecycle expert for the MasterClaw platform |
+| `openclaw` | Deploy and troubleshoot OpenClaw (Node.js) and ZeroClaw (Rust) runtimes | Building and operating OpenClaw deployments |
+| `nemoclaw` | NVIDIA NemoClaw deployment, onboarding and credential handling | Operating NemoClaw clusters at scale |
 | `manus` | Manus AI agent framework — task automation, multi-step workflows, tool orchestration, autonomous agents | Building Manus-powered automation |
 | `manus-workflows` | Manus workflow design patterns — parallel execution, state management, agent coordination, error recovery | Designing complex Manus workflow graphs |
 | `hermes-agent` | NousResearch Hermes Agent operations — discovery-first setup, providers, tools, memory, skills, automation, gateways, integrations, extensions, production hardening, offline preflight, and 98-page official-source provenance | Installing, configuring, auditing, troubleshooting, extending, or safely operating Hermes Agent |
@@ -138,8 +138,8 @@ Skills that already spawned parallel agents received three additive upgrades:
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `prompt-master` | Prompt engineering (CoT, ToT, ReAct, DSPy), RAG pipelines, model-specific tuning for Claude & GPT | Squeezing every token of performance |
-| `prompt` | Core prompt design, optimization, and structuring best practices | Getting cleaner, more reliable AI outputs |
+| `prompt-master` | Prompting techniques, RAG pipelines, context-size reduction | Squeezing every token of performance |
+| `prompt` | Design, harden and debug prompts and prompt systems | Getting cleaner, more reliable AI outputs |
 | `claude` | Claude API/SDK integration — tool use, multi-turn, streaming, MCP, caching, computer use | Building Claude-powered applications |
 | `openai` | OpenAI API integration — function calling, Assistants API, fine-tuning, vision | Building OpenAI-powered applications |
 | `rag` | RAG architectures — chunking strategies, embedding models, retrieval patterns, reranking, evaluation | Knowledge-grounded AI applications |
@@ -167,10 +167,10 @@ Skills that already spawned parallel agents received three additive upgrades:
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `devops-infrastructure` | AWS/GCP/Azure, Kubernetes, CI/CD, Terraform, SRE, networking, database ops | Infra that doesn't page you at 3am |
-| `devops` | CI/CD pipelines, deployment automation, GitOps, infrastructure as code | Streamlining the path from commit to production |
-| `docker` | Docker containerization — images, Compose, networking, volumes, multi-arch | Containers that actually work in prod |
-| `dockerfile` | Dockerfile authoring — multi-stage builds, layer optimization, hardening, best practices | Lean, secure, reproducible images |
+| `devops-infrastructure` | Cross-cloud architecture, IaC, SRE, platform engineering, FinOps | Infra that doesn't page you at 3am |
+| `devops` | Hands-on AWS/EKS/Helm/GitOps/VPC provisioning and troubleshooting | Streamlining the path from commit to production |
+| `docker` | Run and operate containers and Compose; hardening and troubleshooting | Containers that actually work in prod |
+| `dockerfile` | Author and optimize Dockerfiles (multi-stage, BuildKit, hardening) | Lean, secure, reproducible images |
 | `k8s-eks` | Kubernetes on AWS EKS — workloads, networking, IAM, autoscaling, node groups | Running K8s without the PhD |
 | `lerian-helm` | Lerian platform Helm chart engineering with strict Lerian conventions and security patterns | Lerian-compliant Helm deployments |
 | `cron-master` | Cron across local and Docker environments — Supercronic, Ofelia, host-to-container patterns | Scheduled tasks that actually run |
@@ -182,14 +182,14 @@ Skills that already spawned parallel agents received three additive upgrades:
 
 | Skill | What it does | Best for |
 |:------|:-------------|:---------|
-| `database` | Database design, SQL, indexing, query optimization, migrations, normalization | Getting the schema right the first time |
-| `postgres-15` | PostgreSQL 15 expert — advanced queries, partitioning, tuning, replication, logical decoding | High-performance Postgres at scale |
+| `database` | Engine-agnostic DB design and security (PostgreSQL and MongoDB) | Getting the schema right the first time |
+| `postgres-15` | PostgreSQL 15+ operations, tuning, upgrades, DR and security | High-performance Postgres at scale |
 | `mongodb` | MongoDB — schema design, aggregation pipelines, indexing, Atlas, transactions | Document-model application data |
-| `redis-valkey` | Redis/Valkey — data structures, caching, pub/sub, Lua scripting, Sentinel, clustering | Fast data that lives at the edge of your stack |
-| `valkey-redis` | Valkey/Redis open-source fork patterns — migration, compatibility, extended commands | Moving from Redis to Valkey |
+| `redis-valkey` | Operate and troubleshoot Redis/Valkey: latency, memory, hot keys, Lua | Fast data that lives at the edge of your stack |
+| `valkey-redis` | Valkey config (valkey.conf) and Redis OSS to Valkey migration | Moving from Redis to Valkey |
 | `rabbitmq` | RabbitMQ — exchanges, queues, routing, dead letters, shovel, clustering | Reliable async message delivery |
 | `rabbitmq-documentdb` | RabbitMQ + DocumentDB integration — event-sourcing patterns, consumer groups, idempotency | Message-driven document persistence |
-| `sql-partitioning` | PostgreSQL table partitioning — range, list, hash, declarative, constraint exclusion | Tables that don't grind to a halt at 100M rows |
+| `sql-partitioning` | Partitioning and sharding design for large SQL tables | Tables that don't grind to a halt at 100M rows |
 | `seaweedfs` | SeaweedFS distributed storage — volumes, topology, S3 API, tiered storage, erasure coding | Cheap, scalable blob storage on your own infra |
 
 ### 🔐 Security
@@ -251,7 +251,7 @@ Skills that already spawned parallel agents received three additive upgrades:
 | `playwright` | Playwright automation — browser testing, E2E workflows, scraping, network interception | Tests that survive a redesign |
 | `vitest` | Vitest unit testing — fast, ESM-native, coverage, mocking, snapshot testing | Unit tests that run before you lose patience |
 | `tomate-pos80` | Tomate POS-80 thermal printer — raw ESC/POS commands, encoding, barcodes, receipt templates | Your AI can now print receipts |
-| `bot` | Bot development patterns — webhooks, state machines, conversational flows, NLP integration | Bots that have a real conversation |
+| `bot` | Build and secure bots on OpenClaw/NemoClaw/OpenShell (channels, plugins, sandboxes) | Bots that have a real conversation |
 
 ### 🧪 Testing & Quality
 

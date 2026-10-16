@@ -1,15 +1,17 @@
 ---
 name: valkey-redis
-description: Specialist skill for managing Valkey (the open-source Redis fork), configuring valkey.conf, and executing safe migrations from Redis OSS to Valkey.
+description: "Valkey-specific administration: configuring valkey.conf, securing Valkey, and migrating Redis OSS 7.2 or earlier to Valkey. Use when editing valkey.conf, deploying or hardening Valkey, or planning and validating a Redis OSS to Valkey migration. Not for day-to-day latency, memory, hot-key or Lua troubleshooting: use `redis-valkey`."
 ---
 
 # Valkey Database Administration and Migration Skill
+
+**Related skills:** `redis-valkey`, `database`
 
 ## Scope and Triggers
 
 Use this skill when you need to architect, deploy, configure, troubleshoot, or secure Valkey databases, or when you need to migrate an existing Redis OSS deployment to Valkey. Valkey is an open-source, high-performance key-value data store that originated as a fork of Redis OSS 7.2.4.
 
-**Non-goals:** Do not use this skill for managing legacy Redis deployments prior to 7.2.4 or Redis Enterprise. For those, route to the `redis-admin` skill. Do not treat Valkey as a "key management system" (KMS) for Redis; Valkey is the database itself.
+**Non-goals:** Do not use this skill for managing legacy Redis deployments prior to 7.2.4 or Redis Enterprise. For those, route to the `redis-valkey` skill. Do not treat Valkey as a "key management system" (KMS) for Redis; Valkey is the database itself.
 
 ## Preconditions
 

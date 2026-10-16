@@ -53,7 +53,7 @@ For the STT layer, ElevenLabs Scribe v2 Realtime is recommended for its ultra-lo
 ## Fast LLM Generation
 
 The LLM is the brain of the agent. To minimize TTFT:
-*   **Model Choice**: Use fast, smaller models like `gpt-4o-mini` or `gpt-5-mini`.
+*   **Model Choice**: Use a fast, small LLM (check your provider's current model list).
 *   **Gateway/Provider**: Route requests through low-latency inference providers like Groq to achieve extremely fast token generation rates (~1s total response generation time).
 *   **Streaming**: **Crucially, stream the LLM output.** Do not wait for the entire response to generate.
 

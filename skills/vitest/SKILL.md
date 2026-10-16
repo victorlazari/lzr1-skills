@@ -1,6 +1,6 @@
 ---
 name: vitest
-description: Comprehensive Vitest 4.1 unit testing specialist for modern full-stack environments (Next.js 16, React 19). Covers advanced mocking, snapshot testing, test tags, and complex state management.
+description: "Vitest 4.1 unit testing specialist for modern full-stack environments (Next.js 16, React 19), covering advanced mocking, snapshot testing, test tags and complex state management. Use when configuring Vitest, mocking Prisma, Valkey or RabbitMQ, testing React or Next.js components and hooks, writing snapshots, or debugging failing tests, timeouts and coverage."
 ---
 
 # Vitest Unit Testing Specialist

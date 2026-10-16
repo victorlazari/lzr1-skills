@@ -73,8 +73,8 @@ Expert-level product management covering strategy, discovery, delivery, growth, 
 ## Cross-Skill Routing
 
 - `software-engineering` — route when the task requires writing code, designing system architecture, or implementing technical solutions.
-- `ui-ux-design` — route when the task requires creating visual designs, wireframes, or detailed user interface specifications.
-- `data-analysis` — route when the task requires complex statistical analysis, writing SQL queries, or building data pipelines beyond basic product metrics.
+- `design-ux` — route when the task requires creating visual designs, wireframes, or detailed user interface specifications.
+- `data-analytics` — route when the task requires complex statistical analysis, writing SQL queries, or building data pipelines beyond basic product metrics.
 
 ---
 

@@ -42,7 +42,7 @@ Never depend on a single external provider in a live conversation. Implement ord
 | --- | --- | --- |
 | STT | ElevenLabs `scribe_v2_realtime` | OpenAI `whisper-1`, Groq `whisper-large-v3-turbo` |
 | TTS | ElevenLabs `eleven_multilingual_v2` (language-aware voice IDs) | OpenAI `tts-1` |
-| LLM | Gateway → `gpt-5-mini` (Groq fast path) | Direct OpenAI API |
+| LLM | Gateway → a fast, small LLM (check your provider's current model list; Groq fast path) | Direct OpenAI API |
 
 For TTS, keep a mapping of language code → voice ID so the bot replies in the language of the conversation. Detect language from the STT output metadata.
 

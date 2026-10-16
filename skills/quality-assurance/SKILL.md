@@ -13,7 +13,7 @@ Expert-level QA covering test strategy, automation, performance testing, securit
 - **Triggers**: Use when the user asks to design a test strategy, build an automation framework, plan performance/security/AI testing, or establish QA processes.
 - **Out of Scope / Escalation**:
   - For deep, line-by-line code security review or vulnerability scanning, route to `security-review`.
-  - For prolonged interaction acting as a specific QA persona, route to `ai-teammates`.
+  - For prolonged interaction acting as a specific QA persona, route to a dedicated AI persona skill, if installed.
 
 ## Preconditions
 

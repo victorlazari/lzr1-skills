@@ -1,6 +1,6 @@
 ---
 name: voip-oncall
-description: Comprehensive mastery of VoIP On-Call Services, including advanced IVR, WebRTC integration, telecom regulations, programmable voice APIs, and cost optimization.
+description: "VoIP on-call services specialist covering IVR, WebRTC, telecom regulations, programmable voice APIs and cost optimization. Use when building IVR incident acknowledgment, WebRTC war rooms, voice alerting with Twilio or Vonage, handling A2P 10DLC, GDPR or STIR/SHAKEN compliance, or configuring SIP trunks and escalations."
 ---
 
 # VoIP On-Call Services Specialist

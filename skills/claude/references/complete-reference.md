@@ -1,6 +1,6 @@
 # Complete Reference: Mastering Claude Models
 
-This document consolidates and enhances the comprehensive knowledge required to master Claude models (Fable 5, Mythos 5, Opus 5, Sonnet 5), including API usage, system prompt engineering, tool integrations, vision capabilities, extended cognitive tasks, prompt caching strategies, Artifacts, CLI usage, configuration schemas, advanced architecture, security auditing, and troubleshooting.
+This document consolidates and enhances the comprehensive knowledge required to master Claude models (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5), including API usage, system prompt engineering, tool integrations, vision capabilities, extended cognitive tasks, prompt caching strategies, Artifacts, CLI usage, configuration schemas, advanced architecture, security auditing, and troubleshooting.
 
 **Verified against upstream: 2026-08-07**
 
@@ -26,10 +26,10 @@ This document consolidates and enhances the comprehensive knowledge required to 
 
 Anthropic offers a family of Claude models, each optimized for different use cases:
 
-- **Claude Fable 5:** One of Anthropic's most capable models, designed for complex reasoning and creative tasks.
-- **Claude Mythos 5:** Another highly capable model, excelling in deep analysis and nuanced understanding.
-- **Claude Opus 5:** A powerful model for a wide range of tasks, balancing performance and capability.
-- **Claude Sonnet 5:** Optimized for speed and efficiency, ideal for high-throughput applications.
+- **Claude Fable 5.1 (`claude-fable-5-1`):** One of Anthropic's most capable models, designed for complex reasoning and creative tasks.
+- **Claude Opus 5.5 (`claude-opus-5-5`):** A powerful model for a wide range of tasks, balancing performance and capability.
+- **Claude Sonnet 5.5 (`claude-sonnet-5-5`):** Balanced speed and capability for general production workloads.
+- **Claude Haiku 5.5 (`claude-haiku-5-5`):** Fastest and smallest tier, ideal for high-throughput, low-latency applications.
 
 ### Key Attributes
 
@@ -68,7 +68,7 @@ anthropic-version: 2023-06-01
 
 A typical request includes the following parameters:
 
-- `model`: Specifies the model name (e.g., `claude-fable-5`, `claude-mythos-5`, `claude-opus-5`, `claude-sonnet-5`).
+- `model`: Specifies the model name (e.g., `claude-fable-5-1`, `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`).
 - `messages`: An array of message objects containing the conversation history.
 - `max_tokens`: Limits the number of tokens generated.
 - `temperature`: Controls randomness in output (0 to 1).
@@ -78,7 +78,7 @@ A typical request includes the following parameters:
 
 ```json
 {
-  "model": "claude-sonnet-5",
+  "model": "claude-sonnet-5-5",
   "max_tokens": 1024,
   "messages": [
     {"role": "user", "content": "Explain the significance of the Turing Test in AI development."}
@@ -107,7 +107,7 @@ The API returns a JSON object including:
       "text": "The Turing Test, proposed by Alan Turing in 1950, is a benchmark for determining whether a machine can demonstrate intelligent behavior indistinguishable from a human..."
     }
   ],
-  "model": "claude-sonnet-5",
+  "model": "claude-sonnet-5-5",
   "stop_reason": "end_turn",
   "stop_sequence": null,
   "usage": {
@@ -134,7 +134,7 @@ System prompts are foundational instructions that define the behavior, tone, and
 
 ```json
 {
-  "model": "claude-opus-5",
+  "model": "claude-opus-5-5",
   "max_tokens": 1024,
   "system": "You are an expert legal advisor specializing in intellectual property law. Provide concise and accurate responses.",
   "messages": [
@@ -162,7 +162,7 @@ Claude's tool use capabilities enable the invocation of external APIs or custom 
 
 ```json
 {
-  "model": "claude-fable-5",
+  "model": "claude-fable-5-1",
   "max_tokens": 1024,
   "tools": [
     {
@@ -207,7 +207,7 @@ Claude's tool use capabilities enable the invocation of external APIs or custom 
 
 ```json
 {
-  "model": "claude-fable-5",
+  "model": "claude-fable-5-1",
   "max_tokens": 1024,
   "messages": [
     {"role": "user", "content": "What is the weather like in Paris?"},
@@ -250,7 +250,7 @@ Vision inputs are included in the `messages` array as `image` blocks, encoded in
 
 ```json
 {
-  "model": "claude-mythos-5",
+  "model": "claude-opus-5-5",
   "max_tokens": 1024,
   "messages": [
     {
@@ -304,7 +304,7 @@ To use prompt caching, add a `cache_control` object to the blocks you want to ca
 
 ```json
 {
-  "model": "claude-sonnet-5",
+  "model": "claude-sonnet-5-5",
   "max_tokens": 1024,
   "system": [
     {

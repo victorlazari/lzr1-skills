@@ -21,7 +21,7 @@ Expert-level IT administration covering endpoint management, identity and access
 
 **Escalation Boundaries:**
 - For deep application or code-level security analysis, route to `security-review`.
-- For building complex automated IT workflows or background processes, route to `automation-and-scheduling`.
+- For building complex automated IT workflows or background processes, route to a dedicated automation and scheduling skill, if installed.
 
 ## Preconditions
 

@@ -1,6 +1,6 @@
 ---
 name: rag
-description: "Expert in Retrieval-Augmented Generation (RAG) architecture, including Adaptive RAG, agentic workflows, document chunking, embeddings, vector databases, and similarity search."
+description: "Retrieval-Augmented Generation architecture, including Adaptive and agentic RAG, chunking, embeddings, vector databases, and hybrid retrieval. Use when designing or tuning a RAG pipeline, choosing a vector store or embedding model, fixing hallucinations or irrelevant retrieval, implementing chunking or hybrid BM25 search, or auditing a RAG system for prompt injection and data privacy."
 ---
 
 # Retrieval-Augmented Generation (RAG) Specialist
@@ -18,7 +18,7 @@ Use this skill when you need to:
 - Set up continuous data ingestion pipelines or automated updates.
 
 **Cross-Skill Routing:**
-- `automation-and-scheduling`: Route when the task requires setting up continuous data ingestion pipelines or automated updates.
+- A dedicated automation and scheduling skill, if installed: Route when the task requires setting up continuous data ingestion pipelines or automated updates.
 - `security-review`: Route when the task requires a deep security audit of the RAG system, beyond basic access control and prompt injection mitigation.
 
 ## Preconditions

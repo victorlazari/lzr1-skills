@@ -1,6 +1,6 @@
 ---
 name: ticket-supreme
-description: Advanced architecture and implementation guide for enterprise-grade ticketing and issue-tracking systems, focusing on high availability, real-time communication, SLA management, security, omnichannel integration, and AI/ML capabilities.
+description: "Architecture and implementation guide for enterprise ticketing and issue-tracking systems covering high availability, real-time communication, SLA management, security, omnichannel integration and AI/ML. Use when designing or building a ticketing system, modeling SLAs and workflows, adding real-time updates or omnichannel intake, or reviewing ticketing architecture."
 ---
 
 # Ticket System Supreme Specialist
@@ -74,6 +74,6 @@ Use parallel work only for independent dimensions. Define inputs, schemas, confl
 | Multiple AI/ML models to train | AI/ML Engineer | Parallel development of ticket deflection, categorization, and sentiment analysis models |
 
 **Cross-skill routing:**
-- `ai-teammates`: Route when specialized professional roles are needed for parallel execution.
-- `automation-and-scheduling`: Route when implementing automated ticket categorization, SLA timers, or webhook event handling.
+- A dedicated AI persona skill, if installed: Route when specialized professional roles are needed for parallel execution.
+- A dedicated automation and scheduling skill, if installed: Route when implementing automated ticket categorization, SLA timers, or webhook event handling.
 - `security-review`: Route when validating application code against security breaches, logical flaws, or AI-specific risks.

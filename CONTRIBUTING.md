@@ -8,7 +8,9 @@ contract. Read its docstring and rules before opening a PR.
 
 - `skills/<name>/SKILL.md` exists, with frontmatter containing `name`
   (matching the directory) and `description`.
-- The description should say when to use the skill ("Use when ...").
+- The description must say when to use the skill: it has to contain
+  `use when`, `use for` or `triggers` (case-insensitive), or the catalog
+  linter fails with `desc-trigger`.
 - Every file under `references/`, `scripts/`, `templates/` and `assets/` is
   named in `SKILL.md`, and every path `SKILL.md` names exists.
 - Scripts (`.sh`, `.py`) are executable (`chmod +x`, then

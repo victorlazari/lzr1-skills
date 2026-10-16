@@ -1,9 +1,11 @@
 ---
 name: docker
-description: Advanced Docker operations, multi-platform builds, security hardening, and production troubleshooting.
+description: "Running and operating containers and Docker Compose: Buildx multi-platform builds, runtime security hardening, Docker Scout scanning, and container networking, storage and performance troubleshooting. Use when a container or Compose stack must be run, debugged or hardened. Not for authoring or optimizing a Dockerfile itself: use `dockerfile`."
 ---
 
 # Docker Super Specialist
+
+**Related skills:** `dockerfile`, `trivy-scanner`, `security-review`
 
 ## Scope and Triggers
 Use this skill when you need to:

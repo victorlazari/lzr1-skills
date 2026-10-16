@@ -1,6 +1,6 @@
 ---
 name: rabbitmq
-description: Advanced RabbitMQ 4.x operations, troubleshooting, and architecture design focusing on Quorum Queues and Streams.
+description: "RabbitMQ 4.x operations, troubleshooting, and topology design, focused on Quorum Queues and Streams. Use when diagnosing RabbitMQ memory or disk alarms, partitions, or message backlogs, designing quorum queue, stream, or dead-letter topologies, tuning throughput or latency, or auditing cluster TLS and RBAC. Not for deploying new instances or legacy mirrored queues."
 ---
 
 # RabbitMQ Operations Specialist
@@ -17,8 +17,8 @@ This skill provides comprehensive expertise in managing, troubleshooting, and op
 - Perform security audits on RabbitMQ clusters (TLS, RBAC).
 
 **Do NOT use this skill for:**
-- Building new event-driven applications or background workers (route to `automation-and-scheduling`).
-- Deploying a new RabbitMQ instance via Docker or systemd (route to `persistent-computing`).
+- Building new event-driven applications or background workers (route to a dedicated automation and scheduling skill, if installed).
+- Deploying a new RabbitMQ instance via Docker or systemd (route to a dedicated persistent-hosting and heavy-compute skill, if installed).
 - Managing legacy Classic Mirrored Queues or Classic Queue version 1 (CQv1).
 
 ## Preconditions and Source Freshness

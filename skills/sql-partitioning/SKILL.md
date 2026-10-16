@@ -1,9 +1,11 @@
 ---
 name: sql-partitioning
-description: Advanced SQL partitioning, sharding, query optimization, and troubleshooting for high-scale production databases.
+description: "Partitioning and sharding design for very large SQL tables: declarative partitioning, partition pruning, pg_partman, migrating unpartitioned tables, and tuning for partitioned workloads. Use when a table is too large for one heap, partition pruning fails, or an unpartitioned table must be migrated with no downtime. Not for general PostgreSQL operations and tuning: use `postgres-15`."
 ---
 
 # SQL Partitioning and Sharding Specialist
+
+**Related skills:** `postgres-15`, `database`
 
 ## When to Use
 
@@ -124,6 +126,6 @@ The synthesis step actively resolves rather than aggregates:
 
 ## Cross-Skill Routing
 
-- `finance-pro-playbooks` — route when task involves financial data modeling or reporting
+- `finance` — route when task involves financial data modeling or reporting
 - `security-review` — route when task involves database security, access control, or auditing
-- `automation-and-scheduling` — route when task involves automated partition management or scheduled maintenance
+- `cron-master` — route when task involves automated partition management or scheduled maintenance

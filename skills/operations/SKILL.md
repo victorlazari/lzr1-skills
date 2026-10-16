@@ -20,8 +20,8 @@ Expert-level operations covering business operations, project management, proces
 - Scaling operations for growth
 
 **Do not use this skill for:**
-- Financial modeling, valuation, or detailed financial analysis (route to `finance-pro-playbooks`)
-- Building automated workflows, integrations, or scheduled tasks (route to `automation-and-scheduling`)
+- Financial modeling, valuation, or detailed financial analysis (route to `finance`)
+- Building automated workflows, integrations, or scheduled tasks (route to a dedicated automation and scheduling skill, if installed)
 
 ## Preconditions
 

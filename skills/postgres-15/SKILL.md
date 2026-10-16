@@ -1,9 +1,11 @@
 ---
 name: postgres-15
-description: Advanced PostgreSQL 15+ Operations and Tech Support Guide for managing massive datasets, high concurrency, and complex operational requirements.
+description: "PostgreSQL 15+ production operations and tuning: autovacuum, memory settings, PgBouncer, lock contention, major upgrades, PITR and disaster recovery, RBAC, RLS and pgaudit. Use when operating, tuning, upgrading or securing a PostgreSQL 15+ server. Not for partitioning and sharding design: use `sql-partitioning`; not for engine-agnostic schema and architecture design: use `database`."
 ---
 
 # PostgreSQL 15+ Specialist
+
+**Related skills:** `sql-partitioning`, `database`
 
 ## Scope and Triggers
 
@@ -16,7 +18,7 @@ Use this skill when dealing with PostgreSQL 15+ in production environments, spec
 - Conducting comprehensive security audits, managing Role-Based Access Control (RBAC), Row-Level Security (RLS), and configuring `pgaudit`.
 
 **Escalation Boundaries:**
-- Route to `automation-and-scheduling` when the user needs to set up recurring maintenance tasks like `pg_partman` partition creation or `pg_repack` runs.
+- Route to `cron-master` when the user needs to set up recurring maintenance tasks like `pg_partman` partition creation or `pg_repack` runs.
 - Route to `security-review` when the user needs a comprehensive security audit of the application code interacting with the database, beyond just the database configuration.
 
 ## Preconditions

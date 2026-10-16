@@ -1,9 +1,11 @@
 ---
 name: nemoclaw
-description: NVIDIA NemoClaw Platform Specialist for enterprise deployment, guided onboarding, and secure credential handling.
+description: "NVIDIA NemoClaw platform deployment, guided onboarding, inference provider setup and secure credential handling. Use when deploying NemoClaw on DGX, WSL or Linux/macOS, onboarding it with the interactive installer, or handling its credentials safely. Not for OpenClaw or ZeroClaw runtime operations: use `openclaw`; not for work spanning both runtimes: use `masterclaw`."
 ---
 
 # NemoClaw Guide
+
+**Related skills:** `openclaw`, `masterclaw`, `bot`
 
 ## Scope and Triggers
 

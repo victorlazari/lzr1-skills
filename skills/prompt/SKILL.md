@@ -1,9 +1,11 @@
 ---
 name: prompt
-description: Advanced prompt engineering, prompt architecture, and prompt system troubleshooting. Use when designing, optimizing, securing, or troubleshooting LLM prompts and prompt-based systems.
+description: "Designing, hardening and debugging prompts and prompt systems: prompt architecture, injection and jailbreak defence, token and caching optimization, schemas and templates, and diagnosing wrong or slow responses. Use when a prompt or prompt-based system must be designed, secured, optimized or troubleshot. Not for choosing prompting techniques, building RAG pipelines or shrinking context size: use `prompt-master`."
 ---
 
 # Prompt Engineering Specialist
+
+**Related skills:** `prompt-master`, `rag`, `masterclaw`
 
 ## When to Use
 

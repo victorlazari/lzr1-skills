@@ -1,13 +1,13 @@
 ---
 name: accessibility-testing
-description: Execute automated accessibility testing with Axe-core/Playwright, manage known issues via snapshots, and validate dynamic trees, focus, and contrast.
+description: Execute automated accessibility testing with Axe-core and Playwright, manage known issues via snapshots, and validate dynamic trees, focus, and contrast. Use when asked to run an axe scan, check WCAG violations in a web page or component, track known a11y issues, or verify color contrast and focus management.
 ---
 
 # Accessibility Testing
 
 ## Scope and Triggers
 Use this skill to perform automated accessibility testing using `@axe-core/playwright`, manage known accessibility issues via snapshot tracking, and validate complex UI patterns (focus management, dynamic trees, color contrast).
-**Do not use** for general end-to-end testing (use `playwright-testing`) or deep manual WCAG audits (use `wcag-auditor`).
+**Do not use** for general end-to-end testing (use `playwright`) or deep manual WCAG audits (use a dedicated manual WCAG audit skill, if installed).
 
 ## Preconditions
 - Target application must be accessible via URL or local server.

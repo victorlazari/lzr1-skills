@@ -140,9 +140,9 @@ Meta's SAM 2 (2024) provides:
 
 | Model | Capabilities | Use Case |
 |---|---|---|
-| GPT-4o | Image understanding, OCR, reasoning | General vision tasks |
-| Claude 3.5 Sonnet | Document analysis, charts, diagrams | Document processing |
-| Gemini 1.5 Pro | Multimodal reasoning | Complex visual QA |
+| OpenAI multimodal flagship (check the provider's current model list) | Image understanding, OCR, reasoning | General vision tasks |
+| Claude Sonnet 5.5 (`claude-sonnet-5-5`) | Document analysis, charts, diagrams | Document processing |
+| Google Gemini Pro tier (check the provider's current model list) | Multimodal reasoning | Complex visual QA |
 | LLaVA | Open-source VLM | Self-hosted vision |
 | CLIP | Image-text alignment | Zero-shot classification, search |
 | Florence-2 | Multiple vision tasks | Unified vision model |

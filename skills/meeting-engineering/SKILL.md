@@ -1,6 +1,6 @@
 ---
 name: meeting-engineering
-description: "Build and deploy live Google Meet virtual assistants using Playwright, PulseAudio, and low-latency STT/LLM/TTS pipelines."
+description: "Live Google Meet virtual assistants built with Playwright, PulseAudio, and low-latency STT/LLM/TTS pipelines. Use when building, debugging, or deploying a bot that joins Google Meet and talks in real time, routing audio with PulseAudio and Xvfb, or tuning voice pipeline latency. Not for general Playwright automation (see playwright)."
 license: Complete terms in LICENSE.txt
 ---
 
@@ -10,7 +10,7 @@ Build high-performance virtual assistants that join Google Meet as live particip
 
 ## Scope and Triggers
 Use this skill when building, debugging, or deploying a Google Meet virtual assistant that requires real-time voice participation, Playwright automation, PulseAudio routing, or low-latency STT/LLM/TTS pipelines.
-Do not use for general Playwright automation outside of Google Meet (route to `playwright-automation`) or general calendar/task scheduling (route to `automation-and-scheduling`).
+Do not use for general Playwright automation outside of Google Meet (route to `playwright`) or general calendar/task scheduling (route to a dedicated automation and scheduling skill, if installed).
 
 ## Preconditions
 - Target environment must support Xvfb and PulseAudio.

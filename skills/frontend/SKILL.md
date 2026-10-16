@@ -1,6 +1,6 @@
 ---
 name: frontend
-description: Advanced Frontend Specialist Guide covering React, Next.js App Router, Server Components, TypeScript, Tailwind CSS, State Management, Testing & Performance.
+description: Advanced Frontend Specialist Guide covering React, Next.js App Router, Server Components, TypeScript, Tailwind CSS, State Management, Testing & Performance. Use when building, auditing, or optimizing a React or Next.js frontend, choosing state management, fixing rendering or bundle performance, or adding frontend tests.
 ---
 
 # Frontend Specialist Skill
@@ -61,6 +61,6 @@ Consult `references/source-map.md` for canonical URLs and verification dates of 
 
 ## Cross-Skill Routing
 - Route to `security-review` when performing deep security audits or vulnerability assessments.
-- Route to `webdev-readme-fullstack` when initializing or configuring a fullstack webdev project.
-- Route to `webdev-readme-mobile` when initializing or configuring a mobile app project.
-- Route to `webdev-readme-static` when initializing or configuring a static webdev project.
+- Route to a dedicated fullstack project scaffolding skill, if installed when initializing or configuring a fullstack webdev project.
+- Route to a dedicated mobile project scaffolding skill, if installed when initializing or configuring a mobile app project.
+- Route to a dedicated static site scaffolding skill, if installed when initializing or configuring a static webdev project.

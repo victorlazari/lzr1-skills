@@ -18,8 +18,8 @@ Choose models based on task complexity, latency requirements, cost constraints, 
 
 | Model Tier | Use Case | Examples | Cost |
 |---|---|---|---|
-| Frontier (reasoning) | Complex analysis, architecture, research | Claude 3.5 Sonnet, GPT-4o, Gemini 1.5 Pro | Highest |
-| Standard | Most tasks: coding, analysis, writing | Claude 3.5 Haiku, GPT-4o-mini, Gemini 1.5 Flash | Medium |
+| Frontier (reasoning) | Complex analysis, architecture, research | Claude Opus 5.5 or Fable 5.1, plus the top reasoning tier from OpenAI and Google (check each provider's current model list) | Highest |
+| Standard | Most tasks: coding, analysis, writing | Claude Sonnet 5.5, plus the mid-tier models from OpenAI and Google (check each provider's current model list) | Medium |
 | Lightweight | Simple tasks, high volume, classification | Llama 3.1 8B, Mistral NeMo | Lowest |
 | Open-source | Privacy-sensitive, on-premise, fine-tuning | Llama 3.1 70B/405B, Qwen 2.5 | Infrastructure |
 
@@ -210,7 +210,7 @@ Based on Anthropic's production agent research, the most successful implementati
 
 - Use prompt caching (Anthropic, OpenAI) for repeated system prompts
 - Compress context: summarize long documents before including
-- Route simple queries to cheaper models (Haiku/GPT-4o-mini)
+- Route simple queries to cheaper models (Claude Haiku 5.5 or another provider's small tier)
 - Batch requests where latency permits
 - Cache embeddings; avoid re-embedding unchanged documents
 

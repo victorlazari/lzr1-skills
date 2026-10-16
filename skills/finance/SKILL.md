@@ -11,7 +11,7 @@ Expert-level finance covering FP&A, accounting, financial modeling, SaaS metrics
 
 **Scope:** This skill handles financial planning and analysis (FP&A), accounting (including ASC 606 and Section 174), financial modeling, SaaS metrics, fundraising, treasury, and corporate finance.
 **Triggers:** Use this skill when the user requests building financial models, analyzing SaaS/business metrics, planning budgets, preparing investor materials, managing cash flow, revenue recognition, fundraising strategy, or financial reporting.
-**Non-goals/Escalation:** Do not use this skill for executing trades, transferring funds, filing taxes, or providing legal/tax advice. Route to `excel-generator` for downloadable Excel files. Route to `business-strategy` for pure market positioning without financial modeling.
+**Non-goals/Escalation:** Do not use this skill for executing trades, transferring funds, filing taxes, or providing legal/tax advice. Route to a dedicated Excel generation skill, if installed for downloadable Excel files. Route to `executive-leadership` for pure market positioning without financial modeling.
 
 ## Preconditions
 

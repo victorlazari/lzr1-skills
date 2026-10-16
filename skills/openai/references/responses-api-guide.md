@@ -15,18 +15,22 @@ The Responses API is the primary method for stateful interactions, tool use, and
 ## Migration from Assistants API
 
 - **Endpoint**: Replace `client.beta.assistants` with `client.responses.create`.
-- **Models**: Update model references to current versions (e.g., `gpt-5.6`, `gpt-5.4`).
+- **Models**: Update model references to a current model from the provider's model list (pick the tier that fits the task: flagship, balanced, or small and fast).
 - **Authentication**: Utilize workload identity federation for short-lived access tokens where applicable.
 
 ## Basic Usage
 
 ```python
+import os
 import openai
+
+# Pick from the provider's current model list; do not hard-code a stale id.
+MODEL = os.environ.get("OPENAI_MODEL", "<set-a-current-model-id>")
 
 client = openai.OpenAI()
 
 response = client.responses.create(
-    model="gpt-5.6",
+    model=MODEL,
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "Hello!"}

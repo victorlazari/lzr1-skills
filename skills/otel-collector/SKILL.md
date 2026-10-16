@@ -1,6 +1,6 @@
 ---
 name: otel-collector
-description: "Expertise in OpenTelemetry Collector advanced patterns, OTTL, scaling, connector patterns, and custom builds."
+description: "OpenTelemetry Collector configuration, OTTL, scaling, connectors, and custom builds. Use when configuring or troubleshooting the OTel Collector, writing OTTL statements, designing Collector scaling, setting up routing or spanmetrics connectors, diagnosing Collector OOM kills, building a custom Collector with OCB, or deploying it on Kubernetes."
 ---
 
 # OpenTelemetry Collector Skill

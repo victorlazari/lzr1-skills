@@ -55,5 +55,5 @@ This skill provides operational procedures for managing Wiki.js enterprise deplo
 - [Check Version Script](scripts/check-version.sh): Script to verify the Wiki.js version.
 
 ## Cross-Skill Routing
-- Route to `automation-and-scheduling` when the user requests recurring backups, scheduled syncs, or event-triggered Wiki.js updates.
+- Route to `cron-master` when the user requests recurring backups, scheduled syncs, or event-triggered Wiki.js updates.
 - Route to `security-review` when the user requests a comprehensive security audit of the Wiki.js deployment infrastructure.

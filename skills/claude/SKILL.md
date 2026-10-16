@@ -1,13 +1,13 @@
 ---
 name: claude
-description: Specialist skill for mastering Claude models (Fable 5, Mythos 5, Opus 5, Sonnet 5), including API integration, system prompts, tool use, vision capabilities, extended thinking, prompt caching, and Artifacts.
+description: Specialist skill for mastering Claude models (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5), including API integration, system prompts, tool use, vision capabilities, extended thinking, prompt caching, and Artifacts. Use when building or tuning an app on Claude, writing system prompts, adding tool use or vision, enabling prompt caching, or troubleshooting a Claude deployment or the Claude CLI.
 ---
 
 # Claude Specialist Skill
 
 ## Scope and Triggers
 
-Use this skill when you need to interact with, configure, or optimize applications powered by Claude models (Fable 5, Mythos 5, Opus 5, Sonnet 5). This includes tasks such as:
+Use this skill when you need to interact with, configure, or optimize applications powered by Claude models (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5). This includes tasks such as:
 - Integrating the Claude API into applications.
 - Designing and refining system prompts for specific personas or constraints.
 - Implementing tool use and external API integrations within Claude.
@@ -22,7 +22,7 @@ Use this skill when you need to interact with, configure, or optimize applicatio
 
 - Detect the target environment, versions, permissions, inputs, constraints, and user intent before acting.
 - Ensure the Claude CLI is installed and configured with the appropriate API keys and environment settings.
-- Verify the specific Claude model required for the task (e.g., `claude-fable-5`, `claude-mythos-5`, `claude-opus-5`, `claude-sonnet-5`).
+- Verify the specific Claude model required for the task (valid ids: `claude-fable-5-1`, `claude-opus-5-5`, `claude-sonnet-5-5`, `claude-haiku-5-5`).
 
 ## Source Freshness
 
@@ -31,7 +31,7 @@ Use this skill when you need to interact with, configure, or optimize applicatio
 
 ## Workflow
 
-1. **Requirement Analysis:** Determine the specific Claude capabilities required for the task (e.g., text generation, vision, tool use, Artifacts) and select the appropriate model (Fable 5, Mythos 5, Opus 5, Sonnet 5).
+1. **Requirement Analysis:** Determine the specific Claude capabilities required for the task (e.g., text generation, vision, tool use, Artifacts) and select the appropriate model (Fable 5.1, Opus 5.5, Sonnet 5.5, Haiku 5.5).
 2. **Environment Setup:** Ensure the Claude CLI is installed and configured with the appropriate API keys and environment settings.
 3. **Prompt Engineering:** Design system prompts that clearly define the model's role, constraints, and output format, incorporating prompt caching if applicable.
 4. **API Integration:** Construct API requests with the correct model names and parameters (`model`, `prompt`, `max_tokens_to_sample`, `temperature`, etc.).

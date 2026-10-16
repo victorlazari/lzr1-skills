@@ -1,9 +1,11 @@
 ---
 name: devops-infrastructure
-description: Comprehensive DevOps and infrastructure engineering skill covering cloud architecture, Kubernetes, CI/CD pipelines, Infrastructure as Code, SRE, platform engineering, networking, database administration, AI/MLOps, and FinOps. Use when designing cloud infrastructure, managing Kubernetes clusters, building CI/CD pipelines, implementing IaC, troubleshooting production systems, or making infrastructure decisions.
+description: "Cross-cloud infrastructure architecture, Infrastructure as Code, SRE, platform engineering, networking, AI/MLOps infrastructure and FinOps decision support. Use when designing cloud infrastructure, choosing between architectures, setting up IaC or SRE practice, or optimizing cloud cost. Not for hands-on AWS, EKS, Helm or GitOps provisioning and troubleshooting: use `devops`."
 ---
 
 # DevOps & Infrastructure Engineering
+
+**Related skills:** `devops`, `k8s-eks`, `docker`
 
 Expert-level DevOps, cloud infrastructure, and platform engineering covering the full operational spectrum: cloud architecture, Kubernetes orchestration, CI/CD automation, Infrastructure as Code, site reliability engineering, networking, database administration, platform engineering, AI/MLOps, and FinOps.
 
@@ -117,8 +119,8 @@ After all agents report, run one **Synthesis Agent** with all reports that:
 
 - `security-review`: Route when deep security validation, vulnerability scanning, or compliance auditing is required.
 - `trivy-scanner`: Route when container image scanning or SBOM generation is needed.
-- `automation-and-scheduling`: Route when setting up recurring tasks, background jobs, or external API integrations.
-- `persistent-computing`: Route when deploying stateful services, game servers, or heavy compute workloads.
+- A dedicated automation and scheduling skill, if installed: Route when setting up recurring tasks, background jobs, or external API integrations.
+- A dedicated persistent-hosting and heavy-compute skill, if installed: Route when deploying stateful services, game servers, or heavy compute workloads.
 
 ## Authoritative sources
 

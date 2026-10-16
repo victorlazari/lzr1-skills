@@ -15,7 +15,7 @@ Expert-level sales covering B2B selling, sales engineering, account management, 
 - **Escalation Boundaries**:
   - `marketing` — Route when the task involves lead generation, brand awareness, or top-of-funnel marketing campaigns.
   - `customer-support` — Route when the task involves resolving technical issues, handling support tickets, or post-sale troubleshooting.
-  - `finance-pro-playbooks` — Route when the task involves complex financial modeling, valuation, or corporate finance analysis beyond standard sales compensation or pricing.
+  - `finance` — Route when the task involves complex financial modeling, valuation, or corporate finance analysis beyond standard sales compensation or pricing.
 
 ## Preconditions
 

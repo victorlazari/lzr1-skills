@@ -1,9 +1,11 @@
 ---
 name: dockerfile
-description: Dockerfile Architect & Container Optimization Specialist. Triggers when designing, refactoring, or auditing Dockerfiles for production, optimizing image sizes, implementing BuildKit features, or integrating Trivy/CodeRabbit scanning.
+description: "Authoring and optimizing Dockerfiles: multi-stage builds, layer caching, BuildKit cache and bind mounts, non-root and secret handling, and Hadolint or Trivy checks in CI. Use when writing, refactoring, shrinking or auditing a Dockerfile. Not for running or operating containers and Compose stacks: use `docker`."
 ---
 
 # Dockerfile Mastery
+
+**Related skills:** `docker`, `trivy-scanner`
 
 ## Scope and Triggers
 Use this skill when you need to:

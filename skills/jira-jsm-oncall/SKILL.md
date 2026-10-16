@@ -1,6 +1,6 @@
 ---
 name: jira-jsm-oncall
-description: Advanced guide and workflow for Jira Service Management (JSM) alerts, on-call management, SLA configurations, and automation.
+description: Advanced guide and workflow for Jira Service Management (JSM) alerts, on-call management, SLA configurations, and automation. Use when configuring JSM SLAs, alert routing or on-call schedules, Jira Edge Connector, CMDB-linked incident workflows, or automation rules that auto-assign or auto-close service tickets.
 ---
 
 # Jira Service Management (JSM) Alerts & On-Call
@@ -16,7 +16,7 @@ This skill handles advanced incident response, alerting, and on-call management 
 - Creating automation rules for auto-assigning and auto-closing tickets.
 
 **Escalation Boundaries:**
-- For general automation, recurring execution, or external API integrations outside of JSM-specific workflows, route to `automation-and-scheduling`.
+- For general automation, recurring execution, or external API integrations outside of JSM-specific workflows, route to a dedicated automation and scheduling skill, if installed.
 
 ## Preconditions
 

@@ -11,7 +11,7 @@ Expert-level R&D covering innovation strategy, technical research methodology, R
 
 - **Handles:** Technical research, literature reviews, emerging technology evaluation, innovation strategy development, R&D portfolio management, technology scouting, and research roadmaps.
 - **Activates when:** Task involves technical research, evaluating emerging technologies, developing innovation strategies, managing R&D programs, or building technology roadmaps.
-- **Non-goals:** Not for financial modeling, valuation, or investment research (use `finance-pro-playbooks`). Not for adopting a specialized professional role for execution (use `ai-teammates`).
+- **Non-goals:** Not for financial modeling, valuation, or investment research (use `finance`). Not for adopting a specialized professional role for execution (use a dedicated AI persona skill, if installed).
 
 ## Preconditions
 

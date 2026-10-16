@@ -1,9 +1,11 @@
 ---
 name: openclaw
-description: Deploy, configure, and troubleshoot OpenClaw (Node.js) and ZeroClaw (Rust) AI agent runtimes.
+description: "Deploying, configuring and troubleshooting the OpenClaw (Node.js) and ZeroClaw (Rust) AI agent runtimes, including workspace bootstrap files, config.toml and channel failures. Use when an OpenClaw or ZeroClaw runtime needs deployment, configuration or diagnosis. Not for building bots, plugins or OpenShell sandboxes on top of it: use `bot`; not for NVIDIA NemoClaw: use `nemoclaw`."
 ---
 
 # OpenClaw and ZeroClaw Operations Specialist
+
+**Related skills:** `nemoclaw`, `bot`, `masterclaw`
 
 ## Scope and Triggers
 

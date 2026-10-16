@@ -1,7 +1,7 @@
 # Next.js App Router
 
 ## Overview
-The App Router is the new paradigm for building Next.js applications, introduced in Next.js 13. It leverages React Server Components, nested layouts, and simplified data fetching.
+The App Router is the standard routing model for Next.js applications (stable since Next.js 13.4). It leverages React Server Components, nested layouts, and simplified data fetching.
 
 ## Key Concepts
 - **Server Components:** Default component type in the App Router. They render on the server and send HTML to the client, reducing bundle size.

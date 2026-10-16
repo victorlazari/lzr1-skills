@@ -1,6 +1,6 @@
 ---
 name: passkeys
-description: Implement passwordless authentication using FIDO2 and WebAuthn standards, including registration, authentication, and recovery workflows.
+description: "Passwordless authentication with FIDO2 and WebAuthn passkeys: registration, authentication, and recovery flows. Use when implementing passkeys or WebAuthn, adding Conditional UI autofill, choosing synced versus device-bound credentials, integrating passkeys with an IdP or SSO, or auditing a passkey rollout against NIST AAL2/AAL3."
 ---
 
 # Passkeys Master Specialist
@@ -17,7 +17,7 @@ Use this skill when tasks involve:
 
 **Cross-Skill Routes:**
 - `security-review` — Route when performing a comprehensive security audit of an application's authentication flow.
-- `identity-management` — Route when integrating passkeys with broader Identity and Access Management (IAM) or SSO solutions.
+- A dedicated identity and access management skill, if installed — Route when integrating passkeys with broader Identity and Access Management (IAM) or SSO solutions.
 
 ## Preconditions
 

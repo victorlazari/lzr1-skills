@@ -1,6 +1,6 @@
 ---
 name: manus-workflows
-description: Advanced guide for n8n Workflow & Integration Specialists to architect, implement, and troubleshoot sophisticated workflows using n8n's AI agent architecture.
+description: "n8n workflow and integration design built on n8n's AI agent architecture, covering scheduling, file handling, messaging patterns, and recovery. Use when designing, building, or debugging n8n workflows, wiring APIs or nodes into an automation pipeline, configuring cron schedules and retries, or diagnosing failed n8n executions."
 ---
 
 # n8n Workflows

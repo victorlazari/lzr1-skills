@@ -17,7 +17,7 @@ Use this skill when you need to:
 
 **Cross-Skill Routing:**
 - `security-review` — Route when the task is a general application or infrastructure security review not specific to AI models.
-- `automation-and-scheduling` — Route when the task involves setting up automated pipelines or recurring data synchronization rather than AI model training.
+- A dedicated automation and scheduling skill, if installed — Route when the task involves setting up automated pipelines or recurring data synchronization rather than AI model training.
 
 ## Preconditions
 

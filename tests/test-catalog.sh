@@ -191,16 +191,22 @@ long=$(python3 -I -c 'print("Use when " + "x" * 1030)')
 printf -- '---\nname: beta\ndescription: %s\n---\n# Beta\n' "$long" > "$m/skills/beta/SKILL.md"
 expect_only_rule "description over 1024 chars" fm-desc "$m"
 
-# (c) no trigger words: WARN only, exit 0.
+# (c) no trigger words: ERROR, exit 1.
 m=$WORK/g3; make_fixture "$m"
 printf -- '---\nname: beta\ndescription: A plain description.\n---\n# Beta\n' > "$m/skills/beta/SKILL.md"
 rc=0
 out=$(python3 -I "$LINT" --root "$m" 2>&1) || rc=$?
-[[ $rc -eq 0 ]] || fail "desc-trigger: expected exit 0, got $rc: $out"
-printf '%s\n' "$out" | grep -E '^WARN beta: desc-trigger' >/dev/null \
-  || fail "desc-trigger: WARN missing: $out"
-printf '%s\n' "$out" | grep -E '^ERROR ' >/dev/null && fail "desc-trigger: unexpected ERROR: $out"
-printf 'PASS: desc-trigger warn\n'
+[[ $rc -eq 1 ]] || fail "desc-trigger: expected exit 1, got $rc: $out"
+printf '%s\n' "$out" | grep -E '^ERROR beta: desc-trigger' >/dev/null \
+  || fail "desc-trigger: ERROR missing: $out"
+printf '%s\n' "$out" | grep -E '^WARN beta: desc-trigger' >/dev/null && fail "desc-trigger: still a WARN: $out"
+printf 'PASS: desc-trigger error\n'
+# desc-trigger positive: "Use when" passes.
+printf -- '---\nname: beta\ndescription: A plain description. Use when testing.\n---\n# Beta\n' > "$m/skills/beta/SKILL.md"
+rc=0
+out=$(python3 -I "$LINT" --root "$m" 2>&1) || rc=$?
+[[ $rc -eq 0 ]] || fail "desc-trigger positive: expected exit 0, got $rc: $out"
+printf 'PASS: desc-trigger accepts use when\n'
 
 # (d) README badge drift.
 m=$WORK/g4; make_fixture "$m"
@@ -311,6 +317,100 @@ printf '%s\n' "$out" | grep -F 'multi-line/block description not supported' >/de
   || fail "multi-line description: message missing: $out"
 [[ $(printf '%s\n' "$out" | grep -c '^ERROR ') -eq 1 ]] || fail "multi-line description: want exactly 1 ERROR: $out"
 printf 'PASS: multi-line description single error\n'
+
+# --- stale-ref fixtures ---
+m=$WORK/s1; make_fixture "$m"
+printf 'Use model gpt-4o here.\n' > "$m/skills/beta/notes.md"
+expect_only_rule "stale model ref" stale-ref "$m"
+printf '%s\n' "$(python3 -I "$LINT" --root "$m" 2>&1 || true)" | grep -E 'notes\.md:1' >/dev/null \
+  || fail "stale-ref: file:line missing"
+
+m=$WORK/s2; make_fixture "$m"
+printf 'Use model gpt-4o here. (historical)\n' > "$m/skills/beta/notes.md"
+expect_clean "stale ref with (historical) marker" "$m"
+
+m=$WORK/s3; make_fixture "$m"
+printf 'Use <provider-model-id> here.\n' > "$m/skills/beta/notes.md"
+expect_clean "clean file no stale ref" "$m"
+
+m=$WORK/s4; make_fixture "$m"
+printf 'ok\nbuilt on Next.js 12 and CLAUDE-3 too\n' > "$m/skills/alpha/scripts/x.py"
+chmod 755 "$m/skills/alpha/scripts/x.py"
+expect_only_rule "stale ref in .py, case-insensitive" stale-ref "$m"
+printf 'PASS: stale-ref\n'
+
+# --- stale-ref hardening fixtures ---
+stale_case() { # name expect(fail|pass) content
+  local d="$WORK/sh_$1"; make_fixture "$d"
+  printf '%s\n' "$3" > "$d/skills/beta/notes.md"
+  if [[ $2 == fail ]]; then expect_only_rule "stale-hard $1" stale-ref "$d"
+  else expect_clean "stale-hard $1" "$d"; fi
+}
+stale_case v1 pass 'Use claude-fable-5-1 here.'
+stale_case v2 pass 'Use claude-opus-5-5 here.'
+stale_case v3 pass 'Use claude-sonnet-5-5 here.'
+stale_case v4 pass 'Use claude-haiku-5-5 here.'
+stale_case r1 fail 'Use claude-opus-5 here.'
+stale_case r2 fail 'Use claude-mythos-5 here.'
+stale_case r3 pass 'Use claude-opus-5 here. (Historical)'
+stale_case g1 pass 'a claude3d scene and https://x.io/aclaude-3'
+stale_case c2 fail 'Use Claude 2 here.'
+stale_case c3 fail 'Use claude-2 here.'
+stale_case c4 fail 'Use claude-instant here.'
+stale_case n1 fail 'Built on Next.js 12.3 today.'
+stale_case n2 fail 'Built on Next.js 13 today.'
+stale_case n3 pass 'Built on Next.js 13.4 today.'
+stale_case n4 pass 'Built on Next.js 14 today.'
+d=$WORK/sh_ext; make_fixture "$d"
+printf 'const m = "gpt-4o";\n' > "$d/skills/beta/a.ts"
+expect_only_rule "stale-hard .ts scanned" stale-ref "$d"
+d=$WORK/sh_multi; make_fixture "$d"
+printf 'gpt-4o and claude-mythos-5\n' > "$d/skills/beta/notes.md"
+[[ $(python3 -I "$LINT" --root "$d" 2>&1 | grep -c '^ERROR .*stale-ref') -eq 2 ]] || fail "stale-hard: want 2 matches on one line"
+printf 'PASS: stale-ref hardening\n'
+
+# --- model-id allow-list fixtures ---
+stale_case m1 pass 'Use claude-opus-5-5-20260101 here.'
+stale_case m2 fail 'Use claude-opus-5-1 here.'
+stale_case m3 fail 'Use claude-opus-4-5 here.'
+stale_case m4 fail 'Use claude-mythos-5 here.'
+stale_case m5 pass 'Use claude-opus-4-5 here. (historical)'
+stale_case m6 fail 'Use claude-sonnet-5-5-beta here.'
+stale_case m7 fail 'Ask Claude Mythos about it.'
+stale_case m8 fail 'Use claude_3_opus here.'
+stale_case m10 pass 'See claude-opus-5-5.md for details.'
+stale_case m11 pass 'Pinned to claude-opus-5-5.'
+stale_case m12 pass 'Pinned (claude-opus-5-5) here.'
+stale_case m13 pass 'Use claude-sonnet-5-5-v2 here.'
+stale_case m14 fail 'Use claude-opus-5-5-20269999 here.'
+stale_case m15 fail 'Use claude-opus-5.5 here.'
+stale_case m9 pass 'Use claude-haiku-5-5. Then claude-fable-5-1, done.'
+printf 'PASS: model-id allow-list\n'
+
+# --- skill-ref fixtures ---
+skill_case() { # name expect(fail|pass) skillmd-body ; description fixed unless 4th arg
+  local d=$WORK/sr_$1; make_fixture "$d"
+  printf -- '---\nname: beta\ndescription: %s\n---\n# Beta\n%s\n' \
+    "${4:-Use when testing beta.}" "$3" > "$d/skills/beta/SKILL.md"
+  if [[ $2 == fail ]]; then expect_only_rule "skill-ref $1" skill-ref "$d"
+  else expect_clean "skill-ref $1" "$d"; fi
+}
+skill_case s1 fail '**Related skills:** `ghost-skill`'
+skill_case s2 pass '**Related skills:** `alpha`'
+skill_case s3 fail 'x' 'Use when testing beta. Not for X: use `ghost-skill`.'
+skill_case s4 pass 'x' 'Use when testing beta. Not for X: use `alpha`.'
+skill_case s5 pass 'Run `docker-compose up` first.'
+skill_case s6 fail 'For that, route to `ghost-skill` instead.'
+skill_case s7 pass 'Instead run `docker-compose` or `kubectl`.'
+skill_case s8 pass 'x' 'Use when testing beta. Use `kubectl` to deploy.'
+mkdir -p "$WORK/sr_s9/skills/beta/references" 2>/dev/null; make_fixture "$WORK/sr_s9"; mkdir -p "$WORK/sr_s9/skills/beta/references"; : > "$WORK/sr_s9/skills/beta/references/a.md"
+skill_case_keep() { printf -- '---\nname: beta\ndescription: %s\n---\n# Beta\nx\n' "$1" > "$WORK/sr_s9/skills/beta/SKILL.md"; expect_clean "skill-ref s9" "$WORK/sr_s9"; }
+skill_case_keep 'Use when testing beta. See `references/a.md`.'
+skill_case s10 pass 'Run `kubectl-neat` instead.'
+skill_case s11 pass 'Set `max-retries` and `read-only` instead of defaults.'
+skill_case s12 fail 'Please use `ghost-skill` instead.'
+skill_case s13 pass 'x' 'Use when testing beta. Use `docker-compose` locally.'
+printf 'PASS: skill-ref\n'
 
 # Real repo must be clean.
 rc=0
