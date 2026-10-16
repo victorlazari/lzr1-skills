@@ -2,7 +2,21 @@
 """Catalog linter for the skills repository (stdlib only; run with python3 -I).
 
 Rules: fm-missing fm-name fm-desc fm-syntax link-broken ref-orphan exec-bit
-       manifest-sync count-sync symlink stale-ref desc-trigger (ERROR); link-broken-prose (WARN).
+       manifest-sync count-sync symlink stale-ref desc-trigger skill-ref (ERROR); link-broken-prose (WARN).
+
+stale-ref model ids: any token claude-(fable|opus|sonnet|haiku|mythos)-<digit>... must be
+exactly one of VALID_MODELS, optionally followed by -YYYYMMDD; claude_<digit> and the spaced
+prose "claude mythos" are always flagged. A line containing "(historical)" is exempt.
+
+skill-ref heuristic (deliberately conservative). A single-backtick token is a skill pointer
+ONLY in these places, and must then be a name listed in skills-list.txt:
+  (a) frontmatter description: the token right after the word "use" or "see", or after
+      "not for ...:" (e.g. "Not for X: use `foo-bar`");
+  (b) a line starting with "**Related skills:**": every backticked token on it;
+  (c) a body line containing "route to", "defer to", "hand off to" or "instead": backticked
+      tokens matching ^[a-z][a-z0-9]*(-[a-z0-9]+)+$ (hyphenated; so no "/", ".", leading
+      "-", spaces). Names in SKILL_REF_ALLOW (hyphenated commands) are skipped.
+Fenced code blocks are ignored for (b) and (c).
 """
 import argparse
 import os
@@ -25,11 +39,18 @@ SKIP_CHARS = ("*", "<", "{", "$")
 TRIGGER_RE = re.compile(r"use when|use for|triggers", re.I)
 # Scope: files under skills/ only; README.md and root docs are deliberately not scanned.
 _G = r"(?<![A-Za-z0-9])"
+VALID_MODELS = ("claude-fable-5-1", "claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5")
+MODEL_RE = re.compile(r"(?<![A-Za-z0-9])claude-(?:fable|opus|sonnet|haiku|mythos)-[0-9][0-9A-Za-z.-]*",
+                      re.I)
+DESC_PTR_RE = re.compile(r"(?:\b(?:use|see)\b|\bnot for\b[^`]*?:)\s*`([^`\n]+)`", re.I)
+HYPHEN_RE = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)+$")
+ROUTE_RE = re.compile(r"route to|defer to|hand off to|instead", re.I)
+SKILL_REF_ALLOW = frozenset(("docker-compose",))
 STALE_PATTERNS = [
     _G + r"claude[- ]?3(?![A-Za-z])", _G + r"claude[- ]2(?!\d)", _G + r"claude-instant",
     _G + r"claude[- ]instant", _G + r"gpt-4o", _G + r"gpt-4-turbo", _G + r"gpt-3\.5",
     _G + r"text-davinci", _G + r"gemini[- ]?1\.5",
-    _G + r"claude-mythos\S*", _G + r"claude-(?:fable|opus|sonnet|haiku)-5(?![-\d])",
+    _G + r"claude_[0-9]", _G + r"claude mythos",
     r"Next\.js 1[0-2](?!\d)", r"Next\.js 13(?!\d)(?!\.[4-9](?!\d))",
 ]
 STALE_RE = re.compile("|".join("(?:%s)" % p for p in STALE_PATTERNS), re.I)
@@ -110,6 +131,11 @@ def main():
         print("ERROR %s: fm-missing skill directory not found" % args.skill)
         return 1
 
+    known = set(names)
+    mp = os.path.join(root, "skills-list.txt")
+    if os.path.isfile(mp):
+        known = set(l.strip() for l in read(mp).splitlines()
+                    if l.strip() and not l.strip().startswith("#"))
     for name in targets:
         base = os.path.join(sdir, name)
         if os.path.islink(base):
@@ -132,6 +158,12 @@ def main():
                     for m in STALE_RE.finditer(ln):
                         add("ERROR", name, "stale-ref", "%s:%d %s"
                             % (os.path.relpath(p, root), i, m.group(0)))
+                    for m in MODEL_RE.finditer(ln):
+                        tok = m.group(0).rstrip(".-").lower()
+                        if not any(tok == v or re.fullmatch(re.escape(v) + r"-\d{8}", tok)
+                                   for v in VALID_MODELS):
+                            add("ERROR", name, "stale-ref", "%s:%d %s"
+                                % (os.path.relpath(p, root), i, m.group(0)))
         skill_md = os.path.join(base, "SKILL.md")
         if not os.path.isfile(skill_md):
             add("ERROR", name, "fm-missing", "SKILL.md not found")
@@ -158,6 +190,24 @@ def main():
         if desc and not TRIGGER_RE.search(desc):
             add("ERROR", name, "desc-trigger",
                 "description has no 'use when'/'use for'/'triggers'")
+        # skill pointers
+        ptrs = [m.group(1) for m in DESC_PTR_RE.finditer(desc)]
+        infence = False
+        for ln in text.splitlines():
+            if ln.lstrip().startswith(("```", "~~~")):
+                infence = not infence
+                continue
+            if infence:
+                continue
+            toks = SPAN_RE.findall(ln)
+            if ln.lstrip().startswith("**Related skills:**"):
+                ptrs.extend(toks)
+            elif ROUTE_RE.search(ln):
+                ptrs.extend(t for t in toks if HYPHEN_RE.match(t)
+                            and t not in SKILL_REF_ALLOW)
+        for t in dict.fromkeys(ptrs):
+            if t not in known:
+                add("ERROR", name, "skill-ref", "`%s` not in skills-list.txt" % t)
         # links
         seen = set()
         fences = []

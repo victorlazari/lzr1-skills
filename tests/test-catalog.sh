@@ -369,6 +369,35 @@ printf 'gpt-4o and claude-mythos-5\n' > "$d/skills/beta/notes.md"
 [[ $(python3 -I "$LINT" --root "$d" 2>&1 | grep -c '^ERROR .*stale-ref') -eq 2 ]] || fail "stale-hard: want 2 matches on one line"
 printf 'PASS: stale-ref hardening\n'
 
+# --- model-id allow-list fixtures ---
+stale_case m1 pass 'Use claude-opus-5-5-20260101 here.'
+stale_case m2 fail 'Use claude-opus-5-1 here.'
+stale_case m3 fail 'Use claude-opus-4-5 here.'
+stale_case m4 fail 'Use claude-mythos-5 here.'
+stale_case m5 pass 'Use claude-opus-4-5 here. (historical)'
+stale_case m6 fail 'Use claude-sonnet-5-5-beta here.'
+stale_case m7 fail 'Ask Claude Mythos about it.'
+stale_case m8 fail 'Use claude_3_opus here.'
+stale_case m9 pass 'Use claude-haiku-5-5. Then claude-fable-5-1, done.'
+printf 'PASS: model-id allow-list\n'
+
+# --- skill-ref fixtures ---
+skill_case() { # name expect(fail|pass) skillmd-body ; description fixed unless 4th arg
+  local d=$WORK/sr_$1; make_fixture "$d"
+  printf -- '---\nname: beta\ndescription: %s\n---\n# Beta\n%s\n' \
+    "${4:-Use when testing beta.}" "$3" > "$d/skills/beta/SKILL.md"
+  if [[ $2 == fail ]]; then expect_only_rule "skill-ref $1" skill-ref "$d"
+  else expect_clean "skill-ref $1" "$d"; fi
+}
+skill_case s1 fail '**Related skills:** `ghost-skill`'
+skill_case s2 pass '**Related skills:** `alpha`'
+skill_case s3 fail 'x' 'Use when testing beta. Not for X: use `ghost-skill`.'
+skill_case s4 pass 'x' 'Use when testing beta. Not for X: use `alpha`.'
+skill_case s5 pass 'Run `docker-compose up` first.'
+skill_case s6 fail 'For that, route to `ghost-skill` instead.'
+skill_case s7 pass 'Instead run `docker-compose` or `kubectl`.'
+printf 'PASS: skill-ref\n'
+
 # Real repo must be clean.
 rc=0
 out=$(python3 -I "$LINT" --root "$ROOT" 2>&1) || rc=$?
