@@ -1,6 +1,6 @@
 ---
 name: claude
-description: Specialist skill for mastering Claude models (Fable 5, Mythos 5, Opus 5, Sonnet 5), including API integration, system prompts, tool use, vision capabilities, extended thinking, prompt caching, and Artifacts.
+description: Specialist skill for mastering Claude models (Fable 5, Mythos 5, Opus 5, Sonnet 5), including API integration, system prompts, tool use, vision capabilities, extended thinking, prompt caching, and Artifacts. Use when building or tuning an app on Claude, writing system prompts, adding tool use or vision, enabling prompt caching, or troubleshooting a Claude deployment or the Claude CLI.
 ---
 
 # Claude Specialist Skill

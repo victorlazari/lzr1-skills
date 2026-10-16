@@ -1,6 +1,6 @@
 ---
 name: accessibility-testing
-description: Execute automated accessibility testing with Axe-core/Playwright, manage known issues via snapshots, and validate dynamic trees, focus, and contrast.
+description: Execute automated accessibility testing with Axe-core and Playwright, manage known issues via snapshots, and validate dynamic trees, focus, and contrast. Use when asked to run an axe scan, check WCAG violations in a web page or component, track known a11y issues, or verify color contrast and focus management.
 ---
 
 # Accessibility Testing

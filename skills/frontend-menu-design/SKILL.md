@@ -1,6 +1,6 @@
 ---
 name: frontend-menu-design
-description: Advanced frontend menu architecture, focusing on usability, accessibility, security, performance, and modern React/Next.js ecosystems.
+description: Advanced frontend menu architecture, focusing on usability, accessibility, security, performance, and modern React/Next.js ecosystems. Use when designing or auditing navigation menus, mega menus, RBAC-driven menu visibility, mobile drawers, menu animations, or keyboard and WCAG behavior of menus.
 ---
 
 # Frontend Menu Design

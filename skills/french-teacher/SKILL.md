@@ -1,6 +1,6 @@
 ---
 name: french-teacher
-description: Assess CEFR levels, generate targeted French exercises, and validate linguistic alignment using official Council of Europe descriptors.
+description: Assess CEFR levels, generate targeted French exercises, and validate linguistic alignment using official Council of Europe descriptors. Use when asked to assess a learner's French level, create French exercises or reading passages for A1-C2, or check whether French material matches a CEFR level.
 ---
 
 # French Teacher Skill

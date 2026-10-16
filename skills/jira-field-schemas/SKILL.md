@@ -1,6 +1,6 @@
 ---
 name: jira-field-schemas
-description: Manage, audit, and optimize Jira unified Field Schemes, Field Contexts, and Screen Schemes, ensuring compliance with 2026 limits (700 fields/space, 150 work types/scheme).
+description: Manage, audit, and optimize Jira unified Field Schemes, Field Contexts, and Screen Schemes, ensuring compliance with 2026 limits (700 fields/space, 150 work types/scheme). Use when designing or auditing Jira field architecture, configuring field contexts or screen schemes, checking field-limit compliance, or automating field schemes via the REST API.
 ---
 
 # Jira Field Schemas

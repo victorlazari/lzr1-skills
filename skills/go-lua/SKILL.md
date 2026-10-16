@@ -1,6 +1,6 @@
 ---
 name: go-lua
-description: Advanced Go and Lua operational playbook for performance profiling, memory tuning, CGO, Redis Lua patterns, and database migrations.
+description: Advanced Go and Lua operational playbook for performance profiling, memory tuning, CGO, Redis Lua patterns, and database migrations. Use when diagnosing Go bottlenecks with pprof, tuning GOGC or GOMEMLIMIT, debugging goroutine leaks or OOM kills, writing Redis Lua scripts, using CGO, or fixing golang-migrate dirty states.
 ---
 
 # Go and Lua Specialist Skill

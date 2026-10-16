@@ -1,6 +1,6 @@
 ---
 name: jira-jsm-oncall
-description: Advanced guide and workflow for Jira Service Management (JSM) alerts, on-call management, SLA configurations, and automation.
+description: Advanced guide and workflow for Jira Service Management (JSM) alerts, on-call management, SLA configurations, and automation. Use when configuring JSM SLAs, alert routing or on-call schedules, Jira Edge Connector, CMDB-linked incident workflows, or automation rules that auto-assign or auto-close service tickets.
 ---
 
 # Jira Service Management (JSM) Alerts & On-Call

@@ -1,6 +1,6 @@
 ---
 name: jira-status-workflows
-description: Advanced Jira workflow configuration, complex state management, ITSM integration, and troubleshooting.
+description: Advanced Jira workflow configuration, complex state management, ITSM integration, and troubleshooting. Use when designing or auditing Jira workflow state machines, configuring transitions, conditions, validators or post-functions, setting workflow properties, or wiring ScriptRunner or Automation into transitions.
 ---
 
 # Jira Status & Workflows

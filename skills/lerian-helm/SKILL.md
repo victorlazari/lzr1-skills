@@ -1,6 +1,6 @@
 ---
 name: lerian-helm
-description: Execute Helm deployments, database migrations, and security validation enforcing Kubernetes Restricted Pod Security Standards.
+description: Execute Helm deployments, database migrations, and security validation for Lerian Studio applications, enforcing Kubernetes Restricted Pod Security Standards. Use when deploying or upgrading a Lerian Studio chart, editing values.yaml overrides, running golang-migrate migrations, or validating pod security settings.
 ---
 
 # Lerian Studio Helm Deployments

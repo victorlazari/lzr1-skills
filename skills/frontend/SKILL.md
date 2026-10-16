@@ -1,6 +1,6 @@
 ---
 name: frontend
-description: Advanced Frontend Specialist Guide covering React, Next.js App Router, Server Components, TypeScript, Tailwind CSS, State Management, Testing & Performance.
+description: Advanced Frontend Specialist Guide covering React, Next.js App Router, Server Components, TypeScript, Tailwind CSS, State Management, Testing & Performance. Use when building, auditing, or optimizing a React or Next.js frontend, choosing state management, fixing rendering or bundle performance, or adding frontend tests.
 ---
 
 # Frontend Specialist Skill
