@@ -5,6 +5,10 @@
 set -euo pipefail
 umask 077
 
+# git commit/tag need an identity even without global user config.
+export GIT_AUTHOR_NAME=test GIT_AUTHOR_EMAIL=t@example.invalid
+export GIT_COMMITTER_NAME=test GIT_COMMITTER_EMAIL=t@example.invalid
+
 ROOT=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
 SCRIPT=$ROOT/scripts/build-release.sh
 WORK=$(mktemp -d "${TMPDIR:-/tmp}/lzr1-release-test.XXXXXXXX")

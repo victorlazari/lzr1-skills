@@ -55,6 +55,8 @@ jobs:
         run: bash tests/test-installer.sh
       - name: Installer download tests
         run: bash tests/test-installer-download.sh
+      - name: Release packaging tests
+        run: bash tests/test-release.sh
       - name: Adversarial remediation tests
         run: bash tests/test-adversarial-remediations.sh
 

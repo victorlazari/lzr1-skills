@@ -281,8 +281,16 @@ sha256_file() {
   fi
 }
 
+wget_secure_flags() {
+  local help
+  help=$(wget --help 2>&1 || true)
+  case "${help}" in *--https-only*) ;; *) fail "This wget lacks --https-only; install curl or a full wget (refusing to download without TLS protection)" ;; esac
+  case "${help}" in *--secure-protocol*) ;; *) fail "This wget lacks --secure-protocol; install curl or a full wget (refusing to download without TLS protection)" ;; esac
+  printf '%s' "--https-only --secure-protocol=TLSv1_2"
+}
+
 download_file() {
-  local url destination
+  local url destination flags
   url=$1
   destination=$2
   case "${url}" in https://*) ;; *) fail "Refusing non-HTTPS download URL" ;; esac
@@ -291,11 +299,56 @@ download_file() {
       --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 20 --max-time 300 \
       --output "${destination}" "${url}" || return 1
   elif command -v wget >/dev/null 2>&1; then
-    wget -q -O "${destination}" "${url}" || return 1
+    flags=$(wget_secure_flags)
+    # shellcheck disable=SC2086
+    wget -q ${flags} -O "${destination}" "${url}" || return 1
   else
     fail "curl or wget is required in piped mode"
   fi
   [ -s "${destination}" ] || return 1
+}
+
+# fetch_sums <url> <dest>: status-aware download of SHA256SUMS.
+# Returns 0 on HTTP 2xx with a non-empty body, 2 on HTTP 404 (no release),
+# and 1 for every other outcome (message left in FETCH_ERR).
+FETCH_ERR=""
+fetch_sums() {
+  local url destination code rc errfile flags
+  url=$1
+  destination=$2
+  FETCH_ERR=""
+  case "${url}" in https://*) ;; *) fail "Refusing non-HTTPS download URL" ;; esac
+  if command -v curl >/dev/null 2>&1; then
+    code=$(curl --silent --show-error --location --write-out '%{http_code}' \
+      --proto '=https' --tlsv1.2 --retry 3 --connect-timeout 20 --max-time 300 \
+      --output "${destination}" "${url}")
+    rc=$?
+    if [ "${rc}" -ne 0 ]; then
+      FETCH_ERR="transport failure (curl exit ${rc})"
+      return 1
+    fi
+  elif command -v wget >/dev/null 2>&1; then
+    flags=$(wget_secure_flags)
+    errfile="${WORK_ROOT}/wget-sums.err"
+    # shellcheck disable=SC2086
+    wget -S ${flags} -O "${destination}" "${url}" >/dev/null 2>"${errfile}"
+    code=$(grep -E '^[[:space:]]*HTTP/[0-9.]+ [0-9]{3}' "${errfile}" | tail -n 1 | awk '{print $2}')
+    if [ -z "${code}" ]; then
+      FETCH_ERR="could not determine the HTTP status (wget)"
+      return 1
+    fi
+  else
+    fail "curl or wget is required in piped mode"
+  fi
+  case "${code}" in
+    404) return 2 ;;
+    2[0-9][0-9])
+      if [ -s "${destination}" ]; then return 0; fi
+      FETCH_ERR="HTTP ${code} with an empty body"
+      return 1
+      ;;
+    *) FETCH_ERR="HTTP status ${code}"; return 1 ;;
+  esac
 }
 
 validate_archive_listing() {
@@ -359,16 +412,28 @@ extract_verified_archive() {
 }
 
 fetch_release_archive() {
-  local base sums archive expected actual matches
+  local base sums archive expected actual matches rc
   base=$1
   sums="${WORK_ROOT}/SHA256SUMS"
   archive="${WORK_ROOT}/lzr1-skills.tar.gz"
-  download_file "${base}/SHA256SUMS" "${sums}" || return 2
+  fetch_sums "${base}/SHA256SUMS" "${sums}"
+  rc=$?
+  if [ "${rc}" -eq 2 ]; then return 2; fi
+  if [ "${rc}" -ne 0 ]; then
+    if [ -z "${REF}" ]; then
+      fail "Could not fetch the latest-release SHA256SUMS: ${FETCH_ERR}. Refusing to fall back silently; re-run with --ref main to install the unverified snapshot knowingly"
+    fi
+    fail "Could not fetch SHA256SUMS for ${REF}: ${FETCH_ERR}"
+  fi
   download_file "${base}/lzr1-skills.tar.gz" "${archive}" || fail "Release archive download failed"
-  matches=$(awk '$2 == "lzr1-skills.tar.gz" {print $1}' "${sums}")
+  matches=$(tr -d '\r' < "${sums}" | awk '{n=$2; sub(/^\*/,"",n); sub(/^\.\//,"",n); if (n == "lzr1-skills.tar.gz") print $1}')
   [ -n "${matches}" ] || fail "SHA256SUMS has no entry for lzr1-skills.tar.gz"
   [ "$(printf '%s\n' "${matches}" | wc -l | tr -d ' ')" = 1 ] || fail "SHA256SUMS has multiple entries for lzr1-skills.tar.gz"
-  expected=${matches}
+  expected=$(printf '%s' "${matches}" | tr 'A-F' 'a-f')
+  case "${expected}" in
+    *[!0-9a-f]*) fail "SHA256SUMS entry is not a valid SHA-256 (non-hex characters)" ;;
+  esac
+  [ "${#expected}" -eq 64 ] || fail "SHA256SUMS entry is not a valid SHA-256 (expected 64 hex characters)"
   actual=$(sha256_file "${archive}")
   [ "${actual}" != "unavailable" ] || fail "Cannot verify release: no sha256sum or shasum available"
   if [ "${actual}" != "${expected}" ]; then
@@ -389,6 +454,14 @@ fetch_branch_archive() {
   log_warn "Installing an unverified snapshot of ${branch}; use a release tag for checksum verification"
   download_file "https://codeload.github.com/${REPO}/tar.gz/refs/heads/${branch}" "${archive}" || fail "Repository archive download failed"
   log_info "Downloaded archive SHA-256: $(sha256_file "${archive}")"
+  command -v tar >/dev/null 2>&1 || fail "tar is required in piped mode"
+  tar -tvzf "${archive}" > "${WORK_ROOT}/archive.verbose" || fail "Repository archive cannot be listed"
+  while IFS= read -r line || [ -n "${line}" ]; do
+    case "${line}" in
+      ""|-*|d*) ;;
+      *) fail "Snapshot contains a non-regular member (symlink or hardlink); refusing to extract" ;;
+    esac
+  done < "${WORK_ROOT}/archive.verbose"
   extract_verified_archive "${archive}"
   SOURCE_VERIFIED="no"
 }
@@ -401,6 +474,7 @@ initialize_source() {
     [ -d "${SOURCE_OVERRIDE}" ] || fail "LZR1_SOURCE_DIR is not a directory"
     SOURCE_ROOT=$(cd "${SOURCE_OVERRIDE}" 2>/dev/null && pwd -P) || fail "Cannot resolve LZR1_SOURCE_DIR"
     SOURCE_MODE="override"
+    [ -z "${REF}" ] || log_warn "Ignoring --ref/LZR1_REF (${REF}): using LZR1_SOURCE_DIR"
   else
     script_path=${BASH_SOURCE[0]:-}
     if [ -n "${script_path}" ] && [ -f "${script_path}" ]; then
@@ -411,6 +485,7 @@ initialize_source() {
     if [ -n "${script_dir}" ] && [ -f "${script_dir}/skills-list.txt" ] && [ -d "${script_dir}/skills" ]; then
       SOURCE_ROOT="${script_dir}"
       SOURCE_MODE="local"
+      [ -z "${REF}" ] || log_warn "Ignoring --ref/LZR1_REF (${REF}): running from a local checkout"
     else
       log_info "Downloading from GitHub"
       if [ -z "${REF}" ]; then

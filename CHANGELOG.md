@@ -19,7 +19,13 @@ All notable changes to this project are documented here. The format follows
 - Verified install: `--ref <value>` and `LZR1_REF`. By default the installer
   downloads the latest release archive and checks it against `SHA256SUMS`;
   `vX.Y.Z` pins a verified release; other refs are unverified snapshots;
-  `doctor` reports source mode, ref and verification status.
+  `doctor` reports source mode, ref and verification status. The unverified
+  `main` snapshot fallback happens only when the latest-release `SHA256SUMS`
+  returns HTTP 404; any other failure stops the install. Checksum parsing
+  accepts CRLF, `./` and `*` name forms and requires one 64-hex entry; branch
+  snapshots containing symlink or hardlink members are refused; wget downloads
+  require `--https-only` and TLS 1.2; the release workflow triggers only on
+  `vX.Y.Z` tags and CI runs `tests/test-release.sh`.
 - Release packaging `scripts/build-release.sh`, tag-triggered
   `.github/workflows/release.yml` and offline tests for the release and
   download paths.

@@ -63,22 +63,32 @@ cat >"$FAKEBIN/curl" <<'CURL'
 # Fake curl: parses --output and the https URL argument; serves $FAKE_FIXTURE.
 out=""
 url=""
+wout=""
+fail_flag=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --output) out=$2; shift ;;
+    --write-out) wout=$2; shift ;;
+    --fail) fail_flag=1 ;;
     https://*) url=$1 ;;
   esac
   shift
 done
 printf '%s\n' "$url" >>"$FAKE_FIXTURE/requests.log"
+if [ -n "$wout" ] && [ -n "${FAKE_SUMS_EXIT:-}" ]; then exit "$FAKE_SUMS_EXIT"; fi
+if [ -n "$wout" ] && [ -n "${FAKE_SUMS_STATUS:-}" ]; then printf '%s' "$FAKE_SUMS_STATUS"; exit 0; fi
 case "$url" in
   */SHA256SUMS) src=$FAKE_FIXTURE/SHA256SUMS ;;
   */lzr1-skills.tar.gz) src=$FAKE_FIXTURE/lzr1-skills.tar.gz ;;
   */refs/heads/*) src=$FAKE_FIXTURE/codeload.tar.gz ;;
   *) exit 22 ;;
 esac
-[ -f "$src" ] || exit 22
+if [ ! -f "$src" ]; then
+  if [ -n "$wout" ]; then printf '404'; exit 0; fi
+  exit 22
+fi
 cp "$src" "$out"
+[ -z "$wout" ] || printf '200'
 CURL
 chmod 755 "$FAKEBIN/curl"
 
@@ -100,7 +110,7 @@ new_case() {
 # run_installer <installer args...>: piped mode, isolated HOME, fake curl first.
 run_installer() {
   set +e
-  cat "$INSTALLER" | env HOME="$HOME_DIR" FAKE_FIXTURE="$FIX" PATH="$FAKEBIN:$PATH" \
+  cat "$INSTALLER" | env HOME="$HOME_DIR" FAKE_FIXTURE="$FIX" FAKE_SUMS_STATUS="${FAKE_SUMS_STATUS:-}" FAKE_SUMS_EXIT="${FAKE_SUMS_EXIT:-}" PATH="$FAKEBIN:$PATH" \
     bash -s -- "$@" >"$LOG" 2>&1
   RC=$?
   set -e
@@ -201,5 +211,72 @@ new_case "$GOOD"
 run_installer --ref '' --codex --yes
 expect_fail_with "--ref value must not be empty"
 printf 'PASS: invalid refs rejected\n'
+
+# 8. Hard failures on latest SHA256SUMS: no fallback, nothing installed.
+for st in 500 503 403 429 401; do
+  new_case "$SNAP"
+  cp "$GOOD"/* "$FIX"/
+  FAKE_SUMS_STATUS=$st run_installer --codex --yes
+  expect_fail_with "HTTP status $st"
+  expect_log "--ref main"
+  if grep -F "codeload.github.com" "$FIX/requests.log" >/dev/null; then fail "case 8 ($st): must not fall back"; fi
+done
+for ex in 28 6; do
+  new_case "$SNAP"
+  FAKE_SUMS_EXIT=$ex run_installer --codex --yes
+  expect_fail_with "curl exit $ex"
+  expect_log "--ref main"
+  if grep -F "codeload.github.com" "$FIX/requests.log" >/dev/null; then fail "case 8 (exit $ex): must not fall back"; fi
+done
+# 404 explicitly with a published release asset set still falls back with WARN.
+new_case "$SNAP"
+FAKE_SUMS_STATUS=404 run_installer --codex --yes
+expect_ok
+expect_log "No published release found"
+# Empty 200 body is a hard failure.
+new_case "$GOOD"
+: >"$FIX/SHA256SUMS"
+run_installer --codex --yes
+expect_fail_with "empty body"
+printf 'PASS: only HTTP 404 falls back\n'
+
+# 9. Checksum parsing variants.
+HASH=$(awk '{print $1}' "$GOOD/SHA256SUMS")
+sums_case() { # <content> <expect: ok|msg>
+  new_case "$GOOD"
+  printf '%b' "$1" >"$FIX/SHA256SUMS"
+  run_installer --codex --yes
+  if [[ $2 == ok ]]; then expect_ok; expect_installed; else expect_fail_with "$2"; fi
+}
+UP=$(printf '%s' "$HASH" | tr 'a-f' 'A-F')
+sums_case "$HASH  lzr1-skills.tar.gz\r\n" ok
+sums_case "$HASH  ./lzr1-skills.tar.gz\n" ok
+sums_case "$HASH *lzr1-skills.tar.gz\n" ok
+sums_case "$UP  lzr1-skills.tar.gz\n" ok
+sums_case "${HASH#?}  lzr1-skills.tar.gz\n" "not a valid SHA-256"
+sums_case "${HASH%?}g  lzr1-skills.tar.gz\n" "not a valid SHA-256"
+sums_case "$HASH  lzr1-skills.tar.gz\n$HASH  ./lzr1-skills.tar.gz\n" "multiple entries"
+printf 'PASS: checksum parsing\n'
+
+# 10. Snapshot with a symlink member is refused before extraction.
+new_case "$SNAP"
+SYM=$WORK/symsnap
+rm -rf "$SYM"; mkdir -p "$SYM"
+tar -xzf "$SNAP/codeload.tar.gz" -C "$SYM"
+ln -s /etc/passwd "$SYM/lzr1-skills-main/evil-link"
+(cd "$SYM" && tar -czf "$FIX/codeload.tar.gz" lzr1-skills-main)
+run_installer --ref main --codex --yes
+expect_fail_with "non-regular member"
+printf 'PASS: symlink snapshot refused\n'
+
+# 11. --ref ignored warning for LZR1_SOURCE_DIR.
+new_case "$GOOD"
+set +e
+LZR1_SOURCE_DIR="$ROOT" HOME="$HOME_DIR" bash "$INSTALLER" --ref v1.0.0 --codex --yes --dry-run >"$LOG" 2>&1
+RC=$?
+set -e
+expect_ok
+expect_log "Ignoring --ref"
+printf 'PASS: ignored ref warns\n'
 
 printf 'All installer download tests passed\n'
