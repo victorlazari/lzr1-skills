@@ -217,7 +217,7 @@ Edge cases reachable: a skill dir without SKILL.md (report `fm-missing`, skip ot
 ### Epic 3.1: Static analysis gate for all scripts
 
 **Goal:** `shellcheck` (sh) and `python3 -m py_compile` plus a pinned linter (ruff) (py) pass on all 55 shell and 31 Python scripts, blocking in CI.
-**Scope:** `skills/*/scripts/`, `.github/workflows/ci.yml`
+**Scope:** `skills/*/scripts/`, `.github/workflows/ci.yml`; macOS portability of `coderabbit-reviewer` scripts and installer tests (`sha256sum` with `shasum -a 256` fallback, replace `realpath -e`) so the installer suites can return to the macOS CI leg
 **Dependencies:** Phase 1 (CI exists)
 **Done when:** the informational shellcheck step from Task 1.2.1 is made blocking and green
 **Status:** Pending
@@ -260,3 +260,9 @@ Edge cases reachable: a skill dir without SKILL.md (report `fm-missing`, skip ot
 - **Ordering hazard:** Task 1.1.2's real-repo assertion fails until Epic 1.3 lands. Execute 1.1.1, then 1.3.1 and 1.3.2, then 1.1.2, then Epic 1.2.
 - **Phase boundaries:** each phase leaves the repo installable and green.
 - **Known limitation:** the audit verified structure, metadata, links, scripts and stale-keyword scans, not the technical accuracy of every reference file. The README's "Pattern A/B/C" parallel-agent claims were not machine-verified; Epic 2.3 should add a check that skills claiming a protocol actually contain it.
+
+---
+
+## Deviations
+
+- **Task 1.2.1 CI matrix (decided in fix pass):** the pre-existing `skills/coderabbit-reviewer` scripts and the installer tests use `sha256sum` and `realpath -e`, which are absent on stock macOS, so `tests/test-installer.sh` and `tests/test-adversarial-remediations.sh` fail on the macOS leg. Decision: the hardened coderabbit scripts are not modified in Phase 1. The macOS leg runs only the portable checks (`python3 -I scripts/lint_catalog.py`, `bash tests/test-catalog.sh`); the installer and remediation suites run on ubuntu only; the shellcheck job is kept. The portability work (`sha256sum` to `shasum -a 256` fallback, `realpath -e` replacement) is an explicit item in Epic 3.1 scope.
