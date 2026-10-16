@@ -19,14 +19,14 @@ This skill is the master knowledge base for prompt engineering, context engineer
 
 | If the task involves... | Read this reference |
 | :--- | :--- |
-| Tuning **Claude** or **OpenAI** models (model selection, pricing, request shapes) | Route to `builtin-llm-models` skill |
+| Tuning **Claude** or **OpenAI** models (model selection, pricing, request shapes) | Route to the `claude` or `openai` skill |
 | Choosing or designing a **prompting technique** (zero/few-shot, CoT, ToT, GoT, ReAct, self-consistency, auto-optimization) | [references/prompting_techniques.md](references/prompting_techniques.md) |
 | Building or improving a **RAG / GraphRAG / Agentic RAG** pipeline, chunking, retrieval, or evaluation | [references/rag_engineering.md](references/rag_engineering.md) |
 | **Reducing context/bootstrap size**, prompt compression, context rot, or prompt caching | [references/context_reduction.md](references/context_reduction.md) |
 
 ## Core Operating Principles
 
-1. **Match the model to the task.** Use the `builtin-llm-models` skill to select the right tier (speed vs. intelligence) and configure parameters before writing the prompt.
+1. **Match the model to the task.** Use the `claude` or `openai` skill to select the right tier (speed vs. intelligence) and configure parameters before writing the prompt.
 2. **Structure before content.** Place static elements (system instructions, tools, canonical examples) first to maximize prompt caching; place dynamic data (query, history) last. See [references/context_reduction.md](references/context_reduction.md).
 3. **Engineer context, not just prompts.** Counter context rot with progressive disclosure and Just-In-Time loading rather than pre-loading large files.
 4. **Compress relentlessly.** Replace verbose instructions with dense heuristics; frontier models generalize well from them. State each rule exactly once.

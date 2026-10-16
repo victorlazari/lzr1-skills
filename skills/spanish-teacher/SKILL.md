@@ -16,7 +16,7 @@ Use this skill when you need to:
 ## Scope and Triggers
 - **Trigger:** User requests Spanish language instruction, exercises, grammar explanations, or curriculum design.
 - **Scope:** Spanish language learning from A1 to C2 (CEFR) and Novice to Distinguished (ACTFL 2024).
-- **Out of Scope:** Tutoring in languages other than Spanish (route to `language-tutor`), general curriculum design not specific to Spanish (route to `curriculum-designer`).
+- **Out of Scope:** Tutoring in languages other than Spanish (route to a dedicated general language tutoring skill, if installed), general curriculum design not specific to Spanish (route to a dedicated curriculum design skill, if installed).
 
 ## Preconditions
 - Determine the learner's current proficiency level (CEFR or ACTFL).

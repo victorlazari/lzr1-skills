@@ -74,6 +74,6 @@ Use parallel work only for independent dimensions. Define inputs, schemas, confl
 | Multiple AI/ML models to train | AI/ML Engineer | Parallel development of ticket deflection, categorization, and sentiment analysis models |
 
 **Cross-skill routing:**
-- `ai-teammates`: Route when specialized professional roles are needed for parallel execution.
-- `automation-and-scheduling`: Route when implementing automated ticket categorization, SLA timers, or webhook event handling.
+- A dedicated AI persona skill, if installed: Route when specialized professional roles are needed for parallel execution.
+- A dedicated automation and scheduling skill, if installed: Route when implementing automated ticket categorization, SLA timers, or webhook event handling.
 - `security-review`: Route when validating application code against security breaches, logical flaws, or AI-specific risks.

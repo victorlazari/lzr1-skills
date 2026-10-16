@@ -7,7 +7,7 @@ description: Execute automated accessibility testing with Axe-core and Playwrigh
 
 ## Scope and Triggers
 Use this skill to perform automated accessibility testing using `@axe-core/playwright`, manage known accessibility issues via snapshot tracking, and validate complex UI patterns (focus management, dynamic trees, color contrast).
-**Do not use** for general end-to-end testing (use `playwright-testing`) or deep manual WCAG audits (use `wcag-auditor`).
+**Do not use** for general end-to-end testing (use `playwright`) or deep manual WCAG audits (use a dedicated manual WCAG audit skill, if installed).
 
 ## Preconditions
 - Target application must be accessible via URL or local server.

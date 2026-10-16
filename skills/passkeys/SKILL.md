@@ -17,7 +17,7 @@ Use this skill when tasks involve:
 
 **Cross-Skill Routes:**
 - `security-review` — Route when performing a comprehensive security audit of an application's authentication flow.
-- `identity-management` — Route when integrating passkeys with broader Identity and Access Management (IAM) or SSO solutions.
+- A dedicated identity and access management skill, if installed — Route when integrating passkeys with broader Identity and Access Management (IAM) or SSO solutions.
 
 ## Preconditions
 

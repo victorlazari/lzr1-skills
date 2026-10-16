@@ -16,7 +16,7 @@ This skill handles advanced incident response, alerting, and on-call management 
 - Creating automation rules for auto-assigning and auto-closing tickets.
 
 **Escalation Boundaries:**
-- For general automation, recurring execution, or external API integrations outside of JSM-specific workflows, route to `automation-and-scheduling`.
+- For general automation, recurring execution, or external API integrations outside of JSM-specific workflows, route to a dedicated automation and scheduling skill, if installed.
 
 ## Preconditions
 

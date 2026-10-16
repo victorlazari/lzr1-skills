@@ -11,7 +11,7 @@ This skill enables Manus to design, architect, and build premium landing pages i
 ## Scope and Triggers
 
 - **Activates when:** The user requests a premium landing page, a cinematic scrollytelling experience, or a high-performance web presentation.
-- **Non-goals:** This skill does not build slide decks or presentations (route to `frontend-slides`). It does not generate new visual assets or edit existing images (route to `imagegen`).
+- **Non-goals:** This skill does not build slide decks or presentations (route to a dedicated slide deck skill, if installed). It does not generate new visual assets or edit existing images (route to a dedicated image generation skill, if installed).
 
 ## Preconditions
 

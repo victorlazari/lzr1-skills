@@ -11,7 +11,7 @@ Expert-level content and communications covering content strategy, technical wri
 
 - **Scope**: Creating content strategies, writing technical documentation, crafting marketing copy, managing corporate communications, and building developer relations programs.
 - **Triggers**: Activates when the user requests content planning, technical guides, marketing messaging, PR announcements, or developer advocacy materials.
-- **Non-goals**: Does not execute social media campaigns (route to `social-media-manager`), perform deep SEO audits (route to `seo-optimization`), or conduct comprehensive WCAG compliance checking (route to `accessibility-audit`).
+- **Non-goals**: Does not execute social media campaigns (route to `marketing`), perform deep SEO audits (route to `marketing`), or conduct comprehensive WCAG compliance checking (route to `accessibility-testing`).
 
 ## Preconditions
 

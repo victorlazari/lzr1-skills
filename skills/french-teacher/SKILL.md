@@ -16,8 +16,8 @@ This skill provides an operational workflow for generating, assessing, and valid
 - Analyzing French texts using CLI tools or NLP libraries.
 
 **Do NOT use this skill for:**
-- Deep linguistic analysis or corpus linguistics beyond standard CEFR assessment (route to `text-analyzer`).
-- Generating generic language exercises not tied to a specific CEFR progression (route to `exercise-generator`).
+- Deep linguistic analysis or corpus linguistics beyond standard CEFR assessment (route to a dedicated text analysis skill, if installed).
+- Generating generic language exercises not tied to a specific CEFR progression (route to a dedicated exercise generation skill, if installed).
 
 ## Preconditions
 

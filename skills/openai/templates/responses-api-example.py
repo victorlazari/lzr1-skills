@@ -13,6 +13,9 @@ import os
 import json
 import sys
 
+# Pick from the provider's current model list; do not hard-code a stale id.
+MODEL = os.environ.get("OPENAI_MODEL", "<set-a-current-model-id>")
+
 # Ensure OPENAI_API_KEY is set
 if "OPENAI_API_KEY" not in os.environ:
     print("Error: OPENAI_API_KEY environment variable not set.", file=sys.stderr)
@@ -77,7 +80,7 @@ def main():
 
     print("Initiating Responses API call...")
     response = mock_responses_create(
-        model="gpt-5.6",
+        model=MODEL,
         messages=messages,
         tools=tools
     )

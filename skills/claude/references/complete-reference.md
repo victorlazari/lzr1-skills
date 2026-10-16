@@ -27,7 +27,6 @@ This document consolidates and enhances the comprehensive knowledge required to 
 Anthropic offers a family of Claude models, each optimized for different use cases:
 
 - **Claude Fable 5.1 (`claude-fable-5-1`):** One of Anthropic's most capable models, designed for complex reasoning and creative tasks.
-- **Claude Mythos 5:** Restricted availability; confirm the id in Anthropic's model docs. No id is listed here.
 - **Claude Opus 5.5 (`claude-opus-5-5`):** A powerful model for a wide range of tasks, balancing performance and capability.
 - **Claude Sonnet 5.5 (`claude-sonnet-5-5`):** Balanced speed and capability for general production workloads.
 - **Claude Haiku 5.5 (`claude-haiku-5-5`):** Fastest and smallest tier, ideal for high-throughput, low-latency applications.

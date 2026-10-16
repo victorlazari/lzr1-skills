@@ -18,10 +18,10 @@ Use this skill when you need to:
 - Troubleshoot worst-case scenarios like goroutine leaks, deadlocks, and OOM kills.
 
 **Escalation Boundaries:**
-- For infrastructure-level debugging (e.g., Kubernetes pod crash-looping), route to `terraform-kubernetes-ops`.
-- For observability alerts (e.g., "High Memory Usage"), route to `prometheus-grafana-alerts`.
-- For deep security audits, route to `security-auditing-tools`.
-- For database performance tuning outside migrations, route to `postgresql-dba-guide`.
+- For infrastructure-level debugging (e.g., Kubernetes pod crash-looping), route to `devops`.
+- For observability alerts (e.g., "High Memory Usage"), route to `devops`.
+- For deep security audits, route to `security-review`.
+- For database performance tuning outside migrations, route to `database`.
 
 ## Preconditions
 

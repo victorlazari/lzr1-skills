@@ -70,8 +70,8 @@ Based on the chosen output format, route to the appropriate skill:
 3.  Ensure the generated HTML strictly follows the visual principles in `references/specifications.md`.
 
 **If PDF:**
-1.  Route to `typst-pdf-maker` with the generated content.
-2.  Instruct `typst-pdf-maker` to adhere to the visual principles in `references/specifications.md`.
+1.  Route to a dedicated Typst PDF generation skill, if installed with the generated content.
+2.  Instruct that skill to adhere to the visual principles in `references/specifications.md`.
 
 ### 5. Validation
 

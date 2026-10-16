@@ -15,8 +15,8 @@ Use this skill when you need to architect, scale, secure, or troubleshoot comple
 - Handling complex file management, including S3 multipart uploads with CRC-64/NVME checksums.
 
 **Cross-Skill Routing:**
-- Route to `automation-and-scheduling` when the task involves automated execution, recurring execution, or background execution.
-- Route to `persistent-computing` when the task requires persistent services, Docker, fixed IP, or heavy compute.
+- Route to a dedicated automation and scheduling skill, if installed when the task involves automated execution, recurring execution, or background execution.
+- Route to a dedicated persistent-hosting and heavy-compute skill, if installed when the task requires persistent services, Docker, fixed IP, or heavy compute.
 
 ## Preconditions
 

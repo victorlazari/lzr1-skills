@@ -10,7 +10,7 @@ Expert-level supply chain management covering procurement, vendor management, su
 ## Scope and Triggers
 
 - **Triggers:** Managing vendor relationships and contracts, optimizing procurement processes, analyzing supply chain data and costs, managing inventory and demand planning, developing sourcing strategies, evaluating and selecting suppliers, risk management in supply chain, cost optimization and negotiation.
-- **Non-goals:** Deep financial modeling, valuation, or investment research (route to `finance-pro-playbooks`). Formal legal review or compliance assessment for contract negotiation (route to `legal-review`).
+- **Non-goals:** Deep financial modeling, valuation, or investment research (route to `finance`). Formal legal review or compliance assessment for contract negotiation (route to `legal-compliance`).
 
 ## Preconditions
 

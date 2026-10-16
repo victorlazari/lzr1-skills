@@ -13,9 +13,9 @@ Use this skill when you need to:
 - Validate Lua script syntax.
 
 **Escalation Boundaries:**
-- For Redis cluster management or non-Lua Redis operations, route to `redis-admin`.
-- For primary C/C++ application development rather than Lua embedding, route to `c-cpp-developer`.
-- For building a complete browser game rather than specific Lua game logic, route to `game-dev`.
+- For Redis cluster management or non-Lua Redis operations, route to `redis-valkey`.
+- For primary C/C++ application development rather than Lua embedding, route to a dedicated C/C++ development skill, if installed.
+- For building a complete browser game rather than specific Lua game logic, route to a dedicated game development skill, if installed.
 
 ## Preconditions
 - Identify the target environment (standalone, embedded, Redis, game engine).

@@ -18,7 +18,7 @@ Use this skill when you need to:
 - Set up continuous data ingestion pipelines or automated updates.
 
 **Cross-Skill Routing:**
-- `automation-and-scheduling`: Route when the task requires setting up continuous data ingestion pipelines or automated updates.
+- A dedicated automation and scheduling skill, if installed: Route when the task requires setting up continuous data ingestion pipelines or automated updates.
 - `security-review`: Route when the task requires a deep security audit of the RAG system, beyond basic access control and prompt injection mitigation.
 
 ## Preconditions

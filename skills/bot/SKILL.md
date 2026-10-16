@@ -19,7 +19,7 @@ Use this skill when tasked with designing, developing, deploying, or auditing ad
 
 **Escalation Boundaries:**
 - For comprehensive code or application security audits beyond bot configuration, route to `security-review`.
-- For setting up general automated workflows not specific to OpenClaw/NemoClaw bots, route to `automation-and-scheduling`.
+- For setting up general automated workflows not specific to OpenClaw/NemoClaw bots, route to a dedicated automation and scheduling skill, if installed.
 
 ## Preconditions
 

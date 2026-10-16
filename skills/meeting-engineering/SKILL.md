@@ -10,7 +10,7 @@ Build high-performance virtual assistants that join Google Meet as live particip
 
 ## Scope and Triggers
 Use this skill when building, debugging, or deploying a Google Meet virtual assistant that requires real-time voice participation, Playwright automation, PulseAudio routing, or low-latency STT/LLM/TTS pipelines.
-Do not use for general Playwright automation outside of Google Meet (route to `playwright-automation`) or general calendar/task scheduling (route to `automation-and-scheduling`).
+Do not use for general Playwright automation outside of Google Meet (route to `playwright`) or general calendar/task scheduling (route to a dedicated automation and scheduling skill, if installed).
 
 ## Preconditions
 - Target environment must support Xvfb and PulseAudio.

@@ -126,6 +126,6 @@ The synthesis step actively resolves rather than aggregates:
 
 ## Cross-Skill Routing
 
-- `finance-pro-playbooks` — route when task involves financial data modeling or reporting
+- `finance` — route when task involves financial data modeling or reporting
 - `security-review` — route when task involves database security, access control, or auditing
-- `automation-and-scheduling` — route when task involves automated partition management or scheduled maintenance
+- `cron-master` — route when task involves automated partition management or scheduled maintenance

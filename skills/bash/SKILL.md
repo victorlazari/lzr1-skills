@@ -15,8 +15,8 @@ Use this skill when you need to:
 - Handle file descriptors, redirections, and process substitutions efficiently.
 
 **Non-goals:**
-- Do not use this skill for tasks requiring long-running services, Docker, or heavy compute (route to `persistent-computing`).
-- Do not use this skill for recurring execution, background execution, or event-triggered execution (route to `automation-and-scheduling`).
+- Do not use this skill for tasks requiring long-running services, Docker, or heavy compute (route to a dedicated persistent-hosting and heavy-compute skill, if installed).
+- Do not use this skill for recurring execution, background execution, or event-triggered execution (route to `cron-master`).
 
 ## Preconditions
 

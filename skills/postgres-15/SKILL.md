@@ -18,7 +18,7 @@ Use this skill when dealing with PostgreSQL 15+ in production environments, spec
 - Conducting comprehensive security audits, managing Role-Based Access Control (RBAC), Row-Level Security (RLS), and configuring `pgaudit`.
 
 **Escalation Boundaries:**
-- Route to `automation-and-scheduling` when the user needs to set up recurring maintenance tasks like `pg_partman` partition creation or `pg_repack` runs.
+- Route to `cron-master` when the user needs to set up recurring maintenance tasks like `pg_partman` partition creation or `pg_repack` runs.
 - Route to `security-review` when the user needs a comprehensive security audit of the application code interacting with the database, beyond just the database configuration.
 
 ## Preconditions

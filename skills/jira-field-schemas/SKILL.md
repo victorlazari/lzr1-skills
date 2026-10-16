@@ -15,8 +15,8 @@ description: Manage, audit, and optimize Jira unified Field Schemes, Field Conte
 - Automating field schema management via the Jira REST API (Field Scheme Model APIs).
 
 **Do NOT use this skill for:**
-- Querying issues based on field values (use `jira-jql-search`).
-- Automating issue transitions or updates based on field changes (use `jira-automation`).
+- Querying issues based on field values (use a dedicated Jira JQL search skill, if installed).
+- Automating issue transitions or updates based on field changes (use a dedicated Jira automation skill, if installed).
 
 ## Preconditions
 

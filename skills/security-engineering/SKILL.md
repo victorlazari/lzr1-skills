@@ -19,7 +19,7 @@ Expert-level cybersecurity covering the full security spectrum: application secu
 **Escalation Boundaries:**
 - For exhaustive, line-by-line code security audits, secret scanning, or IaC checks, route to `security-review`.
 - For customer-facing incident reports and post-mortems, route to `tech-support-ops`.
-- For adopting a specific security persona (e.g., penetration-tester) for a broader workflow, route to `ai-teammates`.
+- For adopting a specific security persona (e.g., penetration-tester) for a broader workflow, route to a dedicated AI persona skill, if installed.
 
 ## Preconditions
 

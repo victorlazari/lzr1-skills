@@ -17,8 +17,8 @@ This skill provides comprehensive expertise in managing, troubleshooting, and op
 - Perform security audits on RabbitMQ clusters (TLS, RBAC).
 
 **Do NOT use this skill for:**
-- Building new event-driven applications or background workers (route to `automation-and-scheduling`).
-- Deploying a new RabbitMQ instance via Docker or systemd (route to `persistent-computing`).
+- Building new event-driven applications or background workers (route to a dedicated automation and scheduling skill, if installed).
+- Deploying a new RabbitMQ instance via Docker or systemd (route to a dedicated persistent-hosting and heavy-compute skill, if installed).
 - Managing legacy Classic Mirrored Queues or Classic Queue version 1 (CQv1).
 
 ## Preconditions and Source Freshness

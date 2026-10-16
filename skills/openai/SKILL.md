@@ -46,7 +46,7 @@ Use this skill when you need to:
 ## Validation
 
 - **Syntax Checks**: Run safe local syntax checks on generated code (`bash -n`, Python compilation, JSON/YAML parsing).
-- **API Checks**: Verify no usage of `client.beta.assistants` in any code or documentation. Ensure all tool calling examples use the `client.responses.create` endpoint. Validate that `strict: true` is included in function schemas where appropriate. Check that model names in examples reflect current versions (e.g., `gpt-5.6`).
+- **API Checks**: Verify no usage of `client.beta.assistants` in any code or documentation. Ensure all tool calling examples use the `client.responses.create` endpoint. Validate that `strict: true` is included in function schemas where appropriate. Check that model names in examples reflect a current model from the provider's model list, not a pinned legacy id, ideally read from configuration.
 
 ## Failure Handling
 

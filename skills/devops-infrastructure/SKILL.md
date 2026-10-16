@@ -119,8 +119,8 @@ After all agents report, run one **Synthesis Agent** with all reports that:
 
 - `security-review`: Route when deep security validation, vulnerability scanning, or compliance auditing is required.
 - `trivy-scanner`: Route when container image scanning or SBOM generation is needed.
-- `automation-and-scheduling`: Route when setting up recurring tasks, background jobs, or external API integrations.
-- `persistent-computing`: Route when deploying stateful services, game servers, or heavy compute workloads.
+- A dedicated automation and scheduling skill, if installed: Route when setting up recurring tasks, background jobs, or external API integrations.
+- A dedicated persistent-hosting and heavy-compute skill, if installed: Route when deploying stateful services, game servers, or heavy compute workloads.
 
 ## Authoritative sources
 

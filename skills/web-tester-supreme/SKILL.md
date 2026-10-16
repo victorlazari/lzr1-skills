@@ -15,8 +15,8 @@ Use this skill when you need to perform advanced, enterprise-grade web applicati
 - Integrating observability (OpenTelemetry, structured logging) into the testing pipeline.
 
 **Escalation Boundaries:**
-- Route to `playwright-automation` when the task is solely to write or run basic Playwright scripts without Next.js, RBAC, or observability complexities.
-- Route to `nextjs-developer` when the task is to build or debug Next.js application code rather than test it.
+- Route to `playwright` when the task is solely to write or run basic Playwright scripts without Next.js, RBAC, or observability complexities.
+- Route to `frontend` when the task is to build or debug Next.js application code rather than test it.
 - Route to `security-review` when the task requires deep security auditing beyond basic client-side checks.
 
 ## Preconditions

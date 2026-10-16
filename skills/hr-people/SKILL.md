@@ -11,7 +11,7 @@ Expert-level HR covering talent acquisition, people operations, organizational d
 
 - **Scope**: Designing hiring processes, building organizational structures, creating compensation and equity programs, developing culture programs, managing performance reviews, HR compliance, and people analytics.
 - **Triggers**: Use when the task involves HR policies, job descriptions, compensation bands, org design, or people operations.
-- **Non-goals**: Does not handle code review, IDE extensions, or AST analysis (route to `coderabbit-reviewer`). Does not handle financial modeling, equity valuation, or company financial analysis beyond basic compensation (route to `finance-pro-playbooks`).
+- **Non-goals**: Does not handle code review, IDE extensions, or AST analysis (route to `coderabbit-reviewer`). Does not handle financial modeling, equity valuation, or company financial analysis beyond basic compensation (route to `finance`).
 
 ## Preconditions
 
