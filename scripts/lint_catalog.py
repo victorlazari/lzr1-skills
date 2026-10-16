@@ -144,7 +144,12 @@ def main():
             ("README.md", r"skills-(\d+)-", "badge skills-N-"),
             ("README.md", r"(\d+) curated AI skills", "'N curated AI skills'"),
         ]
+        derived_pat = re.compile(r'^\s*EXPECTED=\$\(\s*wc\s+-l\s*<\s*"\$ROOT/skills-list\.txt"')
         for rel, pat, label in checks:
+            if rel == "tests/test-installer.sh":
+                tp = os.path.join(root, rel)
+                if os.path.isfile(tp) and any(derived_pat.match(l) for l in read(tp).splitlines()):
+                    continue  # derived from skills-list.txt, nothing to compare
             v = first_int(os.path.join(root, rel), pat)
             if v is None:
                 add("ERROR", "-", "count-sync", "%s: pattern for %s not found" % (rel, label))
