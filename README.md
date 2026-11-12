@@ -539,6 +539,10 @@ More: [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [CHANG
 
 ---
 
+## Companion configs
+
+`configs/claude-session-status/` holds a personal Claude Code hook that makes every turn end with an English status block (progress bar, percentage, "With me" / "With you" lists). It is not a skill, so the installer does not copy it. Install with `bash configs/claude-session-status/install.sh` (needs `python3` and `jq`) and see its README.
+
 ## Scope
 
 This public, MIT-licensed repository does not add Lerian-specific skills; those belong in the ring plugin, and non-public Lerian material must not be submitted here. The existing `lerian-helm` skill was audited with a keyword and pattern search, which found no credentials, internal hostnames, account ids, or personal or customer names; whether the chart conventions it describes are public is the repository owner's confirmation, tracked as an open item in the decision record. See [docs/decisions/0001-lerian-skill-scope.md](docs/decisions/0001-lerian-skill-scope.md).
