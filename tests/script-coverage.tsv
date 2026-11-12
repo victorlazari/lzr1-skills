@@ -62,6 +62,7 @@ skills/security-engineering/scripts/verify-owasp.sh	static	no --help branch; fet
 skills/security-review/scripts/inventory.py	help		
 skills/security-review/scripts/self_check.py	behavior		tests/test-installer.sh
 skills/security-review/scripts/validate_report.py	help		
+skills/session-slack-status/scripts/session-hook.py	help		
 skills/slack/scripts/validate-block-kit.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
 skills/spanish-teacher/scripts/validate-curriculum.py	behavior		tests/test-adversarial-remediations.sh
 skills/speedtest/scripts/verify-ooklaserver.sh	help		
