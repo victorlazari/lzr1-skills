@@ -65,12 +65,14 @@ sales
 seaweedfs
 security-engineering
 security-review
+session-slack-status
 slack
 software-engineering
 spanish-teacher
 speedtest
 sql-partitioning
 supply-chain
+sync-slack-session
 tech-support-ops
 ticket-reports
 ticket-supreme
