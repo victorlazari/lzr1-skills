@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `configs/claude-session-status/`: end-of-turn status block hook for Claude Code with an idempotent installer (outside the skill catalog).
+
 ## [2.1.0] - 2026-10-16
 
 ### Added
