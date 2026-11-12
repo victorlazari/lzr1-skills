@@ -40,11 +40,11 @@ def read_json(path):
         return None
 
 
-def write_json(path, data):
+def write_json(path, data, indent=None):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp%d" % os.getpid()
     with open(tmp, "w") as f:
-        json.dump(data, f, ensure_ascii=False)
+        json.dump(data, f, ensure_ascii=False, indent=indent)
     os.replace(tmp, path)
 
 
@@ -195,7 +195,7 @@ def cmd_install(a):
     h = d.setdefault("hooks", {})
     h.setdefault("SessionStart", []).append({"matcher": "startup|resume|clear|compact", "hooks": [{"type": "command", "command": cmd}]})
     h.setdefault("UserPromptSubmit", []).append({"hooks": [{"type": "command", "command": cmd}]})
-    write_json(sp, d)
+    write_json(sp, d, indent=2)
     cp = os.path.join(HOME, "CLAUDE.md")
     txt = open(cp).read() if os.path.exists(cp) else ""
     if BEGIN in txt and END in txt:
@@ -214,7 +214,7 @@ def cmd_uninstall():
     d = load_settings(sp)
     strip_hooks(d)
     if os.path.exists(sp):
-        write_json(sp, d)
+        write_json(sp, d, indent=2)
     cp = os.path.join(HOME, "CLAUDE.md")
     if os.path.exists(cp):
         t = open(cp).read()
