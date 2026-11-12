@@ -36,7 +36,8 @@ contract. Read its docstring and rules before opening a PR.
    - the `skills-N-` badge in `README.md`
    - the "N curated AI skills" sentence in `README.md`
    - `EXPECTED` in `tests/test-installer.sh`, only if it is a literal; when it
-     is derived from `skills-list.txt` it needs no edit.
+     is derived from `skills-list.txt` it needs no edit. The `N/N managed skills`
+     doctor assertions in that file are literals and always need the new count.
    - one table row `| \`<name>\` | ... |` in the README "The Arsenal" section
      (`readme-skills` fails if a skill is missing, listed twice, or listed
      without existing).

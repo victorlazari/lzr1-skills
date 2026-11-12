@@ -1,17 +1,17 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=lzr1-skills&fontSize=42&fontColor=fff&animation=twinkling&fontAlignY=32&desc=86%20AI%20Skills%20%C2%B7%20Parallel%20Agent%20Edition&descAlignY=55&descSize=18" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=180&section=header&text=lzr1-skills&fontSize=42&fontColor=fff&animation=twinkling&fontAlignY=32&desc=88%20AI%20Skills%20%C2%B7%20Parallel%20Agent%20Edition&descAlignY=55&descSize=18" width="100%"/>
 
 <div align="center">
 
 [![Stars](https://img.shields.io/github/stars/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills)
 [![License](https://img.shields.io/badge/license-MIT-06b6d4?style=flat-square&labelColor=1a1a2e)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-86-ec4899?style=flat-square&labelColor=1a1a2e)](skills/)
+[![Skills](https://img.shields.io/badge/skills-88-ec4899?style=flat-square&labelColor=1a1a2e)](skills/)
 [![CI](https://github.com/victorlazari/lzr1-skills/actions/workflows/ci.yml/badge.svg)](https://github.com/victorlazari/lzr1-skills/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/victorlazari/lzr1-skills?style=flat-square&color=a855f7&labelColor=1a1a2e)](https://github.com/victorlazari/lzr1-skills/releases/latest)
 [![macOS](https://img.shields.io/badge/macOS-✓-a855f7?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Linux](https://img.shields.io/badge/Linux-✓-06b6d4?style=flat-square&labelColor=1a1a2e)](install.sh)
 [![Made with Bash](https://img.shields.io/badge/made%20with-bash-ec4899?style=flat-square&labelColor=1a1a2e&logo=gnubash&logoColor=white)](install.sh)
 
-**86 curated AI skills. One installer. Nine tools. Complete packages, not entrypoints alone.**
+**88 curated AI skills. One installer. Nine tools. Complete packages, not entrypoints alone.**
 
 *Stop configuring. Start shipping — in formation.*
 
@@ -27,7 +27,7 @@ curl -fsSL https://raw.githubusercontent.com/victorlazari/lzr1-skills/main/insta
 
 - [What are Skills?](#what-are-skills)
 - [Parallel Agent Architecture](#parallel-agent-architecture) — three multi-agent patterns, counted from the skills
-- [The Arsenal](#the-arsenal) — 86 skills, organized by domain
+- [The Arsenal](#the-arsenal) — 88 skills, organized by domain
 - [Choosing between overlapping skills](#choosing-between-overlapping-skills)
 - [The Armory](#the-armory) — 9 supported tools
 - [Equip Up](#equip-up) — 3 ways to install
@@ -264,6 +264,8 @@ conflict-resolving-synthesis: 15
 | `gcalendar` | Google Calendar via MCP tools: bulk validation, duplicate removal, timezone conversion, scheduling | Calendar cleanup |
 | `google-workspace-bot-integration` | Bot commands and workflows across Gmail, Calendar, Sheets, Slides, Docs, Drive, Forms, Contacts, Tasks, Chat and Events | Workspace bots |
 | `slack` | Slack apps with Bolt or Deno, Block Kit messages, events, slash commands, OAuth, Web API and CLI | Slack apps |
+| `session-slack-status` | One Slack main message per Claude Code session (startup, /clear, /new), a thread update after every interaction, generated html/csv/xml/json/curl included; channel asked, never hardcoded; hooks and installer | Session logging in Slack |
+| `sync-slack-session` | `/sync-slack-session`: backfills the Slack message of a session already in progress without duplicating it | Late Slack sync |
 | `vonage-voice` | Vonage Voice API: outbound calls, NCCO actions, IVR, DTMF/ASR input, answer and event webhooks, REST call control | Programmable voice |
 | `voip-oncall` | VoIP on-call services: IVR incident acknowledgment, WebRTC war rooms, voice alerting with Twilio or Vonage, SIP trunks, telecom compliance | Voice-based on-call |
 | `wikijs` | Wiki.js administration: Git sync, GraphQL content automation, enterprise deployments | Wiki administration |
@@ -460,7 +462,7 @@ bash install.sh [command] [target options] [behavior options]
 
 ## Update & Remove
 
-**Update** validates a fresh source snapshot and reinstalls all 86 complete packages to the targets recorded in `~/.lzr1-skills-state`. Explicit target flags update only those targets while preserving the other recorded selections.
+**Update** validates a fresh source snapshot and reinstalls all 88 complete packages to the targets recorded in `~/.lzr1-skills-state`. Explicit target flags update only those targets while preserving the other recorded selections.
 
 ```bash
 # Via curl (no clone needed)
@@ -493,7 +495,7 @@ The installer chooses its source mode and then applies the same fail-closed cata
 
 **Source modes** — `override` (`LZR1_SOURCE_DIR`), `local` (running from a clone), `release` (checksum-verified release archive) and `branch` (unverified snapshot of a ref).
 
-**Manifest validation** — the source is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 86 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. Unsafe archive paths and symbolic links are rejected. There is no hardcoded-list fallback.
+**Manifest validation** — the source is accepted only when `skills-list.txt` is bytewise sorted, contains exactly 88 unique safe names, and exactly matches `skills/*/SKILL.md`. Every complete package directory is copied, so bundled references, scripts, templates, tests, and fixtures remain available. Unsafe archive paths and symbolic links are rejected. There is no hardcoded-list fallback.
 
 **Checksum verification and fallback** — with no `--ref`, the installer downloads `SHA256SUMS` and `lzr1-skills.tar.gz` from the latest release and refuses to extract on a mismatch. Fallback to the unverified `main` snapshot requires two independent signals: the latest-release `SHA256SUMS` request returns HTTP 404 **and** a status-only request to `https://api.github.com/repos/victorlazari/lzr1-skills/releases/latest` also returns 404. GitHub answers 404 there when the repository has no published (non-draft, non-prerelease) release, so a draft-only or prerelease-only repository also qualifies; the fallback is skipped unless both signals report absence. If that API request returns 2xx, the install stops with "a release exists but SHA256SUMS is missing: refusing to install unverified; use --ref main to override"; any other status or a transport failure stops it too. Any other failure of the checksum request (timeout, DNS, TLS, 5xx, 403/429, other 4xx, or an empty body) also stops the install and names the status, and you may then re-run with `--ref main` to install the snapshot knowingly. Blocking or failing either request therefore cannot downgrade an install. An explicit `vX.Y.Z` tag never falls back: a missing release exits non-zero. Any other ref is an unverified snapshot, with a warning. A missing `sha256sum`/`shasum` tool is an error for verified modes. Downloads use `curl` with `--proto '=https' --tlsv1.2`, retries and timeouts; the `wget` path requires `--https-only` and TLS 1.2 (`--secure-protocol=TLSv1_2`) plus `--tries=3` and `--timeout=30`, and the installer refuses to download when `wget` lacks those options. Symbolic links in the source skills tree are rejected in every source mode (override, local, release and branch); the check runs on the extracted or supplied tree, and the installer also rejects symbolic-link and hardlink members before extracting an archive.
 

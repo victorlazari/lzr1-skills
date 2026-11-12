@@ -5,6 +5,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `session-slack-status` (rewritten) and `sync-slack-session`: per-session Slack main message and per-interaction thread updates in a user-configured channel (asked, not hardcoded), generated html/csv/xml/json/curl posted to the thread, atomic duplicate-safe session state, SessionStart/UserPromptSubmit hooks and an idempotent installer (`scripts/session-hook.py install`). Catalog is now 88 skills.
+
 ## [2.1.0] - 2026-10-16
 
 ### Added
