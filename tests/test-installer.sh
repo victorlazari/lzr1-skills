@@ -115,8 +115,8 @@ printf 'codex\ncursor\n' >"$WORK/expected-state"
 cmp -s "$WORK/expected-state" "$WORK/home/.lzr1-skills-state" || fail 'initial state does not list both installed targets'
 
 run_installer "$WORK/home" doctor >"$WORK/doctor.out"
-assert_contains "$WORK/doctor.out" 'Codex                86/86 managed skills'
-assert_contains "$WORK/doctor.out" 'Cursor               86/86 managed skills'
+assert_contains "$WORK/doctor.out" 'Codex                88/88 managed skills'
+assert_contains "$WORK/doctor.out" 'Cursor               88/88 managed skills'
 
 run_installer "$WORK/home" update --codex --yes >"$WORK/update.out"
 cmp -s "$WORK/expected-state" "$WORK/home/.lzr1-skills-state" || fail 'subset update discarded another installed target from state'
