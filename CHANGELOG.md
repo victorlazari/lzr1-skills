@@ -12,6 +12,8 @@ All notable changes to this project are documented here. The format follows
 - `animated-readme` skill: create, improve or re-render a README with GIFs rendered from HTML,
   a README audit script (`audit_readme.py`), the ideas, the process to apply and the improve loop.
   Apache-2.0 from the original kit; license and notice ship inside the skill folder.
+- `session-slack-status` (rewritten) and `sync-slack-session`: per-session Slack main message and per-interaction thread updates in a user-configured channel (asked, not hardcoded), generated html/csv/xml/json/curl posted to the thread, atomic duplicate-safe session state, SessionStart/UserPromptSubmit hooks and an idempotent installer (`scripts/session-hook.py install`). Catalog is now 89 skills with `animated-readme`.
+- `configs/claude-session-status/`: end-of-turn status block hook for Claude Code with an idempotent installer (outside the skill catalog).
 
 ## [2.1.0] - 2026-10-16
 

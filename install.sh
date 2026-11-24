@@ -8,7 +8,7 @@ umask 077
 REPO="victorlazari/lzr1-skills"
 BRANCH="main"
 VERSION="2.2.0"
-EXPECTED_SKILL_COUNT=87
+EXPECTED_SKILL_COUNT=89
 STATE_FILE="${HOME:-}/.lzr1-skills-state"
 LOCK_DIR="${HOME:-}/.lzr1-skills-lock"
 MANAGED_SOURCE="${REPO}"
