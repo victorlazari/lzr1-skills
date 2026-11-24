@@ -1,6 +1,7 @@
 accessibility-testing
 ai
 ai-ml-engineering
+animated-readme
 bash
 bot
 claude

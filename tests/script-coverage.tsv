@@ -1,6 +1,9 @@
 path	level	reason	test
 skills/accessibility-testing/scripts/validate-a11y.sh	help		
 skills/ai/scripts/validate-ai-config.py	help		
+skills/animated-readme/scripts/audit_readme.py	behavior		skills/animated-readme/tests/test_audit.py
+skills/animated-readme/scripts/record_html.py	static	records with headless Chromium via Playwright, an optional dependency, before any --help	
+skills/animated-readme/scripts/render.py	behavior		skills/animated-readme/tests/test_render.py
 skills/bash/scripts/validate-bash.sh	help		
 skills/bot/scripts/validate-bot-config.sh	static	no --help branch: the first argument is a file path, so --help exits 1 as a missing file	
 skills/coderabbit-reviewer/scripts/install-coderabbit.sh	behavior		skills/coderabbit-reviewer/tests/test_wrappers.sh

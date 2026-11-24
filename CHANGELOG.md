@@ -5,6 +5,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-24
+
+### Added
+
+- `animated-readme` skill: create, improve or re-render a README with GIFs rendered from HTML,
+  a README audit script (`audit_readme.py`), the ideas, the process to apply and the improve loop.
+  Apache-2.0 from the original kit; license and notice ship inside the skill folder.
+
 ## [2.1.0] - 2026-10-16
 
 ### Added
